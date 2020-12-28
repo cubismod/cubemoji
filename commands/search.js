@@ -1,6 +1,8 @@
 module.exports = {
     name: 'search',
     description: 'Search the database for emotes',
+    usage: '[search] <emote_name>',
+    aliases: ['sch', 's'],
     requiresCache: true,
     execute(message, args, client, cache) {
         results = cache.search(args[0]);

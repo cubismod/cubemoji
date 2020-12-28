@@ -1,6 +1,6 @@
 module.exports = {
     name: 'list',
-    description: 'List available emotes',
+    description: 'List available emotes, defaults to printing out all the emotes in well, emote',
     usage: '[list] (optional)[both|text]',
     requiresCache: true,
     cooldown: 30,

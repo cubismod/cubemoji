@@ -1,8 +1,10 @@
 module.exports = {
     name: 'emote',
     description: 'Inserts an emote',
-    requiresCache: false,
-    execute(message, args, client) {
+    usage: '[emote/emoji/e] <emote_name>',
+    aliases: ['emoji', 'e'],
+    requiresCache: true,
+    execute(message, args, client, cache) {
         if(args.length < 1) {
             message.reply('You must specify an emote name in the command!')
         }
@@ -15,7 +17,14 @@ module.exports = {
                 message.channel.send(res.toString());
             }
             else {
-                message.reply('emote not found!')
+                // retrieve a result from the cache
+                var res = cache.search(args[0]);
+                if(res.length > 1) {
+                    message.reply(`emote not found! Maybe try ${res[0]} - \`${res[0].name}\`?`);
+                }
+                else {
+                    message.reply('emote not found!')
+                }                
             }
         }
         

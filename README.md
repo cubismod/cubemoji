@@ -1,5 +1,5 @@
 # cubemoji
-A Discord emoji bot, written in Python!.
+A Discord emoji bot, written in Node JS!.
 ---
 ## Commands
 ### flush/f
@@ -8,8 +8,12 @@ Returns a random flushed emote.
 Lists all emojis available to the bot.
 ### blacklist/b <emote>
 Bot admin command to blacklist an emote from appearing.
-### ping/p
+### ping/pi
 Get current ping to bot server.
+### pingpong/pp
+A good sport!
+### pong/po
+Test bot pong
 ### help/h <command>
 List of help commands.
 ### pun/pn
@@ -26,6 +30,8 @@ Returns the emote according to the listed emote name.
 Searches emote database to see if an emote matching the name is found.
 ### about/a 
 Returns information about the bot.
+### flatfuck/f
+Is it flat fuck friday?!
 
 ## Resources
 - https://github.com/AnIdiotsGuide/discordjs-bot-guide/blob/master/coding-guides/using-emojis.md

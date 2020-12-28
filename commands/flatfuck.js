@@ -1,6 +1,8 @@
 module.exports = {
     name: 'flatfuck',
     description: 'Is it flat fuck friday?!',
+    usage: '[flatfuck/ff]',
+    aliases: ['ff'],
     requiresCache: false,
     execute(message) {
         var day = new Date();
