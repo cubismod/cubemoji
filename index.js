@@ -14,25 +14,25 @@ for (const file of commandFiles) {
 	// with the key as the command name and the value as the exported module
 	client.commands.set(command.name, command);
 }
-
-
-
 client.once('ready', () => {
     console.log('app running!');
 })
-
-
 client.login(config.token);
+
 client.on('message', message => {
-    if(!message.content.startsWith(config.prefix) || message.author.bot) return;
+    var msg = message.content.toLowerCase();
+    if(!msg.startsWith(config.prefix) || message.author.bot) return;
 
     const args = message.content.slice(config.prefix.length).trim().split(/ +/);
     const command = args.shift().toLowerCase();
 
-    if (!client.commands.has(command)) return;
+    if (!client.commands.has(command)) {
+        message.react('❔');
+        return;
+    }
 
     try {
-	    client.commands.get(command).execute(message, args);
+	    client.commands.get(command).execute(message, args, client);
     } catch (error) {
 	    console.error(error);
 	    message.reply('there was an error trying to execute that command!');

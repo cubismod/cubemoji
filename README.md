@@ -26,3 +26,6 @@ Returns the emote according to the listed emote name.
 Searches emote database to see if an emote matching the name is found.
 ### about/a 
 Returns information about the bot.
+
+## Resources
+- https://github.com/AnIdiotsGuide/discordjs-bot-guide/blob/master/coding-guides/using-emojis.md
