@@ -24,6 +24,7 @@
   "dependencies": {
     "discord.js": "^12.5.1",
     "eslint": "^7.16.0",
+    "js-search": "^2.0.0",
     "moment": "^2.29.1"
   }
 }

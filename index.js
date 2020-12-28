@@ -21,7 +21,7 @@ client.once('ready', () => {
 })
 client.login(config.token);
 
-var cache = new EmoteCache(client.emojis.cache);
+var cache = new EmoteCache(client);
 
 client.on('message', message => {
     const args = message.content.slice(config.prefix.length).trim().split(/ +/);
@@ -64,8 +64,7 @@ client.on('message', message => {
         // we only require the cached emote class on certain calls which is specified
         // in each module
         if(client.commands.get(command).requiresCache) {
-            var emoteArray = cache.createEmoteArray(client.emojis.cache);
-            client.commands.get(command).execute(message, args, client, emoteArray);
+            client.commands.get(command).execute(message, args, client, cache);
         }
         else {
             client.commands.get(command).execute(message, args, client);

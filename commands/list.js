@@ -4,21 +4,21 @@ module.exports = {
     usage: '[list] (optional)[both|text]',
     requiresCache: true,
     cooldown: 30,
-    execute(message, args, client, emoteArray) {
+    execute(message, args, client, cache) {
         var msgs = [];
         var msgIndex = 0;
         const helper = require('./../helper');
-        emoteArray = emoteArray.sort()
+        var emoteArray = cache.createEmoteArray().sort();
         msgs.push('')
         for(emote of emoteArray) {
             // don't overload discord msg limit of 2000 chars
             if(args[0] == "both") {
                 // show both emotes and text
-                newText = msgs[msgIndex].concat(`${emote} - ${emote.name}, `);
+                newText = msgs[msgIndex].concat(`${emote} - \`${emote.name}\`, `);
             }
             else if(args[0] == "text") {
                 // show just the text
-                newText = msgs[msgIndex].concat(`${emote.name}, `);
+                newText = msgs[msgIndex].concat(`\`${emote.name}\`, `);
             }
             else {
                 // default to just showing the emotes
@@ -40,7 +40,6 @@ module.exports = {
             if(msg != '') {
                 message.channel.send(msg);
             }
-            
         }
     }
 }
