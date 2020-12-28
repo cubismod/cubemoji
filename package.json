@@ -23,6 +23,7 @@
   "homepage": "https://gitlab.com/cubismod/cubemoji#readme",
   "dependencies": {
     "discord.js": "^12.5.1",
-    "eslint": "^7.16.0"
+    "eslint": "^7.16.0",
+    "moment": "^2.29.1"
   }
 }

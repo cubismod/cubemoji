@@ -2,12 +2,12 @@ module.exports = {
     name: 'list',
     description: 'List available emotes',
     usage: '[list] (optional)[both|text]',
+    requiresCache: true,
     cooldown: 30,
-    execute(message, args, client) {
+    execute(message, args, client, emoteArray) {
         var msgs = [];
         var msgIndex = 0;
         const helper = require('./../helper');
-        var emoteArray = helper.createEmoteArray(client);
         emoteArray = emoteArray.sort()
         msgs.push('')
         for(emote of emoteArray) {

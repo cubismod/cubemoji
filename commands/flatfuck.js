@@ -1,6 +1,7 @@
 module.exports = {
     name: 'flatfuck',
     description: 'Is it flat fuck friday?!',
+    requiresCache: false,
     execute(message) {
         var day = new Date();
         if(day.getDay() == 4) {

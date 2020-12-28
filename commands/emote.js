@@ -1,6 +1,7 @@
 module.exports = {
     name: 'emote',
     description: 'Inserts an emote',
+    requiresCache: false,
     execute(message, args, client) {
         if(args.length < 1) {
             message.reply('You must specify an emote name in the command!')

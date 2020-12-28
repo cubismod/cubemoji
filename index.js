@@ -2,6 +2,7 @@ const fs = require('fs');
 const Discord = require('discord.js');
 const config = require('./config.json');
 const client = new Discord.Client();
+const EmoteCache = require('./helper')
 
 
 client.commands = new Discord.Collection();
@@ -19,6 +20,8 @@ client.once('ready', () => {
     console.log('app running!');
 })
 client.login(config.token);
+
+var cache = new EmoteCache(client.emojis.cache);
 
 client.on('message', message => {
     const args = message.content.slice(config.prefix.length).trim().split(/ +/);
@@ -58,7 +61,16 @@ client.on('message', message => {
     }
 
     try {
-	    client.commands.get(command).execute(message, args, client);
+        // we only require the cached emote class on certain calls which is specified
+        // in each module
+        if(client.commands.get(command).requiresCache) {
+            var emoteArray = cache.createEmoteArray(client.emojis.cache);
+            client.commands.get(command).execute(message, args, client, emoteArray);
+        }
+        else {
+            client.commands.get(command).execute(message, args, client);
+        }
+        
     } catch (error) {
 	    console.error(error);
 	    message.reply('there was an error trying to execute that command!');
