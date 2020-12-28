@@ -20,7 +20,7 @@ Create a new pun to add to the pun database.
 😳
 ### random/r
 Returns a random emote.
-### emote/e <emote>
+### emote/e/emoji <emote>
 Returns the emote according to the listed emote name.
 ### search/sr <emote>
 Searches emote database to see if an emote matching the name is found.
@@ -32,3 +32,4 @@ Returns information about the bot.
 
 ## TODO
 [ ] implement command cooldowns
+[ ] command aliasing
