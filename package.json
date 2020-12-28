@@ -1,0 +1,28 @@
+{
+  "name": "cubemoji",
+  "version": "1.0.0",
+  "description": "A Discord emoji bot.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@gitlab.com/cubismod/cubemoji.git"
+  },
+  "keywords": [
+    "discord",
+    "emoji",
+    "bot"
+  ],
+  "author": "cubis",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://gitlab.com/cubismod/cubemoji/issues"
+  },
+  "homepage": "https://gitlab.com/cubismod/cubemoji#readme",
+  "dependencies": {
+    "discord.js": "^12.5.1",
+    "eslint": "^7.16.0"
+  }
+}
