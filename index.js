@@ -53,9 +53,11 @@ client.on('message', message => {
         }
     }
 
-   
+   // command aliasing
+    const cmd = client.commands.get(command)
+        || client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(command));
 
-    if (!client.commands.has(command)) {
+    if (!cmd) {
         message.react('❔');
         return;
     }
@@ -63,11 +65,11 @@ client.on('message', message => {
     try {
         // we only require the cached emote class on certain calls which is specified
         // in each module
-        if(client.commands.get(command).requiresCache) {
-            client.commands.get(command).execute(message, args, client, cache);
+        if(cmd.requiresCache) {
+            cmd.execute(message, args, client, cache);
         }
         else {
-            client.commands.get(command).execute(message, args, client);
+            cmd.execute(message, args, client);
         }
         
     } catch (error) {
