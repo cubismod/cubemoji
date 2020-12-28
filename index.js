@@ -6,6 +6,7 @@ const client = new Discord.Client();
 
 client.commands = new Discord.Collection();
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
+const cooldowns = new Discord.Collection();
 
 for (const file of commandFiles) {
 	const command = require(`./commands/${file}`);
@@ -20,11 +21,31 @@ client.once('ready', () => {
 client.login(config.token);
 
 client.on('message', message => {
-    var msg = message.content.toLowerCase();
-    if(!msg.startsWith(config.prefix) || message.author.bot) return;
-
     const args = message.content.slice(config.prefix.length).trim().split(/ +/);
     const command = args.shift().toLowerCase();
+    // ensure bots can't trigger the command and that we are using 
+    // c! as a prefix
+    if(!message.content.startsWith(config.prefix) || message.author.bot) return;
+    
+    // check for cooldowns on the command
+    if(!cooldowns.has(command.name)) {
+        cooldowns.set(command.name, new Discord.Collection());
+    }
+
+    const now = Date.now();
+    const timestamps = cooldowns.get(command.name);
+    const cooldownAmount = (command.cooldown || 3) * 1000;
+
+    if (timestamps.has(message.author.id)) {
+        const expirationTime = timestamps.get(message.author.id) + cooldownAmount;
+
+        if (now < expirationTime) {
+            const timeLeft = (expirationTime - now) / 1000;
+            return message.reply(`Please wait ${timeLeft.toFixed(1)} more seconds before executing \`${command.name}\``);
+        }
+    }
+
+   
 
     if (!client.commands.has(command)) {
         message.react('❔');

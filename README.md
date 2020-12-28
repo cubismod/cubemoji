@@ -29,3 +29,6 @@ Returns information about the bot.
 
 ## Resources
 - https://github.com/AnIdiotsGuide/discordjs-bot-guide/blob/master/coding-guides/using-emojis.md
+
+## TODO
+[ ] implement command cooldowns
