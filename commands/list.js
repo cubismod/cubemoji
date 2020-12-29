@@ -12,7 +12,7 @@ module.exports = {
         msgs.push('')
         for(emote of emoteArray) {
             // don't overload discord msg limit of 2000 chars
-            newText = msgs[msgIndex].concat(`${emote}`);
+            newText = msgs[msgIndex].concat(`${emote.name}`);
             newLen = msgs[msgIndex].length + newText.length;
             if(newLen > 2000) {
                 // queue up another msg
