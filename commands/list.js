@@ -12,19 +12,7 @@ module.exports = {
         msgs.push('')
         for(emote of emoteArray) {
             // don't overload discord msg limit of 2000 chars
-            if(args[0] == "both") {
-                // show both emotes and text
-                newText = msgs[msgIndex].concat(`${emote} - \`${emote.name}\`, `);
-            }
-            else if(args[0] == "text") {
-                // show just the text
-                newText = msgs[msgIndex].concat(`\`${emote.name}\`, `);
-            }
-            else {
-                // default to just showing the emotes
-                newText = msgs[msgIndex].concat(`${emote}`);
-            }
-            
+            newText = msgs[msgIndex].concat(`${emote}`);
             newLen = msgs[msgIndex].length + newText.length;
             if(newLen > 2000) {
                 // queue up another msg
