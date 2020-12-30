@@ -26,10 +26,7 @@ var cache = new EmoteCache(client);
 client.on('message', message => {
     const args = message.content.slice(config.prefix.length).trim().split(/ +/);
     const command = args.shift().toLowerCase();
-    // gotta make sure we flush stuff
-    if(message.content.search(/stuff/i) != -1) {
-        message.react('😳');
-    }
+
     
     // ensure bots can't trigger the command and that we are using 
     // c! as a prefix
