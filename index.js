@@ -30,7 +30,7 @@ client.on('message', message => {
     
     // ensure bots can't trigger the command and that we are using 
     // c! as a prefix
-    if(!message.content.startsWith(config.prefix) || message.author.bot) return;
+    if(!message.content.toLowerCase().startsWith(config.prefix) || message.author.bot) return;
     
     // check for cooldowns on the command
     if(!cooldowns.has(command.name)) {

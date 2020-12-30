@@ -23,10 +23,12 @@ module.exports = {
                 msgs[msgIndex] = newText;
             }
         }
+        message.channel.send("I'm sending you a DM with the list of emotes! If you didn't get it then check your privacy settings on Discord.");
+        message.author.send('**Emote List (you can type c!emote <emote_name> in this chat to see a specific emote)**');
         for(msg of msgs) {
             // don't try and send an empty message to discord
             if(msg != '') {
-                message.channel.send(msg);
+                message.author.send(msg);
             }
         }
     }
