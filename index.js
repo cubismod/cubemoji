@@ -1,6 +1,6 @@
 const fs = require('fs');
 const Discord = require('discord.js');
-const config = require('./config.json');
+const secrets = require('./secrets.json');
 const client = new Discord.Client();
 const EmoteCache = require('./helper')
 
@@ -19,18 +19,18 @@ for (const file of commandFiles) {
 client.once('ready', () => {
     console.log('app running!');
 })
-client.login(config.token);
+client.login(secrets.token);
 
 var cache = new EmoteCache(client);
 
 client.on('message', message => {
-    const args = message.content.slice(config.prefix.length).trim().split(/ +/);
+    const args = message.content.slice(secrets.prefix.length).trim().split(/ +/);
     const command = args.shift().toLowerCase();
 
     
     // ensure bots can't trigger the command and that we are using 
     // c! as a prefix
-    if(!message.content.toLowerCase().startsWith(config.prefix) || message.author.bot) return;
+    if(!message.content.toLowerCase().startsWith(secrets.prefix) || message.author.bot) return;
     
     // check for cooldowns on the command
     if(!cooldowns.has(command.name)) {
