@@ -1,8 +1,9 @@
 {
   "name": "cubemoji",
-  "version": "1.0.0",
+  "version": "2",
   "description": "A Discord emoji bot.",
   "main": "index.js",
+  "license": "ISC",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -16,7 +17,6 @@
     "bot"
   ],
   "author": "cubis",
-  "license": "ISC",
   "bugs": {
     "url": "https://gitlab.com/cubismod/cubemoji/issues"
   },
@@ -24,7 +24,8 @@
   "dependencies": {
     "discord.js": "^12.5.1",
     "fuse.js": "^6.4.4",
-    "moment": "^2.29.1"
+    "moment": "^2.29.1",
+    "pandemonium": "^2.0.0"
   },
   "devDependencies": {
     "eslint": "^7.16.0",

@@ -1,3 +1,5 @@
+const emote = require('./emote')
+
 module.exports = {
   name: 'random',
   description: 'Insert a random emote!',
@@ -6,10 +8,9 @@ module.exports = {
   requiresCache: true,
   execute (message, args, client, cache) {
     require('../helper')
+    const Pandemonium = require('pandemonium')
     console.log('random command used')
-    // first we get a random number
-    const emoteArray = cache.createEmoteArray()
-    const randomNumber = Math.floor(Math.random() * emoteArray.length)
-    message.channel.send(emoteArray[randomNumber].toString())
+    const chance = Pandemonium
+    message.channel.send(chance.choice(cache.createEmoteArray()).toString())
   }
 }

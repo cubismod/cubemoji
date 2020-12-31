@@ -19,11 +19,12 @@ for (const file of commandFiles) {
 }
 client.once('ready', () => {
   console.log('app running!')
+  // set up help message
+  client.user.setActivity('c!help', { type: 'WATCHING' })
 })
 client.login(secrets.token)
 
 const cache = new EmoteCache(client)
-const startupTime = moment()
 
 client.on('message', message => {
   const args = message.content.slice(secrets.prefix.length).trim().split(/ +/)
