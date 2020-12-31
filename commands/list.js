@@ -5,7 +5,7 @@ module.exports = {
   requiresCache: true,
   cooldown: 30,
   execute (message, args, client, cache) {
-    console.info('list command used')
+    console.log('list command used')
     const msgs = []
     let msgIndex = 0
     // const helper = require('./../helper')

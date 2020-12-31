@@ -4,7 +4,7 @@ module.exports = {
   usage: '[pingpong]',
   aliases: ['pp'],
   execute (message, args) {
-    console.info('pingpong command used')
+    console.log('pingpong command used')
     message.reply('🏓')
   }
 }

@@ -6,7 +6,7 @@ module.exports = {
   requiresCache: false,
   execute (message, args, client) {
     if (args.length === 0) {
-      console.info('help command used')
+      console.log('help command used')
       // just offer up list of other commands available
       let text = 'The following commands are available:\n'
       client.commands.forEach(function (command) {
