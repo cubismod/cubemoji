@@ -5,6 +5,7 @@ module.exports = {
   aliases: ['r', 'rnd'],
   requiresCache: true,
   execute (message, args, client, cache) {
+    console.info('random command used')
     // first we get a random number
     const emoteArray = cache.createEmoteArray()
     const randomNumber = Math.floor(Math.random() * emoteArray.length)

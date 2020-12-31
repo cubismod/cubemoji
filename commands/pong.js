@@ -4,6 +4,7 @@ module.exports = {
   usage: '[pong]',
   aliases: ['po'],
   execute (message, args) {
+    console.info('pong command used')
     message.reply('ping')
   }
 }

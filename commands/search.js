@@ -5,6 +5,7 @@ module.exports = {
   aliases: ['sch', 's'],
   requiresCache: true,
   execute (message, args, client, cache) {
+    console.info('search used')
     const results = cache.search(args[0])
     if (results.length === 0) {
       message.channel.send(`No results found for your search query \`${args[0]}\``)

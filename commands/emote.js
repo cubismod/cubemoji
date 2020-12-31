@@ -5,6 +5,7 @@ module.exports = {
   aliases: ['emoji', 'e'],
   requiresCache: true,
   execute (message, args, client, cache) {
+    console.info('emote command used')
     if (args.length < 1) {
       message.reply('You must specify an emote name in the command!')
     } else {

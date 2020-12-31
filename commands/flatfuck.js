@@ -1,15 +1,17 @@
 module.exports = {
   name: 'flatfuck',
   description: 'Is it flat fuck friday?!',
-  usage: '[flatfuck/ff]',
-  aliases: ['ff'],
+  usage: '[flatfuck]',
+  aliases: ['ff', 'flat_fuck_friday', 'femboy_friday'],
   requiresCache: false,
   execute (message) {
+    console.info('flat_fuck used')
     const day = new Date()
     if (day.getDay() === 4) {
-      message.channel.send("IT'S FLAT FUCK FRIDAY YOU FUCKING LOSER :hahagators:")
+      console.info('flat fuck command used')
+      message.channel.send(':hahagators:')
     } else {
-      message.channel.send("Sorry no it's not FFF!")
+      message.channel.send('i am sorry but no')
     }
   }
 }

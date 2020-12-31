@@ -9,8 +9,39 @@ const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('
 const cooldowns = new Discord.Collection()
 
 // this is used to log various messages to a specific Discord channel
-// function logMsg(content, severity, channel) {
+// content is a string
+// severity is an int
+// 0 - 2 that will determine the color of the message
+// function logMsg (content, severity) {
+//   let color
+//   switch (severity) {
+//     case 0:
+//       color = 4494926
+//       break
+//     case 1:
+//       color = 16312092
+//       break
+//     case 2:
+//       color = 13632027
+//       break
+//   }
+//   client.channels.fetch('793650181533859880')
+//     .then(channel => console.log(channel.name))
+//     .catch(console.error)
+  // .then(channel => {
+  //     if (content.length > 2040) {
+  //       channel.send(`Unable to send a log message with ${content.length} characters`)
+  //     }
 
+  //     const msgEmbed = new Discord.MessageEmbed()
+  //       .setTimestamp()
+  //       .setColor(color)
+  //       .setDescription(content)
+
+  //     channel.send(msgEmbed)
+  //   }, reason => {
+  //     console.error(`unable to send log message due to ${reason}`)
+  //   })
 // }
 
 for (const file of commandFiles) {
