@@ -1,77 +1,77 @@
-const fs = require('fs');
-const Discord = require('discord.js');
-const secrets = require('./secrets.json');
-const client = new Discord.Client();
+const fs = require('fs')
+const Discord = require('discord.js')
+const secrets = require('./secrets.json')
+const client = new Discord.Client()
 const EmoteCache = require('./helper')
 
+client.commands = new Discord.Collection()
+const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'))
+const cooldowns = new Discord.Collection()
 
-client.commands = new Discord.Collection();
-const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
-const cooldowns = new Discord.Collection();
+// this is used to log various messages to a specific Discord channel
+// function logMsg(content, severity, channel) {
+
+// }
 
 for (const file of commandFiles) {
-	const command = require(`./commands/${file}`);
+  const command = require(`./commands/${file}`)
 
-	// set a new item in the Collection
-	// with the key as the command name and the value as the exported module
-	client.commands.set(command.name, command);
+  // set a new item in the Collection
+  // with the key as the command name and the value as the exported module
+  client.commands.set(command.name, command)
 }
 client.once('ready', () => {
-    console.log('app running!');
+  console.log('app running!')
 })
-client.login(secrets.token);
+client.login(secrets.token)
 
-var cache = new EmoteCache(client);
+const cache = new EmoteCache(client)
 
 client.on('message', message => {
-    const args = message.content.slice(secrets.prefix.length).trim().split(/ +/);
-    const command = args.shift().toLowerCase();
+  const args = message.content.slice(secrets.prefix.length).trim().split(/ +/)
+  const command = args.shift().toLowerCase()
 
-    
-    // ensure bots can't trigger the command and that we are using 
-    // c! as a prefix
-    if(!message.content.toLowerCase().startsWith(secrets.prefix) || message.author.bot) return;
-    
-    // check for cooldowns on the command
-    if(!cooldowns.has(command.name)) {
-        cooldowns.set(command.name, new Discord.Collection());
+  // ensure bots can't trigger the command and that we are using
+  // c! as a prefix
+  if (!message.content.toLowerCase().startsWith(secrets.prefix) || message.author.bot) return
+
+  // check for cooldowns on the command
+  if (!cooldowns.has(command.name)) {
+    cooldowns.set(command.name, new Discord.Collection())
+  }
+
+  const now = Date.now()
+  const timestamps = cooldowns.get(command.name)
+  const cooldownAmount = (command.cooldown || 3) * 1000
+
+  if (timestamps.has(message.author.id)) {
+    const expirationTime = timestamps.get(message.author.id) + cooldownAmount
+
+    if (now < expirationTime) {
+      const timeLeft = (expirationTime - now) / 1000
+      return message.reply(`Please wait ${timeLeft.toFixed(1)} more seconds before executing \`${command.name}\``)
     }
+  }
 
-    const now = Date.now();
-    const timestamps = cooldowns.get(command.name);
-    const cooldownAmount = (command.cooldown || 3) * 1000;
+  // command aliasing
+  const cmd = client.commands.get(command) ||
+        client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(command))
 
-    if (timestamps.has(message.author.id)) {
-        const expirationTime = timestamps.get(message.author.id) + cooldownAmount;
+  if (!cmd) {
+    message.react('❔')
+    return
+  }
 
-        if (now < expirationTime) {
-            const timeLeft = (expirationTime - now) / 1000;
-            return message.reply(`Please wait ${timeLeft.toFixed(1)} more seconds before executing \`${command.name}\``);
-        }
+  try {
+    // we only require the cached emote class on certain calls which is specified
+    // in each module
+    if (cmd.requiresCache) {
+      cmd.execute(message, args, client, cache)
+    } else {
+      cmd.execute(message, args, client)
     }
-
-   // command aliasing
-    const cmd = client.commands.get(command)
-        || client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(command));
-
-    if (!cmd) {
-        message.react('❔');
-        return;
-    }
-
-    try {
-        // we only require the cached emote class on certain calls which is specified
-        // in each module
-        if(cmd.requiresCache) {
-            cmd.execute(message, args, client, cache);
-        }
-        else {
-            cmd.execute(message, args, client);
-        }
-        
-    } catch (error) {
-	    console.error(error);
-	    message.reply('there was an error trying to execute that command!');
-    }
-
+  } catch (error) {
+    console.error(error)
+    message.reply('there was an error trying to execute that command!')
+  }
 })
