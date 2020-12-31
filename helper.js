@@ -34,7 +34,8 @@ module.exports = class EmoteCache {
     const options = {
       keys: ['name'],
       useExtendedSearch: true,
-      minMatchCharLength: 2
+      minMatchCharLength: 2,
+      threshold: 0.3
     }
     const search = new Fuse(this.createEmoteArray(), options)
     const results = search.search(query)
