@@ -1,5 +1,3 @@
-const emote = require('./emote')
-
 module.exports = {
   name: 'random',
   description: 'Insert a random emote!',

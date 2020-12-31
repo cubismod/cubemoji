@@ -3,8 +3,6 @@ const Discord = require('discord.js')
 const secrets = require('./secrets.json')
 const client = new Discord.Client()
 const EmoteCache = require('./helper')
-const moment = require('moment')
-
 
 client.commands = new Discord.Collection()
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'))
