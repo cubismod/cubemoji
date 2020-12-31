@@ -23,7 +23,7 @@
   "homepage": "https://gitlab.com/cubismod/cubemoji#readme",
   "dependencies": {
     "discord.js": "^12.5.1",
-    "js-search": "^2.0.0",
+    "fuse.js": "^6.4.4",
     "moment": "^2.29.1"
   },
   "devDependencies": {

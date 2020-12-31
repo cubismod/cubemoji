@@ -15,7 +15,7 @@ module.exports = {
       let msgIndex = 0
       msgs.push(`${results.length} result(s) found for your search query \`${args[0]}\`\n`)
       for (const result of results) {
-        const newText = msgs[msgIndex].concat(`\`${result.name}\`, `)
+        const newText = msgs[msgIndex].concat(`\`${result.item.name}\`, `)
         const newLen = msgs[msgIndex].length + newText.length
         if (newLen > 2000) {
           msgIndex += 1

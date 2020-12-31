@@ -1,6 +1,6 @@
 // helper functions
 const moment = require('moment')
-const search = require('js-search')
+const Fuse = require('fuse.js')
 // a class which can return an array version of emotes
 // and also only refreshes when necessary
 module.exports = class EmoteCache {
@@ -31,13 +31,13 @@ module.exports = class EmoteCache {
   }
 
   search (query) {
-    // init indexing
-    const searcher = new search.Search('name')
-    searcher.indexStrategy = new search.AllSubstringsIndexStrategy()
-    searcher.addIndex('name')
-    // search among emote names
-    // first make sure the emote array is up to date
-    searcher.addDocuments(this.createEmoteArray())
-    return (searcher.search(query))
+    const options = {
+      keys: ['name'],
+      useExtendedSearch: true,
+      minMatchCharLength: 2
+    }
+    const search = new Fuse(this.createEmoteArray(), options)
+    const results = search.search(query)
+    return (results)
   }
 }

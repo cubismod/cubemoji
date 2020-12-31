@@ -4,8 +4,22 @@ module.exports = {
   aliases: ['a'],
   usage: '[about/a]',
   requiresCache: false,
-  execute (message) {
+  execute (message, args, client) {
     console.log('about command used')
-    message.channel.send('Here is my git! https://gitlab.com/cubismod/cubemoji. I was made lovingly by cubis. Bugs/issues/feature requests should go on the git.')
+    const embed = {
+      title: '<:cubemoji:793663899072200744>',
+      color: 0x91d7f2,
+      author: {
+        name: 'Created by cubis'
+      },
+      description: 'a simple emoji bot built to last ⌛',
+      fields: [
+        {
+          name: 'GitLab',
+          value: 'https://gitlab.com/cubismod/cubemoji'
+        }
+      ]
+    }
+    message.channel.send({ embed: embed })
   }
 }
