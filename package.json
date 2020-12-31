@@ -1,9 +1,9 @@
 {
   "name": "cubemoji",
-  "version": "2",
+  "version": "2.0.0",
   "description": "A Discord emoji bot.",
   "main": "index.js",
-  "license": "ISC",
+  "license": "MIT",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
