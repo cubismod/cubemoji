@@ -1,3 +1,4 @@
+const moment = require('moment')
 module.exports = {
   name: 'about',
   description: 'Information about the bot!',
@@ -29,7 +30,7 @@ module.exports = {
         },
         {
           name: 'Stats',
-          value: `Current Emote Count: ${client.emojis.cache.size}\nUptime: ${Math.floor(client.uptime / 60000)} min\nServers: ${client.guilds.cache.size}`
+          value: `Current Emote Count: ${client.emojis.cache.size}\nUptime: ${moment().to(client.readyAt, true)}\nServers: ${client.guilds.cache.size}`
         }
       ]
     }
