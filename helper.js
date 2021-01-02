@@ -41,4 +41,24 @@ module.exports = class EmoteCache {
     const results = search.search(query)
     return (results)
   }
+
+  // retrieves an emote based on title
+  // or the user actually embedding an emote in
+  // their message, then returns that emoji object
+  retrieve (emote) {
+    // first convert the name to lowercase so we aren't case sensitive
+    const emoteName = emote.toLowerCase()
+
+    let res = this.client.emojis.cache.find(emote => emote.name.toLowerCase() === emoteName)
+    if (!res) {
+      // try and read the emote directly
+      // like <:flass:781664252058533908>
+      // so we take the "flass" part
+      const split = emoteName.split(':')
+      if (split.length > 2) {
+        res = this.client.emojis.cache.find(emote => emote.name.toLowerCase() === split[1])
+      }
+    }
+    return res
+  }
 }

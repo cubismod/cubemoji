@@ -12,13 +12,13 @@ module.exports = {
       // emoji names are only one word long so we will only consider the 0th element
       // also doing case insensitive searching
       const emoteName = args[0].toLowerCase()
-      let res = client.emojis.cache.find(emote => emote.name.toLowerCase() === emoteName)
+      let res = cache.retrieve(emoteName)
       if (res) {
         message.channel.send(res.toString())
       } else {
         // retrieve a result from the cache
         res = cache.search(args[0])
-        if (res.length > 1) {
+        if (res.length > 0) {
           message.reply(`emote not found! Maybe try ${res[0].item} - \`${res[0].item.name}\`?`)
         } else {
           message.reply('emote not found!')
