@@ -77,6 +77,7 @@ client.on('messageReactionAdd', (react, author) => {
   if (author.id !== '792878401589477377' && react.emoji.name === '🎲' && react.message.author.id === '792878401589477377') {
     // ensures it's cubemoji
     react.message.edit(Pandemonium.choice(cache.createEmoteArray()).toString())
-    react.message.reactions.removeAll().then(react.message.react('🎲'))
+    react.message.reactions.resolve(react).users.remove(author)
+    // react.message.reactions.removeAll().then(react.message.react('🎲'))
   }
 })
