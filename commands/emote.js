@@ -1,7 +1,7 @@
 module.exports = {
   name: 'emote',
   description: 'Inserts an emote',
-  usage: '[emote/emoji/e] <emote_name>',
+  usage: '[emote] <emote_name>',
   aliases: ['emoji', 'e'],
   requiresCache: true,
   execute (message, args, client, cache) {

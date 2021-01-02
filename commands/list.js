@@ -2,6 +2,7 @@ module.exports = {
   name: 'list',
   description: 'List available emotes, defaults to printing out all the emotes in well, emote',
   usage: '[list] (optional)[both|text]',
+  aliases: 'l',
   requiresCache: true,
   cooldown: 30,
   execute (message, args, client, cache) {

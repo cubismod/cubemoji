@@ -2,8 +2,8 @@ const moment = require('moment')
 module.exports = {
   name: 'about',
   description: 'Information about the bot!',
+  usage: '[about]',
   aliases: ['a'],
-  usage: '[about/a]',
   requiresCache: false,
   execute (message, args, client) {
     const pkg = require('../package.json')

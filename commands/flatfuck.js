@@ -2,7 +2,7 @@ module.exports = {
   name: 'flatfuck',
   description: 'Is it flat fuck friday?!',
   usage: '[flatfuck]',
-  aliases: ['ff', 'flat_fuck_friday', 'femboy_friday'],
+  aliases: ['ff', 'flat_fuck_friday', 'femboy_friday', 'femboy', 'flat'],
   requiresCache: false,
   execute (message) {
     const Pandemonium = require('pandemonium')

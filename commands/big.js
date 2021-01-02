@@ -2,7 +2,7 @@ module.exports = {
   name: 'big',
   description: 'Creates a big version of an emote',
   usage: '[source] <emote_name/emote>',
-  aliases: [],
+  aliases: ['b', 'large', 'enhance'],
   requiresCache: true,
   execute (message, args, client, cache) {
     console.log('big command used')

@@ -2,7 +2,7 @@ module.exports = {
   name: 'info',
   description: 'Gets details about an emote',
   usage: '[info] <emote_name/emote>',
-  aliases: [],
+  aliases: ['i'],
   requiresCache: true,
   execute (message, args, client, cache) {
     console.log('emote command used')
