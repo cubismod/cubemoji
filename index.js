@@ -3,7 +3,7 @@ const Discord = require('discord.js')
 const secrets = require('./secrets.json')
 const client = new Discord.Client()
 const EmoteCache = require('./helper')
-
+const Pandemonium = require('pandemonium')
 client.commands = new Discord.Collection()
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'))
 const cooldowns = new Discord.Collection()
@@ -70,5 +70,13 @@ client.on('message', message => {
   } catch (error) {
     console.error(error)
     message.reply('there was an error trying to execute that command!')
+  }
+})
+
+client.on('messageReactionAdd', (react, author) => {
+  if (author.id !== '792878401589477377' && react.emoji.name === '🎲' && react.message.author.id === '792878401589477377') {
+    // ensures it's cubemoji
+    react.message.edit(Pandemonium.choice(cache.createEmoteArray()).toString())
+    react.message.reactions.removeAll().then(react.message.react('🎲'))
   }
 })
