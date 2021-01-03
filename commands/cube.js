@@ -3,6 +3,7 @@ module.exports = {
   description: 'Create a random cube to shuffle emotes!',
   usage: '[cube]',
   aliases: ['rc'],
+  cooldown: 60,
   requiresCache: true,
   execute (message, args, client, cache) {
     require('../helper')

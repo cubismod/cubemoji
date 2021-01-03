@@ -4,7 +4,7 @@ module.exports = {
   usage: '[list] (optional)[both|text]',
   aliases: 'l',
   requiresCache: true,
-  cooldown: 30,
+  cooldown: 120,
   execute (message, args, client, cache) {
     console.log('list command used')
     const msgs = []

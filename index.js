@@ -25,21 +25,21 @@ client.login(secrets.token)
 const cache = new EmoteCache(client)
 
 client.on('message', message => {
-  const args = message.content.slice(secrets.prefix.length).trim().split(/ +/)
-  const command = args.shift().toLowerCase()
-
-   // command aliasing
-   const cmd = client.commands.get(command) ||
-   client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(command))
-
-
   // ensure bots can't trigger the command and that we are using
   // c! as a prefix
   if (!message.content.toLowerCase().startsWith(secrets.prefix) || message.author.bot) return
 
-  // check for cooldowns on the command
-  if (!cooldowns.has(command)) {
-    cooldowns.set(command, new Discord.Collection())
+  // now we determine the command name from the string
+  const args = message.content.slice(secrets.prefix.length).trim().split(/ +/)
+  const commandName = args.shift().toLowerCase()
+
+  // then convert from alias if necessary
+  const cmd = client.commands.get(commandName) ||
+   client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName))
+
+  // cooldown checks
+  if (!cooldowns.has(cmd.name)) {
+    cooldowns.set(cmd.name, new Discord.Collection())
   }
 
   const now = Date.now()
