@@ -3,7 +3,7 @@ module.exports = {
   description: 'Play the slots!',
   usage: '[slots]',
   aliases: ['sl'],
-  cooldown: 30,
+  cooldown: 15,
   requiresCache: true,
   execute (message, args, client, cache) {
     // creates text representing slots
