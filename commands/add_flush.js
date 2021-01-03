@@ -2,8 +2,8 @@ const Discord = require('discord.js')
 
 module.exports = {
   name: 'add_flush',
-  description: 'Returns a flushed version of an emote',
-  usage: '[add_flush] <emote_name/emote>',
+  description: 'Returns a flushed version of an emote. Use invert arg to invert the flush.',
+  usage: '[add_flush] <emote_name/emote> (optional)[invert]',
   aliases: ['af'],
   requiresCache: true,
   execute (message, args, client, cache) {
@@ -19,6 +19,9 @@ module.exports = {
         const canv = createCanvas(128, 128) // discord emotes are 128x128 px
         const baseEmoji = loadImage(res.url)
         const ctx = canv.getContext('2d')
+        if (args.length > 1 && args[1].toLowerCase() === 'invert') {
+          ctx.globalCompositeOperation = 'destination-atop'
+        }
 
         baseEmoji.then((emoji) => {
           ctx.drawImage(emoji, 0, 0, canv.width, canv.height)
