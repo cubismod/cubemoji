@@ -28,31 +28,35 @@ client.on('message', message => {
   const args = message.content.slice(secrets.prefix.length).trim().split(/ +/)
   const command = args.shift().toLowerCase()
 
+   // command aliasing
+   const cmd = client.commands.get(command) ||
+   client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(command))
+
+
   // ensure bots can't trigger the command and that we are using
   // c! as a prefix
   if (!message.content.toLowerCase().startsWith(secrets.prefix) || message.author.bot) return
 
   // check for cooldowns on the command
-  if (!cooldowns.has(command.name)) {
-    cooldowns.set(command.name, new Discord.Collection())
+  if (!cooldowns.has(command)) {
+    cooldowns.set(command, new Discord.Collection())
   }
 
   const now = Date.now()
-  const timestamps = cooldowns.get(command.name)
-  const cooldownAmount = (command.cooldown || 3) * 1000
+  const timestamps = cooldowns.get(cmd.name)
+  const cooldownAmount = (cmd.cooldown || 3) * 1000
 
   if (timestamps.has(message.author.id)) {
     const expirationTime = timestamps.get(message.author.id) + cooldownAmount
 
     if (now < expirationTime) {
       const timeLeft = (expirationTime - now) / 1000
-      return message.reply(`Please wait ${timeLeft.toFixed(1)} more seconds before executing \`${command.name}\``)
+      return message.reply(`Please wait ${timeLeft.toFixed(1)} more seconds before executing \`${cmd.name}\``)
     }
+  } else {
+    timestamps.set(message.author.id, now)
+    setTimeout(() => timestamps.delete(message.author.id), cooldownAmount)
   }
-
-  // command aliasing
-  const cmd = client.commands.get(command) ||
-        client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(command))
 
   if (!cmd) {
     message.react('❔')
