@@ -1,6 +1,6 @@
 {
   "name": "cubemoji",
-  "version": "2.0.5",
+  "version": "2.1.0",
   "description": "A Discord emoji bot.",
   "main": "index.js",
   "license": "MIT",
@@ -22,6 +22,7 @@
   },
   "homepage": "https://gitlab.com/cubismod/cubemoji#readme",
   "dependencies": {
+    "canvas": "^2.6.1",
     "discord.js": "^12.5.1",
     "fuse.js": "^6.4.4",
     "moment": "^2.29.1",

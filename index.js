@@ -73,6 +73,7 @@ client.on('message', message => {
   }
 })
 
+// TODO: fix bug wherein a user can add a die to any message to change that message contents
 client.on('messageReactionAdd', (react, author) => {
   if (author.id !== '792878401589477377' && react.emoji.name === '🎲' && react.message.author.id === '792878401589477377') {
     // ensures it's cubemoji

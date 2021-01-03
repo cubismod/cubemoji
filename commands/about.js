@@ -31,6 +31,10 @@ module.exports = {
         {
           name: 'Stats',
           value: `Current Emote Count: ${client.emojis.cache.size}\nUptime: ${moment().to(client.readyAt, true)}\nServers: ${client.guilds.cache.size}`
+        },
+        {
+          name: 'Discord',
+          value: 'https://discord.gg/xPNtt7TR2z'
         }
       ]
     }
