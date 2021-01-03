@@ -37,6 +37,11 @@ client.on('message', message => {
   const cmd = client.commands.get(commandName) ||
    client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName))
 
+  if (!cmd) {
+    message.react('❔')
+    return
+  }
+
   // cooldown checks
   if (!cooldowns.has(cmd.name)) {
     cooldowns.set(cmd.name, new Discord.Collection())
@@ -56,11 +61,6 @@ client.on('message', message => {
   } else {
     timestamps.set(message.author.id, now)
     setTimeout(() => timestamps.delete(message.author.id), cooldownAmount)
-  }
-
-  if (!cmd) {
-    message.react('❔')
-    return
   }
 
   try {
