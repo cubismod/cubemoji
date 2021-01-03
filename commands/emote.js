@@ -13,7 +13,8 @@ module.exports = {
       // also doing case insensitive searching
       const emoteName = args[0].toLowerCase()
       let res = cache.retrieve(emoteName)
-      if (res) {
+      if (res && !('external' in res)) {
+        // ensure we're not sending external emotes
         message.channel.send(res.toString())
       } else {
         // retrieve a result from the cache

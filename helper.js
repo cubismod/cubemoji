@@ -45,6 +45,8 @@ module.exports = class EmoteCache {
   // retrieves an emote based on title
   // or the user actually embedding an emote in
   // their message, then returns that emoji object
+  // if cubemoji doesn't have access to the emote then we return a URL
+  // to the emote image
   retrieve (emote) {
     // first convert the name to lowercase so we aren't case sensitive
     const emoteName = emote.toLowerCase()
@@ -57,6 +59,13 @@ module.exports = class EmoteCache {
       const split = emoteName.split(':')
       if (split.length > 2) {
         res = this.client.emojis.cache.find(emote => emote.name.toLowerCase() === split[1])
+        if (res === undefined) {
+          res = {}
+          // return the url here
+          res.url = 'https://cdn.discordapp.com/emojis/' + split[2]
+          res.url = res.url.slice(0, res.url.length - 1) // chop off the '>'
+          res.external = true
+        }
       }
     }
     return res
