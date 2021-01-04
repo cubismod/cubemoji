@@ -3,7 +3,7 @@ module.exports = {
   description: 'Play the slots!',
   usage: '[slots]',
   aliases: ['sl'],
-  cooldown: 20,
+  cooldown: 5,
   requiresCache: true,
   execute (message, args, client, cache) {
     // creates text representing slots
@@ -39,7 +39,7 @@ module.exports = {
     const pand = require('pandemonium')
     const emoteArray = cache.createEmoteArray()
     // get slot options
-    const slotOptions = pand.geometricReservoirSample(20, emoteArray)
+    const slotOptions = pand.geometricReservoirSample(10, emoteArray)
     const headerMsg = message.channel.send('**Your slots <a:dieRoll:795419079254605834>**')
     const slotsMsg = message.channel.send(createSlotText(slotOptions))
     // edit with the options for 5 times
