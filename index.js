@@ -56,7 +56,7 @@ client.on('message', message => {
 
     if (now < expirationTime) {
       const timeLeft = (expirationTime - now) / 1000
-      return message.reply(`Please wait ${timeLeft.toFixed(1)} more seconds before executing \`${cmd.name}\``)
+      return message.reply(`Please wait ${timeLeft.toFixed(1)} more seconds before executing \`${cmd.name}\`. The cooldown is ${cmd.cooldown} seconds`)
     }
   } else {
     timestamps.set(message.author.id, now)
