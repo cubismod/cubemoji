@@ -77,9 +77,16 @@ client.on('message', message => {
   }
 })
 
-// TODO: fix bug wherein a user can add a die to any message to change that message contents
 client.on('messageReactionAdd', (react, author) => {
-  if (author.id !== '792878401589477377' && react.emoji.name === '🎲' && react.message.author.id === '792878401589477377') {
+/* this set of conditionals ensures that edit reaction behavior for c!cube
+  is only processed on messages which cubemoji has marked already with 🎲
+  as well as ensuring that cubemoji is not editing the message when it is applying
+  a react itself */
+  const id = '792878401589477377'
+  if (react.users.cache.has(id) &&
+  author.id !== id &&
+  react.emoji.name === '🎲' &&
+  react.message.author.id === id) {
     // ensures it's cubemoji
     react.message.edit(Pandemonium.choice(cache.createEmoteArray()).toString())
     react.message.reactions.resolve(react).users.remove(author)
