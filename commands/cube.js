@@ -8,7 +8,7 @@ module.exports = {
   execute (message, args, client, cache) {
     require('../helper')
     const Pandemonium = require('pandemonium')
-    console.log('rando_cube command used')
+    console.log('cube command used')
     const chance = Pandemonium
     const emoteArray = cache.createEmoteArray()
     const msg = message.channel.send(chance.choice(emoteArray).toString())

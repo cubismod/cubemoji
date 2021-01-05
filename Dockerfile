@@ -3,13 +3,13 @@ FROM $BUILD_FROM
 
 ENV LANG C.UTF-8
 
-RUN apk add --no-cache \
+RUN apk add \
     nodejs \
     npm \
     git
 
 # canvas dependences
-RUN apk add --no-cache \
+RUN apk add \
     build-base \
     g++ \
     cairo-dev \
@@ -18,9 +18,9 @@ RUN apk add --no-cache \
     giflib-dev
 
 # install app dependencies
-COPY package.json /
-COPY . /
+WORKDIR /cubemoji
+COPY package.json package-lock.json /cubemoji/
+RUN npm ci
+COPY . /cubemoji
 
-RUN cd / && npm install
-
-CMD [ "node", "index.js" ]
+CMD ["npm", "run", "start" ]

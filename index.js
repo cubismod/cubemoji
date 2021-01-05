@@ -7,6 +7,7 @@ const Pandemonium = require('pandemonium')
 client.commands = new Discord.Collection()
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'))
 const cooldowns = new Discord.Collection()
+require('log-timestamp')
 
 for (const file of commandFiles) {
   const command = require(`./commands/${file}`)
@@ -16,7 +17,7 @@ for (const file of commandFiles) {
   client.commands.set(command.name, command)
 }
 client.once('ready', () => {
-  console.log('app running!')
+  console.log('cubemoji running!')
   // set up help message
   client.user.setActivity('c!help', { type: 'WATCHING' })
 })

@@ -6,6 +6,7 @@ module.exports = {
   cooldown: 5,
   requiresCache: true,
   execute (message, args, client, cache) {
+    console.log('slots command used')
     // creates text representing slots
     function createSlotText (options) {
       return `${pand.choice(slotOptions)}${pand.choice(slotOptions)}${pand.choice(slotOptions)}`
