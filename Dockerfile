@@ -8,15 +8,6 @@ RUN apk add \
     npm \
     git
 
-# canvas dependences
-RUN apk add \
-    build-base \
-    g++ \
-    cairo-dev \
-    jpeg-dev \
-    pango-dev \
-    giflib-dev
-
 # install app dependencies
 WORKDIR /cubemoji
 COPY package.json package-lock.json /cubemoji/
