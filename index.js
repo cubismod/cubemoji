@@ -28,6 +28,10 @@ const cache = new EmoteCache(client)
 client.on('message', message => {
   // ensure bots can't trigger the command and that we are using
   // c! as a prefix
+  if (message.system) {
+    // add stupid reacts to system msgs
+    message.react(Pandemonium.choice(cache.createEmoteArray()))
+  }
   if (!message.content.toLowerCase().startsWith(secrets.prefix) || message.author.bot) return
 
   // now we determine the command name from the string
