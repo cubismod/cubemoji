@@ -25,7 +25,13 @@ module.exports = {
       }
       if (res) {
         // parse command arguments now, anything after the emote name
-        const opts = args.slice(1)
+        let opts
+        // limit the amount of commands that can be performed at once since this runs synchronously
+        if (args.length > 10) {
+          opts = args.slice(1, 15)
+        } else {
+          opts = args.slice(1)
+        }
         Jimp.read(res.url).then(emote => {
           // convolution info https://docs.gimp.org/2.6/en/plug-in-convmatrix.html
           opts.forEach(option => {
