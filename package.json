@@ -22,9 +22,9 @@
   },
   "homepage": "https://gitlab.com/cubismod/cubemoji#readme",
   "dependencies": {
-    "canvas": "^2.6.1",
     "discord.js": "^12.5.1",
     "fuse.js": "^6.4.4",
+    "jimp": "^0.16.1",
     "log-timestamp": "^0.3.0",
     "moment": "^2.29.1",
     "pandemonium": "^2.0.0"

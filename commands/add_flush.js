@@ -2,10 +2,10 @@ const Discord = require('discord.js')
 
 module.exports = {
   name: 'add_flush',
-  description: 'Returns a flushed version of an emote. Use invert arg to invert the flush.',
-  usage: '[add_flush] <emote_name/emote> (optional)[invert]',
+  description: 'Returns a flushed version of an emote. Animated emotes will return static images sadly :(',
+  usage: '[add_flush] <emote_name/emote>',
   aliases: ['af', 'addflush'],
-  cooldown: 1,
+  cooldown: 10,
   requiresCache: true,
   execute (message, args, client, cache) {
     console.log('add_flush used')
@@ -14,9 +14,27 @@ module.exports = {
     } else {
       const emoteName = args[0].toLowerCase()
       let res = cache.retrieve(emoteName)
+      // since we implement a longer cooldown, we autofill for the first emote we find from search
+      if (!res) {
+        res = cache.search(args[0])[0].item
+      }
       if (res) {
+        const Jimp = require('jimp')
+        Jimp.read('./assets/flushed.png').then(flush => {
+          Jimp.read(res.url).then(baseEmote => {
+            baseEmote.composite(flush, 0, 0, { mode: Jimp.BLEND_SOURCE_OVER })
+            baseEmote.getBufferAsync(Jimp.AUTO).then(buf => {
+              const attach = new Discord.MessageAttachment(buf, 'flush.png')
+              message.channel.send(attach)
+            })
+              .catch(reason => console.log(reason))
+          })
+            .catch(reason => console.log(reason))
+        })
+          .catch(reason => console.log(reason))
+
         // if we find a match then let's begin flushing
-        const { createCanvas, loadImage } = require('canvas')
+        /* const { createCanvas, loadImage } = require('canvas')
         const canv = createCanvas(128, 128) // discord emotes are 128x128 px
         const baseEmoji = loadImage(res.url)
         const ctx = canv.getContext('2d')
@@ -37,15 +55,9 @@ module.exports = {
         })
         baseEmoji.catch((reason) => {
           console.log(reason)
-        })
+        }) */
       } else {
-        // retrieve a result from the cache
-        res = cache.search(args[0])
-        if (res.length > 0) {
-          message.reply(`emote not found! Maybe try ${res[0].item} - \`${res[0].item.name}\`?`)
-        } else {
-          message.reply('emote not found!')
-        }
+        message.reply('emote not found!')
       }
     }
   }
