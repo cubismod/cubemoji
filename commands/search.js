@@ -3,6 +3,7 @@ module.exports = {
   description: 'Search the database for emotes',
   usage: '[search] <emote_name>',
   aliases: ['sch', 's'],
+  cooldown: 2,
   requiresCache: true,
   execute (message, args, client, cache) {
     console.log('search used')

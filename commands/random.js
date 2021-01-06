@@ -3,6 +3,7 @@ module.exports = {
   description: 'Insert a random emote!',
   usage: '[random] (optional)[number of emotes to create max: 15]',
   aliases: ['r', 'rnd', 'rand'],
+  cooldown: 2,
   requiresCache: true,
   execute (message, args, client, cache) {
     require('../helper')

@@ -2,7 +2,7 @@ module.exports = {
   name: 'flatfuck',
   description: 'Is it flat fuck friday?!',
   usage: '[flatfuck]',
-  aliases: ['ff', 'flat_fuck_friday', 'femboy_friday', 'femboy', 'flat'],
+  aliases: ['ff', 'flat_fuck_friday', 'femboy_friday', 'femboy', 'flat', 'flat_fuck'],
   cooldown: 60,
   requiresCache: false,
   execute (message) {

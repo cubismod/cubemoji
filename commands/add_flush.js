@@ -4,7 +4,8 @@ module.exports = {
   name: 'add_flush',
   description: 'Returns a flushed version of an emote. Use invert arg to invert the flush.',
   usage: '[add_flush] <emote_name/emote> (optional)[invert]',
-  aliases: ['af'],
+  aliases: ['af', 'addflush'],
+  cooldown: 1,
   requiresCache: true,
   execute (message, args, client, cache) {
     console.log('add_flush used')

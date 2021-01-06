@@ -4,6 +4,7 @@ module.exports = {
   description: 'Information about the bot!',
   usage: '[about]',
   aliases: ['a'],
+  cooldown: 5,
   requiresCache: false,
   execute (message, args, client) {
     const pkg = require('../package.json')

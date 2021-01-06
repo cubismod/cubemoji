@@ -2,7 +2,7 @@ module.exports = {
   name: 'cube',
   description: 'Create a random cube to shuffle emotes!',
   usage: '[cube]',
-  aliases: ['rc'],
+  aliases: ['c'],
   cooldown: 60,
   requiresCache: true,
   execute (message, args, client, cache) {

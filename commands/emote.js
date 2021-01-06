@@ -3,6 +3,7 @@ module.exports = {
   description: 'Inserts an emote',
   usage: '[emote] <emote_name>',
   aliases: ['emoji', 'e'],
+  cooldown: 1,
   requiresCache: true,
   execute (message, args, client, cache) {
     console.log('emote command used')

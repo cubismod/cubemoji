@@ -3,6 +3,7 @@ module.exports = {
   description: 'Insert a random flushed emote!',
   usage: '[flushed] (optional)[number of emotes to create max: 15]',
   aliases: ['flush', 'fl', 'f', 'cubis'],
+  cooldown: 2,
   requiresCache: true,
   execute (message, args, client, cache) {
     require('../helper')

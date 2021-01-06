@@ -4,6 +4,7 @@ module.exports = {
   usage: '[source] <emote_name/emote>',
   aliases: ['b', 'large', 'enhance'],
   requiresCache: true,
+  cooldown: 1,
   execute (message, args, client, cache) {
     console.log('big command used')
     if (args.length < 1) {
