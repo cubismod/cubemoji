@@ -35,7 +35,11 @@ module.exports = {
         },
         {
           name: 'Discord',
-          value: 'https://discord.gg/xPNtt7TR2z'
+          value: 'https://discord.gg/Y59XVpx'
+        },
+        {
+          name: 'Bugs and Feature Requests',
+          value: 'https://gitlab.com/cubismod/cubemoji/-/issues'
         }
       ]
     }
