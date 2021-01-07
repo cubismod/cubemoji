@@ -3,7 +3,7 @@ module.exports = {
   description: 'Play the slots!',
   usage: '[slots]',
   aliases: ['sl'],
-  cooldown: 5,
+  cooldown: 2,
   requiresCache: true,
   execute (message, args, client, cache) {
     console.log('slots command used')
@@ -43,7 +43,7 @@ module.exports = {
     // get slot options
     // make things more difficult by varying the number of emotes taken
     // for the subset of slots each time
-    const slotOptions = pand.geometricReservoirSample(pand.random(5, emoteArray.length), emoteArray)
+    const slotOptions = pand.geometricReservoirSample(pand.random(5, 20), emoteArray)
     const slotsMsg = message.channel.send(createSlotText(slotOptions))
     // edit with the options for 5 times
     slotsMsg.then((sentMsg) => {

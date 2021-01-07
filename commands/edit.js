@@ -1,10 +1,11 @@
 const Discord = require('discord.js')
 const Jimp = require('jimp')
+const Pand = require('pandemonium')
 
 module.exports = {
   name: 'edit',
   description: 'Edits an emote according to the effects you select. Effects are applied in the order you specify them. Animated emotes will return static images sadly :(',
-  usage: '[edit] <emote_name/emote> (optional and you can select multiple)<sharpen/sh> <edge_detect/ed> <emboss/em> <grayscale/gs> <blur/bl> <posterize/p> <sepia/sp> <pixelate/pi>',
+  usage: '[edit] <emote_name/emote> (optional) <random/r> (optional and you can select multiple)<sharpen/sh> <edge_detect/ed> <emboss/em> <grayscale/gs> <blur/bl> <posterize/p> <sepia/sp> <pixelate/pi>',
   aliases: ['ed', 'modify'],
   cooldown: 5,
   requiresCache: true,
@@ -24,14 +25,20 @@ module.exports = {
         }
       }
       if (res) {
-        // parse command arguments now, anything after the emote name
-        let opts
-        // limit the amount of commands that can be performed at once since this runs synchronously
-        if (args.length > 10) {
-          opts = args.slice(1, 15)
+        let opts = []
+        if (args[1].toLowerCase() === 'random' || args[1].toLowerCase() === 'r') {
+          // random effects option
+          const optLen = Pand.random(1, 21)
+          const effects = ['sh', 'ed', 'em', 'gs', 'bl', 'p', 'sp', 'pi']
+          for (let i = 0; i < optLen; i++) {
+            opts.push(Pand.choice(effects))
+          }
         } else {
-          opts = args.slice(1)
+          // parse command arguments now, anything after the emote name
+          opts = args.slice(1, 20)
         }
+
+        // limit the amount of commands that can be performed at once since this runs synchronously
         Jimp.read(res.url).then(emote => {
           // convolution info https://docs.gimp.org/2.6/en/plug-in-convmatrix.html
           opts.forEach(option => {
