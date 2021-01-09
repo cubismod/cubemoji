@@ -5,7 +5,7 @@ const Pand = require('pandemonium')
 module.exports = {
   name: 'edit',
   description: 'Edits an emote according to the effects you select. Effects are applied in the order you specify them. Animated emotes will return static images sadly :(',
-  usage: '[edit] <emote> (opt args): <random/r> <sharpen/sh> <edge_detect/ed> <emboss/em> <grayscale/gs> <blur/bl> <posterize/p> <sepia/sp> <pixelate/pi>',
+  usage: '[edit] <emote> (opt args): <random/r> <sharpen/sh> <edge_detect/ed> <emboss/em> <grayscale/gs> <blur/bl> <posterize/p> <sepia/sp> <rotate/rt> <scale/sc>',
   aliases: ['ed', 'modify'],
   cooldown: 5,
   requiresCache: true,
@@ -30,8 +30,8 @@ module.exports = {
         if (args[1].toLowerCase() === 'random' || args[1].toLowerCase() === 'r') {
           // random effects option
           random = true
-          const optLen = Pand.random(1, 21)
-          const effects = ['sharpen', 'edge_detect', 'emboss', 'grayscale', 'blur', 'posterize', 'sepia', 'pixelate']
+          const optLen = Pand.random(1, 10)
+          const effects = ['sharpen', 'emboss', 'grayscale', 'blur', 'posterize', 'sepia', 'rotate', 'scale']
           for (let i = 0; i < optLen; i++) {
             opts.push(Pand.choice(effects))
           }
@@ -65,19 +65,23 @@ module.exports = {
                 break
               case 'bl':
               case 'blur':
-                emote.blur(1)
+                emote.blur(Pand.random(1, 5))
                 break
               case 'p':
               case 'posterize':
-                emote.posterize(10)
+                emote.posterize(Pand.random(1, 5))
                 break
               case 'sp':
               case 'sepia':
                 emote.sepia()
                 break
-              case 'pi':
-              case 'pixelate':
-                emote.pixelate(10)
+              case 'rt':
+              case 'rotate':
+                emote.rotate(Pand.random(-360, 360))
+                break
+              case 'sc':
+              case 'scale':
+                emote.scale(Pand.randomFloat(0.1, 2))
                 break
             }
           })
