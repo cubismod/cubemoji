@@ -5,12 +5,13 @@ const Pand = require('pandemonium')
 module.exports = {
   name: 'edit',
   description: 'Edits an emote according to the effects you select. Effects are applied in the order you specify them. Animated emotes will return static images sadly :(',
-  usage: '[edit] <emote_name/emote> (optional) <random/r> (optional and you can select multiple)<sharpen/sh> <edge_detect/ed> <emboss/em> <grayscale/gs> <blur/bl> <posterize/p> <sepia/sp> <pixelate/pi>',
+  usage: '[edit] <emote> (opt args): <random/r> <sharpen/sh> <edge_detect/ed> <emboss/em> <grayscale/gs> <blur/bl> <posterize/p> <sepia/sp> <pixelate/pi>',
   aliases: ['ed', 'modify'],
   cooldown: 5,
   requiresCache: true,
   execute (message, args, client, cache) {
     console.log('edit used')
+    let random
     if (args.length < 1) {
       message.reply('You must specify an emote name and filters in the command! Use `c!help edit` for info on how to use this command.')
     } else {
@@ -28,14 +29,16 @@ module.exports = {
         let opts = []
         if (args[1].toLowerCase() === 'random' || args[1].toLowerCase() === 'r') {
           // random effects option
+          random = true
           const optLen = Pand.random(1, 21)
-          const effects = ['sh', 'ed', 'em', 'gs', 'bl', 'p', 'sp', 'pi']
+          const effects = ['sharpen', 'edge_detect', 'emboss', 'grayscale', 'blur', 'posterize', 'sepia', 'pixelate']
           for (let i = 0; i < optLen; i++) {
             opts.push(Pand.choice(effects))
           }
         } else {
           // parse command arguments now, anything after the emote name
           opts = args.slice(1, 20)
+          random = false
         }
 
         // limit the amount of commands that can be performed at once since this runs synchronously
@@ -66,7 +69,7 @@ module.exports = {
                 break
               case 'p':
               case 'posterize':
-                emote.posterize(5)
+                emote.posterize(10)
                 break
               case 'sp':
               case 'sepia':
@@ -74,13 +77,17 @@ module.exports = {
                 break
               case 'pi':
               case 'pixelate':
-                emote.pixelate(4)
+                emote.pixelate(10)
                 break
             }
           })
           emote.getBufferAsync(Jimp.AUTO).then(buf => {
             const attach = new Discord.MessageAttachment(buf, 'edit.png')
             message.channel.send(attach)
+            if (random) {
+              // send out the effects chain
+              message.channel.send(`Effects chain used: ${opts.join(', ')}`)
+            }
           })
             .catch(reason => console.log(reason))
         })
