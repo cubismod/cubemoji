@@ -8,19 +8,18 @@ module.exports = {
   usage: '[edit] <emote> (opt args): <random/r> <sharpen/sh> <edge_detect/ed> <emboss/em> <grayscale/gs> <blur/bl> <posterize/p> <sepia/sp> <rotate/rt> <scale/sc>.',
   aliases: ['ed', 'modify'],
   cooldown: 3,
-  requiresCache: true,
-  execute (message, args, client, cache) {
+  execute (message, args, client, helper) {
     console.log('edit used')
     let random
     if (args.length < 2) {
       message.reply(`You must specify an emote name and filters in the command! \n \`${this.usage}\``)
     } else {
       const emoteName = args[0].toLowerCase()
-      let res = cache.retrieve(emoteName)
+      let res = helper.cache.retrieve(emoteName)
       // since we implement a longer cooldown, we autofill for the first emote we find from search
       // TODO: move into helper class
       if (!res) {
-        const searchRes = cache.search(args[0])
+        const searchRes = helper.cache.search(args[0])
         if (searchRes.length !== 0) {
           res = searchRes[0].item
         }

@@ -4,7 +4,6 @@ module.exports = {
   usage: '[help] (optional)<command_name>',
   aliases: ['h'],
   cooldown: 1,
-  requiresCache: false,
   execute (message, args, client) {
     if (args.length === 0) {
       console.log('help command used')

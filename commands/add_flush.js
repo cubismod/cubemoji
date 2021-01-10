@@ -7,17 +7,16 @@ module.exports = {
   usage: '[add_flush] <emote>',
   aliases: ['af', 'addflush'],
   cooldown: 5,
-  requiresCache: true,
-  execute (message, args, client, cache) {
+  execute (message, args, client, helper) {
     console.log('add_flush used')
     if (args.length < 1) {
       message.reply(`You must specify an emote in the command! \n \`${this.usage}\``)
     } else {
       const emoteName = args[0].toLowerCase()
-      let res = cache.retrieve(emoteName)
+      let res = helper.cache.retrieve(emoteName)
       // since we implement a longer cooldown, we autofill for the first emote we find from search
       if (!res) {
-        const searchRes = cache.search(args[0])
+        const searchRes = helper.cache.search(args[0])
         if (searchRes.length !== 0) {
           res = searchRes[0].item
         }

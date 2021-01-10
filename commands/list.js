@@ -3,14 +3,13 @@ module.exports = {
   description: 'List available emotes, defaults to printing out all the emotes in well, emote',
   usage: '[list] (optional)[both|text]',
   aliases: 'l',
-  requiresCache: true,
   cooldown: 120,
-  execute (message, args, client, cache) {
+  execute (message, args, client, helper) {
     console.log('list command used')
     const msgs = []
     let msgIndex = 0
     // const helper = require('./../helper')
-    const emoteArray = cache.createEmoteArray().sort()
+    const emoteArray = helper.cache.createEmoteArray().sort()
     msgs.push('')
     for (const emote of emoteArray) {
       // don't overload discord msg limit of 2000 chars

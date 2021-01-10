@@ -4,13 +4,12 @@ module.exports = {
   usage: '[cube]',
   aliases: ['c'],
   cooldown: 60,
-  requiresCache: true,
-  execute (message, args, client, cache) {
+  execute (message, args, client, helper) {
     require('../helper')
     const Pandemonium = require('pandemonium')
     console.log('cube command used')
     const chance = Pandemonium
-    const emoteArray = cache.createEmoteArray()
+    const emoteArray = helper.cache.createEmoteArray()
     const msg = message.channel.send(chance.choice(emoteArray).toString())
     // add the react
     msg.then(message => message.react('🎲'))

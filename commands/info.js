@@ -5,7 +5,7 @@ module.exports = {
   aliases: ['i'],
   cooldown: 1,
   requiresCache: true,
-  execute (message, args, client, cache) {
+  execute (message, args, client, helper) {
     console.log('emote command used')
     if (args.length < 1) {
       message.reply('You must specify an emote name in the command!')
@@ -13,7 +13,7 @@ module.exports = {
       // emoji names are only one word long so we will only consider the 0th element
       // also doing case insensitive searching
       const emoteName = args[0].toLowerCase()
-      let res = cache.retrieve(emoteName)
+      let res = helper.cache.retrieve(emoteName)
       if (res) {
         const author = res.fetchAuthor()
         author.then((author) => {
@@ -67,7 +67,7 @@ module.exports = {
         })
       } else {
         // retrieve a result from the cache
-        res = cache.search(args[0])
+        res = helper.cache.search(args[0])
         if (res.length > 0) {
           message.reply(`emote not found! Maybe try ${res[0].item} - \`${res[0].item.name}\`?`)
         } else {

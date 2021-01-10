@@ -4,12 +4,11 @@ module.exports = {
   usage: '[flushed] (optional)<# of emotes to create max: 25>',
   aliases: ['flush', 'fl', 'f', 'cubis'],
   cooldown: 2,
-  requiresCache: true,
-  execute (message, args, client, cache) {
+  execute (message, args, client, helper) {
     require('../helper')
     const Pand = require('pandemonium')
     let repeats = 1
-    const options = cache.search('fl')
+    const options = helper.cache.search('fl')
     const intVers = parseInt(args[0])
     if (args.length > 1 && !isNaN(intVers) && intVers < 26) {
       repeats = intVers

@@ -4,10 +4,9 @@ module.exports = {
   usage: '[search] <emote_name>',
   aliases: ['sch', 's'],
   cooldown: 2,
-  requiresCache: true,
-  execute (message, args, client, cache) {
+  execute (message, args, client, helper) {
     console.log('search used')
-    const results = cache.search(args[0])
+    const results = helper.cache.search(args[0])
     if (results.length === 0) {
       message.channel.send(`No results found for your search query \`${args[0]}\``)
     } else {

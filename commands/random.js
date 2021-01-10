@@ -4,9 +4,7 @@ module.exports = {
   usage: '[random] (optional)[number of emotes to create max: 15]',
   aliases: ['r', 'rnd', 'rand'],
   cooldown: 2,
-  requiresCache: true,
-  execute (message, args, client, cache) {
-    require('../helper')
+  execute (message, args, client, helper) {
     const Pandemonium = require('pandemonium')
     let repeats = 1
     const intVers = parseInt(args[0])
@@ -16,7 +14,7 @@ module.exports = {
     console.log('random command used')
     const chance = Pandemonium
     let msg = ''
-    const emoteArray = cache.createEmoteArray()
+    const emoteArray = helper.cache.createEmoteArray()
     for (let i = 0; i < repeats; i++) {
       msg = msg.concat(chance.choice(emoteArray).toString())
     }

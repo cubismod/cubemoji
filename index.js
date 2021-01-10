@@ -8,15 +8,6 @@ client.commands = new Discord.Collection()
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'))
 const cooldowns = new Discord.Collection()
 
-// firebase setup
-var fbAdmin = require('firebase-admin')
-const serviceAccount = require('./serviceAccountKey.json')
-
-fbAdmin.initializeApp({
-  credential: fbAdmin.credential.cert(serviceAccount),
-  databaseURL: 'https://cubemoji-default-rtdb.firebaseio.com'
-})
-
 for (const file of commandFiles) {
   const command = require(`./commands/${file}`)
 
@@ -31,14 +22,16 @@ client.once('ready', () => {
 })
 client.login(secrets.token)
 
-const cache = new EmoteCache(client)
+const helper = {
+  cache: new EmoteCache(client)
+}
 
 client.on('message', message => {
   // ensure bots can't trigger the command and that we are using
   // c! as a prefix
   if (message.system) {
     // add stupid reacts to system msgs
-    message.react(Pandemonium.choice(cache.createEmoteArray()))
+    message.react(Pandemonium.choice(helper.cache.createEmoteArray()))
   }
   if (!message.content.toLowerCase().startsWith(secrets.prefix) || message.author.bot) return
 
@@ -77,13 +70,9 @@ client.on('message', message => {
   }
 
   try {
-    // we only require the cached emote class on certain calls which is specified
-    // in each module
-    if (cmd.requiresCache) {
-      cmd.execute(message, args, client, cache)
-    } else {
-      cmd.execute(message, args, client)
-    }
+    // we tie multiple things to this helper variable including a worker pool for complex functions,
+    // the emote cache wrapper class, and other things
+    cmd.execute(message, args, client, helper)
   } catch (error) {
     console.error(error)
     message.reply('there was an error trying to execute that command!')
@@ -101,7 +90,7 @@ client.on('messageReactionAdd', (react, author) => {
   react.emoji.name === '🎲' &&
   react.message.author.id === id) {
     // ensures it's cubemoji
-    react.message.edit(Pandemonium.choice(cache.createEmoteArray()).toString())
+    react.message.edit(Pandemonium.choice(helper.cache.createEmoteArray()).toString())
     react.message.reactions.resolve(react).users.remove(author)
     // react.message.reactions.removeAll().then(react.message.react('🎲'))
   }

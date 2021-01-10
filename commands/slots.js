@@ -4,8 +4,7 @@ module.exports = {
   usage: '[slots]',
   aliases: ['sl'],
   cooldown: 2,
-  requiresCache: true,
-  execute (message, args, client, cache) {
+  execute (message, args, client, helper) {
     console.log('slots command used')
     // creates text representing slots
     function createSlotText (options) {
@@ -39,7 +38,7 @@ module.exports = {
 
     // begin actual code
     const pand = require('pandemonium')
-    const emoteArray = cache.createEmoteArray()
+    const emoteArray = helper.cache.createEmoteArray()
     // get slot options
     // make things more difficult by varying the number of emotes taken
     // for the subset of slots each time
