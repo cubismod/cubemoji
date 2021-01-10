@@ -29,6 +29,8 @@ const helper = {
   pool: workerpool.pool(path.join(__dirname, 'worker.js'))
 }
 
+console.log(`${helper.pool.maxWorkers} workers available`)
+
 client.on('message', message => {
   // ensure bots can't trigger the command and that we are using
   // c! as a prefix

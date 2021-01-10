@@ -19,22 +19,22 @@ module.exports = {
         emotes
       }
     }
-    function editMsg (msg, iter) {
-      const content = createSlotText(slotOptions)
-      if (iter === 4) {
-        // on the 4th iteration we print a result
+    function editMsg (msg, iter, options) {
+      const content = createSlotText(options)
+      if (iter === 2) {
+        // on the 3rd iteration we print a result
         // points are determined if the previous emote and current emote are the same
         let points = 0
-        content.emotes.forEach((emote, index, arr) => {
-          if (index !== 0) {
-            // avoid out of bounds errors
-            const prevEmote = arr[index - 1]
-            if (emote === prevEmote) {
-              points++
+        options.forEach(option => {
+          const indices = []
+          content.emotes.filter((currentVal, index) => {
+            if (option === currentVal) {
+              indices.push(index)
             }
-          }
+          })
+          console.log(indices)
         })
-        content.res = content.res.concat(`\nPoints earned: ${points}`)
+        content.res = content.res.concat(`\n**Points earned: ${points} <a:dieRoll:795419079254605834>**`)
       }
       msg.edit(content.res)
     }
@@ -44,13 +44,14 @@ module.exports = {
     // get slot options
     // make things more difficult by varying the number of emotes taken
     // for the subset of slots each time
-    const slotOptions = Pand.geometricReservoirSample(Pand.random(1, 20), emoteArray)
+    const slotOptions = Pand.geometricReservoirSample(Pand.random(1, 40), emoteArray)
     const slotsRet = createSlotText(slotOptions)
     const slotsMsg = message.channel.send(slotsRet.res)
     // edit with the options for 5 times
     slotsMsg.then((sentMsg) => {
-      for (let i = 0; i < 5; i++) {
-        setImmediate(editMsg, sentMsg, i)
+      for (let i = 0; i < 3; i++) {
+        // TODO: investigate whether worker pooling would provide better performance
+        setImmediate(editMsg, sentMsg, i, slotOptions)
       }
     })
     slotsMsg.catch((reason) => {
