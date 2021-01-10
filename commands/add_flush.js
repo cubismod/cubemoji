@@ -4,14 +4,14 @@ const Jimp = require('jimp')
 module.exports = {
   name: 'add_flush',
   description: 'Returns a flushed version of an emote. Animated emotes will return static images sadly :(',
-  usage: '[add_flush] <emote_name/emote>',
+  usage: '[add_flush] <emote>',
   aliases: ['af', 'addflush'],
   cooldown: 5,
   requiresCache: true,
   execute (message, args, client, cache) {
     console.log('add_flush used')
     if (args.length < 1) {
-      message.reply('You must specify an emote name in the command!')
+      message.reply(`You must specify an emote in the command! \n \`${this.usage}\``)
     } else {
       const emoteName = args[0].toLowerCase()
       let res = cache.retrieve(emoteName)

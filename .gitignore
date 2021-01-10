@@ -118,3 +118,5 @@ dist
 secrets.json
 .devcontainer
 data/
+
+serviceAccountKey.json

@@ -7,7 +7,15 @@ const Pandemonium = require('pandemonium')
 client.commands = new Discord.Collection()
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'))
 const cooldowns = new Discord.Collection()
-require('log-timestamp')
+
+// firebase setup
+var fbAdmin = require('firebase-admin')
+const serviceAccount = require('./serviceAccountKey.json')
+
+fbAdmin.initializeApp({
+  credential: fbAdmin.credential.cert(serviceAccount),
+  databaseURL: 'https://cubemoji-default-rtdb.firebaseio.com'
+})
 
 for (const file of commandFiles) {
   const command = require(`./commands/${file}`)

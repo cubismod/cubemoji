@@ -5,15 +5,15 @@ const Pand = require('pandemonium')
 module.exports = {
   name: 'edit',
   description: 'Edits an emote according to the effects you select. Effects are applied in the order you specify them. Animated emotes will return static images sadly :(',
-  usage: '[edit] <emote> (opt args): <random/r> <sharpen/sh> <edge_detect/ed> <emboss/em> <grayscale/gs> <blur/bl> <posterize/p> <sepia/sp> <rotate/rt> <scale/sc>',
+  usage: '[edit] <emote> (opt args): <random/r> <sharpen/sh> <edge_detect/ed> <emboss/em> <grayscale/gs> <blur/bl> <posterize/p> <sepia/sp> <rotate/rt> <scale/sc>.',
   aliases: ['ed', 'modify'],
-  cooldown: 5,
+  cooldown: 3,
   requiresCache: true,
   execute (message, args, client, cache) {
     console.log('edit used')
     let random
-    if (args.length < 1) {
-      message.reply('You must specify an emote name and filters in the command! Use `c!help edit` for info on how to use this command.')
+    if (args.length < 2) {
+      message.reply(`You must specify an emote name and filters in the command! \n \`${this.usage}\``)
     } else {
       const emoteName = args[0].toLowerCase()
       let res = cache.retrieve(emoteName)
@@ -27,7 +27,7 @@ module.exports = {
       }
       if (res) {
         let opts = []
-        if (args[1].toLowerCase() === 'random' || args[1].toLowerCase() === 'r') {
+        if ((args.length > 0 && args[1].toLowerCase() === 'random') || args[1].toLowerCase() === 'r') {
           // random effects option
           random = true
           const optLen = Pand.random(1, 10)
@@ -44,6 +44,10 @@ module.exports = {
         // limit the amount of commands that can be performed at once since this runs synchronously
         Jimp.read(res.url).then(emote => {
           // convolution info https://docs.gimp.org/2.6/en/plug-in-convmatrix.html
+          if (emote.bitmap.width > 250 || emote.bitmap.height > 250) {
+            emote.scale(0.4)
+          }
+          let scaleAmts = 0
           opts.forEach(option => {
             switch (option) {
               // let the user use shorter aliases that fall through
@@ -75,18 +79,27 @@ module.exports = {
               case 'sepia':
                 emote.sepia()
                 break
+                // limit the number of scales to preserve memory
               case 'rt':
               case 'rotate':
-                emote.rotate(Pand.random(-360, 360))
+                if (scaleAmts < 6) {
+                  emote.rotate(Pand.random(-360, 360))
+                  scaleAmts++
+                }
                 break
               case 'sc':
               case 'scale':
-                emote.scale(Pand.randomFloat(0.1, 2))
+                if (scaleAmts < 6) {
+                  emote.scale(Pand.randomFloat(0.1, 2))
+                  scaleAmts++
+                }
                 break
             }
-          })
+            emote.resize(275, 275)
+          }
+          )
           emote.getBufferAsync(Jimp.AUTO).then(buf => {
-            const attach = new Discord.MessageAttachment(buf, 'edit.png')
+            const attach = new Discord.MessageAttachment(buf, 'most_likely_blursed.png')
             message.channel.send(attach)
             if (random) {
               // send out the effects chain
