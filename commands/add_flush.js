@@ -1,5 +1,4 @@
 const Discord = require('discord.js')
-const Jimp = require('jimp')
 
 module.exports = {
   name: 'add_flush',
