@@ -62,22 +62,31 @@ function editImage (url, options) {
       emote.resize(275, 275)
     }
     )
-    return emote.getBufferAsync(Jimp.AUTO).then(buf => { return buf })
+    return emote.getBufferAsync(Jimp.AUTO).then(buf => {
+      return buf
+    })
     // catch if jimp fails to get the buffer asynchronously
       .catch(reason => console.log(reason))
-      // {
-      //   const attach = new Discord.MessageAttachment(buf, 'most_likely_blursed.png')
-      //   message.channel.send(attach)
-      //   if (random) {
-      //     // send out the effects chain
-      //     message.channel.send(`Effects chain used: ${options.join(', ')}`)
-      //   }
-      // })
   })
   // catch statement if JIMP fails to load the image
     .catch(reason => console.log(reason))
 }
 
+function addFlush (url) {
+  return Jimp.read('./assets/flushed.png').then(flush => {
+    return Jimp.read(url).then(baseEmote => {
+      baseEmote.composite(flush, 0, 0, { mode: Jimp.BLEND_SOURCE_OVER })
+      return baseEmote.getBufferAsync(Jimp.AUTO).then(buf => {
+        return buf
+      })
+        .catch(reason => console.log(reason)) // unable to get async buf
+    })
+      .catch(reason => console.log(reason)) // unable to read url of user emote
+  })
+    .catch(reason => console.log(reason)) // unable to read base flushed image
+}
+
 workerpool.worker({
-  editImage: editImage
+  editImage: editImage,
+  addFlush: addFlush
 })

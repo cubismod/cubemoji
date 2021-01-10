@@ -50,7 +50,6 @@ module.exports = {
             }
           })
           .catch(error => console.log(error))
-        console.log('worker queued')
       } else {
         message.reply('emote not found!')
       }

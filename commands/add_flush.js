@@ -6,7 +6,6 @@ module.exports = {
   description: 'Returns a flushed version of an emote. Animated emotes will return static images sadly :(',
   usage: '[add_flush] <emote>',
   aliases: ['af', 'addflush'],
-  cooldown: 5,
   execute (message, args, client, helper) {
     console.log('add_flush used')
     if (args.length < 1) {
@@ -22,18 +21,13 @@ module.exports = {
         }
       }
       if (res) {
-        Jimp.read('./assets/flushed.png').then(flush => {
-          Jimp.read(res.url).then(baseEmote => {
-            baseEmote.composite(flush, 0, 0, { mode: Jimp.BLEND_SOURCE_OVER })
-            baseEmote.getBufferAsync(Jimp.AUTO).then(buf => {
-              const attach = new Discord.MessageAttachment(buf, 'flush.png')
-              message.channel.send(attach)
-            })
-              .catch(reason => console.log(reason))
+        // queue up another worker to run the image edit
+        helper.pool.exec('addFlush', [res.url])
+          .then(result => {
+            const attach = new Discord.MessageAttachment(Buffer.from(result), 'flushed.png')
+            message.channel.send(attach)
           })
-            .catch(reason => console.log(reason))
-        })
-          .catch(reason => console.log(reason))
+          .catch(error => console.log(error))
       } else {
         message.reply('emote not found!')
       }
