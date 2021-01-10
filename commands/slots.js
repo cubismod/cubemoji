@@ -1,7 +1,7 @@
 const Pand = require('pandemonium')
 module.exports = {
   name: 'slots',
-  description: 'Play the slots! One point is added for each matching emote',
+  description: 'Play the slots! One point is added for each pair of matches.',
   usage: '[slots]',
   aliases: ['sl'],
   cooldown: 2,
@@ -25,16 +25,15 @@ module.exports = {
         // on the 3rd iteration we print a result
         // points are determined if the previous emote and current emote are the same
         let points = 0
-        options.forEach(option => {
-          const indices = []
-          content.emotes.filter((currentVal, index) => {
-            if (option === currentVal) {
-              indices.push(index)
+        content.emotes.forEach((emote, index, arr) => {
+          if (index > 0) {
+            const prevEmote = arr[index - 1]
+            if (emote === prevEmote) {
+              points++
             }
-          })
-          console.log(indices)
+          }
         })
-        content.res = content.res.concat(`\n**Points earned: ${points} <a:dieRoll:795419079254605834>**`)
+        content.res = content.res.concat(`\n**<a:dieRoll:795419079254605834> Matches: ${points} <a:dieRoll:795419079254605834>**`)
       }
       msg.edit(content.res)
     }
