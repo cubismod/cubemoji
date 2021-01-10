@@ -7,6 +7,8 @@ const Pandemonium = require('pandemonium')
 client.commands = new Discord.Collection()
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'))
 const cooldowns = new Discord.Collection()
+const workerpool = require('workerpool')
+const path = require('path')
 
 for (const file of commandFiles) {
   const command = require(`./commands/${file}`)
@@ -23,7 +25,8 @@ client.once('ready', () => {
 client.login(secrets.token)
 
 const helper = {
-  cache: new EmoteCache(client)
+  cache: new EmoteCache(client),
+  pool: workerpool.pool(path.join(__dirname, 'worker.js'))
 }
 
 client.on('message', message => {
@@ -49,24 +52,26 @@ client.on('message', message => {
   }
 
   // cooldown checks
-  if (!cooldowns.has(cmd.name)) {
-    cooldowns.set(cmd.name, new Discord.Collection())
-  }
-
-  const now = Date.now()
-  const timestamps = cooldowns.get(cmd.name)
-  const cooldownAmount = (cmd.cooldown || 3) * 1000
-
-  if (timestamps.has(message.author.id)) {
-    const expirationTime = timestamps.get(message.author.id) + cooldownAmount
-
-    if (now < expirationTime) {
-      const timeLeft = (expirationTime - now) / 1000
-      return message.reply(`Please wait ${timeLeft.toFixed(1)} more seconds before executing \`${cmd.name}\`. The cooldown is ${cmd.cooldown} seconds`)
+  if ('cooldown' in cmd) {
+    if (!cooldowns.has(cmd.name)) {
+      cooldowns.set(cmd.name, new Discord.Collection())
     }
-  } else {
-    timestamps.set(message.author.id, now)
-    setTimeout(() => timestamps.delete(message.author.id), cooldownAmount)
+
+    const now = Date.now()
+    const timestamps = cooldowns.get(cmd.name)
+    const cooldownAmount = (cmd.cooldown || 3) * 1000
+
+    if (timestamps.has(message.author.id)) {
+      const expirationTime = timestamps.get(message.author.id) + cooldownAmount
+
+      if (now < expirationTime) {
+        const timeLeft = (expirationTime - now) / 1000
+        return message.reply(`Please wait ${timeLeft.toFixed(1)} more seconds before executing \`${cmd.name}\`. The cooldown is ${cmd.cooldown} seconds`)
+      }
+    } else {
+      timestamps.set(message.author.id, now)
+      setTimeout(() => timestamps.delete(message.author.id), cooldownAmount)
+    }
   }
 
   try {
