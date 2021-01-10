@@ -1,6 +1,7 @@
+const Pand = require('pandemonium')
 module.exports = {
   name: 'slots',
-  description: 'Play the slots!',
+  description: 'Play the slots! One point is added for each matching emote',
   usage: '[slots]',
   aliases: ['sl'],
   cooldown: 2,
@@ -8,42 +9,44 @@ module.exports = {
     console.log('slots command used')
     // creates text representing slots
     function createSlotText (options) {
-      return `${pand.choice(slotOptions)}${pand.choice(slotOptions)}${pand.choice(slotOptions)}`
-    }
-    // on the 4th iteration we print a result
-    function editMsg (msg, iter) {
-      let content = createSlotText(slotOptions)
-      if (iter === 4) {
-        const emotes = content.split(':')
-        // split should look something like this
-        // [
-        //   "<", 0
-        //   "amongus", 1
-        //   "780838024803254303><",  2
-        //   "triCri",  3
-        //   "778722027854888991><a", 4
-        //   "flushWide", 5
-        //   "783113008129245215>", 6
-        // ]
-        if ((emotes[1] === emotes[3]) &&
-        (emotes[3] === emotes[5])) {
-          // user won
-          content = content.concat(`\n**Congrats you won! ${message.author.username}** <a:dieRoll:795419079254605834>`)
-        } else {
-          content = content.concat(`\n**Sorry you lost... ${message.author.username}** <a:dieRoll:795419079254605834>`)
-        }
+      const emotes = Pand.sampleWithReplacements(20, options)
+      let res = ''
+      emotes.forEach(emote => {
+        res = res.concat(emote)
+      })
+      return {
+        res,
+        emotes
       }
-      msg.edit(content)
+    }
+    function editMsg (msg, iter) {
+      const content = createSlotText(slotOptions)
+      if (iter === 4) {
+        // on the 4th iteration we print a result
+        // points are determined if the previous emote and current emote are the same
+        let points = 0
+        content.emotes.forEach((emote, index, arr) => {
+          if (index !== 0) {
+            // avoid out of bounds errors
+            const prevEmote = arr[index - 1]
+            if (emote === prevEmote) {
+              points++
+            }
+          }
+        })
+        content.res = content.res.concat(`\nPoints earned: ${points}`)
+      }
+      msg.edit(content.res)
     }
 
     // begin actual code
-    const pand = require('pandemonium')
     const emoteArray = helper.cache.createEmoteArray()
     // get slot options
     // make things more difficult by varying the number of emotes taken
     // for the subset of slots each time
-    const slotOptions = pand.geometricReservoirSample(pand.random(5, 20), emoteArray)
-    const slotsMsg = message.channel.send(createSlotText(slotOptions))
+    const slotOptions = Pand.geometricReservoirSample(Pand.random(1, 20), emoteArray)
+    const slotsRet = createSlotText(slotOptions)
+    const slotsMsg = message.channel.send(slotsRet.res)
     // edit with the options for 5 times
     slotsMsg.then((sentMsg) => {
       for (let i = 0; i < 5; i++) {

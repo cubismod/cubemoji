@@ -3,9 +3,10 @@ const Pand = require('pandemonium')
 
 module.exports = {
   name: 'edit',
-  description: 'Edits an emote according to the effects you select. Effects are applied in the order you specify them. Animated emotes will return static images sadly :(',
+  description: 'Edits an emote according to the effects you select. Effects are applied in the order you specify them. Animated emotes will return static images. This process is computationally intense so give it a few seconds to work.',
   usage: '[edit] <emote> (opt args): <random/r> <sharpen/sh> <edge_detect/ed> <emboss/em> <grayscale/gs> <blur/bl> <posterize/p> <sepia/sp> <rotate/rt> <scale/sc>.',
   aliases: ['ed', 'modify'],
+  cooldown: 5,
   execute (message, args, client, helper) {
     console.log('edit used')
     let random
@@ -37,6 +38,7 @@ module.exports = {
           options = args.slice(1, 20)
           random = false
         }
+        message.react('<a:dieRoll:795419079254605834>')
         // queue up a worker to run
         helper.pool.exec('editImage', [res.url, options])
           .then(result => {
