@@ -4,7 +4,7 @@ module.exports = {
   description: 'Play the slots! One point is added for each pair of matches.',
   usage: '[slots]',
   aliases: ['sl'],
-  cooldown: 2,
+  cooldown: 1,
   execute (message, args, client, helper) {
     console.log('slots command used')
     // creates text representing slots
@@ -33,8 +33,7 @@ module.exports = {
             }
           }
         })
-        content.res = content.res.concat(`\n**<a:dieRoll:795419079254605834> Matches: ${points} <a:dieRoll:795419079254605834>**`)
-
+        let newScore = points
         helper.slotsDb.once('value')
           .then(snapshot => {
             // check if user exists, if not add them to the database
@@ -42,17 +41,21 @@ module.exports = {
             if (!childUser.exists()) {
               // create user
               helper.slotsDb.child(message.author.id).set({
-                score: points
+                score: newScore
               })
             } else {
               // otherwise set their score
               const prevValue = childUser.val().score
+              newScore = points + parseInt(prevValue)
               helper.slotsDb.child(message.author.id).set({
-                score: points + parseInt(prevValue)
+                score: newScore
               })
             }
+            // then we send out the score
+            content.res = content.res.concat(`\n**<a:dieRoll:795419079254605834> Matches: ${points} <a:dieRoll:795419079254605834>.\nYour current score: ${newScore}**`)
+            msg.edit(content.res)
           })
-        msg.edit(content.res)
+          .catch(rejected => console.log(rejected))
       }
     }
 
@@ -61,7 +64,7 @@ module.exports = {
     // get slot options
     // make things more difficult by varying the number of emotes taken
     // for the subset of slots each time
-    const slotOptions = Pand.geometricReservoirSample(Pand.random(1, 40), emoteArray)
+    const slotOptions = Pand.geometricReservoirSample(Pand.random(5, 30), emoteArray)
     const slotsRet = createSlotText(slotOptions)
     const slotsMsg = message.channel.send(slotsRet.res)
     // edit with the options for 5 times

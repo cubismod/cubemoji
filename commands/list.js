@@ -1,7 +1,7 @@
 module.exports = {
   name: 'list',
-  description: 'List available emotes, defaults to printing out all the emotes in well, emote',
-  usage: '[list] (optional)[both|text]',
+  description: 'List available emotes in a DM',
+  usage: '[list]',
   aliases: 'l',
   cooldown: 120,
   execute (message, args, client, helper) {
