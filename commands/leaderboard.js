@@ -6,7 +6,7 @@ module.exports = {
   cooldown: 5,
   execute (message, args, client, helper) {
     // get the leaderboard organized by scores
-    helper.slotsDb.orderByValue().once('value')
+    helper.slotsDb.orderByChild('score').once('value')
       .then(async (snapshot) => {
         const msgs = []
         snapshot.forEach(user => {
