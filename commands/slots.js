@@ -21,8 +21,8 @@ module.exports = {
     }
     function editMsg (msg, iter, options) {
       const content = createSlotText(options)
-      if (iter === 2) {
-        // on the 3rd iteration we print a result
+      if (iter === 1) {
+        // on the 2ndd iteration we print a result
         // points are determined if the previous emote and current emote are the same
         let points = 0
         content.emotes.forEach((emote, index, arr) => {
@@ -54,7 +54,7 @@ module.exports = {
               })
             }
             // then we send out the score
-            content.res = content.res.concat(`\n**<a:dieRoll:795419079254605834> Matches: ${points} <a:dieRoll:795419079254605834>.\nYour current score: ${newScore}**`)
+            content.res = content.res.concat(`\n**<a:dieRoll:795419079254605834> Matches: ${points} <a:dieRoll:795419079254605834>.\n${message.author.username}'s current score: ${newScore}**`)
             msg.edit(content.res)
           })
           .catch(rejected => console.log(rejected))
@@ -71,7 +71,7 @@ module.exports = {
     const slotsMsg = message.channel.send(slotsRet.res)
     // edit with the options for 5 times
     slotsMsg.then((sentMsg) => {
-      for (let i = 0; i < 3; i++) {
+      for (let i = 0; i < 2; i++) {
         // TODO: investigate whether worker pooling would provide better performance
         setImmediate(editMsg, sentMsg, i, slotOptions)
       }
