@@ -41,14 +41,16 @@ module.exports = {
             if (!childUser.exists()) {
               // create user
               helper.slotsDb.child(message.author.id).set({
-                score: newScore
+                score: newScore,
+                username: message.author.username
               })
             } else {
               // otherwise set their score
               const prevValue = childUser.val().score
               newScore = points + parseInt(prevValue)
               helper.slotsDb.child(message.author.id).set({
-                score: newScore
+                score: newScore,
+                username: message.author.username
               })
             }
             // then we send out the score

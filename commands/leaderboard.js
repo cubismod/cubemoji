@@ -9,35 +9,35 @@ module.exports = {
     helper.slotsDb.orderByValue().once('value')
       .then(async (snapshot) => {
         const msgs = []
-        let msgIndex = 0
-        msgs.push('**Slots Leaderboard**\n')
-        let i = 1
-        await snapshot.forEach(async (user, index, arr) => {
-          // need to fetch the actual username from the ID
-          // send messages spaced out for char limits
-          // since we are building and sending a message string, we need to await
-          // results of the promise
+        snapshot.forEach(user => {
+          // for each snapshot we will add onto an array of scores
           console.log(user.key)
-          const fetchedUsr = await client.users.fetch(user.key)
-          const newText = msgs[msgIndex].concat(`${i}. ${fetchedUsr.username} - ${user.val().score}`)
-          const newLen = msgs[msgIndex].length + newText.length
-          if (newLen > 2000) {
-            // new message queued
-            msgIndex += 1
-            msgs.push('')
+          msgs.push(`${user.val().username} - ${user.val().score} matches`)
+        })
+        // then we reverse this list of msgs since we need sorting hi-lo scores
+        msgs.reverse()
+        let charCount = 0
+        let msgStr = '<a:dieRoll:795419079254605834> ** Slots Leaderboard ** <a:dieRoll:795419079254605834>\n'
+        for (let i = 0; i < msgs.length; i++) {
+          if (msgs[i].length + charCount > 2000) {
+            // split out the message into multiple messages if needed
+            client.channel.send(msgStr)
+            msgStr = 0
+            charCount = 0
           } else {
-            msgs[msgIndex] = newText
-          }
-          i++
-          if (i === arr.length) {
-            // now we send the message
-            for (const msg of msgs) {
-              if (msg !== '') {
-                message.channel.send(msg)
-              }
+            if (msgs[i].indexOf(message.author.username) !== -1) {
+              msgStr = msgStr.concat(`**${i + 1}. ${msgs[i]}**\n`)
+            } else {
+              // bold the user's name so they know where they placed
+              msgStr = msgStr.concat(`${i + 1}. ${msgs[i]}\n`)
             }
           }
-        })
+        }
+        // send out a message if it hasn't already been sent
+        if (msgStr !== '') {
+          message.channel.send(msgStr)
+        }
+        // send user's placement
       })
   }
 }

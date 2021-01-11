@@ -1,6 +1,6 @@
 {
     "name": "cubemoji",
-    "version": "2.3.7",
+    "version": "2.4.0",
     "slug": "cubemoji",
     "description": "A Discord emote bot!",
     "arch": ["armv7", "amd64"],
