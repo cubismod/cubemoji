@@ -10,6 +10,20 @@ const cooldowns = new Discord.Collection()
 const workerpool = require('workerpool')
 const path = require('path')
 
+// firebase setup
+const fbAdmin = require('firebase-admin')
+const svcAcct = require('./serviceAccountKey.json')
+
+fbAdmin.initializeApp({
+  credential: fbAdmin.credential.cert(svcAcct),
+  databaseURL: 'https://cubemoji-default-rtdb.firebaseio.com/',
+  databaseAuthVariableOverride: {
+    uid: 'cubemoji-ds-bot'
+  }
+})
+
+const db = fbAdmin.database()
+
 for (const file of commandFiles) {
   const command = require(`./commands/${file}`)
 
@@ -24,9 +38,14 @@ client.once('ready', () => {
 })
 client.login(secrets.token)
 
+// helper serves as a catch-all reference object that
+// commands can use to spin up workers, access the emote cache
+// and update the firebase database
 const helper = {
   cache: new EmoteCache(client),
-  pool: workerpool.pool(path.join(__dirname, 'worker.js'))
+  pool: workerpool.pool(path.join(__dirname, 'worker.js')),
+  emojiDb: db.ref('emojis/'),
+  slotsDb: db.ref('slots/')
 }
 
 console.log(`${helper.pool.maxWorkers} workers available`)

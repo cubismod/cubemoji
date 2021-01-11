@@ -34,8 +34,26 @@ module.exports = {
           }
         })
         content.res = content.res.concat(`\n**<a:dieRoll:795419079254605834> Matches: ${points} <a:dieRoll:795419079254605834>**`)
+
+        helper.slotsDb.once('value')
+          .then(snapshot => {
+            // check if user exists, if not add them to the database
+            const childUser = snapshot.child(message.author.id)
+            if (!childUser.exists()) {
+              // create user
+              helper.slotsDb.child(message.author.id).set({
+                score: points
+              })
+            } else {
+              // otherwise set their score
+              const prevValue = childUser.val().score
+              helper.slotsDb.child(message.author.id).set({
+                score: points + parseInt(prevValue)
+              })
+            }
+          })
+        msg.edit(content.res)
       }
-      msg.edit(content.res)
     }
 
     // begin actual code

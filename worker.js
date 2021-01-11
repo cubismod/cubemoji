@@ -86,8 +86,6 @@ function addFlush (url) {
     .catch(reason => console.log(reason)) // unable to read base flushed image
 }
 
-function 
-
 workerpool.worker({
   editImage: editImage,
   addFlush: addFlush
