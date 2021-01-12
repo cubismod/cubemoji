@@ -29,7 +29,7 @@ module.exports = {
           if (index > 0) {
             const prevEmote = arr[index - 1]
             if (emote === prevEmote) {
-              points = points + Pand.random(0, 2)
+              points = points + Pand.random(1, 4)
             }
           }
         })
