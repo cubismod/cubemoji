@@ -76,11 +76,14 @@ module.exports = {
         setImmediate(editMsg, sentMsg, i, slotOptions)
       }
     })
-    // attach an event to delete the message after 1 min to avoid spam
+    // attach an event to delete the message after 2 min to avoid spam
+    // but choose this randomly
     slotsMsg.then(msg => {
-      setTimeout(function () {
-        msg.delete()
-      }, 60000)
+      if (Pand.choice([true, false])) {
+        setTimeout(function () {
+          msg.delete()
+        }, 120000)
+      }
     })
   }
 }
