@@ -70,4 +70,15 @@ module.exports = class EmoteCache {
     }
     return res
   }
+
+  // given an argument in the form of <@86890631690977280> or <!@86890631690977280>
+  // this returns the URL of that avatar or null
+  getAvatar (msg, client) {
+    const found = msg.match(/<@!?(\d+)>/)
+    if (found) {
+      const user = client.users.cache.get(found[1])
+      // inform the editor that this is just a URL we are grabbing, not an emote object
+      return (user.avatarURL({ format: 'png', size: 128 }))
+    } else return null
+  }
 }

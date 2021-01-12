@@ -2,8 +2,8 @@ const Discord = require('discord.js')
 
 module.exports = {
   name: 'add_flush',
-  description: 'Returns a flushed version of an emote. Animated emotes will return static images. This process is computationally intense so give it a few seconds to work.',
-  usage: '[add_flush] <emote>',
+  description: 'Returns a flushed version of an emote/avatar. Animated emotes/avatars will return static images. This process is computationally intense so give it a few seconds to work.',
+  usage: '[add_flush] <emote/@mention>',
   aliases: ['af', 'addflush'],
   cooldown: 1,
   execute (message, args, client, helper) {
@@ -11,13 +11,21 @@ module.exports = {
     if (args.length < 1) {
       message.reply(`You must specify an emote in the command! \n \`${this.usage}\``)
     } else {
-      const emoteName = args[0].toLowerCase()
-      let res = helper.cache.retrieve(emoteName)
-      // since we implement a longer cooldown, we autofill for the first emote we find from search
-      if (!res) {
-        const searchRes = helper.cache.search(args[0])
-        if (searchRes.length !== 0) {
-          res = searchRes[0].item
+      const argName = args[0].toLowerCase()
+      // check if its a mention and then only get
+      // the numeric part of the mention code
+      const avatarUrl = helper.cache.getAvatar(argName, client)
+      let res = {}
+      if (avatarUrl) {
+        res.url = avatarUrl
+      } else {
+        res = helper.cache.retrieve(argName)
+        // since we implement a longer cooldown, we autofill for the first emote we find from search
+        if (!res) {
+          const searchRes = helper.cache.search(args[0])
+          if (searchRes.length !== 0) {
+            res = searchRes[0].item
+          }
         }
       }
       if (res) {

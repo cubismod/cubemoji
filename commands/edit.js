@@ -3,8 +3,8 @@ const Pand = require('pandemonium')
 
 module.exports = {
   name: 'edit',
-  description: 'Edits an emote according to the effects you select. Effects are applied in the order you specify them. Animated emotes will return static images. This process is computationally intense so give it a few seconds to work.',
-  usage: '[edit] <emote> (opt args): <random/r> <sharpen/sh> <edge_detect/ed> <emboss/em> <grayscale/gs> <blur/bl> <posterize/p> <sepia/sp> <rotate/rt> <scale/sc>.',
+  description: 'Edits an emote/avatar according to the effects you select. Effects are applied in the order you specify them. Animated emotes will return static images. This process is computationally intense so give it a few seconds to work.',
+  usage: '[edit] <emote/@mention> (opt args): <random/r> <sharpen/sh> <edge_detect/ed> <emboss/em> <grayscale/gs> <blur/bl> <posterize/p> <sepia/sp> <rotate/rt> <scale/sc>.',
   aliases: ['ed', 'modify'],
   cooldown: 5,
   execute (message, args, client, helper) {
@@ -13,14 +13,22 @@ module.exports = {
     if (args.length < 2) {
       message.reply(`You must specify an emote name and filters in the command! \n \`${this.usage}\``)
     } else {
-      const emoteName = args[0].toLowerCase()
-      let res = helper.cache.retrieve(emoteName)
-      // since we implement a longer cooldown, we autofill for the first emote we find from search
-      // TODO: move into helper class
-      if (!res) {
-        const searchRes = helper.cache.search(args[0])
-        if (searchRes.length !== 0) {
-          res = searchRes[0].item
+      const argName = args[0].toLowerCase()
+      // check if its a mention and then only get
+      // the numeric part of the mention code
+      const avatarUrl = helper.cache.getAvatar(argName, client)
+      let res = {}
+      if (avatarUrl) {
+        res.url = avatarUrl
+      } else {
+        res = helper.cache.retrieve(argName)
+        // since we implement a longer cooldown, we autofill for the first emote we find from search
+        // TODO: move into helper class
+        if (!res) {
+          const searchRes = helper.cache.search(args[0])
+          if (searchRes.length !== 0) {
+            res = searchRes[0].item
+          }
         }
       }
       if (res) {
