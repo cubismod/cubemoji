@@ -22,14 +22,14 @@ module.exports = {
     function editMsg (msg, iter, options) {
       const content = createSlotText(options)
       if (iter === 1) {
-        // on the 2ndd iteration we print a result
+        // on the 2nd iteration we print a result
         // points are determined if the previous emote and current emote are the same
         let points = 0
         content.emotes.forEach((emote, index, arr) => {
           if (index > 0) {
             const prevEmote = arr[index - 1]
             if (emote === prevEmote) {
-              points++
+              points = points + Pand.random(0, 2)
             }
           }
         })
@@ -54,7 +54,7 @@ module.exports = {
               })
             }
             // then we send out the score
-            content.res = content.res.concat(`\n**<a:dieRoll:795419079254605834> Matches: ${points} <a:dieRoll:795419079254605834>.\n${message.author.username}'s current score: ${newScore}**`)
+            content.res = content.res.concat(`\n**<a:dieRoll:795419079254605834> Score: ${points} <a:dieRoll:795419079254605834>.\n${Pand.choice(helper.cache.createEmoteArray())} ${message.author.username}'s high score: ${newScore}**`)
             msg.edit(content.res)
           })
           .catch(rejected => console.log(rejected))
@@ -66,7 +66,7 @@ module.exports = {
     // get slot options
     // make things more difficult by varying the number of emotes taken
     // for the subset of slots each time
-    const slotOptions = Pand.geometricReservoirSample(Pand.random(5, 30), emoteArray)
+    const slotOptions = Pand.geometricReservoirSample(Pand.random(1, 20), emoteArray)
     const slotsRet = createSlotText(slotOptions)
     const slotsMsg = message.channel.send(slotsRet.res)
     // edit with the options for 5 times

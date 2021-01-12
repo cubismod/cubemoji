@@ -9,6 +9,7 @@ const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('
 const cooldowns = new Discord.Collection()
 const workerpool = require('workerpool')
 const path = require('path')
+require('log-timestamp')
 
 // firebase setup
 const fbAdmin = require('firebase-admin')
