@@ -8,8 +8,8 @@ function editImage (url, options) {
   // limit the amount of commands that can be performed at once since this runs synchronously
   return Jimp.read(url).then(emote => {
     // convolution info https://docs.gimp.org/2.6/en/plug-in-convmatrix.html
-    if (emote.bitmap.width > 250 || emote.bitmap.height > 250) {
-      emote.scale(0.4)
+    if (emote.bitmap.width > 128 || emote.bitmap.height > 128) {
+      emote.resize(128, 128)
     }
     let scaleAmts = 0
     options.forEach(option => {
@@ -59,7 +59,6 @@ function editImage (url, options) {
           }
           break
       }
-      emote.resize(275, 275)
     }
     )
     return emote.getBufferAsync(Jimp.AUTO).then(buf => {

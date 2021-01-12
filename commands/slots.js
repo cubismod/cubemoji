@@ -4,7 +4,7 @@ module.exports = {
   description: 'Play the slots! One point is added for each pair of matches.',
   usage: '[slots]',
   aliases: ['sl'],
-  cooldown: 1,
+  cooldown: 2,
   execute (message, args, client, helper) {
     console.log('slots command used')
     // creates text representing slots
@@ -76,8 +76,11 @@ module.exports = {
         setImmediate(editMsg, sentMsg, i, slotOptions)
       }
     })
-    slotsMsg.catch((reason) => {
-      console.log(reason)
+    // attach an event to delete the message after 1 min to avoid spam
+    slotsMsg.then(msg => {
+      setTimeout(function () {
+        msg.delete()
+      }, 60000)
     })
   }
 }
