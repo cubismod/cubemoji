@@ -8,7 +8,7 @@ module.exports = {
     const Pandemonium = require('pandemonium')
     let repeats = 1
     const intVers = parseInt(args[0])
-    if (args.length > 0 && !isNaN(intVers) && intVers < 16) {
+    if (args.length > 0 && !isNaN(intVers) && intVers < 26) {
       repeats = intVers
     }
     console.log('random command used')
