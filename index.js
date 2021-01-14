@@ -57,8 +57,8 @@ function checkWhiteList (channel, commandName) {
   /* so the command whitelist JSON file is organized like so:
   {
     (server id) {
-      (whitelisted channel id) {
-        (command name)
+      (command name) {
+        (channel id)
       }
     }
   }
@@ -68,10 +68,12 @@ function checkWhiteList (channel, commandName) {
   const guildId = channel.guild.id
   const channelId = channel.id
   if (Object.prototype.hasOwnProperty.call(whitelist, guildId)) {
-    if (Object.prototype.hasOwnProperty.call(whitelist[guildId], channelId)) {
-      if (Object.prototype.hasOwnProperty.call(whitelist[guildId][channelId], commandName)) {
+    if (Object.prototype.hasOwnProperty.call(whitelist[guildId], commandName)) {
+      if (Object.prototype.hasOwnProperty.call(whitelist[guildId][commandName], channelId)) {
         return true
       }
+    } else {
+      return true
     }
   } else {
     return true
