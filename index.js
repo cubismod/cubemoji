@@ -51,6 +51,34 @@ const helper = {
 
 console.log(`${helper.pool.maxWorkers} workers available`)
 
+// function returns true if the command is allowed in the specific channel
+// false if not
+function checkWhiteList (channel, commandName) {
+  /* so the command whitelist JSON file is organized like so:
+  {
+    (server id) {
+      (whitelisted channel id) {
+        (command name)
+      }
+    }
+  }
+  channel whitelists are per server
+  */
+  const whitelist = require('./whitelist.json')
+  const guildId = channel.guild.id
+  const channelId = channel.id
+  if (Object.prototype.hasOwnProperty.call(whitelist, guildId)) {
+    if (Object.prototype.hasOwnProperty.call(whitelist[guildId], channelId)) {
+      if (Object.prototype.hasOwnProperty.call(whitelist[guildId][channelId], commandName)) {
+        return true
+      }
+    }
+  } else {
+    return true
+  }
+  return false
+}
+
 client.on('message', message => {
   if (!message.content.toLowerCase().startsWith(secrets.prefix) || message.author.bot) return
 
@@ -67,7 +95,12 @@ client.on('message', message => {
     return
   }
 
-  // cooldown checks
+  // check the command whitelist
+  if (!checkWhiteList(message.channel, cmd.name)) {
+    return message.reply('This command is not allowed in this channel.')
+  }
+
+  // cooldown check and ensure that the command is allowed in the specific channel
   if ('cooldown' in cmd) {
     if (!cooldowns.has(cmd.name)) {
       cooldowns.set(cmd.name, new Discord.Collection())
