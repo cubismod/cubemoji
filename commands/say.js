@@ -5,7 +5,7 @@ module.exports = {
   aliases: ['sy'],
   cooldown: 5,
   execute (message, args, client) {
-    console.log('add_flush used')
+    // console.log('add_flush used')
     if (args.length < 2 || message.author.id !== '170358606590377984') {
       message.reply('You must include a channel id and text in the command and be cubis!')
     } else {

@@ -11,7 +11,7 @@ module.exports = {
     if (args.length > 0 && !isNaN(intVers) && intVers < 26) {
       repeats = intVers
     }
-    console.log('random command used')
+    // console.log('random command used')
     const chance = Pandemonium
     let msg = ''
     const emoteArray = helper.cache.createEmoteArray()

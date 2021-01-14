@@ -8,7 +8,7 @@ module.exports = {
   aliases: ['ed', 'modify'],
   cooldown: 5,
   execute (message, args, client, helper) {
-    console.log('edit used')
+    // console.log('edit used')
     let random
     if (args.length < 2) {
       message.reply(`You must specify an emote name and filters in the command! \n \`${this.usage}\``)

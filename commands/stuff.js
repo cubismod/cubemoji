@@ -5,7 +5,7 @@ module.exports = {
   aliases: ['st', 'stuffed', 'stuffee'],
   cooldown: 1,
   execute (message) {
-    console.log('stuff command used')
+    // console.log('stuff command used')
     message.channel.send('😳')
   }
 }

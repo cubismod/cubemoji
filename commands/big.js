@@ -5,7 +5,7 @@ module.exports = {
   aliases: ['b', 'large', 'enhance'],
   cooldown: 1,
   execute (message, args, client, helper) {
-    console.log('big command used')
+    // console.log('big command used')
     if (args.length < 1) {
       message.reply(`You must specify an emote in the command!\n \`${this.usage}\``)
     } else {

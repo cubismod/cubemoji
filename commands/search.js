@@ -5,7 +5,7 @@ module.exports = {
   aliases: ['sch', 's'],
   cooldown: 2,
   execute (message, args, client, helper) {
-    console.log('search used')
+    // console.log('search used')
     const results = helper.cache.search(args[0])
     if (results.length === 0) {
       message.channel.send(`No results found for your search query \`${args[0]}\``)

@@ -5,7 +5,7 @@ module.exports = {
   aliases: 'l',
   cooldown: 120,
   execute (message, args, client, helper) {
-    console.log('list command used')
+    // console.log('list command used')
     const msgs = []
     let msgIndex = 0
     // const helper = require('./../helper')

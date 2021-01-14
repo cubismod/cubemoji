@@ -13,7 +13,7 @@ module.exports = {
     if (args.length > 0 && !isNaN(intVers) && intVers < 26) {
       repeats = intVers
     }
-    console.log('flushed command used')
+    // console.log('flushed command used')
     const emotes = Pand.geometricReservoirSample(repeats, options)
     let msg = ''
     emotes.forEach(emote => {

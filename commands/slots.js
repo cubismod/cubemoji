@@ -6,7 +6,7 @@ module.exports = {
   aliases: ['sl'],
   cooldown: 2,
   execute (message, args, client, helper) {
-    console.log('slots command used')
+    // console.log('slots command used')
     // creates text representing slots
     function createSlotText (options) {
       const emotes = Pand.sampleWithReplacements(20, options)
