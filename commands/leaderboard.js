@@ -11,7 +11,7 @@ module.exports = {
         const msgs = []
         snapshot.forEach(user => {
           // for each snapshot we will add onto an array of scores
-          msgs.push(`${user.val().username} - ${user.val().score} points`)
+          msgs.push(`\`${user.val().username}\` - ${user.val().score} points`)
         })
         // then we reverse this list of msgs since we need sorting hi-lo scores
         msgs.reverse()

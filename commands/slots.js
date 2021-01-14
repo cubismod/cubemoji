@@ -37,7 +37,7 @@ module.exports = {
         if (points === 19) {
           const pogEmote = Pand.choice(helper.cache.search('pog')).item
 
-          message.channel.send(`${pogEmote} JACKPOT!!`)
+          message.channel.send(`${pogEmote} **JACKPOT!!**`)
           points *= 5
         }
         let newScore = points
@@ -61,7 +61,7 @@ module.exports = {
               })
             }
             // then we send out the score
-            content.res = content.res.concat(`\n**<a:dieRoll:795419079254605834> Score: ${points} <a:dieRoll:795419079254605834>.\n${Pand.choice(helper.cache.createEmoteArray())} ${message.author.username}'s high score: ${newScore}**`)
+            content.res = content.res.concat(`\n**<a:dieRoll:795419079254605834> Score: ${points} <a:dieRoll:795419079254605834>\n${Pand.choice(helper.cache.createEmoteArray())} ${message.author.username}'s high score: ${newScore}**`)
             msg.edit(content.res)
           })
           .catch(rejected => console.log(rejected))
@@ -73,7 +73,7 @@ module.exports = {
     // get slot options
     // make things more difficult by varying the number of emotes taken
     // for the subset of slots each time
-    const slotOptions = Pand.geometricReservoirSample(Pand.random(2, 30), emoteArray)
+    const slotOptions = Pand.geometricReservoirSample(Pand.random(1, 30), emoteArray)
     const slotsRet = createSlotText(slotOptions)
     const slotsMsg = message.channel.send(slotsRet.res)
     // edit with the options for 5 times
@@ -82,12 +82,6 @@ module.exports = {
         // TODO: investigate whether worker pooling would provide better performance
         setImmediate(editMsg, sentMsg, i, slotOptions)
       }
-    })
-    // attach an event to delete the message after 2 min to avoid spam
-    slotsMsg.then(msg => {
-      setTimeout(function () {
-        msg.delete()
-      }, 120000)
     })
   }
 }

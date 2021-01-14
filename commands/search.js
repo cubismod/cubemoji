@@ -6,6 +6,9 @@ module.exports = {
   cooldown: 2,
   execute (message, args, client, helper) {
     // console.log('search used')
+    if (args.length < 1) {
+      return message.reply(`you must specify an emote name to search for \nusage: \`${this.usage}\``)
+    }
     const results = helper.cache.search(args[0])
     if (results.length === 0) {
       message.channel.send(`No results found for your search query \`${args[0]}\``)

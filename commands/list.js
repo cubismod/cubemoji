@@ -2,7 +2,7 @@ module.exports = {
   name: 'list',
   description: 'List available emotes in a DM',
   usage: '[list]',
-  aliases: 'l',
+  aliases: ['l'],
   cooldown: 120,
   execute (message, args, client, helper) {
     // console.log('list command used')

@@ -9,7 +9,7 @@ module.exports = {
   execute (message, args, client, helper) {
     console.log('add_flush used')
     if (args.length < 1) {
-      message.reply(`You must specify an emote in the command! \n \`${this.usage}\``)
+      message.reply(`You must specify an emote in the command! \nusage: \`${this.usage}\``)
     } else {
       const argName = args[0].toLowerCase()
       // check if its a mention and then only get
