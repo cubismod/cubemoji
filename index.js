@@ -65,7 +65,7 @@ function checkWhiteList (channel, commandName) {
   channel whitelists are per server
   */
   const whitelist = require('./whitelist.json')
-  try {
+  if (channel.type !== 'dm') {
     if (Object.prototype.hasOwnProperty.call(whitelist, channel.guild.id)) {
       if (Object.prototype.hasOwnProperty.call(whitelist[channel.guild.id], commandName)) {
         if (Object.prototype.hasOwnProperty.call(whitelist[channel.guild.id][commandName], channel.id)) {
@@ -79,11 +79,7 @@ function checkWhiteList (channel, commandName) {
     }
     return false
   }
-  catch (err) {
-    // fail gracefully if we can't return a whitelist value
-    console.log(err)
-    return true
-  }
+  return true
 }
 
 client.on('message', message => {
