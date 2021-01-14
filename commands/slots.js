@@ -4,7 +4,7 @@ module.exports = {
   description: 'Play the slots! One point is added for each pair of matches.',
   usage: '[slots]',
   aliases: ['sl'],
-  cooldown: 2,
+  cooldown: 4,
   execute (message, args, client, helper) {
     // console.log('slots command used')
     // creates text representing slots
@@ -29,10 +29,17 @@ module.exports = {
           if (index > 0) {
             const prevEmote = arr[index - 1]
             if (emote === prevEmote) {
-              points = points + Pand.random(1, 4)
+              points++
             }
           }
         })
+        // jackpot condition
+        if (points === 19) {
+          const pogEmote = Pand.choice(helper.cache.search('pog')).item
+
+          message.channel.send(`${pogEmote} JACKPOT!!`)
+          points *= 5
+        }
         let newScore = points
         helper.slotsDb.once('value')
           .then(snapshot => {
@@ -66,7 +73,7 @@ module.exports = {
     // get slot options
     // make things more difficult by varying the number of emotes taken
     // for the subset of slots each time
-    const slotOptions = Pand.geometricReservoirSample(Pand.random(1, 20), emoteArray)
+    const slotOptions = Pand.geometricReservoirSample(Pand.random(2, 30), emoteArray)
     const slotsRet = createSlotText(slotOptions)
     const slotsMsg = message.channel.send(slotsRet.res)
     // edit with the options for 5 times
@@ -77,13 +84,10 @@ module.exports = {
       }
     })
     // attach an event to delete the message after 2 min to avoid spam
-    // but choose this randomly
     slotsMsg.then(msg => {
-      if (Pand.choice([true, false])) {
-        setTimeout(function () {
-          msg.delete()
-        }, 120000)
-      }
+      setTimeout(function () {
+        msg.delete()
+      }, 120000)
     })
   }
 }
