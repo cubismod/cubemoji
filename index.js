@@ -114,15 +114,25 @@ client.on('message', message => {
     const cooldownAmount = (cmd.cooldown || 3) * 1000
 
     if (timestamps.has(message.author.id)) {
-      const expirationTime = timestamps.get(message.author.id) + cooldownAmount
-
-      if (now < expirationTime) {
-        const timeLeft = (expirationTime - now) / 1000
-        return message.reply(`Please wait ${timeLeft.toFixed(1)} more seconds before executing \`${cmd.name}\`. The cooldown is ${cmd.cooldown} seconds`)
+      // prevent people from just spamming the bot
+      const authorTimestamp = timestamps.get(message.author.id)
+      if (now < authorTimestamp.nextUsage) {
+        // prevent spam by increasing the time to use on each repeated use
+        authorTimestamp.nextUsage += 2 * (authorTimestamp.nextUsage - now)
+        authorTimestamp.uses++
+        const timeLeft = (authorTimestamp.nextUsage - now) / 1000
+        return message.reply(`Please wait ${timeLeft.toFixed(0)} more seconds before executing \`${cmd.name}\`. *Hint: spamming commands will get you nowhere fast*`)
+      } else {
+        // remove the entry for that user
+        timestamps.delete(message.author.id)
       }
     } else {
-      timestamps.set(message.author.id, now)
-      setTimeout(() => timestamps.delete(message.author.id), cooldownAmount)
+      // save a reference to the author's id and the next time they can use the command
+      const tsObj = {
+        nextUsage: now + cooldownAmount,
+        uses: 1
+      }
+      timestamps.set(message.author.id, tsObj)
     }
   }
 
