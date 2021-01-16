@@ -4,7 +4,7 @@ module.exports = {
   description: 'Play the slots! One point is added for each pair of matches.',
   usage: '[slots]',
   aliases: ['sl'],
-  cooldown: 3,
+  cooldown: 2,
   execute (message, args, client, helper) {
     // console.log('slots command used')
     // creates text representing slots

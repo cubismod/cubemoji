@@ -118,10 +118,21 @@ client.on('message', message => {
       const authorTimestamp = timestamps.get(message.author.id)
       if (now < authorTimestamp.nextUsage) {
         // prevent spam by increasing the time to use on each repeated use
-        authorTimestamp.nextUsage += 2 * (authorTimestamp.nextUsage - now)
+        authorTimestamp.nextUsage += (cooldownAmount * authorTimestamp.uses)
         authorTimestamp.uses++
+        if (authorTimestamp.nextUsage > (now + 30000)) {
+          // limit to a max of a 30 second wait
+          authorTimestamp.nextUsage = now + 30000
+        }
         const timeLeft = (authorTimestamp.nextUsage - now) / 1000
-        return message.reply(`Please wait ${timeLeft.toFixed(0)} more seconds before executing \`${cmd.name}\`. *Hint: spamming commands will get you nowhere fast*`)
+        const msg = message.reply(`Please wait ${timeLeft.toFixed(0)} more seconds before executing \`${cmd.name}\`. *This message will delete itself once you can run the command again.*`)
+        msg.then(resolvedMsg => {
+          function delMsg (resolvedMsg) {
+            resolvedMsg.delete()
+          }
+          setTimeout(delMsg, authorTimestamp.nextUsage - now, resolvedMsg)
+        })
+        return msg
       } else {
         // remove the entry for that user
         timestamps.delete(message.author.id)
