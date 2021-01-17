@@ -12,7 +12,7 @@ module.exports = {
       return message.reply(`You must specify a player and wager amount in the command! \nusage: \`${this.usage}\``)
     }
     const wager = parseInt(args[1])
-    if (isNaN(wager)) return message.reply('you must specify an integer amount to steal')
+    if (isNaN(wager) || wager < 0) return message.reply('you must specify a positive integer amount to steal')
 
     // first we try to see if there's a mention
     let user = helper.cache.parseMention(args[0], client)
