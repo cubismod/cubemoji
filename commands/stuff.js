@@ -2,7 +2,7 @@ module.exports = {
   name: 'stuff',
   description: '...',
   usage: '[stuff]',
-  aliases: ['st', 'stuffed', 'stuffee'],
+  aliases: ['sf', 'stuffed', 'stuffee'],
   cooldown: 1,
   execute (message) {
     // console.log('stuff command used')

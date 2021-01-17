@@ -120,19 +120,22 @@ client.on('message', message => {
         // prevent spam by increasing the time to use on each repeated use
         authorTimestamp.nextUsage += (cooldownAmount * authorTimestamp.uses)
         authorTimestamp.uses++
-        if (authorTimestamp.nextUsage > (now + 30000)) {
-          // limit to a max of a 30 second wait
-          authorTimestamp.nextUsage = now + 30000
+        if (authorTimestamp.nextUsage > (now + (cooldownAmount * 20))) {
+          // limit to a max of a cooldownAmount * 20
+          authorTimestamp.nextUsage = now + (cooldownAmount * 20)
         }
         const timeLeft = (authorTimestamp.nextUsage - now) / 1000
-        const msg = message.reply(`Please wait ${timeLeft.toFixed(0)} more seconds before executing \`${cmd.name}\`. *This message will delete itself once you can run the command again.*`)
-        msg.then(resolvedMsg => {
-          function delMsg (resolvedMsg) {
-            resolvedMsg.delete()
-          }
-          setTimeout(delMsg, authorTimestamp.nextUsage - now, resolvedMsg)
-        })
-        return msg
+        if (authorTimestamp.uses !== 1) {
+          // don't penalize the user for making an initial mistake in their command
+          const msg = message.reply(`Please wait ${timeLeft.toFixed(0)} more seconds before executing \`${cmd.name}\`. *This message will delete itself once you can run the command again.*`)
+          msg.then(resolvedMsg => {
+            function delMsg (resolvedMsg) {
+              resolvedMsg.delete()
+            }
+            setTimeout(delMsg, authorTimestamp.nextUsage - now, resolvedMsg)
+          })
+          return msg
+        }
       } else {
         // remove the entry for that user
         timestamps.delete(message.author.id)
@@ -141,7 +144,7 @@ client.on('message', message => {
       // save a reference to the author's id and the next time they can use the command
       const tsObj = {
         nextUsage: now + cooldownAmount,
-        uses: 1
+        uses: 0
       }
       timestamps.set(message.author.id, tsObj)
     }

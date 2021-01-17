@@ -4,7 +4,7 @@ module.exports = {
   description: 'Play the slots! One point is added for each pair of matches.',
   usage: '[slots]',
   aliases: ['sl'],
-  cooldown: 2,
+  cooldown: 3,
   execute (message, args, client, helper) {
     // console.log('slots command used')
     // creates text representing slots
@@ -82,6 +82,16 @@ module.exports = {
         // TODO: investigate whether worker pooling would provide better performance
         setImmediate(editMsg, sentMsg, i, slotOptions)
       }
+      // auto delete after 30 seconds
+      setTimeout(function (myMsg, userMsg) {
+        myMsg.delete()
+        try {
+          // we may not have manage message perms in the channel
+          userMsg.delete()
+        } catch (err) {
+          console.log(err)
+        }
+      }, 30000, sentMsg, message)
     })
   }
 }

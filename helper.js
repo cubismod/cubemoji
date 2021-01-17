@@ -71,14 +71,25 @@ module.exports = class EmoteCache {
     return res
   }
 
+  // return the User object https://discord.js.org/#/docs/main/stable/class/User or false if no match found
+  parseMention (msg, client) {
+    const found = msg.match(/<@!?(\d+)>/)
+    if (found) {
+      // https://discord.js.org/#/docs/collection/master/class/Collection?scrollTo=get
+      // returns a nice undefined
+      const user = client.users.cache.get(found[1])
+      if (undefined) return false
+      else return user
+    }
+    return false
+  }
+
   // given an argument in the form of <@86890631690977280> or <!@86890631690977280>
   // this returns the URL of that avatar or null
   getAvatar (msg, client) {
-    const found = msg.match(/<@!?(\d+)>/)
-    if (found) {
-      const user = client.users.cache.get(found[1])
-      // inform the editor that this is just a URL we are grabbing, not an emote object
+    const user = this.parseMention(msg, client)
+    if (user) {
       return (user.avatarURL({ format: 'png', size: 128 }))
-    } else return null
+    }
   }
 }
