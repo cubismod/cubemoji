@@ -54,7 +54,7 @@ module.exports = {
             } else {
               // otherwise set their score
               const prevValue = childUser.val().score
-              newScore = points + parseInt(prevValue)
+              newScore = points + prevValue
               helper.slotsDb.child(message.author.id).set({
                 score: newScore,
                 username: message.author.username
