@@ -1,7 +1,8 @@
 const Fuse = require('fuse.js')
+const Pand = require('pandemonium')
 module.exports = {
   name: 'steal',
-  description: 'Attempt to steal from a wealthier player than you. You can only wager as many points as you currently have.',
+  description: 'Attempt to steal from a wealthier player than you. You can wager up to as many points as that player has although be warned that large bets can result in large losses.',
   usage: '[steal] <username from leaderboard or mention> <wager amount>',
   aliases: ['st'],
   cooldown: 10,
@@ -9,6 +10,9 @@ module.exports = {
     if (args.length < 2) {
       return message.reply(`You must specify a player and wager amount in the command! \nusage: \`${this.usage}\``)
     }
+    const wager = parseInt(args[1])
+    if (isNaN(wager)) return message.reply('you must specify an integer amount to steal')
+
     // first we try to see if there's a mention
     let user = helper.cache.parseMention(args[0], client)
     // if not, we load up the results from the db
@@ -39,15 +43,39 @@ module.exports = {
         // now at this point we should have the ID of the user we are looking for
         // check to ensure the user is not trying to steal from themeslves
         if (user === message.author.id) return message.reply('you can\'t steal from yourself!')
-        // then double check to ensure that user is on the leaderboard
-        const childUser = snapshot.child(user)
-        if (!childUser.exists()) return message.reply('that user is not on the leaderboard!')
+        // then double check to ensure that the victim is on the leaderboard
+        const victim = snapshot.child(user)
+        if (!victim.exists()) return message.reply('that user is not on the leaderboard!')
+        const victimScore = victim.val().score
+        const player = snapshot.child(message.author.id)
+        if (!player.exists()) return message.reply('you are not on the leaderboard! Start playing with `c!slots` to gain points')
+        const playerScore = player.val().score
+        if (playerScore > victimScore) return message.reply(`you have ${playerScore} points and thus can't steal from your victim who has ${victimScore} points! Unlike real life, the wealthy here can't steal from the poor.`)
+        if (wager > victimScore) return message.reply(`you can't steal more points than your victim has, they have ${victimScore} points`)
+        // now comes the fun part where we determine how successful the steal will be
+        // users are more likely to win a steal if they are waging less on the steal
+        const stealChance = Pand.random(0, victimScore)
+        // have to get a new reference to the player to update their value
+        const playerWriteable = helper.slotsDb.child(message.author.id)
+        if (stealChance < wager) {
+          // unsuccessful steal
+          const lossAmount = Math.min(wager, stealChance, Math.round(playerScore * Pand.randomFloat(0, 1)))
+          playerWriteable.update({ score: playerScore - lossAmount })
+          return message.reply(`your steal was unsuccessful and you lost ${lossAmount} points. Your new score is ${playerScore - lossAmount}`)
+        } else {
+          // successful steal
+          const victimWriteable = helper.slotsDb.child(user)
+          const stealAmount = Math.min(wager, stealChance)
+          victimWriteable.update({ score: victimScore - stealAmount })
+          playerWriteable.update({ score: playerScore + stealAmount })
+          if (stealAmount !== wager) {
+            // the player will steal some of what the other player had
+            return message.reply(`partially succesful steal from <@${user}> of ${stealAmount} points. You now have ${playerScore + stealAmount} points while they have ${victimScore - stealAmount} points`)
+          } else {
+            // the player steals that full amount
+            return message.reply(`successful steal from <@${user}> of ${stealAmount} points. You now have ${playerScore + stealAmount} while they have ${victimScore - stealAmount} points`)
+          }
+        }
       })
-    // then see if there's a direct match, if not we do a fuzzy search
-    // if we have a result continue otherwise error out
-    // see if user is able to perform the steal based on the difference of points between the two
-    // if they are continue
-    // determine a success rate of how much the user can steal
-    // user performs steal, decrementing other person's points and adding to their own total
   }
 }
