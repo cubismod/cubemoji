@@ -64,6 +64,8 @@ module.exports = {
           const stealChance = Pand.random(0, victimScore)
           // have to get a new reference to the player to update their value
           const playerWriteable = helper.slotsDb.child(message.author.id)
+
+          const promo = ['Watch live steals here', 'https://discord.gg/SjXbFbyVwf']
           if (stealChance < wager) {
             // unsuccessful steal
             const lossAmount = Math.min(wager, stealChance, Math.round(playerScore * Pand.randomFloat(0, 1)))
@@ -76,15 +78,15 @@ module.exports = {
 
             const replyEmbed = new Discord.MessageEmbed()
               .setColor('RED')
-              .setDescription(`Your steal was unsuccessful and you lost ${lossAmount} points. Your new score is ${playerScore - lossAmount}`)
+              .setDescription(`${message.author}, your steal was unsuccessful and you lost ${lossAmount} points. Your new score is ${playerScore - lossAmount}`)
               .setTitle('Steal Unsuccessful')
-              .addField('Watch live steals here', 'https://discord.gg/SjXbFbyVwf')
+              .addField(promo[0], promo[1])
 
             return message.reply(replyEmbed)
           } else {
           // successful steal
             const victimWriteable = helper.slotsDb.child(user)
-            const stealAmount = Math.min(wager, stealChance)
+            const stealAmount = Math.min(wager, Pand.random(0, victimScore))
             victimWriteable.update({ score: victimScore - stealAmount })
             playerWriteable.update({ score: playerScore + stealAmount })
 
@@ -96,19 +98,19 @@ module.exports = {
             if (stealAmount !== wager) {
               // the player will steal some of what the other player had
               const replyEmbed = new Discord.MessageEmbed()
-                .setColor('ORANGE')
-                .setDescription(`Partially succesful steal from <@${user}> of ${stealAmount} points. You now have ${playerScore + stealAmount} points while they have ${victimScore - stealAmount} points.`)
+                .setColor('YELLOW')
+                .setDescription(`${message.author}, partially successful steal from <@${user}> of ${stealAmount} points. You now have ${playerScore + stealAmount} points while they have ${victimScore - stealAmount} points.`)
                 .setTitle('Steal Partially Successful')
-                .addField('Watch live steals here:', 'https://discord.gg/SjXbFbyVwf')
+                .addField(promo[0], promo[1])
 
               return message.reply(replyEmbed)
             } else {
             // the player steals that full amount
               const replyEmbed = new Discord.MessageEmbed()
                 .setColor('GREEN')
-                .setDescription(`Successful steal from <@${user}> of ${stealAmount} points. You now have ${playerScore + stealAmount} while they have ${victimScore - stealAmount} points.`)
+                .setDescription(`${message.author}, successful steal from <@${user}> of ${stealAmount} points. You now have ${playerScore + stealAmount} while they have ${victimScore - stealAmount} points.`)
                 .setTitle('Steal Successful')
-                .addField('Watch live steals here:', 'https://discord.gg/SjXbFbyVwf')
+                .addField(promo[0], promo[1])
 
               return message.reply(replyEmbed)
             }

@@ -5,7 +5,9 @@ module.exports = {
   aliases: ['lb'],
   cooldown: 5,
   execute (message, args, client, helper) {
-    // get the leaderboard organized by scores
+    // order the leaderboard
+    const orderedMap = new Map()
+    /* // get the leaderboard organized by scores
     helper.slotsDb.orderByChild('score').once('value')
       .then(async (snapshot) => {
         const msgs = []
@@ -37,6 +39,6 @@ module.exports = {
           message.channel.send(msgStr)
         }
         // send user's placement
-      })
+      }) */
   }
 }
