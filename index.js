@@ -14,6 +14,7 @@ require('log-timestamp')
 // firebase setup
 const fbAdmin = require('firebase-admin')
 const svcAcct = require('./serviceAccountKey.json')
+const { MIME_JPEG } = require('jimp')
 
 fbAdmin.initializeApp({
   credential: fbAdmin.credential.cert(svcAcct),
@@ -82,7 +83,28 @@ function checkWhiteList (channel, commandName) {
   return true
 }
 
+// ambiently adds a point whenever a user sends a message, requiring them to still
+// have run c!sl at least once
+function ambPointAdd (user) {
+  helper.slotsDb.once('value')
+    .then(snapshot => {
+      const childUser = snapshot.child(user.id)
+      if (childUser.exists()) {
+        const prevVal = childUser.val().score
+        const newScore = prevVal + 1
+        console.log(`point logged for ${user.username}`)
+        helper.slotsDb.child(user.id).set({
+          score: newScore,
+          username: user.username
+        })
+      }
+    })
+}
+
 client.on('message', message => {
+  // random chance that we will ambiently add points for the user
+  if (Pandemonium.choice([true, false])) ambPointAdd(message.author)
+
   if (!message.content.toLowerCase().startsWith(secrets.prefix) || message.author.bot) return
 
   // now we determine the command name from the string
