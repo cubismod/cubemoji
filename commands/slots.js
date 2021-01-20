@@ -84,12 +84,16 @@ module.exports = {
       }
       // auto delete after 30 seconds
       setTimeout(function (myMsg, userMsg) {
-        myMsg.delete()
+        try {
+          myMsg.delete()
+        } catch {
+          console.log('unable to delete my own slots msg')
+        }
         try {
           // we may not have manage message perms in the channel
           userMsg.delete()
         } catch (err) {
-          console.log(err)
+          console.log('unable to delete user slots msg')
         }
       }, 30000, sentMsg, message)
     })

@@ -86,26 +86,30 @@ function checkWhiteList (channel, commandName) {
 // ambiently adds a point whenever a user sends a message, requiring them to still
 // have run c!sl at least once
 function ambPointAdd (user) {
-  helper.slotsDb.once('value')
-    .then(snapshot => {
-      const childUser = snapshot.child(user.id)
-      if (childUser.exists()) {
-        const prevVal = childUser.val().score
-        const newScore = prevVal + 1
-        console.log(`point logged for ${user.username}`)
-        helper.slotsDb.child(user.id).set({
-          score: newScore,
-          username: user.username
-        })
-      }
-    })
+  if (Pandemonium.choice([true, false])) {
+    helper.slotsDb.once('value')
+      .then(snapshot => {
+        const childUser = snapshot.child(user.id)
+        if (childUser.exists()) {
+          const prevVal = childUser.val().score
+          const newScore = prevVal + 1
+          console.log(`point logged for ${user.username}`)
+          helper.slotsDb.child(user.id).set({
+            score: newScore,
+            username: user.username
+          })
+        }
+      })
+  }
 }
 
 client.on('message', message => {
-  // random chance that we will ambiently add points for the user
-  if (Pandemonium.choice([true, false])) ambPointAdd(message.author)
-
-  if (!message.content.toLowerCase().startsWith(secrets.prefix) || message.author.bot) return
+  if (!message.content.toLowerCase().startsWith(secrets.prefix) || message.author.bot) {
+    // random chance that we will ambiently add points for the user
+    // for non command messages
+    ambPointAdd(message.author)
+    return
+  }
 
   // now we determine the command name from the string
   const args = message.content.slice(secrets.prefix.length).trim().split(/ +/)
