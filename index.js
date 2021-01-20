@@ -14,7 +14,6 @@ require('log-timestamp')
 // firebase setup
 const fbAdmin = require('firebase-admin')
 const svcAcct = require('./serviceAccountKey.json')
-const { MIME_JPEG } = require('jimp')
 
 fbAdmin.initializeApp({
   credential: fbAdmin.credential.cert(svcAcct),
@@ -47,7 +46,8 @@ const helper = {
   cache: new EmoteCache(client),
   pool: workerpool.pool(path.join(__dirname, 'worker.js')),
   emojiDb: db.ref('emojis/'),
-  slotsDb: db.ref('slots/')
+  slotsDb: db.ref('slots/'),
+  slotsUsers: new Set()
 }
 
 console.log(`${helper.pool.maxWorkers} workers available`)
@@ -85,8 +85,10 @@ function checkWhiteList (channel, commandName) {
 
 // ambiently adds a point whenever a user sends a message, requiring them to still
 // have run c!sl at least once
+// also check the cache
 function ambPointAdd (user) {
-  if (Pandemonium.choice([true, false])) {
+  if (helper.slotsUsers.has(user.id) &&
+  Pandemonium.choice([true, false])) {
     helper.slotsDb.once('value')
       .then(snapshot => {
         const childUser = snapshot.child(user.id)
@@ -102,6 +104,12 @@ function ambPointAdd (user) {
       })
   }
 }
+
+// here we cache a basic list of slots users so we don't have to check the database
+
+helper.slotsDb.on('child_added', function (snapshot) {
+  helper.slotsUsers.add(snapshot.key)
+})
 
 client.on('message', message => {
   if (!message.content.toLowerCase().startsWith(secrets.prefix) || message.author.bot) {
