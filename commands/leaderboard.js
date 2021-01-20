@@ -1,3 +1,4 @@
+const Discord = require('discord.js')
 module.exports = {
   name: 'leaderboard',
   description: 'Get the leaderboard of top slots players across servers.',
@@ -5,40 +6,43 @@ module.exports = {
   aliases: ['lb'],
   cooldown: 5,
   execute (message, args, client, helper) {
-    // order the leaderboard
-    const orderedMap = new Map()
-    /* // get the leaderboard organized by scores
+    // get the leaderboard organized by scores
     helper.slotsDb.orderByChild('score').once('value')
       .then(async (snapshot) => {
-        const msgs = []
+        let count = 0
+        // since we store a reference to how many users are playing, we can
+        // use that as an index to show user scores
+        let rank = helper.slotsUsers.size
+        let embed
+        let players = []
         snapshot.forEach(user => {
-          // for each snapshot we will add onto an array of scores
-          msgs.push(`\`${user.val().username}\` - ${user.val().score} points`)
-        })
-        // then we reverse this list of msgs since we need sorting hi-lo scores
-        msgs.reverse()
-        let charCount = 0
-        let msgStr = '<a:dieRoll:795419079254605834> ** Slots Leaderboard ** <a:dieRoll:795419079254605834>\n'
-        for (let i = 0; i < msgs.length; i++) {
-          if (msgs[i].length + charCount > 2000) {
-            // split out the message into multiple messages if needed
-            client.channel.send(msgStr)
-            msgStr = 0
-            charCount = 0
-          } else {
-            if (msgs[i].indexOf(message.author.username) !== -1) {
-              msgStr = msgStr.concat(`**${i + 1}. ${msgs[i]}**\n`)
-            } else {
-              // bold the user's name so they know where they placed
-              msgStr = msgStr.concat(`${i + 1}. ${msgs[i]}\n`)
+          if (user.val().score !== 0) {
+            // don't display users with scores of 0 on board
+            if (count === 0) {
+              // create a new embed obj
+              embed = new Discord.MessageEmbed()
+                .setTitle('<a:dieRoll:795419079254605834> Leaderboard <a:dieRoll:795419079254605834>')
+                .setColor('BLUE')
+                .setDescription('Users with scores of zeroes are omitted from the leaderboard.')
             }
+            if (count < 25) {
+              // max of 25 fields in an embed
+              players.push({ name: `${rank}`, value: `${user.val().username}: ${user.val().score} pts`, inline: true })
+            } else {
+              // need to reverse our list as firebase returns in ascending order
+              embed.addFields(players.reverse())
+              message.channel.send({ embed: embed })
+              count = 0
+              players = []
+            }
+            count++
           }
+          rank--
+        })
+        if (count !== 0) {
+          embed.addFields(players.reverse())
+          message.channel.send({ embed: embed })
         }
-        // send out a message if it hasn't already been sent
-        if (msgStr !== '') {
-          message.channel.send(msgStr)
-        }
-        // send user's placement
-      }) */
+      })
   }
 }

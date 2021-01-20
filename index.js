@@ -47,8 +47,7 @@ const helper = {
   pool: workerpool.pool(path.join(__dirname, 'worker.js')),
   emojiDb: db.ref('emojis/'),
   slotsDb: db.ref('slots/'),
-  slotsUsers: new Set(),
-  scoreboard: new Map()
+  slotsUsers: new Set()
 }
 
 console.log(`${helper.pool.maxWorkers} workers available`)
@@ -110,7 +109,6 @@ function ambPointAdd (user) {
 // as well as update the scoreboard obj
 helper.slotsDb.on('child_added', function (snapshot) {
   helper.slotsUsers.add(snapshot.key)
-  helper.scoreboard.set(snapshot.key, snapshot.val().score)
 })
 
 client.on('message', message => {
