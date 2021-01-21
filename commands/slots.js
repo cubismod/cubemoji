@@ -49,13 +49,15 @@ module.exports = {
               // create user
               helper.slotsDb.child(message.author.id).set({
                 score: newScore,
-                username: message.author.username
+                username: message.author.username,
+                timeOnTop: 0
               })
             } else {
               // otherwise set their score
+              // time on top is the time the user spends on the top of the leaderboard
               const prevValue = childUser.val().score
               newScore = points + prevValue
-              helper.slotsDb.child(message.author.id).set({
+              helper.slotsDb.child(message.author.id).update({
                 score: newScore,
                 username: message.author.username
               })

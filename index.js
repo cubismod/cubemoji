@@ -47,7 +47,10 @@ const helper = {
   pool: workerpool.pool(path.join(__dirname, 'worker.js')),
   emojiDb: db.ref('emojis/'),
   slotsDb: db.ref('slots/'),
-  slotsUsers: new Set()
+  slotsUsers: new Set(),
+  topPlayer: '',
+  topPlayerTime: '',
+  beginTop: ''
 }
 
 console.log(`${helper.pool.maxWorkers} workers available`)
@@ -96,7 +99,7 @@ function ambPointAdd (user) {
           const prevVal = childUser.val().score
           const newScore = prevVal + 1
           console.log(`point logged for ${user.username}`)
-          helper.slotsDb.child(user.id).set({
+          helper.slotsDb.child(user.id).update({
             score: newScore,
             username: user.username
           })
@@ -109,6 +112,59 @@ function ambPointAdd (user) {
 // as well as update the scoreboard obj
 helper.slotsDb.on('child_added', function (snapshot) {
   helper.slotsUsers.add(snapshot.key)
+})
+
+helper.slotsDb.orderByChild('score').limitToLast(1).on('child_changed', function(snapshot) {
+  // fill with inital data
+  if (helper.topPlayer === '') {
+    helper.topPlayer = snapshot.key
+    helper.beginTop = new Date()
+    helper.topPlayerTime = snapshot.val().timeOnTop
+  }
+  else {
+    // calculate the time they were on top
+    const curTime = new Date()
+    const diff = Math.abs(curTime - helper.beginTop)
+    // save that value
+    const newTime = helper.topPlayerTime + diff
+    helper.slotsDb.child(helper.topPlayer).update({
+      timeOnTop: newTime
+    })
+    // now save the new ones
+    helper.topPlayer = snapshot.key
+    helper.beginTop = new Date()
+    helper.topPlayerTime = snapshot.val().timeOnTop
+  }
+})
+
+
+
+// use this to keep track of the time a player is on top
+helper.slotsDb.on('child_changed', function (snapshot) {
+  // fill with inital data
+  if (helper.topPlayer === '') {
+    helper.topPlayer = snapshot.key
+    helper.beginTop = new Date()
+    helper.topPlayerTime = snapshot.val().timeOnTop
+    helper.topScore = snapshot.val().score
+  } else {
+    
+    if (snapshot.key !== helper.topPlayer && snapshot.val().score > helper.topScore) {
+      // calculate the time they were on top
+      const curTime = new Date()
+      const diff = Math.abs(curTime - helper.beginTop)
+      // save that value
+      const newTime = helper.topPlayerTime + diff
+      helper.slotsDb.child(helper.topPlayer).update({
+        timeOnTop: newTime
+      })
+      // now save the new ones
+      helper.topPlayer = snapshot.key
+      helper.beginTop = new Date()
+      helper.topScore = snapshot.val().score
+      helper.topPlayerTime = snapshot.val().timeOnTop
+    }
+  }
 })
 
 client.on('message', message => {
