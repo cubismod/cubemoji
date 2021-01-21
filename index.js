@@ -114,31 +114,26 @@ helper.slotsDb.on('child_added', function (snapshot) {
   helper.slotsUsers.add(snapshot.key)
 })
 
-helper.slotsDb.orderByChild('score').limitToLast(1).on('child_changed', function(snapshot) {
-  // fill with inital data
-  if (helper.topPlayer === '') {
-    helper.topPlayer = snapshot.key
-    helper.beginTop = new Date()
-    helper.topPlayerTime = snapshot.val().timeOnTop
-  }
-  else {
-    // calculate the time they were on top
-    const curTime = new Date()
-    const diff = Math.abs(curTime - helper.beginTop)
-    // save that value
-    const newTime = helper.topPlayerTime + diff
-    helper.slotsDb.child(helper.topPlayer).update({
-      timeOnTop: newTime
-    })
-    // now save the new ones
-    helper.topPlayer = snapshot.key
-    helper.beginTop = new Date()
-    helper.topPlayerTime = snapshot.val().timeOnTop
-  }
+helper.slotsDb.orderByChild('score').limitToLast(1).on('child_added', function (snapshot) {
+  // new user becomes top player
+  helper.topPlayer = snapshot.key
+  helper.beginTop = new Date()
+  helper.topPlayerTime = snapshot.val().timeOnTop
 })
 
+helper.slotsDb.orderByChild('score').limitToLast(1).on('child_removed', function () {
+  // user leaves top player spot
+  const curTime = new Date()
+  // saving in seconds
+  const diff = (Math.abs(curTime - helper.beginTop))/1000
+  // save that value
+  const newTime = helper.topPlayerTime + diff
+  helper.slotsDb.child(helper.topPlayer).update({
+    timeOnTop: newTime
+  })
+})
 
-
+/*
 // use this to keep track of the time a player is on top
 helper.slotsDb.on('child_changed', function (snapshot) {
   // fill with inital data
@@ -148,7 +143,7 @@ helper.slotsDb.on('child_changed', function (snapshot) {
     helper.topPlayerTime = snapshot.val().timeOnTop
     helper.topScore = snapshot.val().score
   } else {
-    
+
     if (snapshot.key !== helper.topPlayer && snapshot.val().score > helper.topScore) {
       // calculate the time they were on top
       const curTime = new Date()
@@ -165,7 +160,7 @@ helper.slotsDb.on('child_changed', function (snapshot) {
       helper.topPlayerTime = snapshot.val().timeOnTop
     }
   }
-})
+}) */
 
 client.on('message', message => {
   if (!message.content.toLowerCase().startsWith(secrets.prefix) || message.author.bot) {

@@ -23,11 +23,11 @@ module.exports = {
               embed = new Discord.MessageEmbed()
                 .setTitle('<a:dieRoll:795419079254605834> Leaderboard <a:dieRoll:795419079254605834>')
                 .setColor('BLUE')
-                .setFooter('Users with scores of zeroes are omitted from the leaderboard.')
+                .setFooter('Users with scores of zeroes are omitted from the leaderboard.\nThe user with the highest time on top (in #1 spot) wins for the week.\nTime on top scores are updated once another user overtakes them in the top position.')
             }
             if (count < 25) {
               // max of 25 fields in an embed
-              players.push({ name: `# ${rank}`, value: `${user.val().username}: **${user.val().score} pts**\nTime on Top ${user.val().timeOnTop}` })
+              players.push({ name: `# ${rank}`, value: `${user.val().username}: **${user.val().score} pts**\nTime on Top ${user.val().timeOnTop} s` })
               // indicate the score to the player
               if (message.author.id === user.key) {
                 embed.setDescription(`${message.author}, your score is **${user.val().score} pts**`)
