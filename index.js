@@ -108,6 +108,16 @@ function ambPointAdd (user) {
   }
 }
 
+// calculate the difference in time of a top player
+// adding that value to their existing time and returning it
+function calcTimeDiff () {
+  const curTime = new Date()
+  // saving in seconds
+  const diff = (Math.abs(curTime - helper.beginTop)) / 1000
+  // save that value
+  return helper.topPlayerTime + diff
+}
+
 // here we cache a basic list of slots users so we don't have to check the database constantly for ambient msgs
 // as well as update the scoreboard obj
 helper.slotsDb.on('child_added', function (snapshot) {
@@ -123,44 +133,10 @@ helper.slotsDb.orderByChild('score').limitToLast(1).on('child_added', function (
 
 helper.slotsDb.orderByChild('score').limitToLast(1).on('child_removed', function () {
   // user leaves top player spot
-  const curTime = new Date()
-  // saving in seconds
-  const diff = (Math.abs(curTime - helper.beginTop))/1000
-  // save that value
-  const newTime = helper.topPlayerTime + diff
   helper.slotsDb.child(helper.topPlayer).update({
-    timeOnTop: newTime
+    timeOnTop: calcTimeDiff()
   })
 })
-
-/*
-// use this to keep track of the time a player is on top
-helper.slotsDb.on('child_changed', function (snapshot) {
-  // fill with inital data
-  if (helper.topPlayer === '') {
-    helper.topPlayer = snapshot.key
-    helper.beginTop = new Date()
-    helper.topPlayerTime = snapshot.val().timeOnTop
-    helper.topScore = snapshot.val().score
-  } else {
-
-    if (snapshot.key !== helper.topPlayer && snapshot.val().score > helper.topScore) {
-      // calculate the time they were on top
-      const curTime = new Date()
-      const diff = Math.abs(curTime - helper.beginTop)
-      // save that value
-      const newTime = helper.topPlayerTime + diff
-      helper.slotsDb.child(helper.topPlayer).update({
-        timeOnTop: newTime
-      })
-      // now save the new ones
-      helper.topPlayer = snapshot.key
-      helper.beginTop = new Date()
-      helper.topScore = snapshot.val().score
-      helper.topPlayerTime = snapshot.val().timeOnTop
-    }
-  }
-}) */
 
 client.on('message', message => {
   if (!message.content.toLowerCase().startsWith(secrets.prefix) || message.author.bot) {
@@ -261,3 +237,13 @@ client.on('messageReactionAdd', (react, author) => {
     // react.message.reactions.removeAll().then(react.message.react('🎲'))
   }
 })
+
+// setup an interval to save time every 60 seconds to db
+// and reset time tracking for the top player
+setInterval(function () {
+  if (helper.slotsUsers.has(helper.topPlayer)) {
+    helper.topPlayerTime = calcTimeDiff()
+    helper.beginTop = new Date()
+    helper.slotsDb.child(helper.topPlayer).update({ timeOnTop: helper.topPlayerTime })
+  }
+}, 60000)
