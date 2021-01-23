@@ -1,4 +1,3 @@
-const Discord = require('discord.js')
 module.exports = {
   name: 'leaderboard',
   description: 'Get the leaderboard of top slots players across servers.',
@@ -9,44 +8,24 @@ module.exports = {
     // get the leaderboard organized by scores
     helper.slotsDb.orderByChild('score').once('value')
       .then(async (snapshot) => {
-        let count = 0
         // since we store a reference to how many users are playing, we can
         // use that as an index to show user scores
         let rank = helper.slotsUsers.size
-        let embed
-        let players = []
+        let msg = []
+        // push footer information
+        msg.push('*Users with scores of zeroes are omitted from the leaderboard.\nThe user with the highest time on top (in #1 spot) wins for the week.\nTime on top scores are updated once another user overtakes them in the top position.*')
         snapshot.forEach(user => {
           if (user.val().score !== 0) {
             // don't display users with scores of 0 on board
-            if (count === 0) {
-              // create a new embed obj
-              embed = new Discord.MessageEmbed()
-                .setTitle('<a:dieRoll:795419079254605834> Leaderboard <a:dieRoll:795419079254605834>')
-                .setColor('BLUE')
-                .setFooter('Users with scores of zeroes are omitted from the leaderboard.\nThe user with the highest time on top (in #1 spot) wins for the week.\nTime on top scores are updated once another user overtakes them in the top position.')
-            }
-            if (count < 25) {
-              // max of 25 fields in an embed
-              players.push({ name: `# ${rank}`, value: `${user.val().username}: **${user.val().score} pts**. . .Time on Top: **${(user.val().timeOnTop / 60).toFixed(2)} min**`, inline: true })
-              // indicate the score to the player
-              if (message.author.id === user.key) {
-                embed.setDescription(`${message.author}, your score is **${user.val().score} pts**`)
-              }
-            } else {
-              // need to reverse our list as firebase returns in ascending order
-              embed.addFields(players.reverse())
-              message.channel.send({ embed: embed })
-              count = 0
-              players = []
-            }
-            count++
+            msg.push(`${rank}. \`${user.val().username}\`: **${user.val().score}** pts, **${(user.val().timeOnTop / 60).toFixed(2)}** s on top`)
           }
           rank--
         })
-        if (count !== 0) {
-          embed.addFields(players.reverse())
-          message.channel.send({ embed: embed })
-        }
+        // push the header msg
+        msg.push('<a:dieRoll:795419079254605834> Leaderboard <a:dieRoll:795419079254605834>')
+        // reverse all of this since we were iterating in ascending order and we want a descending result
+        msg = msg.reverse()
+        message.channel.send(msg.join('\n'), { split: true })
       })
   }
 }
