@@ -27,7 +27,7 @@ module.exports = {
             }
             if (count < 25) {
               // max of 25 fields in an embed
-              players.push({ name: `# ${rank}`, value: `${user.val().username}: **${user.val().score} pts**\nTime on Top: **${(user.val().timeOnTop / 60).toFixed(2)} min**` })
+              players.push({ name: `# ${rank}`, value: `${user.val().username}: **${user.val().score} pts**. . .Time on Top: **${(user.val().timeOnTop / 60).toFixed(2)} min**`, inline: true })
               // indicate the score to the player
               if (message.author.id === user.key) {
                 embed.setDescription(`${message.author}, your score is **${user.val().score} pts**`)
