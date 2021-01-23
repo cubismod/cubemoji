@@ -1,3 +1,4 @@
+const moment = require('moment')
 module.exports = {
   name: 'leaderboard',
   description: 'Get the leaderboard of top slots players across servers.',
@@ -17,7 +18,7 @@ module.exports = {
         snapshot.forEach(user => {
           if (user.val().score !== 0) {
             // don't display users with scores of 0 on board
-            msg.push(`${rank}. \`${user.val().username}\`: **${user.val().score}** pts, **${(user.val().timeOnTop / 60).toFixed(2)}** s on top`)
+            msg.push(`${rank}. \`${user.val().username}\`: **${user.val().score}** pts, **${moment.duration(user.val().timeOnTop, 'seconds').humanize()}** on top`)
           }
           rank--
         })
