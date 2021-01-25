@@ -84,20 +84,17 @@ module.exports = {
         // TODO: investigate whether worker pooling would provide better performance
         setImmediate(editMsg, sentMsg, i, slotOptions)
       }
-      // auto delete after 30 seconds
-      setTimeout(function (myMsg, userMsg) {
-        try {
-          myMsg.delete()
-        } catch {
-          console.log('unable to delete my own slots msg')
-        }
-        try {
-          // we may not have manage message perms in the channel
-          userMsg.delete()
-        } catch (err) {
-          console.log('unable to delete user slots msg')
-        }
-      }, 30000, sentMsg, message)
+      // auto delete after 30 seconds when in a text channel
+      if (message.channel.type === 'text') {
+        setTimeout(function (myMsg, userMsg) {
+          try {
+            myMsg.delete()
+            userMsg.delete()
+          } catch {
+            console.log('unable to delete slots message')
+          }
+        }, 30000, sentMsg, message)
+      }
     })
   }
 }
