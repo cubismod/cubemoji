@@ -45,14 +45,14 @@ module.exports = {
         if ((args.length > 0 && args[1].toLowerCase() === 'random') || args[1].toLowerCase() === 'r') {
           // random effects option
           random = true
-          const optLen = Pand.random(1, 10)
+          const optLen = Pand.random(2, 30)
           const effects = ['sharpen', 'emboss', 'grayscale', 'blur', 'sepia', 'rotate', 'scale']
           for (let i = 0; i < optLen; i++) {
             options.push(Pand.choice(effects))
           }
         } else {
           // parse command arguments now, anything after the emote name
-          options = args.slice(1, 20)
+          options = args.slice(1, 30)
           random = false
         }
         // queue up a worker to run
