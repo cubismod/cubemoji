@@ -14,7 +14,7 @@ module.exports = {
         let rank = helper.slotsUsers.size
         let msg = []
         // push footer information
-        msg.push('*Users with scores of zeroes are omitted from the leaderboard.\nThe user with the highest time on top (in #1 spot) wins for the week.\nTime on top scores are updated once another user overtakes them in the top position.*')
+        msg.push('*Users with scores of zeroes are omitted from the leaderboard.\nThe user with the highest time on top (in #1 spot) wins for the week.\nOnline Leaderboard: <https://lb.cubis.codes>*')
         snapshot.forEach(user => {
           if (user.val().score !== 0) {
             // don't display users with scores of 0 on board

@@ -13,7 +13,6 @@ module.exports = class EmoteCache {
     this.nextUpdateTime = moment().add(15, 'minutes')
   }
 
-
   // sortable: returns just a list of names which can be easily sorted
   createEmoteArray (sortable = false) {
     // we are just manually iterating through the map to create a list
@@ -50,6 +49,7 @@ module.exports = class EmoteCache {
     return (results)
   }
 
+  // TODO: move fuzzy searching here
   // retrieves an emote based on title
   // or the user actually embedding an emote in
   // their message, then returns that emoji object

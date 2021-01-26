@@ -11,6 +11,8 @@ module.exports = {
     if (args.length < 1) {
       message.reply(`You must specify an emote in the command! \nusage: \`${this.usage}\``)
     } else {
+      // start a typing indicator to show we're working
+      message.channel.startTyping()
       const argName = args[0].toLowerCase()
       // check if its a mention and then only get
       // the numeric part of the mention code
@@ -29,11 +31,11 @@ module.exports = {
         }
       }
       if (res) {
-        message.react('<a:dieRoll:795419079254605834>')
         // queue up another worker to run the image edit
         helper.pool.exec('addFlush', [res.url])
           .then(result => {
             const attach = new Discord.MessageAttachment(Buffer.from(result), 'flushed.png')
+            message.channel.stopTyping()
             message.channel.send(attach)
           })
           .catch(error => console.log(error))

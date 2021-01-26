@@ -32,10 +32,6 @@ function editImage (url, options) {
         case 'blur':
           emote.blur(Pand.random(1, 5))
           break
-        case 'p':
-        case 'posterize':
-          emote.posterize(Pand.random(1, 5))
-          break
         case 'sp':
         case 'sepia':
           emote.sepia()

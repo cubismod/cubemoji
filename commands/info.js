@@ -34,8 +34,16 @@ module.exports = {
                 value: res.url
               },
               {
-                name: 'author',
-                value: author
+                name: 'Author',
+                value: author.username
+              },
+              {
+                name: 'Animated',
+                value: res.animated
+              },
+              {
+                name: 'Origin Server Name',
+                value: res.guild.name
               }
             ]
           }
