@@ -18,9 +18,8 @@ module.exports = {
         const author = res.fetchAuthor()
         author.then((author) => {
           const embed = {
-            title: res.toString(),
+            title: res.name,
             color: 7738070,
-            description: res.name,
             fields: [
               {
                 name: 'Created',
@@ -40,7 +39,7 @@ module.exports = {
               }
             ]
           }
-          message.channel.send({ embed: embed })
+          message.channel.send(`${res}`, { embed: embed })
         }).catch((reason) => {
           console.log(reason)
           // send msg without author

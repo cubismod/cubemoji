@@ -6,30 +6,20 @@ module.exports = {
   cooldown: 120,
   execute (message, args, client, helper) {
     // console.log('list command used')
-    const msgs = []
-    let msgIndex = 0
+    const msg = []
     // const helper = require('./../helper')
-    const emoteArray = helper.cache.createEmoteArray().sort()
-    msgs.push('')
-    for (const emote of emoteArray) {
-      // don't overload discord msg limit of 2000 chars
-      const newText = msgs[msgIndex].concat(`\`${emote.name}\`, `)
-      const newLen = msgs[msgIndex].length + newText.length
-      if (newLen > 2000) {
-        // queue up another msg
-        msgIndex += 1
-        msgs.push('')
-      } else {
-        msgs[msgIndex] = newText
+    const emoteArray = helper.cache.createEmoteArray(true)
+    let letter = ''
+    emoteArray.forEach(emote => {
+      // split lines by
+      if ((emote[0]).toUpperCase() !== letter) {
+        letter = emote[0].toUpperCase()
+        msg.push(`\n**${letter}: **`)
       }
-    }
+      msg.push(`\`${emote}\``)
+    })
+    const msgStr = msg.join(' ')
     message.channel.send("I'm sending you a DM with the list of emotes! If you didn't get it then check your privacy settings on Discord.")
-    message.author.send('**Emote List (you can type c!emote <emote_name> in this chat to see a specific emote)**')
-    for (const msg of msgs) {
-      // don't try and send an empty message to discord
-      if (msg !== '') {
-        message.author.send(msg)
-      }
-    }
+    message.author.send(`**Emote List**\nType \`c!emote <emote_name>\` in this chat to see a specific emote)\nType \`c!info <emote_name>\` for more info about a specific emote\n${msgStr}\n`, { split: true })
   }
 }

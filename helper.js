@@ -8,25 +8,33 @@ module.exports = class EmoteCache {
     this.client = client
     this.emoteCache = client.emojis.cache
     this.arrayVersion = [] // init with an empty array
+    this.sortedArray = []
     // we only want to do an update every ten minutes
     this.nextUpdateTime = moment().add(15, 'minutes')
   }
 
-  createEmoteArray () {
+
+  // sortable: returns just a list of names which can be easily sorted
+  createEmoteArray (sortable = false) {
     // we are just manually iterating through the map to create a list
     // ensure we only update if there is no data or the update time has lapsed
     if ((this.arrayVersion === undefined || this.arrayVersion.length === 0) ||
         (moment().isAfter(this.nextUpdateTime))) {
       console.log('emote cache updated')
       this.emoteCache = this.client.emojis.cache
-      const emotes = []
+      this.arrayVersion = []
+      this.sortedArray = []
       for (const [, value] of this.emoteCache) {
-        emotes.push(value)
+        this.arrayVersion.push(value)
+        this.sortedArray.push(value.name)
       }
-      this.arrayVersion = emotes
+      this.sortedArray = this.sortedArray.sort(function (a, b) {
+        return a.toLowerCase().localeCompare(b.toLowerCase())
+      })
       // only perform an update every fifteen minutes
       this.nextUpdateTime = moment().add(15, 'minutes')
     }
+    if (sortable) return this.sortedArray
     return this.arrayVersion
   }
 
