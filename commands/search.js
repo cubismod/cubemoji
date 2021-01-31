@@ -1,3 +1,4 @@
+const Discord = require('discord.js')
 module.exports = {
   name: 'search',
   description: 'Search the database for emotes',
@@ -13,26 +14,18 @@ module.exports = {
     if (results.length === 0) {
       message.channel.send(`No results found for your search query \`${args[0]}\``)
     } else {
-      // stagger out messages so we don't overdue the 2,000 char msg limit
-      const msgs = []
-      let msgIndex = 0
-      msgs.push(`${results.length} result(s) found for your search query \`${args[0]}\`\n`)
-      for (const result of results) {
-        const newText = msgs[msgIndex].concat(`\`${result.item.name}\`, `)
-        const newLen = msgs[msgIndex].length + newText.length
-        if (newLen > 2000) {
-          msgIndex += 1
-          msgs.push('')
-        } else {
-          msgs[msgIndex] = newText
-        }
-      }
-      for (const msg of msgs) {
-        // don't try and send an empty message to discord
-        if (msg !== '') {
-          message.channel.send(msg)
-        }
-      }
+      const description = []
+      results.forEach((result) => {
+        // try to avoid going over message limit
+        if (results.length > 20) description.push(`\`${result.item.name}\` `)
+        else description.push(`${result.item} \`${result.item.name}\` `)
+      })
+      const embed = new Discord.MessageEmbed()
+        .setTitle(`Search for ${args[0]} (${results.length})`)
+        .setDescription(description.join('  ').slice(0, 2047))
+        .setColor('BLUE')
+        .setFooter('Some results may be missing. Use c!list to get a full list to your DMs.')
+      message.channel.send({ embed: embed })
     }
   }
 }
