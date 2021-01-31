@@ -60,7 +60,7 @@ module.exports = {
           .then(result => {
             // send out the resulting image as a Discord attachment
             // convert it to a node buffer
-            message.channel.stopTyping()
+            message.channel.stopTyping(true)
             const attach = new Discord.MessageAttachment(Buffer.from(result), 'most_likely_blursed.png')
             message.channel.send(attach)
             if (random) {

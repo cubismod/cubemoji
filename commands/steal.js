@@ -61,7 +61,8 @@ module.exports = {
           if (wager > victimScore) return message.reply(`you can't steal more points than your victim has, they have ${victimScore} points`)
           // now comes the fun part where we determine how successful the steal will be
           // users are more likely to win a steal if they are waging less on the steal
-          const stealChance = Pand.random(0, victimScore)
+          // sometimes get a value between the min amount to get above score or the victim's total score
+          const stealChance = Pand.random(0, Pand.choice(victimScore, (victimScore - playerScore) + 5))
           // have to get a new reference to the player to update their value
           const playerWriteable = helper.slotsDb.child(message.author.id)
 

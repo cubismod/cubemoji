@@ -35,7 +35,7 @@ module.exports = {
         helper.pool.exec('addFlush', [res.url])
           .then(result => {
             const attach = new Discord.MessageAttachment(Buffer.from(result), 'flushed.png')
-            message.channel.stopTyping()
+            message.channel.stopTyping(true)
             message.channel.send(attach)
           })
           .catch(error => console.log(error))

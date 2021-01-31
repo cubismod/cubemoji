@@ -97,7 +97,8 @@ function ambPointAdd (user) {
         const childUser = snapshot.child(user.id)
         if (childUser.exists()) {
           const prevVal = childUser.val().score
-          const newScore = prevVal + 1
+          const newScore = prevVal + Pandemonium.random(1, 20)
+          console.log(`point logged for ${user.username}`)
           helper.slotsDb.child(user.id).update({
             score: newScore,
             username: user.username
