@@ -19,7 +19,6 @@ module.exports = class EmoteCache {
     // ensure we only update if there is no data or the update time has lapsed
     if ((this.arrayVersion === undefined || this.arrayVersion.length === 0) ||
         (moment().isAfter(this.nextUpdateTime))) {
-      console.log('emote cache updated')
       this.emoteCache = this.client.emojis.cache
       this.arrayVersion = []
       this.sortedArray = []

@@ -98,7 +98,6 @@ function ambPointAdd (user) {
         if (childUser.exists()) {
           const prevVal = childUser.val().score
           const newScore = prevVal + 1
-          console.log(`point logged for ${user.username}`)
           helper.slotsDb.child(user.id).update({
             score: newScore,
             username: user.username
