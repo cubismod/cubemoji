@@ -5,7 +5,7 @@ module.exports = {
   usage: '[about]',
   aliases: ['a'],
   cooldown: 5,
-  execute (message, args, client) {
+  execute (message, _args, client) {
     const pkg = require('../package.json')
     // console.log('about command used')
     const embed = {

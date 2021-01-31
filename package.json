@@ -26,7 +26,6 @@
     "firebase-admin": "^9.4.2",
     "fuse.js": "^6.4.4",
     "jimp": "^0.16.1",
-    "log-timestamp": "^0.3.0",
     "moment": "^2.29.1",
     "pandemonium": "^2.0.0",
     "workerpool": "^6.0.3"

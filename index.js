@@ -9,7 +9,7 @@ const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('
 const cooldowns = new Discord.Collection()
 const workerpool = require('workerpool')
 const path = require('path')
-require('log-timestamp')
+const moment = require('moment')
 
 // firebase setup
 const fbAdmin = require('firebase-admin')
@@ -246,3 +246,8 @@ setInterval(function () {
     helper.slotsDb.child(helper.topPlayer).update({ timeOnTop: helper.topPlayerTime })
   }
 }, 60000)
+
+// regular check in every 30 min
+setInterval(function () {
+  console.log(`time up: ${moment().to(client.readyAt, true)}`)
+}, 1.8e+6)
