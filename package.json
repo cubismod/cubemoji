@@ -28,6 +28,7 @@
     "jimp": "^0.16.1",
     "moment": "^2.29.1",
     "pandemonium": "^2.0.0",
+    "twemoji-parser": "^13.0.0",
     "workerpool": "^6.0.3"
   },
   "devDependencies": {

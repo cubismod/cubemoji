@@ -53,8 +53,8 @@ function editImage (url, options) {
           break
       }
       // ensure the image can't get too huge
-      if (emote.bitmap.width > 128 || emote.bitmap.height > 128) {
-        emote.scaleToFit(128, 128)
+      if (emote.bitmap.width > 256 || emote.bitmap.height > 256) {
+        emote.scaleToFit(256, 256)
       }
     }
     )

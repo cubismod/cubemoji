@@ -1,6 +1,7 @@
 // helper functions
-const moment = require('moment')
+const Moment = require('moment')
 const Fuse = require('fuse.js')
+const Twemoji = require('twemoji-parser')
 // a class which can return an array version of emotes
 // and also only refreshes when necessary
 module.exports = class EmoteCache {
@@ -10,7 +11,7 @@ module.exports = class EmoteCache {
     this.arrayVersion = [] // init with an empty array
     this.sortedArray = []
     // we only want to do an update every ten minutes
-    this.nextUpdateTime = moment().add(15, 'minutes')
+    this.nextUpdateTime = Moment().add(15, 'minutes')
   }
 
   // sortable: returns just a list of names which can be easily sorted
@@ -18,7 +19,7 @@ module.exports = class EmoteCache {
     // we are just manually iterating through the map to create a list
     // ensure we only update if there is no data or the update time has lapsed
     if ((this.arrayVersion === undefined || this.arrayVersion.length === 0) ||
-        (moment().isAfter(this.nextUpdateTime))) {
+        (Moment().isAfter(this.nextUpdateTime))) {
       this.emoteCache = this.client.emojis.cache
       this.arrayVersion = []
       this.sortedArray = []
@@ -30,7 +31,7 @@ module.exports = class EmoteCache {
         return a.toLowerCase().localeCompare(b.toLowerCase())
       })
       // only perform an update every fifteen minutes
-      this.nextUpdateTime = moment().add(15, 'minutes')
+      this.nextUpdateTime = Moment().add(15, 'minutes')
     }
     if (sortable) return this.sortedArray
     return this.arrayVersion
@@ -98,5 +99,12 @@ module.exports = class EmoteCache {
     if (user) {
       return (user.avatarURL({ format: 'png', size: 128 }))
     }
+  }
+
+  // parse a twemoji and return a url
+  parseTwemoji (str) {
+    const entitites = Twemoji.parse(str, { assetType: 'png' })
+    if (entitites) return entitites[0]
+    else return ''
   }
 }

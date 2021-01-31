@@ -8,7 +8,6 @@ module.exports = {
   aliases: ['ed', 'modify'],
   cooldown: 1,
   execute (message, args, client, helper) {
-    // console.log('edit used')
     let random
     if (args.length < 2 && (args.length !== 1 && args[0] !== 'hole')) {
       message.reply(`You must specify an emote name and filters in the command! \n \`${this.usage}\``)
@@ -25,9 +24,11 @@ module.exports = {
         // check if its a mention and then only get
       // the numeric part of the mention code
         const avatarUrl = helper.cache.getAvatar(argName, client)
+        const twemoji = helper.cache.parseTwemoji(argName)
         res = {}
-        if (avatarUrl) {
-          res.url = avatarUrl
+        if (avatarUrl || twemoji) {
+          if (avatarUrl) res.url = avatarUrl
+          else res.url = twemoji.url
         } else {
           res = helper.cache.retrieve(argName)
           // since we implement a longer cooldown, we autofill for the first emote we find from search
@@ -44,7 +45,7 @@ module.exports = {
         let options = []
         let argLc
         if ((args.length > 1)) argLc = args[1].toLowerCase()
-        if (argLc === 'random' && args[1].toLowerCase() === 'r') {
+        if (argLc === 'random' || argLc === 'r') {
           // random effects option
           random = true
           const optLen = Pand.random(2, 30)

@@ -53,7 +53,6 @@ const helper = {
   beginTop: ''
 }
 
-console.log(`${helper.pool.maxWorkers} workers available`)
 
 // function returns true if the command is allowed in the specific channel
 // false if not
@@ -98,7 +97,6 @@ function ambPointAdd (user) {
         if (childUser.exists()) {
           const prevVal = childUser.val().score
           const newScore = prevVal + Pandemonium.random(1, 20)
-          console.log(`point logged for ${user.username}`)
           helper.slotsDb.child(user.id).update({
             score: newScore,
             username: user.username

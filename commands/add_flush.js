@@ -16,9 +16,11 @@ module.exports = {
       // check if its a mention and then only get
       // the numeric part of the mention code
       const avatarUrl = helper.cache.getAvatar(argName, client)
+      const twemoji = helper.cache.parseTwemoji(argName)
       let res = {}
-      if (avatarUrl) {
-        res.url = avatarUrl
+      if (avatarUrl || twemoji) {
+        if (avatarUrl) res.url = avatarUrl
+        else res.url = twemoji.url
       } else {
         res = helper.cache.retrieve(argName)
         // since we implement a longer cooldown, we autofill for the first emote we find from search
