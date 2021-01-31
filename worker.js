@@ -71,6 +71,7 @@ function editImage (url, options) {
 function addFlush (url) {
   return Jimp.read('./assets/flushed.png').then(flush => {
     return Jimp.read(url).then(baseEmote => {
+      flush.resize(baseEmote.bitmap.width, baseEmote.bitmap.height)
       baseEmote.composite(flush, 0, 0, { mode: Jimp.BLEND_SOURCE_OVER })
       return baseEmote.getBufferAsync(Jimp.AUTO).then(buf => {
         return buf
