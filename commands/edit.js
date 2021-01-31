@@ -42,7 +42,9 @@ module.exports = {
       }
       if (res) {
         let options = []
-        if ((args.length > 0 && args[1].toLowerCase() === 'random') || args[1].toLowerCase() === 'r') {
+        let argLc
+        if ((args.length > 1)) argLc = args[1].toLowerCase()
+        if (argLc === 'random' && args[1].toLowerCase() === 'r') {
           // random effects option
           random = true
           const optLen = Pand.random(2, 30)
@@ -73,5 +75,6 @@ module.exports = {
         message.reply('emote not found!')
       }
     }
+    message.channel.stopTyping(true)
   }
 }

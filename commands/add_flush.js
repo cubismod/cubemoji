@@ -7,7 +7,6 @@ module.exports = {
   aliases: ['af', 'addflush'],
   cooldown: 1,
   execute (message, args, client, helper) {
-    console.log('add_flush used')
     if (args.length < 1) {
       message.reply(`You must specify an emote in the command! \nusage: \`${this.usage}\``)
     } else {
@@ -43,5 +42,6 @@ module.exports = {
         message.reply('emote not found!')
       }
     }
+    message.channel.stopTyping(true)
   }
 }
