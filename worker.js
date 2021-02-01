@@ -37,19 +37,29 @@ function editImage (url, options) {
           emote.sepia()
           break
           // limit the number of scales to preserve memory
-        case 'rt':
-        case 'rotate':
-          if (scaleAmts < 6) {
-            emote.rotate(Pand.random(-360, 360))
-            scaleAmts++
-          }
+        case 'rtro':
+        case 'rightrotate':
+          emote.rotate(-15)
           break
-        case 'sc':
-        case 'scale':
-          if (scaleAmts < 6) {
-            emote.scale(Pand.randomFloat(0.1, 2))
-            scaleAmts++
-          }
+        case 'lfro':
+        case 'leftrotate':
+          emote.rotate(15)
+          break
+        case 'scup':
+        case 'scaleup':
+          emote.scale(1.2)
+          break
+        case 'scdn':
+        case 'scaledown':
+          emote.scale(0.8)
+          break
+        case 'fl':
+        case 'flip':
+          emote.flip(true, false)
+          break
+        case 'ud':
+        case 'upsidedown':
+          emote.flip(false, true)
           break
       }
       // ensure the image can't get too huge

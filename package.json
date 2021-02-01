@@ -1,6 +1,6 @@
 {
   "name": "cubemoji",
-  "version": "2.7.8",
+  "version": "2.8.0",
   "description": "A Discord emoji bot.",
   "main": "index.js",
   "license": "MIT",
@@ -27,6 +27,7 @@
     "fuse.js": "^6.4.4",
     "jimp": "^0.16.1",
     "moment": "^2.29.1",
+    "node-emoji": "^1.10.0",
     "pandemonium": "^2.0.0",
     "twemoji-parser": "^13.0.0",
     "workerpool": "^6.0.3"

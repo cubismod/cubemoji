@@ -1,10 +1,10 @@
 const Discord = require('discord.js')
 const Pand = require('pandemonium')
-
+const Emoji = require('node-emoji')
 module.exports = {
   name: 'edit',
   description: 'Edits an emote/avatar according to the effects you select. Effects are applied in the order you specify them. Animated emotes will return static images. This process is computationally intense so give it a few seconds to work.',
-  usage: '[edit] <emote/@mention> (opt args): <random/r> <sharpen/sh> <edge_detect/ed> <emboss/em> <grayscale/gs> <blur/bl> <sepia/sp> <rotate/rt> <scale/sc>.',
+  usage: '[edit] <emote/@mention> (opt args): <random/r> <sharpen/sh> <edge_detect/ed> <emboss/em> <grayscale/gs> <blur/bl> <sepia/sp> <rightrotate/rtro> <lfro/leftrotate> <scaleup/scup> <scaledown/scdn>, <flip/fl>, <upsidedown/ud>.',
   aliases: ['ed', 'modify'],
   cooldown: 1,
   execute (message, args, client, helper) {
@@ -16,8 +16,11 @@ module.exports = {
       const argName = args[0].toLowerCase()
       let res
       if (argName === 'hole') {
+        res = {}
         // easter egg time
-        res = Pand.choice(helper.cache.createEmoteArray())
+        if (Pand.choice([true, false])) res = Pand.choice(helper.cache.createEmoteArray())
+        // random option of twemoji
+        else res.url = helper.cache.parseTwemoji(Emoji.random().emoji)
         // change up the args
         args = ['hole', 'random']
       } else {
@@ -49,7 +52,7 @@ module.exports = {
           // random effects option
           random = true
           const optLen = Pand.random(2, 30)
-          const effects = ['sharpen', 'emboss', 'grayscale', 'blur', 'sepia', 'rotate', 'scale']
+          const effects = ['sharpen', 'emboss', 'grayscale', 'blur', 'sepia', 'rightrotate', 'leftrotate', 'scaleup', 'scaledown', 'flip', 'upsidedown']
           for (let i = 0; i < optLen; i++) {
             options.push(Pand.choice(effects))
           }

@@ -53,7 +53,6 @@ const helper = {
   beginTop: ''
 }
 
-
 // function returns true if the command is allowed in the specific channel
 // false if not
 function checkWhiteList (channel, commandName) {
