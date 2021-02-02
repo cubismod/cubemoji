@@ -23,6 +23,7 @@ fbAdmin.initializeApp({
   }
 })
 
+console.log('firebase active')
 const db = fbAdmin.database()
 
 for (const file of commandFiles) {
@@ -34,6 +35,9 @@ for (const file of commandFiles) {
 }
 client.once('ready', () => {
   console.log('cubemoji running!')
+  const serverlist = []
+  client.guilds.cache.forEach(key => serverlist.push(key.name))
+  console.log(`active on the following servers: ${serverlist}`)
   // set up help message
   client.user.setActivity('c!help', { type: 'WATCHING' })
 })
@@ -126,6 +130,7 @@ helper.slotsDb.orderByChild('score').limitToLast(1).on('child_added', function (
   helper.topPlayer = snapshot.key
   helper.beginTop = new Date()
   helper.topPlayerTime = snapshot.val().timeOnTop
+  console.log(`new top player: ${snapshot.val().username}`)
 })
 
 helper.slotsDb.orderByChild('score').limitToLast(1).on('child_removed', function () {
@@ -245,7 +250,7 @@ setInterval(function () {
   }
 }, 60000)
 
-// regular check in every 30 min
+// regular check in every 60 min
 setInterval(function () {
   console.log(`time up: ${moment().to(client.readyAt, true)}`)
-}, 1.8e+6)
+}, 3.6e+6)
