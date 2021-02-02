@@ -14,6 +14,7 @@ module.exports = {
         // get the text and put it back together
         const text = args.slice(1).join(' ')
         fetched.send(text)
+        console.log(text)
       })
         .catch(reason => {
           console.log(reason)
