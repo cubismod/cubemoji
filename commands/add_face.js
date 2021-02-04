@@ -1,14 +1,14 @@
 const Discord = require('discord.js')
 
 module.exports = {
-  name: 'add_flush',
-  description: 'Returns a flushed version of an emote/avatar. Animated emotes/avatars will return static images. This process is computationally intense so give it a few seconds to work.',
-  usage: '[add_flush] <emote/@mention>',
+  name: 'add_face',
+  description: 'Adds a face or...other to an avatar or emote. Animated emotes/avatars will return static images.',
+  usage: '[add_flush] <emote/@mention> (opt args): <jfc> <joy> <pensive> <plead> <thinking> <triumph> <weary> <zany>',
   aliases: ['af', 'addflush'],
   cooldown: 1,
   execute (message, args, client, helper) {
     if (args.length < 1) {
-      message.reply(`You must specify an emote in the command! \nusage: \`${this.usage}\``)
+      message.reply(`You must specify an emote/mention in the command! \nusage: \`${this.usage}\``)
     } else {
       // start a typing indicator to show we're working
       message.channel.startTyping()
@@ -32,10 +32,14 @@ module.exports = {
         }
       }
       if (res) {
+        // determine the face specified, default to flushed if none found
+        let path = './assets/flushed.png'
+        const opts = ['jfc', 'joy', 'pensive', 'plead', 'thinking', 'triumph', 'weary', 'zany']
+        if (args.length >= 2 && opts.includes(args[1].toLowerCase())) path = `./assets/${args[1].toLowerCase()}.png`
         // queue up another worker to run the image edit
-        helper.pool.exec('addFlush', [res.url])
+        helper.pool.exec('addFace', [res.url, path])
           .then(result => {
-            const attach = new Discord.MessageAttachment(Buffer.from(result), 'flushed.png')
+            const attach = new Discord.MessageAttachment(Buffer.from(result), 'face.png')
             message.channel.stopTyping(true)
             message.channel.send(attach)
           })

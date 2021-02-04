@@ -8,7 +8,6 @@ function editImage (url, options) {
   // limit the amount of commands that can be performed at once since this runs synchronously
   return Jimp.read(url).then(emote => {
     // convolution info https://docs.gimp.org/2.6/en/plug-in-convmatrix.html
-    let scaleAmts = 0
     options.forEach(option => {
       switch (option) {
         // let the user use shorter aliases that fall through
@@ -78,9 +77,9 @@ function editImage (url, options) {
     .catch(reason => console.log(reason))
 }
 
-function addFlush (url) {
-  return Jimp.read('./assets/flushed.png').then(flush => {
-    return Jimp.read(url).then(baseEmote => {
+function addFace (baseUrl, faceUrl) {
+  return Jimp.read(faceUrl).then(flush => {
+    return Jimp.read(baseUrl).then(baseEmote => {
       // do a bit of transformation of the face
       flush.contain(baseEmote.bitmap.width, baseEmote.bitmap.height, Jimp.HORIZONTAL_ALIGN_CENTER | Jimp.VERTICAL_ALIGN_MIDDLE)
       baseEmote.composite(flush, 0, 0, { mode: Jimp.BLEND_SOURCE_OVER })
@@ -96,5 +95,5 @@ function addFlush (url) {
 
 workerpool.worker({
   editImage: editImage,
-  addFlush: addFlush
+  addFace: addFace
 })
