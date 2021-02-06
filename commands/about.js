@@ -7,7 +7,6 @@ module.exports = {
   cooldown: 5,
   execute (message, _args, client) {
     const pkg = require('../package.json')
-    // console.log('about command used')
     const embed = {
       title: '<:cubemoji:793663899072200744>',
       color: 0x91d7f2,

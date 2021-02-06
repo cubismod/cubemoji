@@ -6,7 +6,6 @@ module.exports = {
   aliases: ['sch', 's'],
   cooldown: 2,
   execute (message, args, client, helper) {
-    // console.log('search used')
     if (args.length < 1) {
       return message.reply(`you must specify an emote name to search for \nusage: \`${this.usage}\``)
     }

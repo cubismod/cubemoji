@@ -71,10 +71,10 @@ function editImage (url, options) {
       return buf
     })
     // catch if jimp fails to get the buffer asynchronously
-      .catch(reason => console.log(reason))
+      .catch(reason => console.error(reason))
   })
   // catch statement if JIMP fails to load the image
-    .catch(reason => console.log(reason))
+    .catch(reason => console.error(reason))
 }
 
 function addFace (baseUrl, faceUrl) {
@@ -86,11 +86,11 @@ function addFace (baseUrl, faceUrl) {
       return baseEmote.getBufferAsync(Jimp.AUTO).then(buf => {
         return buf
       })
-        .catch(reason => console.log(reason)) // unable to get async buf
+        .catch(reason => console.error(reason)) // unable to get async buf
     })
-      .catch(reason => console.log(reason)) // unable to read url of user emote
+      .catch(reason => console.error(reason)) // unable to read url of user emote
   })
-    .catch(reason => console.log(reason)) // unable to read base flushed image
+    .catch(reason => console.error(reason)) // unable to read base flushed image
 }
 
 workerpool.worker({

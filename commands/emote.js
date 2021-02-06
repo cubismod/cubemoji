@@ -6,7 +6,6 @@ module.exports = {
   cooldown: 1,
   requiresCache: true,
   execute (message, args, _client, helper) {
-    // console.log('emote command used')
     if (args.length < 1) {
       message.reply('You must specify an emote in the command!')
     } else {

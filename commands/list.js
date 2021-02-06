@@ -5,9 +5,7 @@ module.exports = {
   aliases: ['l'],
   cooldown: 120,
   execute (message, args, client, helper) {
-    // console.log('list command used')
     const msg = []
-    // const helper = require('./../helper')
     const emoteArray = helper.cache.createEmoteArray(true)
     let letter = ''
     emoteArray.forEach(emote => {

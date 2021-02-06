@@ -5,7 +5,6 @@ module.exports = {
   aliases: ['sy'],
   cooldown: 5,
   execute (message, args, client) {
-    // console.log('add_flush used')
     if (args.length < 2 || message.author.id !== '170358606590377984') {
       message.reply('You must include a channel id and text in the command and be cubis!')
     } else {
@@ -14,10 +13,10 @@ module.exports = {
         // get the text and put it back together
         const text = args.slice(1).join(' ')
         fetched.send(text)
-        console.log(text)
+        console.log(`"${text}" sent using say command in #${fetched.name} in ${fetched.guild.name}`)
       })
         .catch(reason => {
-          console.log(reason)
+          console.error(reason)
           message.reply('unable to retrieve the channel')
         })
     }

@@ -6,7 +6,6 @@ module.exports = {
   cooldown: 1,
   requiresCache: true,
   execute (message, args, client, helper) {
-    // console.log('emote command used')
     if (args.length < 1) {
       message.reply('You must specify an emote name in the command!')
     } else {
@@ -49,7 +48,7 @@ module.exports = {
           }
           message.channel.send(`${res}`, { embed: embed })
         }).catch((reason) => {
-          console.log(reason)
+          console.error(reason)
           // send msg without author
           const embed = {
             title: res.toString(),

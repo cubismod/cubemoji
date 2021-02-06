@@ -6,7 +6,6 @@ module.exports = {
   aliases: ['sl'],
   cooldown: 3,
   execute (message, args, client, helper) {
-    // console.log('slots command used')
     // creates text representing slots
     function createSlotText (options) {
       const emotes = Pand.sampleWithReplacements(20, options)
@@ -66,7 +65,7 @@ module.exports = {
             content.res = content.res.concat(`\n**<a:dieRoll:795419079254605834> Score: ${points} <a:dieRoll:795419079254605834>\n${Pand.choice(helper.cache.createEmoteArray())} ${message.author.username}'s high score: ${newScore}**`)
             msg.edit(content.res)
           })
-          .catch(rejected => console.log(rejected))
+          .catch(rejected => console.error(rejected))
       }
     }
 
@@ -91,7 +90,7 @@ module.exports = {
             myMsg.delete()
             userMsg.delete()
           } catch {
-            console.log('unable to delete slots message')
+            console.error('unable to delete slots message')
           }
         }, 30000, sentMsg, message)
       }

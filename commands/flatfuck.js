@@ -13,7 +13,6 @@ module.exports = {
       'https://www.youtube.com/watch?v=NRn8coFCIjU',
       'https://twitter.com/GatorsDaily'
     ]
-    // console.log('flat_fuck used')
     const day = new Date()
     if (day.getDay() === 5) {
       message.channel.send('<:hahaflatfuck:769663194729414656>')

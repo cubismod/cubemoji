@@ -74,7 +74,7 @@ module.exports = {
               message.channel.send(`Effects chain used: ${options.join(' ')}`)
             }
           })
-          .catch(error => console.log(error))
+          .catch(error => console.error(error))
       } else {
         message.reply('emote not found!')
       }

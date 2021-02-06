@@ -7,7 +7,6 @@ module.exports = {
   execute (message, args, client, helper) {
     require('../helper')
     const Pandemonium = require('pandemonium')
-    // console.log('cube command used')
     const chance = Pandemonium
     const emoteArray = helper.cache.createEmoteArray()
     const msg = message.channel.send(chance.choice(emoteArray).toString())
