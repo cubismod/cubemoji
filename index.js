@@ -160,7 +160,9 @@ client.on('message', message => {
    client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName))
 
   if (!cmd) {
+    // log this msg as well
     message.react('❔')
+    console.log(`${message.author.username} tried to use the invalid command "c!${commandName}"`)
     return
   }
 
