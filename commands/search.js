@@ -23,7 +23,7 @@ module.exports = {
         .setTitle(`Search for ${args[0]} (${results.length})`)
         .setDescription(description.join('  ').slice(0, 2047))
         .setColor('BLUE')
-        .setFooter('Some results may be missing. Use c!list to get a full list to your DMs.')
+        .setFooter('Searching yielding tons of results will be truncated. Use c!list to get a list of all emotes to your DMs.')
       message.channel.send({ embed: embed })
     }
   }

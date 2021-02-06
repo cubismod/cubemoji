@@ -10,9 +10,8 @@ module.exports = {
     let repeats = 1
     const options = helper.cache.search('fl')
     const intVers = parseInt(args[0])
-    if (args.length > 0 && !isNaN(intVers) && intVers < 26) {
-      repeats = intVers
-    }
+    if (args.length > 0 && !isNaN(intVers) && intVers < 26) repeats = intVers
+    // safely fail by just returning 1 emote
     const emotes = Pand.geometricReservoirSample(repeats, options)
     let msg = ''
     emotes.forEach(emote => {

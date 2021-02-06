@@ -5,7 +5,7 @@ module.exports = {
   aliases: ['i'],
   cooldown: 1,
   requiresCache: true,
-  execute (message, args, client, helper) {
+  execute (message, args, _client, helper) {
     if (args.length < 1) {
       message.reply('You must specify an emote name in the command!')
     } else {

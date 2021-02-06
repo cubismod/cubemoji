@@ -11,7 +11,12 @@ module.exports = {
       'https://www.youtube.com/watch?v=A5U8ypHq3BU',
       'https://www.youtube.com/watch?v=H0b3moDYTUA',
       'https://www.youtube.com/watch?v=NRn8coFCIjU',
-      'https://twitter.com/GatorsDaily'
+      'https://youtu.be/MLESXo2YINY',
+      'https://youtu.be/LBAj4ADIxNM',
+      'https://youtu.be/SSp8NcxPE24',
+      'https://youtu.be/NDse0v849cc',
+      'https://youtu.be/i359iZI3QlE',
+      'https://youtu.be/dXE0E3w71oM'
     ]
     const day = new Date()
     if (day.getDay() === 5) {

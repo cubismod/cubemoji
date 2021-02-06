@@ -4,8 +4,9 @@ module.exports = {
   usage: '[big] <emote>',
   aliases: ['b', 'large', 'enhance'],
   cooldown: 1,
-  execute (message, args, client, helper) {
+  execute (message, args, _client, helper) {
     if (args.length < 1) {
+      console.log(`${message.author.username} failed to use ${this.name} correctly`)
       message.reply(`You must specify an emote in the command!\n \`${this.usage}\``)
     } else {
       // emoji names are only one word long so we will only consider the 0th element

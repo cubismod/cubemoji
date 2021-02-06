@@ -7,6 +7,7 @@ module.exports = {
   requiresCache: true,
   execute (message, args, _client, helper) {
     if (args.length < 1) {
+      console.log(`${message.author.username} failed to use ${this.name} correctly`)
       message.reply('You must specify an emote in the command!')
     } else {
       // emoji names are only one word long so we will only consider the 0th element
@@ -22,6 +23,7 @@ module.exports = {
         if (res.length > 0) {
           message.channel.send(res[0].item.toString())
         } else {
+          console.log(`${message.author.username} failed to find emote ${emoteName}`)
           message.reply('emote not found!')
         }
       }

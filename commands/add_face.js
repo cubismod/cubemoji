@@ -8,6 +8,7 @@ module.exports = {
   cooldown: 1,
   execute (message, args, client, helper) {
     if (args.length < 1) {
+      console.log(`${message.author.username} failed to use ${this.name} correctly`)
       message.reply(`You must specify an emote/mention in the command! \nusage: \`${this.usage}\``)
     } else {
       // start a typing indicator to show we're working

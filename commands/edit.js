@@ -10,6 +10,7 @@ module.exports = {
   execute (message, args, client, helper) {
     let random
     if (args.length < 2 && (args.length !== 1 && args[0] !== 'hole')) {
+      console.log(`${message.author.username} failed to use ${this.name} correctly`)
       message.reply(`You must specify an emote name and filters in the command! \n \`${this.usage}\``)
     } else {
       message.channel.startTyping()
