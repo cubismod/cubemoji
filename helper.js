@@ -20,12 +20,20 @@ module.exports = class EmoteCache {
     // ensure we only update if there is no data or the update time has lapsed
     if ((this.arrayVersion === undefined || this.arrayVersion.length === 0) ||
         (Moment().isAfter(this.nextUpdateTime))) {
+      // load up our blacklist.json file
+      // note that with the require(), you need to restart app
+      // for it to see changes to the file
+      const blacklist = require('./blacklist.json').blacklist
       this.emoteCache = this.client.emojis.cache
       this.arrayVersion = []
       this.sortedArray = []
       for (const [, value] of this.emoteCache) {
-        this.arrayVersion.push(value)
-        this.sortedArray.push(value.name)
+        // utilize the blacklist.json file to remove bad emotes
+        // blacklist.json utiizes emote IDs
+        if (!blacklist.includes(value.id)) {
+          this.arrayVersion.push(value)
+          this.sortedArray.push(value.name)
+        }
       }
       this.sortedArray = this.sortedArray.sort(function (a, b) {
         return a.toLowerCase().localeCompare(b.toLowerCase())
@@ -59,14 +67,14 @@ module.exports = class EmoteCache {
     // first convert the name to lowercase so we aren't case sensitive
     const emoteName = emote.toLowerCase()
 
-    let res = this.client.emojis.cache.find(emote => emote.name.toLowerCase() === emoteName)
+    let res = this.arrayVersion.find(emote => emote.name.toLowerCase() === emoteName)
     if (!res) {
       // try and read the emote directly
       // like <:flass:781664252058533908>
       // so we take the "flass" part
       const split = emoteName.split(':')
       if (split.length > 2) {
-        res = this.client.emojis.cache.find(emote => emote.name.toLowerCase() === split[1])
+        res = this.arrayVersion.find(emote => emote.name.toLowerCase() === split[1])
         if (res === undefined) {
           res = {}
           // return the url here

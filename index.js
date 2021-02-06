@@ -57,6 +57,9 @@ const helper = {
   beginTop: ''
 }
 
+helper.cache.createEmoteArray()
+console.log('initialized emote array')
+
 // function returns true if the command is allowed in the specific channel
 // false if not
 function checkWhiteList (channel, commandName) {
