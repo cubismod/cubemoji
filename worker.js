@@ -2,6 +2,7 @@
 const Pand = require('pandemonium')
 const Jimp = require('jimp')
 const workerpool = require('workerpool')
+const { BLEND_SOURCE_OVER } = require('jimp')
 
 function editImage (url, options) {
   // edit function that we pass to workers
@@ -82,7 +83,12 @@ function addFace (baseUrl, faceUrl) {
     return Jimp.read(baseUrl).then(baseEmote => {
       // do a bit of transformation of the face
       flush.contain(baseEmote.bitmap.width, baseEmote.bitmap.height, Jimp.HORIZONTAL_ALIGN_CENTER | Jimp.VERTICAL_ALIGN_MIDDLE)
-      baseEmote.composite(flush, 0, 0, { mode: Jimp.BLEND_SOURCE_OVER })
+      const mask = baseEmote.clone()
+      // create a mask image to ensure shadow doesn't go over transparent regions
+      mask.grayscale()
+      mask.opaque()
+      if (faceUrl.includes('jfc')) flush.mask(mask, 0, 0)
+      baseEmote.composite(flush, 0, 0, { mode: BLEND_SOURCE_OVER })
       return baseEmote.getBufferAsync(Jimp.AUTO).then(buf => {
         return buf
       })
