@@ -40,7 +40,11 @@ module.exports = {
         // queue up another worker to run the image edit
         helper.pool.exec('addFace', [res.url, path])
           .then(result => {
-            const attach = new Discord.MessageAttachment(Buffer.from(result), 'face.png')
+            // automatically spoiler 'jfc' images
+            let fileName
+            if (args[1].toLowerCase() === 'jfc') fileName = 'SPOILER_face.png'
+            else fileName = 'face.png'
+            const attach = new Discord.MessageAttachment(Buffer.from(result), fileName)
             message.channel.stopTyping(true)
             message.channel.send(attach)
           })
