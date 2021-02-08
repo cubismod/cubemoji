@@ -54,7 +54,8 @@ const helper = {
   slotsUsers: new Set(),
   topPlayer: '',
   topPlayerTime: '',
-  beginTop: ''
+  beginTop: '',
+  matches: {}
 }
 
 helper.cache.createEmoteArray()
