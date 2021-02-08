@@ -53,16 +53,20 @@ module.exports = {
         // user is not yet on the queue so let's add them
         helper.matches[message.author.id.toString()] = { matched: false, match: '', msg: text }
         const users = Object.keys(helper.matches)
-        // check if there is a match possible
-        if (users.length < 2) {
-          // no matches
-          return message.reply('no matches available yet, we will let you know when we find one!')
-        }
         // we have found a match
         // create an array w/o the original sender in it
         const senderID = message.author.id
         const index = users.indexOf(senderID)
         users.splice(index, 1)
+        users.forEach((user, i, arr) => {
+          // remove any users who may be matched
+          if (user.matched) arr.splice(i, 1)
+        })
+        // check if there is a match possible
+        if (users.length < 1) {
+          // no matches
+          return message.reply('no matches available yet, we will let you know when we find one!')
+        }
         const recieverID = Pandemonium.choice(users)
         // now we have identified a user, so lets match each up
         // first on the sender side
