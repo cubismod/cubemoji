@@ -27,22 +27,40 @@ module.exports = {
       if (matches.length !== 0 && matches.includes(message.author.id)) {
         const sender = helper.matches[message.author.id]
         if (sender.matched === true) {
-          // end and reporting features
-          if (args[0].toLowerCase() === 'end') {
-            // end the chat now
-            message.author.send('Chat has ended now. Have a great day!')
-            console.log(`Conversation between ${message.author.id} & ${sender.match} has ended`)
-            delete helper.matches[message.author.id]
-            delete helper.matches[sender.match]
-          } else if (args[0].toLowerCase() === 'report') {
-            message.author.send('Your conversation has ended and been reported')
-            console.error(`Conversation between ${message.author.id} & ${sender.match} has been reported!`)
-            delete helper.matches[message.author.id]
-            delete helper.matches[sender.match]
-          } else {
-            // there is a match so we can send a message now
-            // now load up the receiving user
-            sendMsg(sender.match, text)
+          switch (args[0].toLowerCase()) {
+            case 'end':
+              // end the chat now
+              message.author.send('Chat has ended now. Have a great day!')
+              sendMsg(sender.match, 'conversation ended')
+              console.log(`Conversation between ${message.author.id} & ${sender.match} has ended`)
+              // clear out timeouts
+              clearTimeout(helper.matches[message.author.id].timeout)
+              clearTimeout(helper.matches[sender.match].timeout)
+
+              delete helper.matches[message.author.id]
+              delete helper.matches[sender.match]
+              break
+            case 'report':
+              message.author.send('Your conversation has ended and been reported')
+              sendMsg(sender.match, 'conversation ended')
+              // clear out timeouts
+              clearTimeout(helper.matches[message.author.id].timeout)
+              clearTimeout(helper.matches[sender.match].timeout)
+
+              console.error(`Conversation between ${message.author.id} & ${sender.match} has been reported!`)
+              delete helper.matches[message.author.id]
+              delete helper.matches[sender.match]
+              break
+            case 'id':
+              // reveal the users ID
+              helper.matches[message.author.id].id = true
+              if (helper.matches[sender.match].id === true) {
+                message.author.send(`turns out you are chatting with <@${sender.match}>`)
+                sendMsg(sender.match, `turns out you are chatting with <@${message.author.id}>`)
+              }
+              break
+            default:
+              sendMsg(sender.match, text)
           }
         } else {
           // no matches yet
@@ -75,19 +93,22 @@ module.exports = {
         // then on the receiver side
         helper.matches[recieverID].match = senderID
         helper.matches[recieverID].matched = true
-        message.author.send('We found a match for you! You will now be able to chat for 15 minutes before the conversation closes. Please keep in mind that chats are moderated by cubis, the bot owner, who will see all messages and usernames. Additionally if you want to end a chat you can use `c!message end` and if you want to report a chat (which will close it), use `c!message report`. Enjoy!')
+        const welcomeMsg = 'We found a match for you! You will now be able to chat for 15 minutes before the conversation closes. Please keep in mind that chats are moderated by cubis, the bot owner, who will see all messages and usernames. Additionally if you want to end a chat you can use `c!message end` and if you want to report a chat (which will close it), use `c!message report`. Use `c!id` to reveal your ID 😉. Enjoy!'
+        message.author.send(welcomeMsg)
+        sendMsg(recieverID, welcomeMsg)
         // now resolve the other user and send them a msg
         sendMsg(helper.matches[senderID].match, helper.matches[senderID].msg)
 
         // then we setup a timeout to stop the convo after 15 minutes
         const endMsg = 'Thanks for chatting! Your conversation is done now.'
-        setTimeout(function () {
-          message.author.send(endMsg)
+        const timeout = setTimeout(function () {
           sendMsg(recieverID, endMsg)
           // delete references to the users
           delete helper.matches[senderID]
           delete helper.matches[recieverID]
-        }, 900000)
+        }, 30000)
+        helper.matches[senderID].timeout = timeout
+        helper.matches[recieverID].timeout = timeout
       }
     }
   }

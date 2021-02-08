@@ -145,15 +145,18 @@ helper.slotsDb.orderByChild('score').limitToLast(1).on('child_removed', function
 })
 
 client.on('message', message => {
+  const args = message.content.slice(secrets.prefix.length).trim().split(/ +/)
   if (!message.content.toLowerCase().startsWith(secrets.prefix) || message.author.bot) {
     // random chance that we will ambiently add points for the user
     // for non command messages
     ambPointAdd(message.author)
+    if (message.channel.type === 'dm' && !message.author.bot) {
+      client.commands.get('message').execute(message, message.content.split(' '), client, helper)
+    }
     return
   }
 
   // now we determine the command name from the string
-  const args = message.content.slice(secrets.prefix.length).trim().split(/ +/)
   const commandName = args.shift().toLowerCase()
 
   // then convert from alias if necessary
