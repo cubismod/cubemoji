@@ -55,7 +55,8 @@ const helper = {
   topPlayer: '',
   topPlayerTime: '',
   beginTop: '',
-  matches: {}
+  matches: {},
+  openUsers: new Set()
 }
 
 helper.cache.createEmoteArray()
