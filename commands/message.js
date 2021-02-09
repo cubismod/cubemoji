@@ -12,6 +12,11 @@ module.exports = {
       client.users.fetch(id).then(receiver => {
         receiver.send(`${prefix} ${text}`)
         console.log(`${message.author.tag} sent "${text}" to ${receiver.tag}`)
+        if (!system) {
+          client.channels.fetch('808511506442485801').then(ramblings => {
+            ramblings.send(text)
+          })
+        }
       }).catch(rej => console.error(rej))
     }
     // begin actual code
