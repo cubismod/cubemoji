@@ -28,10 +28,10 @@ module.exports = {
         const sender = helper.matches[message.author.id]
         if (sender.matched === true) {
           switch (args[0].toLowerCase()) {
-            case 'end':
+            case '!end':
               // end the chat now
               message.author.send('Chat has ended now. Have a great day!')
-              sendMsg(sender.match, 'conversation ended')
+              sendMsg(sender.match, 'The conversation has ended.')
               console.log(`Conversation between ${message.author.id} & ${sender.match} has ended`)
               // clear out timeouts
               clearTimeout(helper.matches[message.author.id].timeout)
@@ -40,7 +40,7 @@ module.exports = {
               delete helper.matches[message.author.id]
               delete helper.matches[sender.match]
               break
-            case 'report':
+            case '!report':
               message.author.send('Your conversation has ended and been reported')
               sendMsg(sender.match, 'conversation ended')
               // clear out timeouts
@@ -51,7 +51,7 @@ module.exports = {
               delete helper.matches[message.author.id]
               delete helper.matches[sender.match]
               break
-            case 'id':
+            case '!id':
               // reveal the users ID
               helper.matches[message.author.id].id = true
               if (helper.matches[sender.match].id === true) {
@@ -85,30 +85,30 @@ module.exports = {
           // no matches
           return message.reply('no matches available yet, we will let you know when we find one!')
         }
-        const recieverID = Pandemonium.choice(users)
+        const receiverID = Pandemonium.choice(users)
         // now we have identified a user, so lets match each up
         // first on the sender side
-        helper.matches[senderID].match = recieverID
+        helper.matches[senderID].match = receiverID
         helper.matches[senderID].matched = true
         // then on the receiver side
-        helper.matches[recieverID].match = senderID
-        helper.matches[recieverID].matched = true
-        const welcomeMsg = 'We found a match for you! You will now be able to chat for 15 minutes before the conversation closes. Please keep in mind that chats are moderated by cubis, the bot owner, who will see all messages and usernames. Additionally if you want to end a chat you can use `c!message end` and if you want to report a chat (which will close it), use `c!message report`. Use `c!id` to reveal your ID 😉. Enjoy!'
+        helper.matches[receiverID].match = senderID
+        helper.matches[receiverID].matched = true
+        const welcomeMsg = 'We found a match for you! You will now be able to chat for 15 minutes before the conversation closes. Please keep in mind that chats are moderated by cubis, the bot owner, who will see all messages and usernames. Additionally if you want to end a chat you can use `!end` and if you want to report a chat (which will close it), use `!report`. Use `!id` to reveal your ID 😉. Enjoy!'
         message.author.send(welcomeMsg)
-        sendMsg(recieverID, welcomeMsg)
+        sendMsg(receiverID, welcomeMsg)
         // now resolve the other user and send them a msg
         sendMsg(helper.matches[senderID].match, helper.matches[senderID].msg)
 
         // then we setup a timeout to stop the convo after 15 minutes
         const endMsg = 'Thanks for chatting! Your conversation is done now.'
         const timeout = setTimeout(function () {
-          sendMsg(recieverID, endMsg)
+          sendMsg(receiverID, endMsg)
           // delete references to the users
           delete helper.matches[senderID]
-          delete helper.matches[recieverID]
-        }, 30000)
+          delete helper.matches[receiverID]
+        }, 900000)
         helper.matches[senderID].timeout = timeout
-        helper.matches[recieverID].timeout = timeout
+        helper.matches[receiverID].timeout = timeout
       }
     }
   }
