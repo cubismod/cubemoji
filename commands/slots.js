@@ -92,7 +92,7 @@ module.exports = {
           } catch {
             console.error('unable to delete slots message')
           }
-        }, 30000, sentMsg, message)
+        }, 4.32e+7, sentMsg, message)
       }
     })
   }

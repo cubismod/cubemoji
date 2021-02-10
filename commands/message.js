@@ -5,16 +5,27 @@ module.exports = {
   aliases: ['m', 'msg'],
   cooldown: 1,
   execute (message, args, client, helper) {
+    const Moment = require('moment')
     // resolve and send a message to a user using their ID
     function sendMsg (id, text, system = false) {
-      let prefix = '*Incoming Message*: '
+      const userObj = helper.matches[id]
+      let prefix = `*Chat ends ${Moment().to(userObj.timeLeft)}:*`
       if (system) prefix = '*System Message*: '
       client.users.fetch(id).then(receiver => {
         receiver.send(`${prefix} ${text}`)
         console.log(`${message.author.tag} sent "${text}" to ${receiver.tag}`)
         if (!system) {
           client.channels.fetch('808511506442485801').then(ramblings => {
-            ramblings.send(text)
+            ramblings.send(`${userObj.emote.toString()}: ${text}`).then(message => {
+              // clear ramblings messages after 10 hours
+              setTimeout(function () {
+                try {
+                  message.delete()
+                } catch (err) {
+                  console.error(err)
+                }
+              }, 3.6e+7)
+            })
           })
         }
       }).catch(rej => console.error(rej))
@@ -83,6 +94,7 @@ module.exports = {
           return message.reply('we have added you to the matching queue and will let you know once we find a match for you!')
         }
       } else {
+        // TODO: turn these gross things into functions
         // user is not yet on the queue so let's add them
         helper.matches[message.author.id.toString()] = { matched: false, match: '', msg: text }
         // we have found a match
@@ -103,6 +115,15 @@ module.exports = {
         // remove both matches from there
         helper.openUsers.delete(senderID)
         helper.openUsers.delete(receiverID)
+        const emotes = Pandemonium.geometricReservoirSample(2, helper.cache.createEmoteArray())
+        // choose random emotes to identify each
+        helper.matches[senderID].emote = emotes[0]
+        helper.matches[receiverID].emote = emotes[1]
+
+        const timeLeft = Moment().add(15, 'minutes')
+        // then save the time until convo over
+        helper.matches[senderID].timeLeft = timeLeft
+        helper.matches[receiverID].timeLeft = timeLeft
         const welcomeMsg = 'We found a match for you! You will now be able to chat for 15 minutes before the conversation closes. Please keep in mind that chats are moderated by cubis, the bot owner, who will see all messages and usernames. Additionally if you want to end a chat you can use `!end` and if you want to report a chat (which will close it), use `!report`. Use `!id` to reveal your ID 😉. Enjoy!'
         message.author.send(welcomeMsg)
         sendMsg(receiverID, welcomeMsg, true)
