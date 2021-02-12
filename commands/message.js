@@ -76,6 +76,7 @@ module.exports = {
       // store when the chat will end so its shows up in dms
       const timeLeft = Moment().add(15, 'minutes')
       helper.matches[sender].timeLeft = timeLeft
+      helper.matches[sender].matched = true
     }
 
     // begin actual code
@@ -121,7 +122,7 @@ module.exports = {
                 sendDM(sender.match, `turns out you are chatting with <@${message.author.id}>`, true)
               } else {
                 message.channel.send('You have revealed your ID, if your match reveals their ID, then a message will be sent indicating who you are chatting with.')
-                sendDM('Your match has revealed their ID. You can reveal yours with `!id`')
+                sendDM(sender.match, 'Your match has revealed their ID. You can reveal yours with `!id`', true)
               }
               break
             default:
@@ -133,6 +134,7 @@ module.exports = {
             // remove user from the queue
             sendRamble('*Someone got tired of waiting so left the queue.*')
             delete helper.matches[message.author.id]
+            helper.openUsers.delete(message.author.id)
             return message.reply('You have been removed from the queue.')
           }
           helper.matches[message.author.id].msg = text
@@ -141,7 +143,7 @@ module.exports = {
         }
       } else {
         // create a user object
-        helper.matches[message.author.id.toString()] = { match: '', msg: text }
+        helper.matches[message.author.id.toString()] = { matched: false, match: '', msg: text }
         const senderID = message.author.id
         if (helper.openUsers.size === 0) {
           // no matches found yet so let's announce that to spark interest
