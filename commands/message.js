@@ -72,7 +72,7 @@ module.exports = {
       // remove from available pool of matches
       helper.openUsers.delete(sender)
       // pick an emote to represent them in chat
-      helper.matches[sender].emote = Pandemonium.geometricReservoirSample(2, helper.cache.createEmoteArray())
+      helper.matches[sender].emote = Pandemonium.choice(helper.cache.createEmoteArray())
       // store when the chat will end so its shows up in dms
       const timeLeft = Moment().add(15, 'minutes')
       helper.matches[sender].timeLeft = timeLeft
@@ -131,9 +131,9 @@ module.exports = {
           // no matches yet
           if (args[0].toLowerCase() === '!leave') {
             // remove user from the queue
-            message.channel.send('You have been removed from the queue.')
             sendRamble('*Someone got tired of waiting so left the queue.*')
             delete helper.matches[message.author.id]
+            return message.reply('You have been removed from the queue.')
           }
           helper.matches[message.author.id].msg = text
           sendRamble(matchRamble)
@@ -162,6 +162,7 @@ module.exports = {
         sendDM(receiverID, welcomeMsg, true)
         // now resolve the other user and send them a msg
         sendDM(helper.matches[senderID].match, helper.matches[senderID].msg)
+        sendRamble(`*${helper.matches[senderID].emote.toString()} & ${helper.matches[receiverID].emote.toString()} have entered the chat.*`)
 
         // then we setup a timeout to stop the convo after 15 minutes
         const timeout = setTimeout(function () {
