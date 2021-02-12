@@ -6,8 +6,10 @@ module.exports = {
   cooldown: 1,
   execute (message, args, client, helper) {
     const Moment = require('moment')
+    const Pandemonium = require('pandemonium')
+
     // resolve and send a message to a user using their ID
-    function sendMsg (id, text, system = false) {
+    function sendDM (id, text, system = false) {
       const userObj = helper.matches[id]
       let prefix = `*Chat ends ${Moment().to(userObj.timeLeft)}:*`
       if (system) prefix = '*System Message*: '
@@ -15,125 +17,156 @@ module.exports = {
         receiver.send(`${prefix} ${text}`)
         console.log(`${message.author.tag} sent "${text}" to ${receiver.tag}`)
         if (!system) {
-          client.channels.fetch('808511506442485801').then(ramblings => {
-            ramblings.send(`${userObj.emote.toString()}: ${text}`).then(message => {
-              // clear ramblings messages after 10 hours
-              setTimeout(function () {
-                try {
-                  message.delete()
-                } catch (err) {
-                  console.error(err)
-                }
-              }, 3.6e+7)
-            })
-          })
+          // send a ramble
+          const rambleBody = `${userObj.emote.toString()}: ${text}`
+          sendRamble(rambleBody)
         }
       }).catch(rej => console.error(rej))
     }
-    // begin actual code
-    if (message.channel.type !== 'dm') {
-      return message.reply('you can only use this command in DMs!')
+
+    // ramble signifying two users have left the chat
+    // only need one user as we can pull the emote from the other user
+    function chatEndRamble (user) {
+      const userOneEmote = user.emote.toString()
+      const userTwoEmote = helper.matches[user.match].emote
+      const msg = `*${userOneEmote} & ${userTwoEmote} have left the chat*`
+      sendRamble(msg)
     }
+
+    // sends a rambling message to be posted to the log
+    function sendRamble (text) {
+      client.channels.fetch('808511506442485801').then(ramblings => {
+        ramblings.send(text).then(message => {
+          // clear ramblings messages after 10 hours
+          setTimeout(function () {
+            try {
+              message.delete()
+            } catch (err) {
+              // log an error but also not super important if we can't delete
+              console.log(err)
+            }
+          }, 3.6e+7)
+        })
+      })
+    }
+
+    // clean up the chat and related objects once its done
+    function cleanupChat () {
+      const sender = helper.matches[message.author.id]
+      const receiver = helper.matches[sender.match]
+      // first we remove those timeouts
+      try {
+        clearTimeout(sender.timeout)
+        clearTimeout(receiver.timeout)
+      } catch {
+        console.log('we were unable to clear timeout(s) as they had been deleted already')
+      }
+      // then we delete the actual objects
+      delete helper.matches[message.author.id]
+      delete helper.matches[sender.match]
+    }
+
+    // convert a user object to be matched
+    function makeMatch (sender, receiver) {
+      helper.matches[sender].match = receiver
+      // remove from available pool of matches
+      helper.openUsers.delete(sender)
+      // pick an emote to represent them in chat
+      helper.matches[sender].emote = Pandemonium.geometricReservoirSample(2, helper.cache.createEmoteArray())
+      // store when the chat will end so its shows up in dms
+      const timeLeft = Moment().add(15, 'minutes')
+      helper.matches[sender].timeLeft = timeLeft
+    }
+
+    // begin actual code
+    // initial command checks
+    if (message.channel.type !== 'dm') return message.reply('you can only use this command in DMs!')
     if (args.length < 1) {
       console.log(`${message.author.username} failed to use ${this.name} correctly`)
       message.reply(`you must specify a message!\n \`${this.usage}\``)
     } else {
-      const Pandemonium = require('pandemonium')
+      const chatEnded = 'Chat has ended now. Have a great day!'
+      const lookingForMatch = 'we have added you to the matching queue and will let you know once we find a match for you! You can type `!leave` to leave the queue.'
+      const matchRamble = '*A user is looking for someone to chat with... Will you answer their call and join the queue?*'
+
+      // merge args back into a message
       const text = args.join(' ')
-      // the user has already entered the matching pool
       const matches = Object.keys(helper.matches)
       if (matches.length !== 0 && matches.includes(message.author.id)) {
+        // the user has already entered the matching pool
         const sender = helper.matches[message.author.id]
         if (sender.matched === true) {
+          // several argument commands are available to control the chat
           switch (args[0].toLowerCase()) {
             case '!end':
               // end the chat now
-              message.author.send('Chat has ended now. Have a great day!')
-              sendMsg(sender.match, 'The conversation has ended.', true)
+              message.author.send(chatEnded)
+              sendDM(sender.match, chatEnded, true)
+              chatEndRamble(sender)
               console.log(`Conversation between ${message.author.id} & ${sender.match} has ended`)
-              // clear out timeouts
-              try {
-                clearTimeout(helper.matches[message.author.id].timeout)
-                clearTimeout(helper.matches[sender.match].timeout)
-              } catch {
-                console.log('oops!')
-              }
-
-              delete helper.matches[message.author.id]
-              delete helper.matches[sender.match]
+              cleanupChat()
               break
             case '!report':
               message.author.send('Your conversation has ended and been reported')
-              sendMsg(sender.match, 'Conversation has ended', true)
+              sendDM(sender.match, chatEnded, true)
               // clear out timeouts
-              try {
-                clearTimeout(helper.matches[message.author.id].timeout)
-                clearTimeout(helper.matches[sender.match].timeout)
-              } catch {
-                console.log('oops!')
-              }
-
               console.error(`Conversation between ${message.author.id} & ${sender.match} has been reported!`)
-              delete helper.matches[message.author.id]
-              delete helper.matches[sender.match]
+              cleanupChat()
               break
             case '!id':
               // reveal the users ID
               helper.matches[message.author.id].id = true
               if (helper.matches[sender.match].id === true) {
                 message.author.send(`turns out you are chatting with <@${sender.match}>`)
-                sendMsg(sender.match, `turns out you are chatting with <@${message.author.id}>`, true)
+                sendDM(sender.match, `turns out you are chatting with <@${message.author.id}>`, true)
+              } else {
+                message.channel.send('You have revealed your ID, if your match reveals their ID, then a message will be sent indicating who you are chatting with.')
+                sendDM('Your match has revealed their ID. You can reveal yours with `!id`')
               }
               break
             default:
-              sendMsg(sender.match, text)
+              sendDM(sender.match, text)
           }
         } else {
           // no matches yet
+          if (args[0].toLowerCase() === '!leave') {
+            // remove user from the queue
+            message.channel.send('You have been removed from the queue.')
+            sendRamble('*Someone got tired of waiting so left the queue.*')
+            delete helper.matches[message.author.id]
+          }
           helper.matches[message.author.id].msg = text
-          return message.reply('we have added you to the matching queue and will let you know once we find a match for you!')
+          sendRamble(matchRamble)
+          return message.reply(lookingForMatch)
         }
       } else {
-        // TODO: turn these gross things into functions
-        // user is not yet on the queue so let's add them
-        helper.matches[message.author.id.toString()] = { matched: false, match: '', msg: text }
-        // we have found a match
-        // create an array w/o the original sender in it
+        // create a user object
+        helper.matches[message.author.id.toString()] = { match: '', msg: text }
         const senderID = message.author.id
         if (helper.openUsers.size === 0) {
+          // no matches found yet so let's announce that to spark interest
           helper.openUsers.add(senderID)
-          return message.reply('no matches available yet, we will let you know when we find one!')
+          sendRamble(matchRamble)
+          return message.reply(lookingForMatch)
         }
+        // here is where we found a match
+        // choose a random unmatched user
         const receiverID = Pandemonium.choice(Array.from(helper.openUsers))
-        // now we have identified a user, so lets match each up
-        // first on the sender side
-        helper.matches[senderID].match = receiverID
-        helper.matches[senderID].matched = true
-        // then on the receiver side
-        helper.matches[receiverID].match = senderID
-        helper.matches[receiverID].matched = true
-        // remove both matches from there
-        helper.openUsers.delete(senderID)
-        helper.openUsers.delete(receiverID)
-        const emotes = Pandemonium.geometricReservoirSample(2, helper.cache.createEmoteArray())
-        // choose random emotes to identify each
-        helper.matches[senderID].emote = emotes[0]
-        helper.matches[receiverID].emote = emotes[1]
 
-        const timeLeft = Moment().add(15, 'minutes')
-        // then save the time until convo over
-        helper.matches[senderID].timeLeft = timeLeft
-        helper.matches[receiverID].timeLeft = timeLeft
-        const welcomeMsg = 'We found a match for you! You will now be able to chat for 15 minutes before the conversation closes. Please keep in mind that chats are moderated by cubis, the bot owner, who will see all messages and usernames. Additionally if you want to end a chat you can use `!end` and if you want to report a chat (which will close it), use `!report`. Use `!id` to reveal your ID 😉. Enjoy!'
+        // lets perform the match
+        makeMatch(senderID, receiverID)
+        makeMatch(receiverID, senderID)
+
+        const welcomeMsg = 'We found a match for you! You will now be able to chat for 15 minutes before the conversation closes. Please keep in mind that while your username is hidden from the public, messages are logged and displayed publically in the cubemoji Discord server and usernames are viewable by the bot owner. Additionally if you want to end a chat you can use `!end` and if you want to report a chat (which will close it), use `!report`. Use `!id` to reveal your ID 😉. Enjoy!'
         message.author.send(welcomeMsg)
-        sendMsg(receiverID, welcomeMsg, true)
+        sendDM(receiverID, welcomeMsg, true)
         // now resolve the other user and send them a msg
-        sendMsg(helper.matches[senderID].match, helper.matches[senderID].msg)
+        sendDM(helper.matches[senderID].match, helper.matches[senderID].msg)
 
         // then we setup a timeout to stop the convo after 15 minutes
-        const endMsg = 'Thanks for chatting! Your conversation is done now.'
         const timeout = setTimeout(function () {
-          sendMsg(receiverID, endMsg, true)
+          message.channel.send(chatEnded)
+          sendDM(receiverID, chatEnded, true)
           // delete references to the users
           delete helper.matches[senderID]
           delete helper.matches[receiverID]
@@ -144,8 +177,3 @@ module.exports = {
     }
   }
 }
-
-/* The user is added to a queue to find other users to match with
-They receive a dm when they are matched.
-They then will have 15 minutes to anonymously message with the user, at the end the
-conversation will be terminated and usernames will be revealed. */
