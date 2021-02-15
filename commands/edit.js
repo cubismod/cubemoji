@@ -8,15 +8,16 @@ module.exports = {
   aliases: ['ed', 'modify'],
   cooldown: 1,
   execute (message, args, client, helper) {
+    const cmdHelper = require('./../command-helper')
     let random
-    if (args.length < 2 && (args.length !== 1 && args[0] !== 'hole')) {
+    const url = cmdHelper.checkImage(message, args, client, helper)
+    if (!url && (args.length !== 1 && args[0] !== 'hole')) {
       console.log(`${message.author.username} failed to use ${this.name} correctly`)
       message.reply(`You must specify an emote name and filters in the command! \n \`${this.usage}\``)
     } else {
       message.channel.startTyping()
-      const argName = args[0].toLowerCase()
       let res
-      if (argName === 'hole') {
+      if (args[0].toLowerCase() === 'hole') {
         res = {}
         // easter egg time
         if (Pand.choice([true, false])) res = Pand.choice(helper.cache.createEmoteArray())
@@ -25,30 +26,14 @@ module.exports = {
         // change up the args
         args = ['hole', 'random']
       } else {
-        // check if its a mention and then only get
-      // the numeric part of the mention code
-        const avatarUrl = helper.cache.getAvatar(argName, client)
-        const twemoji = helper.cache.parseTwemoji(argName)
         res = {}
-        if (avatarUrl || twemoji) {
-          if (avatarUrl) res.url = avatarUrl
-          else res.url = twemoji.url
-        } else {
-          res = helper.cache.retrieve(argName)
-          // since we implement a longer cooldown, we autofill for the first emote we find from search
-          // TODO: move into helper class
-          if (!res) {
-            const searchRes = helper.cache.search(args[0])
-            if (searchRes.length !== 0) {
-              res = searchRes[0].item
-            }
-          }
-        }
+        res.url = url
       }
       if (res) {
         let options = []
         let argLc
         if ((args.length > 1)) argLc = args[1].toLowerCase()
+        else argLc = args[0].toLowerCase()
         if (argLc === 'random' || argLc === 'r') {
           // random effects option
           random = true
