@@ -7,36 +7,21 @@ module.exports = {
   aliases: ['af', 'addflush'],
   cooldown: 1,
   execute (message, args, client, helper) {
-    if (args.length < 1) {
+    const cmdHelper = require('./../command-helper')
+    const url = cmdHelper.checkImage(message, args, client, helper)
+    if (!url) {
       console.log(`${message.author.username} failed to use ${this.name} correctly`)
       message.reply(`You must specify an emote/mention in the command! \nusage: \`${this.usage}\``)
     } else {
-      // start a typing indicator to show we're working
-      message.channel.startTyping()
-      const argName = args[0].toLowerCase()
-      // check if its a mention and then only get
-      // the numeric part of the mention code
-      const avatarUrl = helper.cache.getAvatar(argName, client)
-      const twemoji = helper.cache.parseTwemoji(argName)
-      let res = {}
-      if (avatarUrl || twemoji) {
-        if (avatarUrl) res.url = avatarUrl
-        else res.url = twemoji.url
-      } else {
-        res = helper.cache.retrieve(argName)
-        // since we implement a longer cooldown, we autofill for the first emote we find from search
-        if (!res) {
-          const searchRes = helper.cache.search(args[0])
-          if (searchRes.length !== 0) {
-            res = searchRes[0].item
-          }
-        }
-      }
+      const res = {}
+      res.url = url
       if (res) {
         // determine the face specified, default to flushed if none found
         let path = './assets/flushed.png'
         const opts = ['jfc', 'joy', 'pensive', 'plead', 'thinking', 'triumph', 'weary', 'zany']
-        if (args.length >= 2 && opts.includes(args[1].toLowerCase())) path = `./assets/${args[1].toLowerCase()}.png`
+        // TODO: fix attachments here
+        if (args.length === 1 && opts.includes(args[0].toLowerCase())) path = `./assets/${args[0].toLowerCase()}.png`
+        else path = `./assets/${args[1].toLowerCase()}.png`
         // queue up another worker to run the image edit
         helper.pool.exec('addFace', [res.url, path])
           .then(result => {
