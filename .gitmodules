@@ -1,0 +1,3 @@
+[submodule "liquid-scaling"]
+	path = liquid-scaling
+	url = https://github.com/cubismod/liquid-scaling.git
