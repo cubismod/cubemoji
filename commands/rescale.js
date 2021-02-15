@@ -36,17 +36,18 @@ module.exports = {
         // we then save our image
         console.log('saved to:', filename)
         // then lets build an edit string
-        const xSize = Pandemonium.random(50, 400)
-        const ySize = Pandemonium.random(50, 400)
-        const cmd = `magick ${file} -liquid-rescale ${xSize}x${ySize} ${file}n`
-        const child = spawn(cmd)
+        const xSize = Pandemonium.random(10, 1000)
+        const ySize = Pandemonium.random(10, 1000)
+        const args = [file, '-liquid-rescale', `${xSize}x${ySize}`, `${file}n`]
+        const child = spawn('magick', args)
         child.stdout.on('data', data => console.log(data))
         child.on('error', err => console.error(err))
-        child.on('close', (code, signal) => {
+        child.on('close', (_) => {
           fs.readFile(`${file}n`, (err, data) => {
             if (err) throw err
             // now we send that message out
             const attach = new Discord.MessageAttachment(data)
+            message.channel.stopTyping(true)
             message.channel.send(attach)
           })
         })
