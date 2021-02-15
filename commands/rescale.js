@@ -49,6 +49,13 @@ module.exports = {
             const attach = new Discord.MessageAttachment(data)
             message.channel.stopTyping(true)
             message.channel.send(attach)
+            // delete those files from mem
+            fs.unlink(file, (err) => {
+              if (err) throw err
+            })
+            fs.unlink(`${file}n`, (err) => {
+              if (err) throw err
+            })
           })
         })
       })
