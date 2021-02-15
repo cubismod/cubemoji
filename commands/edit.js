@@ -4,7 +4,7 @@ const Emoji = require('node-emoji')
 module.exports = {
   name: 'edit',
   description: 'Edits an emote/avatar according to the effects you select. Effects are applied in the order you specify them. Animated emotes will return static images. This process is computationally intense so give it a few seconds to work.',
-  usage: '[edit] <emote/@mention> (opt args): <random/r> <sharpen/sh> <edge_detect/ed> <emboss/em> <grayscale/gs> <blur/bl> <sepia/sp> <rightrotate/rtro> <lfro/leftrotate> <scaleup/scup> <scaledown/scdn>, <flip/fl>, <upsidedown/ud>.',
+  usage: '[edit] <emote/@mention> (opt args): <random/r> <sharpen/sh> <edge_detect/ed> <emboss/em> <grayscale/gs> <blur/bl> <sepia/sp> <rightrotate/rtro> <lfro/leftrotate> <scaleup/scup> <scaledown/scdn>, <flip/fl>, <upsidedown/ud>; (opt): <attachment image>',
   aliases: ['ed', 'modify'],
   cooldown: 1,
   execute (message, args, client, helper) {

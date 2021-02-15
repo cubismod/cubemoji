@@ -3,7 +3,7 @@ const Discord = require('discord.js')
 module.exports = {
   name: 'add_face',
   description: 'Adds a face or...other to an avatar or emote. Animated emotes/avatars will return static images.',
-  usage: '[add_face] <emote/@mention> (opt args): <jfc> <joy> <pensive> <plead> <thinking> <triumph> <weary> <zany>',
+  usage: '[add_face] <emote/@mention> (opt args): <jfc> <joy> <pensive> <plead> <thinking> <triumph> <weary> <zany>; (opt): <attachment image>',
   aliases: ['af', 'addflush'],
   cooldown: 1,
   execute (message, args, client, helper) {

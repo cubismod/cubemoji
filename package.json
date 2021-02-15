@@ -29,6 +29,7 @@
     "moment": "^2.29.1",
     "node-emoji": "^1.10.0",
     "pandemonium": "^2.0.0",
+    "request": "^2.88.2",
     "twemoji-parser": "^13.0.0",
     "workerpool": "^6.0.3"
   },

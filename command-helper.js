@@ -1,7 +1,7 @@
 // helper functions for use in command files
 
 // check image
-// returns an image url or arg name of an emote or false if no image is found
+// returns <image URL, GuildEmoji object representing the emote, false if nothing found>
 function checkImage (message, args, client, helper) {
   message.channel.startTyping()
   // check first for a message
