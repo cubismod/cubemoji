@@ -36,8 +36,8 @@ module.exports = {
         // we then save our image
         console.log('saved to:', filename)
         // then lets build an edit string
-        const xSize = Pandemonium.random(10, 1000)
-        const ySize = Pandemonium.random(10, 1000)
+        const xSize = Pandemonium.random(10, 250)
+        const ySize = Pandemonium.random(10, 250)
         const args = [file, '-liquid-rescale', `${xSize}x${ySize}`, `${file}n`]
         const child = spawn('magick', args)
         child.stdout.on('data', data => console.log(data))
