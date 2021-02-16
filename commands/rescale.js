@@ -1,4 +1,4 @@
-const { spawn } = require('child_process')
+const { exec } = require('child_process')
 const cmdHelper = require('./../command-helper')
 const download = require('image-downloader')
 const Pandemonium = require('pandemonium')
@@ -36,15 +36,21 @@ module.exports = {
         // we then save our image
         console.log('saved to:', filename)
         // then lets build an edit string
-        const xSize = Pandemonium.random(10, 250)
-        const ySize = Pandemonium.random(10, 250)
-        const args = [file, '-liquid-rescale', `${xSize}x${ySize}`, `${file}n`]
-        const child = spawn('convert', args, { shell: true, detched: true })
-        child.stdout.on('data', data => console.log(data))
-        child.on('error', err => console.error(err))
-        child.on('close', (_) => {
+        const xSize = Pandemonium.random(10, 400)
+        const ySize = Pandemonium.random(10, 400)
+        const cmd = `convert ${file} -liquid-rescale ${xSize}x${ySize} ${file}n`
+        exec(cmd, (err, stdout, stderr) => {
+          if (err) {
+            console.error(err)
+            return
+          }
+          console.log(stdout)
+          console.log(stderr)
           fs.readFile(`${file}n`, (err, data) => {
-            if (err) console.error(err)
+            if (err) {
+              console.error(err)
+              return
+            }
             // now we send that message out
             const attach = new Discord.MessageAttachment(data)
             message.channel.stopTyping(true)
