@@ -37,8 +37,8 @@ module.exports = {
         // we then save our image
         // console.log('saved to:', filename)
         // then lets build an edit string
-        const xSize = Pandemonium.random(128, 2500)
-        const ySize = Pandemonium.random(128, 2500)
+        const xSize = Pandemonium.random(128, 800)
+        const ySize = Pandemonium.random(128, 800)
         const args = [file, '-liquid-rescale', `${xSize}x${ySize}`, `${file}n`]
         im.convert(args, (err) => {
           if (err) {
