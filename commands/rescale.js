@@ -5,6 +5,7 @@ const Discord = require('discord.js')
 const fs = require('fs')
 const path = require('path')
 const im = require('imagemagick')
+const FileType = require('file-type')
 
 // note that this file requires imagemagick installed on the host os
 module.exports = {
@@ -32,14 +33,14 @@ module.exports = {
       extractFilename: false
     }
     download.image(options)
-      .then((filename) => {
+      .then((fn) => {
         // we then save our image
         // console.log('saved to:', filename)
         // then lets build an edit string
-        const xSize = Pandemonium.random(10, 400)
-        const ySize = Pandemonium.random(10, 400)
+        const xSize = Pandemonium.random(5, 400)
+        const ySize = Pandemonium.random(5, 400)
         const args = [file, '-liquid-rescale', `${xSize}x${ySize}`, `${file}n`]
-        im.convert(args, (err, stdout) => {
+        im.convert(args, (err) => {
           if (err) {
             console.error(err)
             return
@@ -50,16 +51,18 @@ module.exports = {
               console.error(err)
               return
             }
-            // now we send that message out
-            const attach = new Discord.MessageAttachment(data)
-            message.channel.stopTyping(true)
-            message.channel.send(attach)
-            // delete those files from mem
-            fs.unlink(file, (err) => {
-              if (err) console.error(err)
-            })
-            fs.unlink(`${file}n`, (err) => {
-              if (err) console.error(err)
+            FileType.fromBuffer(data).then(ft => {
+              // now we send that message out w/ the proper file type
+              const attach = new Discord.MessageAttachment(data, `${Date.now()}.${ft.ext}`)
+              message.channel.stopTyping(true)
+              message.channel.send(attach)
+              // delete those files from mem
+              fs.unlink(file, (err) => {
+                if (err) console.error(err)
+              })
+              fs.unlink(`${file}n`, (err) => {
+                if (err) console.error(err)
+              })
             })
           })
         })
