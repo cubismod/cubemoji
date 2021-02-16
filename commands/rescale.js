@@ -12,7 +12,7 @@ module.exports = {
   description: 'Rescale an image using Seam carving to humorous results https://en.wikipedia.org/wiki/Seam_carving. This command supports editing attachments.',
   usage: '[rescale] (opt): <attachment image>',
   aliases: ['liquid', 'cas', 'content-scale', 'rs'],
-  cooldown: 10,
+  cooldown: 2,
   execute (message, args, client, helper) {
     let emote = cmdHelper.checkImage(message, args, client, helper)
     if (!emote) {
@@ -34,7 +34,7 @@ module.exports = {
     download.image(options)
       .then((filename) => {
         // we then save our image
-        console.log('saved to:', filename)
+        // console.log('saved to:', filename)
         // then lets build an edit string
         const xSize = Pandemonium.random(10, 400)
         const ySize = Pandemonium.random(10, 400)
@@ -44,7 +44,7 @@ module.exports = {
             console.error(err)
             return
           }
-          console.log(stdout)
+          // console.log(stdout)
           fs.readFile(`${file}n`, (err, data) => {
             if (err) {
               console.error(err)
