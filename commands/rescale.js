@@ -44,17 +44,17 @@ module.exports = {
         child.on('error', err => console.error(err))
         child.on('close', (_) => {
           fs.readFile(`${file}n`, (err, data) => {
-            if (err) throw err
+            if (err) console.error(err)
             // now we send that message out
             const attach = new Discord.MessageAttachment(data)
             message.channel.stopTyping(true)
             message.channel.send(attach)
             // delete those files from mem
             fs.unlink(file, (err) => {
-              if (err) throw err
+              if (err) console.error(err)
             })
             fs.unlink(`${file}n`, (err) => {
-              if (err) throw err
+              if (err) console.error(err)
             })
           })
         })
