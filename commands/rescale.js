@@ -1,10 +1,10 @@
-const { exec } = require('child_process')
 const cmdHelper = require('./../command-helper')
 const download = require('image-downloader')
 const Pandemonium = require('pandemonium')
 const Discord = require('discord.js')
 const fs = require('fs')
 const path = require('path')
+const im = require('imagemagick')
 
 // note that this file requires imagemagick installed on the host os
 module.exports = {
@@ -38,14 +38,13 @@ module.exports = {
         // then lets build an edit string
         const xSize = Pandemonium.random(10, 400)
         const ySize = Pandemonium.random(10, 400)
-        const cmd = `convert ${file} -liquid-rescale ${xSize}x${ySize} ${file}n`
-        exec(cmd, (err, stdout, stderr) => {
+        const args = [file, '-liquid-rescale', `${xSize}x${ySize}`, `${file}n`]
+        im.convert(args, (err, stdout) => {
           if (err) {
             console.error(err)
             return
           }
           console.log(stdout)
-          console.log(stderr)
           fs.readFile(`${file}n`, (err, data) => {
             if (err) {
               console.error(err)
