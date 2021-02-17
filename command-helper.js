@@ -18,9 +18,11 @@ function checkImage (message, args, client, helper) {
   const argName = args[0].toLowerCase()
   const avatarUrl = helper.cache.getAvatar(argName, client)
   const twemoji = helper.cache.parseTwemoji(argName)
-  if (avatarUrl || twemoji) {
+  const urlReg = /^https?:\/\/.+$/
+  if (avatarUrl || twemoji || argName.match(urlReg)) {
     if (avatarUrl) return avatarUrl
-    else return twemoji.url
+    if (twemoji) return twemoji.url
+    return args[0]
   } else {
     // or else try the cache
     const res = helper.cache.retrieve(argName)
