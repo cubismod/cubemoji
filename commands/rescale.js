@@ -42,8 +42,17 @@ module.exports = {
         const args = [file, '-liquid-rescale', `${xSize}x${ySize}`, `${file}n`]
         im.convert(args, (err) => {
           if (err) {
-            console.error(err)
-            return
+            // let the user know there was an error processing that image
+            const sadEmote = Pandemonium.choice(helper.cache.search('sad')).item
+            const errEmbed = new Discord.MessageEmbed()
+              .setColor('RED')
+              .setTitle(`${sadEmote} an error occurred when processing your image!`)
+              .setDescription(`${message.author} Your image may have been too large or an unsupported file type causing the rescale to fail. See technical details below`)
+              .addFields(
+                { name: 'Error Details', value: `\`\`\`${err}\`\`\`` }
+              )
+            console.log(err)
+            return message.reply(errEmbed)
           }
           // console.log(stdout)
           fs.readFile(`${file}n`, (err, data) => {
