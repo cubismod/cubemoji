@@ -9,7 +9,6 @@ const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('
 const cooldowns = new Discord.Collection()
 const workerpool = require('workerpool')
 const path = require('path')
-const moment = require('moment')
 
 // firebase setup
 const fbAdmin = require('firebase-admin')
@@ -227,6 +226,7 @@ client.on('message', message => {
     // we tie multiple things to this helper variable including a worker pool for complex functions,
     // the emote cache wrapper class, and other things
     cmd.execute(message, args, client, helper)
+    message.channel.stopTyping(true)
   } catch (error) {
     console.error(error)
     message.reply('there was an error trying to execute that command!')
@@ -259,8 +259,3 @@ setInterval(function () {
     helper.slotsDb.child(helper.topPlayer).update({ timeOnTop: helper.topPlayerTime })
   }
 }, 60000)
-
-// regular check in every 60 min
-setInterval(function () {
-  console.log(`time up: ${moment().to(client.readyAt, true)}`)
-}, 3.6e+6)
