@@ -15,7 +15,6 @@ module.exports = {
       console.log(`${message.author.username} failed to use ${this.name} correctly`)
       message.reply(`You must specify an emote name and filters in the command! \n \`${this.usage}\``)
     } else {
-      message.channel.startTyping()
       let res
       if (args[0].toLowerCase() === 'hole') {
         res = {}

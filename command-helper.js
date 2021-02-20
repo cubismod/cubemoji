@@ -3,7 +3,7 @@ const Discord = require('discord.js')
 const Pandemonium = require('pandemonium')
 
 // check image
-// returns <image URL, GuildEmoji object representing the emote, false if nothing found>
+// returns <image URL, false if nothing found>
 function checkImage (message, args, client, helper) {
   message.channel.startTyping()
   // check first for a message
@@ -32,7 +32,7 @@ function checkImage (message, args, client, helper) {
       // if not that then we search
       const searchRes = helper.cache.search(args[0])
       if (searchRes.length !== 0) {
-        return searchRes[0].item
+        return searchRes[0].item.url
       }
     } else return res.url
   }
