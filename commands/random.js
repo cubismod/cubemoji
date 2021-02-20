@@ -1,7 +1,7 @@
 module.exports = {
   name: 'random',
   description: 'Insert a random emote!',
-  usage: '[random] (optional)[number of emotes to create max: 15]',
+  usage: 'random (optional)<number of emotes to create, max of 50>',
   aliases: ['r', 'rnd', 'rand'],
   cooldown: 2,
   execute (message, args, client, helper) {

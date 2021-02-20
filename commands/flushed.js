@@ -1,10 +1,10 @@
 module.exports = {
   name: 'flushed',
   description: 'Insert a random flushed emote!',
-  usage: '[flushed] (optional)<# of emotes to create max: 25>',
+  usage: 'flushed (optional)<# of emotes to create, max: 25>',
   aliases: ['flush', 'fl', 'f', 'cubis'],
   cooldown: 2,
-  execute (message, args, client, helper) {
+  execute (message, args, _client, helper) {
     require('../helper')
     const Pand = require('pandemonium')
     let repeats = 1

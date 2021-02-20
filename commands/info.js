@@ -1,7 +1,7 @@
 module.exports = {
   name: 'info',
-  description: 'Gets details about an emote',
-  usage: '[info] <emote_name/emote>',
+  description: 'Provides information about an emote including the time it was created as well as the author and server it is in. Only works with emotes that cubemoji has access to.',
+  usage: 'info <emote_name/emote>',
   aliases: ['i'],
   cooldown: 1,
   requiresCache: true,

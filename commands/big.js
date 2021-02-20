@@ -1,7 +1,7 @@
 module.exports = {
   name: 'big',
-  description: 'Creates a big version of an emote',
-  usage: '[big] <emote>',
+  description: 'Creates a big version of an emote. If the emote is not found, then it performs a search and returns the emote closest matching the emote name.',
+  usage: 'big <emote/emote name>',
   aliases: ['b', 'large', 'enhance'],
   cooldown: 1,
   execute (message, args, _client, helper) {
@@ -16,8 +16,10 @@ module.exports = {
         message.channel.send(res.url)
       } else {
         // retrieve a result from the cache
+        // TODO: bring feature parity of allowing nitro emtoes
         res = helper.cache.search(args[0])
         if (res.length > 1) {
+          message.channel.send(res[0].item.url)
           message.reply(`emote not found! Maybe try ${res[0].item} - \`${res[0].item.name}\`?`)
         } else {
           message.reply('emote not found!')
