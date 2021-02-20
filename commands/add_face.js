@@ -18,16 +18,19 @@ module.exports = {
       if (res) {
         // determine the face specified, default to flushed if none found
         let path = './assets/flushed.png'
-        const opts = ['jfc', 'joy', 'pensive', 'plead', 'thinking', 'triumph', 'weary', 'zany']
-        // TODO: fix attachments here
-        if (args.length === 1 && opts.includes(args[0].toLowerCase())) path = `./assets/${args[0].toLowerCase()}.png`
-        else path = `./assets/${args[1].toLowerCase()}.png`
+        const opts = ['jfc', 'joy', 'pensive', 'plead', 'thinking', 'triumph', 'weary', 'zany', 'flushed']
+        // do a search through arguments to see if we can find a face to use
+        args.forEach(element => {
+          if (opts.includes(element.toLowerCase())) {
+            path = `./assets/${element.toLowerCase()}.png`
+          }
+        })
         // queue up another worker to run the image edit
         helper.pool.exec('addFace', [res.url, path])
           .then(result => {
             // automatically spoiler 'jfc' images
             let fileName
-            if (args[1].toLowerCase() === 'jfc') fileName = 'SPOILER_face.png'
+            if (path.includes('jfc')) fileName = 'SPOILER_face.png'
             else fileName = 'face.png'
             const attach = new Discord.MessageAttachment(Buffer.from(result), fileName)
             message.channel.stopTyping(true)
