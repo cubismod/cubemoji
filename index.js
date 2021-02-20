@@ -37,8 +37,8 @@ client.once('ready', () => {
   const serverlist = []
   client.guilds.cache.forEach(key => serverlist.push(key.name))
   console.log(`active on the following servers: ${serverlist}`)
-  // set up help message
-  client.user.setActivity('c!help', { type: 'WATCHING' })
+  // wait to let the emote cache warm up
+  setTimeout(setStatus, 20000)
 })
 client.login(secrets.token)
 
@@ -60,6 +60,12 @@ const helper = {
 
 helper.cache.createEmoteArray()
 console.log('initialized emote array')
+
+function setStatus () {
+  const emotes = helper.cache.createEmoteArray(true)
+  const msg = `c!help :${Pandemonium.choice(emotes)}:`
+  client.user.setActivity(msg, { type: 'WATCHING' })
+}
 
 // function returns true if the command is allowed in the specific channel
 // false if not
@@ -259,3 +265,6 @@ setInterval(function () {
     helper.slotsDb.child(helper.topPlayer).update({ timeOnTop: helper.topPlayerTime })
   }
 }, 60000)
+
+// here we change the "playing on discord" msg every now and then
+setInterval(setStatus, Pandemonium.random(30, 90) * 60000)
