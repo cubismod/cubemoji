@@ -43,22 +43,16 @@ module.exports = {
         im.convert(args, (err) => {
           if (err) {
             // let the user know there was an error processing that image
-            const sadEmote = Pandemonium.choice(helper.cache.search('sad')).item
-            const errEmbed = new Discord.MessageEmbed()
-              .setColor('RED')
-              .setTitle(`${sadEmote} an error occurred when processing your image!`)
-              .setDescription(`${message.author} Your image may have been too large or an unsupported file type causing the rescale to fail. See technical details below`)
-              .addFields(
-                { name: 'Error Details', value: `\`\`\`${err}\`\`\`` }
-              )
+            const errEmbed = cmdHelper.imgErr(err, helper, message.author)
             console.log(err)
             return message.reply(errEmbed)
           }
           // console.log(stdout)
           fs.readFile(`${file}n`, (err, data) => {
             if (err) {
+              const errEmbed = cmdHelper.imgErr(err, helper, message.author)
               console.error(err)
-              return
+              return message.reply(errEmbed)
             }
             FileType.fromBuffer(data).then(ft => {
               // now we send that message out w/ the proper file type

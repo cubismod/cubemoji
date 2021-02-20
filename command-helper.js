@@ -1,4 +1,6 @@
 // helper functions for use in command files
+const Discord = require('discord.js')
+const Pandemonium = require('pandemonium')
 
 // check image
 // returns <image URL, GuildEmoji object representing the emote, false if nothing found>
@@ -37,6 +39,23 @@ function checkImage (message, args, client, helper) {
   return false
 }
 
+// image error, returns an embed of an error occured along with some
+// technical details in the form of an embed
+function imgErr (error, helper, author) {
+  // pick a random sad emote using Fuse.js extended syntax
+  const sadEmote = Pandemonium.choice(helper.cache.search('cry|sad|ohno')).item
+  const errEmbed = new Discord.MessageEmbed()
+    .setColor('RED')
+    .setTitle(`${sadEmote} an error occurred when processing your image!`)
+    .setDescription(`${author} Your image may have been too large or an unsupported file type causing the rescale to fail. See technical details below`)
+    .addFields(
+      { name: 'Error Details', value: `\`\`\`${error.message.slice(0, 1000)}...\`\`\`` }
+    )
+    // ensure that we don't go past teh limits of a discord msg
+  return errEmbed
+}
+
 module.exports = {
-  checkImage
+  checkImage,
+  imgErr
 }
