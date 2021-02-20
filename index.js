@@ -65,6 +65,17 @@ function setStatus () {
   const emotes = helper.cache.createEmoteArray(true)
   const msg = `c!help :${Pandemonium.choice(emotes)}:`
   client.user.setActivity(msg, { type: 'WATCHING' })
+  // we also take this as an opportunity to clear out the downloaded
+  // images folder
+  const dir = './download/'
+  fs.readdir(dir, (err, files) => {
+    if (err) console.error(err)
+    files.forEach(file => {
+      fs.unlink(path.join(dir, file), err => {
+        if (err) console.error(err)
+      })
+    })
+  })
 }
 
 // function returns true if the command is allowed in the specific channel
