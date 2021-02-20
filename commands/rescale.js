@@ -23,6 +23,7 @@ module.exports = {
     }
     // indicate to the user that we are actually working
     message.channel.startTyping()
+    const cmdStart = Date.now()
     // if we have a guildemoji object, we need to pull the URL from it
     if (emote.url !== undefined) emote = emote.url
     // now try to download the file
@@ -39,7 +40,7 @@ module.exports = {
         // then lets build an edit string
         const xSize = Pandemonium.random(128, 800)
         const ySize = Pandemonium.random(128, 800)
-        const args = [file, '-liquid-rescale', `${xSize}x${ySize}`, `${file}n`]
+        const args = [file, '-resize', '70%', '-liquid-rescale', `${xSize}x${ySize}`, `${file}n`]
         im.convert(args, (err) => {
           if (err) {
             // let the user know there was an error processing that image
@@ -58,6 +59,10 @@ module.exports = {
               // now we send that message out w/ the proper file type
               const attach = new Discord.MessageAttachment(data, `${Date.now()}.${ft.ext}`)
               message.channel.stopTyping(true)
+              if (Date.now() - cmdStart > 30000) {
+                // if a command takes more than 30 seconds to process, we ping the user when its done
+                message.channel.send(`${message.author}, your image has finished processing!`)
+              }
               message.channel.send(attach)
               // delete those files from mem
               fs.unlink(file, (err) => {
