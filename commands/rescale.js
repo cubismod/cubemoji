@@ -76,7 +76,10 @@ module.exports = {
                 message.channel.send(`${message.author}, your image has finished processing!`)
               }
               message.channel.send(attach).then(msg => {
+                // add delete reacts and save a reference to the creator of the original
+                // msg so users cant delete other users images
                 msg.react('🗑️')
+                helper.rescaleMsgs[msg.id] = message.author.id
               })
               // delete those files from mem
               fs.unlink(file, (err) => {

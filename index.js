@@ -51,11 +51,12 @@ const helper = {
   emojiDb: db.ref('emojis/'),
   slotsDb: db.ref('slots/'),
   slotsUsers: new Set(),
-  topPlayer: '',
+  topPlayer: '', // cached local user to calculate time on top
   topPlayerTime: '',
   beginTop: '',
   matches: {},
-  openUsers: new Set()
+  openUsers: new Set(),
+  rescaleMsgs: {} // used to determine whether we can delete a message
 }
 
 helper.cache.createEmoteArray()
@@ -253,16 +254,17 @@ client.on('message', message => {
 client.on('messageReactionAdd', (react, author) => {
 /*  this set of conditionals checks to make sure that cubemoji itself added a react
     to a message to delete/modify the message */
-  const id = '792878401589477377'
-  if (react.users.cache.has(id) &&
-  author.id !== id &&
-  react.message.author.id === id) {
+  const cubemojiID = '792878401589477377'
+  const okayToDelete = helper.rescaleMsgs[react.message.id] === author.id
+  if (react.users.cache.has(cubemojiID) &&
+  author.id !== cubemojiID &&
+  react.message.author.id === cubemojiID) {
     if (react.emoji.name === '🎲') {
       // ensures it's cubemoji
       react.message.edit(Pandemonium.choice(helper.cache.createEmoteArray()).toString())
       react.message.reactions.resolve(react).users.remove(author)
     }
-    if (react.emoji.name === '🗑️') {
+    if (react.emoji.name === '🗑️' && okayToDelete) {
       try {
         react.message.delete()
       } catch (err) {
