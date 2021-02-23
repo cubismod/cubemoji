@@ -1,10 +1,10 @@
 module.exports = {
   name: 'list',
-  description: 'List available emotes in a DM',
+  description: 'List available emotes in a DM https://gitlab.com/cubismod/cubemoji/-/wikis/commands/list',
   usage: '[list]',
   aliases: ['l'],
   cooldown: 120,
-  execute (message, args, client, helper) {
+  execute (message, _args, _client, helper) {
     const msg = []
     const emoteArray = helper.cache.createEmoteArray(true)
     let letter = ''

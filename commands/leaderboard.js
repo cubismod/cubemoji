@@ -1,11 +1,11 @@
 const moment = require('moment')
 module.exports = {
   name: 'leaderboard',
-  description: 'Get the leaderboard of top slots players across servers.',
-  usage: '[leaderboard]',
+  description: 'Get the leaderboard of top slots players across servers. https://gitlab.com/cubismod/cubemoji/-/wikis/slots',
+  usage: 'leaderboard',
   aliases: ['lb'],
   cooldown: 5,
-  execute (message, args, client, helper) {
+  execute (message, _args, _client, helper) {
     // get the leaderboard organized by scores
     helper.slotsDb.orderByChild('score').once('value')
       .then(async (snapshot) => {

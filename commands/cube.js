@@ -1,10 +1,10 @@
 module.exports = {
   name: 'cube',
-  description: 'Create a random cube to shuffle emotes!',
-  usage: '[cube]',
-  aliases: ['c'],
+  description: 'Creates a cube message in chat which you can shuffle by reacting to it. https://gitlab.com/cubismod/cubemoji/-/wikis/commands/cube',
+  usage: 'cube',
+  aliases: ['cb'],
   cooldown: 60,
-  execute (message, args, client, helper) {
+  execute (message, _args, _client, helper) {
     require('../helper')
     const Pandemonium = require('pandemonium')
     const chance = Pandemonium

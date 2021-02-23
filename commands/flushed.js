@@ -1,7 +1,7 @@
 module.exports = {
   name: 'flushed',
   description: 'Insert a random flushed emote!',
-  usage: 'flushed (optional)<# of emotes to create, max: 25>',
+  usage: 'flushed (optional)<# of emotes to create, max: 25> https://gitlab.com/cubismod/cubemoji/-/wikis/commands/flushed',
   aliases: ['flush', 'fl', 'f', 'cubis'],
   cooldown: 2,
   execute (message, args, _client, helper) {

@@ -1,7 +1,7 @@
 const Pand = require('pandemonium')
 module.exports = {
   name: 'slots',
-  description: 'Play the slots! One point is added for each pair of matches.',
+  description: 'Play the slots! One point is added for each pair of matches. https://gitlab.com/cubismod/cubemoji/-/wikis/slots',
   usage: '[slots]',
   aliases: ['sl'],
   cooldown: 3,

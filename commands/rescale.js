@@ -10,7 +10,7 @@ const FileType = require('file-type')
 // note that this file requires imagemagick installed on the host os
 module.exports = {
   name: 'rescale',
-  description: 'Rescale an image using Seam carving to humorous results https://en.wikipedia.org/wiki/Seam_carving. This command supports editing attachments.',
+  description: 'Rescale an image using Seam carving to humorous results https://en.wikipedia.org/wiki/Seam_carving. This command supports editing attachments. https://gitlab.com/cubismod/cubemoji/-/wikis/commands/rescale',
   usage: 'rescale <emote,@mention> (opt): <attachment image>',
   aliases: ['liquid', 'cas', 'content-scale', 'rs'],
   cooldown: 2,

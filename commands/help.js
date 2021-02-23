@@ -11,7 +11,7 @@ module.exports = {
       client.commands.forEach(function (command) {
         text = text.concat(`\`${command.name}\`, `)
       })
-      text = text.concat('Type `c!help <command_name>` to get more info about a specific command.')
+      text = text.concat('Type `c!help <command_name>` to get more info about a specific command. \n Get help online: https://gitlab.com/cubismod/cubemoji/-/wikis/home')
       message.channel.send(text)
     } else {
       // specific command

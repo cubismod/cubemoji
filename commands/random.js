@@ -1,6 +1,6 @@
 module.exports = {
   name: 'random',
-  description: 'Insert a random emote!',
+  description: 'Insert a random emote! https://gitlab.com/cubismod/cubemoji/-/wikis/commands/random',
   usage: 'random (optional)<number of emotes to create, max of 50>',
   aliases: ['r', 'rnd', 'rand'],
   cooldown: 2,

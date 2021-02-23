@@ -1,8 +1,8 @@
 const moment = require('moment')
 module.exports = {
   name: 'about',
-  description: 'Information about the bot!',
-  usage: '[about]',
+  description: 'Provides information and stats about the bot. https://gitlab.com/cubismod/cubemoji/-/wikis/commands/about',
+  usage: 'about',
   aliases: ['a'],
   cooldown: 5,
   execute (message, _args, client) {

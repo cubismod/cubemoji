@@ -1,6 +1,6 @@
 module.exports = {
   name: 'big',
-  description: 'Creates a big version of an emote. If the emote is not found, then it performs a search and returns the emote closest matching the emote name.',
+  description: 'Creates a big version of an emote. If the emote is not found, then it performs a search and returns the emote closest matching the emote name. https://gitlab.com/cubismod/cubemoji/-/wikis/commands/big',
   usage: 'big <emote/emote name>',
   aliases: ['b', 'large', 'enhance'],
   cooldown: 1,

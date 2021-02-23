@@ -1,7 +1,7 @@
 module.exports = {
   name: 'emote',
-  description: 'Inserts an emote',
-  usage: '[emote] <emote as string or emoji>',
+  description: 'Inserts an emote into chat. https://gitlab.com/cubismod/cubemoji/-/wikis/commands/emote',
+  usage: 'emote <emote as string or emoji>',
   aliases: ['emoji', 'e'],
   cooldown: 1,
   requiresCache: true,

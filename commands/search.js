@@ -1,8 +1,8 @@
 const Discord = require('discord.js')
 module.exports = {
   name: 'search',
-  description: 'Search the database for emotes',
-  usage: '[search] <emote_name>',
+  description: 'Search the database for emotes https://gitlab.com/cubismod/cubemoji/-/wikis/commands/search',
+  usage: 'search <emote_name>',
   aliases: ['sch', 's'],
   cooldown: 2,
   execute (message, args, _client, helper) {

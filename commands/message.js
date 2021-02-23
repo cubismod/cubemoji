@@ -1,7 +1,7 @@
 module.exports = {
   name: 'message',
-  description: 'Send a message to the ether which will be received by another random person looking for a soulmate 🥺',
-  usage: '[message] <text>',
+  description: 'Send a message to the ether which will be received by another random person looking for a soulmate 🥺 https://gitlab.com/cubismod/cubemoji/-/wikis/Chat',
+  usage: 'message <text>',
   aliases: ['m', 'msg'],
   cooldown: 1,
   execute (message, args, client, helper) {

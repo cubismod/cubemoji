@@ -1,8 +1,8 @@
 module.exports = {
   name: 'flatfuck',
-  description: 'Is it flat fuck friday?!',
-  usage: '[flatfuck]',
-  aliases: ['ff', 'flat_fuck_friday', 'femboy_friday', 'femboy', 'flat', 'flat_fuck'],
+  description: 'Is it flat fuck friday?! https://gitlab.com/cubismod/cubemoji/-/wikis/commands/flatfuck',
+  usage: 'flatfuck',
+  aliases: ['ff', 'flat_fuck_friday', 'femboy_friday', 'femboy', 'flat', 'flat_fuck', 'fff', 'femboyfriday'],
   cooldown: 60,
   execute (message) {
     const Pandemonium = require('pandemonium')

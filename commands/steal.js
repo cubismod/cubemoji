@@ -3,7 +3,7 @@ const Pand = require('pandemonium')
 const Discord = require('discord.js')
 module.exports = {
   name: 'steal',
-  description: 'Attempt to steal from a wealthier player than you. You can wager up to as many points as that player has although be warned that large bets can result in large losses.',
+  description: 'Attempt to steal from a wealthier player than you. You can wager up to as many points as that player has although be warned that large bets can result in large losses. https://gitlab.com/cubismod/cubemoji/-/wikis/slots',
   usage: '[steal] <username from leaderboard or mention> <wager amount>',
   aliases: ['st'],
   cooldown: 10,

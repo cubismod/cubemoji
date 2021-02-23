@@ -1,6 +1,6 @@
 module.exports = {
   name: 'info',
-  description: 'Provides information about an emote including the time it was created as well as the author and server it is in. Only works with emotes that cubemoji has access to.',
+  description: 'Provides information about an emote including the time it was created as well as the author and server it is in. Only works with emotes that cubemoji has access to. https://gitlab.com/cubismod/cubemoji/-/wikis/commands/info',
   usage: 'info <emote_name/emote>',
   aliases: ['i'],
   cooldown: 1,
