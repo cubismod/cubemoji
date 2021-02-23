@@ -40,7 +40,7 @@ module.exports = {
         // then lets build an edit string
         const xSize = Pandemonium.random(128, 800)
         const ySize = Pandemonium.random(128, 800)
-        const args = [file, '-resize', '70%', '-liquid-rescale', `${xSize}x${ySize}`, `${file}n`]
+        const args = [file, '-liquid-rescale', `${xSize}x${ySize}`, `${file}n`]
         im.convert(args, (err) => {
           if (err) {
             // let the user know there was an error processing that image
