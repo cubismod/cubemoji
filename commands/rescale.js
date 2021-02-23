@@ -34,13 +34,25 @@ module.exports = {
       extractFilename: false
     }
     download.image(options)
-      .then((fn) => {
+      .then((_) => {
         // we then save our image
         // console.log('saved to:', filename)
         // then lets build an edit string
-        const xSize = Pandemonium.random(128, 800)
-        const ySize = Pandemonium.random(128, 800)
-        const args = [file, '-liquid-rescale', `${xSize}x${ySize}`, `${file}n`]
+        let newSize
+        switch (Pandemonium.random(0, 2)) {
+          case 0:
+            // set a width
+            newSize = Pandemonium.random(10, 1000).toString()
+            break
+          case 1:
+            // set a height
+            newSize = `x${Pandemonium.random(10, 1000)}`
+            break
+          case 2:
+            // ignore aspect ratio
+            newSize = `${Pandemonium.random(10, 1000)}x${Pandemonium.random(10, 1000)}!`
+        }
+        const args = [file, '-liquid-rescale', newSize, `${file}n`]
         im.convert(args, (err) => {
           if (err) {
             // let the user know there was an error processing that image
@@ -63,7 +75,9 @@ module.exports = {
                 // if a command takes more than 30 seconds to process, we ping the user when its done
                 message.channel.send(`${message.author}, your image has finished processing!`)
               }
-              message.channel.send(attach)
+              message.channel.send(attach).then(msg => {
+                msg.react('🗑️')
+              })
               // delete those files from mem
               fs.unlink(file, (err) => {
                 if (err) console.error(err)

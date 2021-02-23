@@ -251,19 +251,24 @@ client.on('message', message => {
 })
 
 client.on('messageReactionAdd', (react, author) => {
-/* this set of conditionals ensures that edit reaction behavior for c!cube
-  is only processed on messages which cubemoji has marked already with 🎲
-  as well as ensuring that cubemoji is not editing the message when it is applying
-  a react itself */
+/*  this set of conditionals checks to make sure that cubemoji itself added a react
+    to a message to delete/modify the message */
   const id = '792878401589477377'
   if (react.users.cache.has(id) &&
   author.id !== id &&
-  react.emoji.name === '🎲' &&
   react.message.author.id === id) {
-    // ensures it's cubemoji
-    react.message.edit(Pandemonium.choice(helper.cache.createEmoteArray()).toString())
-    react.message.reactions.resolve(react).users.remove(author)
-    // react.message.reactions.removeAll().then(react.message.react('🎲'))
+    if (react.emoji.name === '🎲') {
+      // ensures it's cubemoji
+      react.message.edit(Pandemonium.choice(helper.cache.createEmoteArray()).toString())
+      react.message.reactions.resolve(react).users.remove(author)
+    }
+    if (react.emoji.name === '🗑️') {
+      try {
+        react.message.delete()
+      } catch (err) {
+        console.error(err)
+      }
+    }
   }
 })
 
