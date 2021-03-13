@@ -9,6 +9,7 @@ const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('
 const cooldowns = new Discord.Collection()
 const workerpool = require('workerpool')
 const path = require('path')
+const moment = require('moment')
 
 // firebase setup
 const fbAdmin = require('firebase-admin')
@@ -121,7 +122,7 @@ function ambPointAdd (user) {
         const childUser = snapshot.child(user.id)
         if (childUser.exists()) {
           const prevVal = childUser.val().score
-          const newScore = prevVal + Pandemonium.random(1, 20)
+          const newScore = prevVal + Pandemonium.random(1, 40)
           helper.slotsDb.child(user.id).update({
             score: newScore,
             username: user.username
@@ -152,7 +153,15 @@ helper.slotsDb.orderByChild('score').limitToLast(1).on('child_added', function (
   helper.topPlayer = snapshot.key
   helper.beginTop = new Date()
   helper.topPlayerTime = snapshot.val().timeOnTop
-  console.log(`new top player: ${snapshot.val().username}`)
+  // send a message to #thieves that we have a new top player
+  client.channels.fetch('800411922499502113').then(thievesChannel => {
+    const topPlayerEmbed = new Discord.MessageEmbed()
+      .setColor('GOLD')
+      .setTitle(`👑 New Top Player: ${snapshot.val().username} 👑`)
+      .addField('Score', snapshot.val().score)
+      .addField('Time on Top', moment.duration(snapshot.val().timeOnTop, 'seconds').humanize())
+    thievesChannel.send(topPlayerEmbed)
+  })
 })
 
 helper.slotsDb.orderByChild('score').limitToLast(1).on('child_removed', function () {
@@ -169,6 +178,7 @@ client.on('message', message => {
     // for non command messages
     ambPointAdd(message.author)
     if (message.channel.type === 'dm' && !message.author.bot) {
+      ambPointAdd(message.author)
       client.commands.get('message').execute(message, message.content.split(' '), client, helper)
     }
     return
