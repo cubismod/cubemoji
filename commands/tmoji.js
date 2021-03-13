@@ -23,8 +23,7 @@ module.exports = {
       }
       message.channel.send(`*${message.author.username} says*`)
       message.channel.send(emList.join(''))
-    }
-    else {
+    } else {
       message.react('❌')
     }
   }
