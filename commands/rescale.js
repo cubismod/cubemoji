@@ -6,6 +6,7 @@ const fs = require('fs')
 const path = require('path')
 const im = require('imagemagick')
 const FileType = require('file-type')
+const { url } = require('inspector')
 
 // note that this file requires imagemagick installed on the host os
 module.exports = {
@@ -31,7 +32,8 @@ module.exports = {
     const options = {
       url: emote,
       dest: file,
-      extractFilename: false
+      extractFilename: false,
+      timeout: 1000
     }
     download.image(options)
       .then((_) => {
@@ -92,6 +94,10 @@ module.exports = {
           })
         })
       })
-      .catch(err => console.error(err))
+      .catch(err => {
+        const errEmbed = cmdHelper.imgErr(err, helper, message.author)
+        console.error(err)
+        return message.reply(errEmbed)
+      })
   }
 }

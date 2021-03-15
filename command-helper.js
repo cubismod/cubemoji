@@ -20,7 +20,7 @@ function checkImage (message, args, client, helper) {
   const argName = args[0].toLowerCase()
   const avatarUrl = helper.cache.getAvatar(argName, client)
   const twemoji = helper.cache.parseTwemoji(argName)
-  const urlReg = /^https?:\/\/.+$/
+  const urlReg = /^https?:\/\/.+.(png|jpeg|jpg|gif)$/
   if (avatarUrl || twemoji || argName.match(urlReg)) {
     if (avatarUrl) return avatarUrl
     if (twemoji) return twemoji.url
@@ -49,9 +49,9 @@ function imgErr (error, helper, author) {
     .setTitle(`${sadEmote} an error occurred when processing your image!`)
     .setDescription(`${author} Your image may have been too large or an unsupported file type causing the rescale to fail. See technical details below`)
     .addFields(
-      { name: 'Error Details', value: `\`\`\`${error.message.slice(0, 1000)}...\`\`\`` }
+      { name: 'Error Details', value: `\`\`\`${error.message.slice(0, 1000)}\`\`\`` }
     )
-    // ensure that we don't go past teh limits of a discord msg
+    // ensure that we don't go past the limits of a discord msg
   return errEmbed
 }
 
