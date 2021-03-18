@@ -7,26 +7,24 @@ const got = require('got')
 // check whether an image is a valid type
 async function checkValidType (url) {
   const stream = got.stream(url)
-  const type = FileType.fromStream(stream)
+  const type = await FileType.fromStream(stream)
   const validTypes = ['jpg', 'jpeg', 'gif', 'png']
 
   if (validTypes.includes(type.ext)) return true
-  return false
+  else return false
 }
 // check image
 // returns <image URL, false if nothing found>
-function checkImage (message, args, client, helper) {
+async function checkImage (message, args, client, helper) {
   message.channel.startTyping()
   // check first for a message
   if (message.attachments.size > 0) {
     const attachment = message.attachments.random(1)
     // get the first attachment url and return
     if (Object.prototype.hasOwnProperty.call(attachment[0], 'url')) {
-      checkValidType(attachment[0].url).then(val => {
-        if (val === true) return attachment[0].url
-        return false
-      })
-      return attachment[0].url
+      const valid = await checkValidType(attachment[0].url)
+      if (valid) return attachment[0].url
+      return false
     }
   }
   // otherwise we check the args
@@ -39,21 +37,19 @@ function checkImage (message, args, client, helper) {
   if (avatarUrl) return avatarUrl
   if (twemoji) return twemoji.url
   // check now whether the image is an okay type for cubemoji to edit
-  checkValidType(args[0]).then(val => {
-    if (val === true) return args[0]
-    return false
-  })
+  const valid = checkValidType(args[0])
+  if (valid) return args[0]
   // or else try the cache
   const res = helper.cache.retrieve(argName)
   if (!res) {
-    // if not that then we search
+  // if not that then we search
     const searchRes = helper.cache.search(args[0])
     if (searchRes.length !== 0) {
       return searchRes[0].item.url
     }
   } else return res.url
-
-  return false
+  // we don't need to do any validity checks above since the cache is guaranteed to
+  // return image urls
 }
 
 // image error, returns an embed of an error occured along with some
