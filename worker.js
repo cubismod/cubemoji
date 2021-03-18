@@ -1,5 +1,4 @@
 // code used for various workers that actually process images
-const Pand = require('pandemonium')
 const Jimp = require('jimp')
 const workerpool = require('workerpool')
 const { BLEND_SOURCE_OVER } = require('jimp')

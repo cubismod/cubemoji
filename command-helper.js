@@ -1,7 +1,18 @@
 // helper functions for use in command files
 const Discord = require('discord.js')
 const Pandemonium = require('pandemonium')
+const FileType = require('file-type')
+const got = require('got')
 
+// check whether an image is a valid type
+async function checkValidType (url) {
+  const stream = got.stream(url)
+  const type = FileType.fromStream(stream)
+  const validTypes = ['jpg', 'jpeg', 'gif', 'png']
+
+  if (validTypes.includes(type.ext)) return true
+  return false
+}
 // check image
 // returns <image URL, false if nothing found>
 function checkImage (message, args, client, helper) {
@@ -11,6 +22,10 @@ function checkImage (message, args, client, helper) {
     const attachment = message.attachments.random(1)
     // get the first attachment url and return
     if (Object.prototype.hasOwnProperty.call(attachment[0], 'url')) {
+      checkValidType(attachment[0].url).then(val => {
+        if (val === true) return attachment[0].url
+        return false
+      })
       return attachment[0].url
     }
   }
@@ -20,22 +35,24 @@ function checkImage (message, args, client, helper) {
   const argName = args[0].toLowerCase()
   const avatarUrl = helper.cache.getAvatar(argName, client)
   const twemoji = helper.cache.parseTwemoji(argName)
-  const urlReg = /^https?:\/\/.+.(png|jpeg|jpg|gif)$/
-  if (avatarUrl || twemoji || argName.match(urlReg)) {
-    if (avatarUrl) return avatarUrl
-    if (twemoji) return twemoji.url
-    return args[0]
-  } else {
-    // or else try the cache
-    const res = helper.cache.retrieve(argName)
-    if (!res) {
-      // if not that then we search
-      const searchRes = helper.cache.search(args[0])
-      if (searchRes.length !== 0) {
-        return searchRes[0].item.url
-      }
-    } else return res.url
-  }
+
+  if (avatarUrl) return avatarUrl
+  if (twemoji) return twemoji.url
+  // check now whether the image is an okay type for cubemoji to edit
+  checkValidType(args[0]).then(val => {
+    if (val === true) return args[0]
+    return false
+  })
+  // or else try the cache
+  const res = helper.cache.retrieve(argName)
+  if (!res) {
+    // if not that then we search
+    const searchRes = helper.cache.search(args[0])
+    if (searchRes.length !== 0) {
+      return searchRes[0].item.url
+    }
+  } else return res.url
+
   return false
 }
 
