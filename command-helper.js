@@ -3,6 +3,28 @@ const Discord = require('discord.js')
 const Pandemonium = require('pandemonium')
 const FileType = require('file-type')
 const got = require('got')
+const secrets = require('./secrets.json')
+
+// checks if a mashup of two emotes is available via Google's Emoji
+// kitchen API, returns false if nothing found
+async function mashup (emotes) {
+  try {
+    const params = {
+      key: secrets.mashup,
+      client_key: 'gboard',
+      media_filter: 'png_transparent',
+      collection: 'emoji_kitchen_v5',
+      q: emotes
+    }
+    const response = await got('https://tenor.googleapis.com/v2/featured', { searchParams: params }).json()
+    // now we handle that response
+    const url = response.results[0].url
+    return url
+  } catch (error) {
+    console.error(error.response.body)
+    return false
+  }
+}
 
 // check whether an image is a valid type
 async function checkValidType (url) {
