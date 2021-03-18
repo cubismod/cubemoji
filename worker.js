@@ -1,4 +1,4 @@
-// code used for various workers
+// code used for various workers that actually process images
 const Pand = require('pandemonium')
 const Jimp = require('jimp')
 const workerpool = require('workerpool')
@@ -30,7 +30,7 @@ function editImage (url, options) {
           break
         case 'bl':
         case 'blur':
-          emote.blur(Pand.random(1, 5))
+          emote.blur(1)
           break
         case 'sp':
         case 'sepia':
@@ -63,8 +63,8 @@ function editImage (url, options) {
           break
       }
       // ensure the image can't get too huge
-      if (emote.bitmap.width > 256 || emote.bitmap.height > 256) {
-        emote.scaleToFit(256, 256)
+      if (emote.bitmap.width > 512 || emote.bitmap.height > 512) {
+        emote.scaleToFit(512, 512)
       }
     }
     )

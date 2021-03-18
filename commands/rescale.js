@@ -4,9 +4,8 @@ const Pandemonium = require('pandemonium')
 const Discord = require('discord.js')
 const fs = require('fs')
 const path = require('path')
-const im = require('imagemagick')
+const gm = require('gm').subClass({ imageMagick: true })
 const FileType = require('file-type')
-const { url } = require('inspector')
 
 // note that this file requires imagemagick installed on the host os
 module.exports = {
@@ -54,50 +53,40 @@ module.exports = {
             // ignore aspect ratio
             newSize = `${Pandemonium.random(10, 1000)}x${Pandemonium.random(10, 1000)}!`
         }
-        const args = [file, '-liquid-rescale', newSize, `${file}n`]
-        im.convert(args, (err) => {
-          if (err) {
-            // let the user know there was an error processing that image
-            const errEmbed = cmdHelper.imgErr(err, helper, message.author)
-            console.log(err)
-            return message.reply(errEmbed)
-          }
-          // console.log(stdout)
-          fs.readFile(`${file}n`, (err, data) => {
-            if (err) {
-              const errEmbed = cmdHelper.imgErr(err, helper, message.author)
-              console.error(err)
-              return message.reply(errEmbed)
-            }
-            FileType.fromBuffer(data).then(ft => {
-              // now we send that message out w/ the proper file type
-              const attach = new Discord.MessageAttachment(data, `${Date.now()}.${ft.ext}`)
+        // get the file type of the image file
+        FileType.fromFile(file).then(ft => {
+          gm(file)
+            .out('-liquid-rescale', newSize)
+            .toBuffer(ft.ext, (err, buff) => {
+              if (err) {
+                const errEmbed = cmdHelper.imgErr(err, helper, message.author)
+                console.error(err)
+                return message.reply(errEmbed)
+              }
+              // now we send out the message
+              const attach = new Discord.MessageAttachment(buff, `${Date.now()}.${ft.ext}`)
               message.channel.stopTyping(true)
               if (Date.now() - cmdStart > 30000) {
-                // if a command takes more than 30 seconds to process, we ping the user when its done
+              // if a command takes more than 30 seconds to process, we ping the user when its done
                 message.channel.send(`${message.author}, your image has finished processing!`)
               }
               message.channel.send(attach).then(msg => {
-                // add delete reacts and save a reference to the creator of the original
-                // msg so users cant delete other users images
+              // add delete reacts and save a reference to the creator of the original
+              // msg so users cant delete other users images
                 msg.react('🗑️')
                 helper.rescaleMsgs[msg.id] = message.author.id
               })
-              // delete those files from mem
+              // delete the source file
               fs.unlink(file, (err) => {
                 if (err) console.error(err)
               })
-              fs.unlink(`${file}n`, (err) => {
-                if (err) console.error(err)
-              })
             })
-          })
         })
-      })
-      .catch(err => {
-        const errEmbed = cmdHelper.imgErr(err, helper, message.author)
-        console.error(err)
-        return message.reply(errEmbed)
+          .catch(err => {
+            const errEmbed = cmdHelper.imgErr(err, helper, message.author)
+            console.error(err)
+            return message.reply(errEmbed)
+          })
       })
   }
 }
