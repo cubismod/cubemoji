@@ -10,7 +10,7 @@ async function checkValidType (url) {
   const type = await FileType.fromStream(stream)
   const validTypes = ['jpg', 'jpeg', 'gif', 'png']
 
-  if (validTypes.includes(type.ext)) return true
+  if (type !== undefined && validTypes.includes(type.ext)) return true
   else return false
 }
 // check image
@@ -36,9 +36,12 @@ async function checkImage (message, args, client, helper) {
 
   if (avatarUrl) return avatarUrl
   if (twemoji) return twemoji.url
-  // check now whether the image is an okay type for cubemoji to edit
-  const valid = checkValidType(args[0])
-  if (valid) return args[0]
+  const urlReg = /^https?:\/\/.+.(png|jpeg|jpg|gif)$/
+  if (args[0].match(urlReg)) {
+    // check now whether the image is an okay type for cubemoji to edit
+    const valid = await checkValidType(args[0])
+    if (valid) return args[0]
+  }
   // or else try the cache
   const res = helper.cache.retrieve(argName)
   if (!res) {
