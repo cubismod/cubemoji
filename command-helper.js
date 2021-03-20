@@ -3,10 +3,10 @@ const Discord = require('discord.js')
 const Pandemonium = require('pandemonium')
 const FileType = require('file-type')
 const got = require('got')
-const secrets = require('./secrets.json')
+// const secrets = require('./secrets.json')
 
 // checks if a mashup of two emotes is available via Google's Emoji
-// kitchen API, returns false if nothing found
+/*  kitchen API, returns false if nothing found
 async function mashup (emotes) {
   try {
     const params = {
@@ -24,7 +24,7 @@ async function mashup (emotes) {
     console.error(error.response.body)
     return false
   }
-}
+} */
 
 // check whether an image is a valid type
 async function checkValidType (url) {
