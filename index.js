@@ -148,20 +148,27 @@ helper.slotsDb.on('child_added', function (snapshot) {
   helper.slotsUsers.add(snapshot.key)
 })
 
+let thievesCount = 0
+
 helper.slotsDb.orderByChild('score').limitToLast(1).on('child_added', function (snapshot) {
-  // new user becomes top player
-  helper.topPlayer = snapshot.key
-  helper.beginTop = new Date()
-  helper.topPlayerTime = snapshot.val().timeOnTop
-  // send a message to #thieves that we have a new top player
-  client.channels.fetch('800411922499502113').then(thievesChannel => {
-    const topPlayerEmbed = new Discord.MessageEmbed()
-      .setColor('GOLD')
-      .setTitle(`👑 New Top Player: ${snapshot.val().username} 👑`)
-      .addField('Score', snapshot.val().score)
-      .addField('Time on Top', moment.duration(snapshot.val().timeOnTop, 'seconds').humanize())
-    thievesChannel.send(topPlayerEmbed)
-  })
+  // to avoid sending thieves messages every single time we start up the bot, we keep a counter
+  // to make sure it doesn't go off the first time
+  if (thievesCount > 0) {
+    // new user becomes top player
+    helper.topPlayer = snapshot.key
+    helper.beginTop = new Date()
+    helper.topPlayerTime = snapshot.val().timeOnTop
+    // send a message to #thieves that we have a new top player
+    client.channels.fetch('800411922499502113').then(thievesChannel => {
+      const topPlayerEmbed = new Discord.MessageEmbed()
+        .setColor('GOLD')
+        .setTitle(`👑 New Top Player: ${snapshot.val().username} 👑`)
+        .addField('Score', snapshot.val().score)
+        .addField('Time on Top', moment.duration(snapshot.val().timeOnTop, 'seconds').humanize())
+      thievesChannel.send(topPlayerEmbed)
+    })
+  }
+  thievesCount++
 })
 
 helper.slotsDb.orderByChild('score').limitToLast(1).on('child_removed', function () {
