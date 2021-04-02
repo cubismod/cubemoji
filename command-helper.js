@@ -37,7 +37,7 @@ async function checkValidType (url) {
 }
 // check image
 // returns <image URL, false if nothing found>
-async function checkImage (message, args, client, helper) {
+async function checkImage (message, args, client, util) {
   message.channel.startTyping()
   // check first for a message
   if (message.attachments.size > 0) {
@@ -53,8 +53,8 @@ async function checkImage (message, args, client, helper) {
   if (args.length < 1) return false
   // check if a mention or twemoji
   const argName = args[0].toLowerCase()
-  const avatarUrl = helper.cache.getAvatar(argName, client)
-  const twemoji = helper.cache.parseTwemoji(argName)
+  const avatarUrl = util.cache.getAvatar(argName, client)
+  const twemoji = util.cache.parseTwemoji(argName)
 
   if (avatarUrl) return avatarUrl
   if (twemoji) return twemoji.url
@@ -65,10 +65,10 @@ async function checkImage (message, args, client, helper) {
     if (valid) return args[0]
   }
   // or else try the cache
-  const res = helper.cache.retrieve(argName)
+  const res = util.cache.retrieve(argName)
   if (!res) {
   // if not that then we search
-    const searchRes = helper.cache.search(args[0])
+    const searchRes = util.cache.search(args[0])
     if (searchRes.length !== 0) {
       return searchRes[0].item.url
     }

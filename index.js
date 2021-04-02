@@ -10,6 +10,7 @@ const cooldowns = new Discord.Collection()
 const workerpool = require('workerpool')
 const path = require('path')
 const moment = require('moment')
+const cmdHelper = require('./command-helper')
 
 // firebase setup
 const fbAdmin = require('firebase-admin')
@@ -46,7 +47,7 @@ client.login(secrets.token)
 // helper serves as a catch-all reference object that
 // commands can use to spin up workers, access the emote cache
 // and update the firebase database
-const helper = {
+const util = {
   cache: new EmoteCache(client),
   pool: workerpool.pool(path.join(__dirname, 'worker.js')),
   emojiDb: db.ref('emojis/'),
@@ -60,11 +61,11 @@ const helper = {
   rescaleMsgs: {} // used to determine whether we can delete a message
 }
 
-helper.cache.createEmoteArray()
+util.cache.createEmoteArray()
 console.log('initialized emote array')
 
 function setStatus () {
-  const emotes = helper.cache.createEmoteArray(true)
+  const emotes = util.cache.createEmoteArray(true)
   const msg = `c!help :${Pandemonium.choice(emotes)}:`
   client.user.setActivity(msg, { type: 'WATCHING' })
   // we also take this as an opportunity to clear out the downloaded
@@ -115,15 +116,15 @@ function checkWhiteList (channel, commandName) {
 // have run c!sl at least once
 // also check the cache
 function ambPointAdd (user) {
-  if (helper.slotsUsers.has(user.id) &&
+  if (util.slotsUsers.has(user.id) &&
   Pandemonium.choice([true, false])) {
-    helper.slotsDb.once('value')
+    util.slotsDb.once('value')
       .then(snapshot => {
         const childUser = snapshot.child(user.id)
         if (childUser.exists()) {
           const prevVal = childUser.val().score
           const newScore = prevVal + Pandemonium.random(1, 40)
-          helper.slotsDb.child(user.id).update({
+          util.slotsDb.child(user.id).update({
             score: newScore,
             username: user.username
           })
@@ -137,27 +138,27 @@ function ambPointAdd (user) {
 function calcTimeDiff () {
   const curTime = new Date()
   // saving in seconds
-  const diff = (Math.abs(curTime - helper.beginTop)) / 1000
+  const diff = (Math.abs(curTime - util.beginTop)) / 1000
   // save that value
-  return helper.topPlayerTime + diff
+  return util.topPlayerTime + diff
 }
 
 // here we cache a basic list of slots users so we don't have to check the database constantly for ambient msgs
 // as well as update the scoreboard obj
-helper.slotsDb.on('child_added', function (snapshot) {
-  helper.slotsUsers.add(snapshot.key)
+util.slotsDb.on('child_added', function (snapshot) {
+  util.slotsUsers.add(snapshot.key)
 })
 
 let thievesCount = 0
 
-helper.slotsDb.orderByChild('score').limitToLast(1).on('child_added', function (snapshot) {
+util.slotsDb.orderByChild('score').limitToLast(1).on('child_added', function (snapshot) {
   // to avoid sending thieves messages every single time we start up the bot, we keep a counter
   // to make sure it doesn't go off the first time
   if (thievesCount > 0) {
     // new user becomes top player
-    helper.topPlayer = snapshot.key
-    helper.beginTop = new Date()
-    helper.topPlayerTime = snapshot.val().timeOnTop
+    util.topPlayer = snapshot.key
+    util.beginTop = new Date()
+    util.topPlayerTime = snapshot.val().timeOnTop
     // send a message to #thieves that we have a new top player
     client.channels.fetch('800411922499502113').then(thievesChannel => {
       const topPlayerEmbed = new Discord.MessageEmbed()
@@ -171,9 +172,9 @@ helper.slotsDb.orderByChild('score').limitToLast(1).on('child_added', function (
   thievesCount++
 })
 
-helper.slotsDb.orderByChild('score').limitToLast(1).on('child_removed', function () {
+util.slotsDb.orderByChild('score').limitToLast(1).on('child_removed', function () {
   // user leaves top player spot
-  helper.slotsDb.child(helper.topPlayer).update({
+  util.slotsDb.child(util.topPlayer).update({
     timeOnTop: calcTimeDiff()
   })
 })
@@ -186,7 +187,7 @@ client.on('message', message => {
     ambPointAdd(message.author)
     if (message.channel.type === 'dm' && !message.author.bot) {
       ambPointAdd(message.author)
-      client.commands.get('message').execute(message, message.content.split(' '), client, helper)
+      client.commands.get('message').execute(message, message.content.split(' '), client, util)
     }
     return
   }
@@ -260,7 +261,7 @@ client.on('message', message => {
   try {
     // we tie multiple things to this helper variable including a worker pool for complex functions,
     // the emote cache wrapper class, and other things
-    cmd.execute(message, args, client, helper)
+    cmd.execute(message, args, client, util)
     message.channel.stopTyping(true)
   } catch (error) {
     console.error(error)
@@ -270,15 +271,15 @@ client.on('message', message => {
 
 client.on('messageReactionAdd', (react, author) => {
 /*  this set of conditionals checks to make sure that cubemoji itself added a react
-    to a message to delete/modify the message */
+    to a message to delete, modify the message, edit a msg, rescale a msg */
   const cubemojiID = '792878401589477377'
-  const okayToDelete = helper.rescaleMsgs[react.message.id] === author.id
+  const okayToDelete = util.rescaleMsgs[react.message.id] === author.id
   if (react.users.cache.has(cubemojiID) &&
   author.id !== cubemojiID &&
   react.message.author.id === cubemojiID) {
     if (react.emoji.name === '🎲') {
       // ensures it's cubemoji
-      react.message.edit(Pandemonium.choice(helper.cache.createEmoteArray()).toString())
+      react.message.edit(Pandemonium.choice(util.cache.createEmoteArray()).toString())
       react.message.reactions.resolve(react).users.remove(author)
     }
     if (react.emoji.name === '🗑️' && okayToDelete) {
@@ -289,15 +290,33 @@ client.on('messageReactionAdd', (react, author) => {
       }
     }
   }
+  if (react.emoji.name === '📷') {
+    const args = [react.message.content, 'random']
+    try {
+      client.commands.get('edit').execute(react.message, args, client, util)
+    } catch (err) {
+      react.message.react('🤯')
+      // we are failing silently
+      console.error(err)
+    }
+  }
+  if (react.emoji.name === '📏') {
+    try {
+      client.commands.get('rescale').execute(react.message, react.message.content.split(' '), client, util)
+    } catch (err) {
+      react.message.react('🤯')
+      console.error(err)
+    }
+  }
 })
 
 // setup an interval to save time every 60 seconds to db
 // and reset time tracking for the top player
 setInterval(function () {
-  if (helper.slotsUsers.has(helper.topPlayer)) {
-    helper.topPlayerTime = calcTimeDiff()
-    helper.beginTop = new Date()
-    helper.slotsDb.child(helper.topPlayer).update({ timeOnTop: helper.topPlayerTime })
+  if (util.slotsUsers.has(util.topPlayer)) {
+    util.topPlayerTime = calcTimeDiff()
+    util.beginTop = new Date()
+    util.slotsDb.child(util.topPlayer).update({ timeOnTop: util.topPlayerTime })
   }
 }, 60000)
 
