@@ -9,7 +9,7 @@ apt-get update
 apt-get -y upgrade
 
 # get imagemagick installed
-apt-get -y install --no-install-recommends imagemagick
+apt-get -y install --no-install-recommends imagemagick graphicsmagick
 
 # Delete cached files we don't need anymore:
 apt-get clean
