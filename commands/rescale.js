@@ -8,6 +8,7 @@ const gm = require('gm').subClass({ imageMagick: true })
 const FileType = require('file-type')
 
 // note that this file requires imagemagick installed on the host os
+// TODO: add image throttling so we don't blast the CPU
 module.exports = {
   name: 'rescale',
   description: 'Rescale an image using Seam carving to humorous results https://en.wikipedia.org/wiki/Seam_carving. This command supports editing attachments. https://gitlab.com/cubismod/cubemoji/-/wikis/commands/rescale',

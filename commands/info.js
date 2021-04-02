@@ -13,6 +13,9 @@ module.exports = {
     } else {
       const user = helper.cache.parseMention(message.content, client)
       if (user) {
+        // TODO: add support for animated avatars...
+        // TODO: show leaderboard score
+        // TODO: add'l colors
         const avatarURL = user.displayAvatarURL({ format: 'png' })
         ColorThief.getColor(avatarURL).then(
           // retrieve dominant color from user avatar
