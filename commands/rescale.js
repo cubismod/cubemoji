@@ -17,6 +17,7 @@ module.exports = {
   cooldown: 2,
   execute (message, args, client, helper) {
     cmdHelper.checkImage(message, args, client, helper).then(emote => {
+      message.channel.startTyping()
       if (!emote) {
         // no image or emote found
         console.log(`${message.author.username} failed to use ${this.name} correctly`)

@@ -17,6 +17,7 @@ module.exports = {
     const cmdHelper = require('./../command-helper')
     let random
     cmdHelper.checkImage(message, args, client, helper).then(url => {
+      message.channel.startTyping()
       if (!url && (args.length !== 1 && args[0] !== 'hole')) {
         console.log(`${message.author.username} failed to use ${this.name} correctly`)
         message.reply(`You must specify an emote name and filters in the command! \n \`${this.usage}\``)
@@ -173,11 +174,10 @@ module.exports = {
                     // if a command takes more than 30 seconds to process, we ping the user when its done
                     message.channel.send(`${message.author}, your image has finished processing!`)
                   }
-                  if (random) {
-                    // send out the effects chain
-                    message.channel.send(`Effects chain used: ${options.join(' ')}`)
-                  }
-                  message.channel.send(attach).then(msg => {
+                  let effects = ''
+                  if (random) effects = `Effects chain used: ${options.join(' ')}`
+                  // send out the effects chain
+                  message.channel.send(effects, attach).then(msg => {
                     // add delete reacts and save a reference to the creator of the original
                     // msg so users cant delete other users images
                     msg.react('🗑️')

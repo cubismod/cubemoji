@@ -42,7 +42,6 @@ async function checkValidType (url) {
 // client - Discord client object
 // util - use the utility object passed from the index file
 async function checkImage (message, args, client, util) {
-  message.channel.startTyping()
   // check first for a message
   if (message.attachments.size > 0) {
     const attachment = message.attachments.random(1)
