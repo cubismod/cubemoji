@@ -6,11 +6,12 @@ const download = require('image-downloader')
 const path = require('path')
 const FileType = require('file-type')
 const fs = require('fs')
+const effects = require('./img_effects.json')
 
 module.exports = {
   name: 'edit',
   description: 'Edits an emote/avatar according to the effects you select. Effects are applied in the order you specify them. Animated emotes will return static images. This process is computationally intense so give it a few seconds to work. https://gitlab.com/cubismod/cubemoji/-/wikis/commands/modify',
-  usage: 'edit <emote/@mention> (opt args): <random/r> <sharpen/sh> <edge_detect/ed> <emboss/em> <grayscale/gs> <blur/bl> <sepia/sp> <rightrotate/rtro> <lfro/leftrotate> <scaleup/scup> <scaledown/scdn>, <flip/fl>, <upsidedown/ud>; (opt): <attachment image>',
+  usage: `edit <emote/@mention> (opt args): ${effects}`,
   aliases: ['ed', 'modify'],
   cooldown: 1,
   execute (message, args, client, helper) {
@@ -24,7 +25,6 @@ module.exports = {
       } else {
         let res
         const cmdStart = Date.now()
-        const effects = require('./img_effects.json')
         if (args[0].toLowerCase() === 'hole') {
           res = {}
           // easter egg time
@@ -114,7 +114,7 @@ module.exports = {
                     case 'mosaic':
                       img.mosaic()
                       break
-                    case 'motionBlur':
+                    case 'motionblur':
                       img.motionBlur(0, 2, Pand.random(0, 360))
                       break
                     case 'noise':
