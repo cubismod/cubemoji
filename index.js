@@ -1,7 +1,8 @@
 const fs = require('fs')
 const Discord = require('discord.js')
 const secrets = require('./secrets.json')
-const client = new Discord.Client()
+// https://discord.js.org/#/docs/main/master/topics/partials
+const client = new Discord.Client({ partials: ['MESSAGE', 'CHANNEL', 'REACTION'] })
 const EmoteCache = require('./helper')
 const Pandemonium = require('pandemonium')
 client.commands = new Discord.Collection()
@@ -269,9 +270,11 @@ client.on('message', message => {
   }
 })
 
-client.on('messageReactionAdd', (react, author) => {
+client.on('messageReactionAdd', async (react, author) => {
 /*  this set of conditionals checks to make sure that cubemoji itself added a react
     to a message to delete, modify the message, edit a msg, rescale a msg */
+  if (react.message.partial) await react.message.fetch()
+  if (react.partial) await react.fetch()
   const cubemojiID = '792878401589477377'
   const okayToDelete = util.rescaleMsgs[react.message.id] === author.id
   if (react.users.cache.has(cubemojiID) &&
@@ -290,24 +293,31 @@ client.on('messageReactionAdd', (react, author) => {
       }
     }
   }
-  if (react.emoji.name === '📷') {
-    const args = [react.message.content, 'random']
-    try {
-      client.commands.get('edit').execute(react.message, args, client, util)
-    } catch (err) {
-      react.message.react('🤯')
-      // we are failing silently
-      console.error(err)
+  // applying image effects via reacts
+  cmdHelper.checkImage(react.message, react.message.content.split(' '), client, util).then(result => {
+    if (result) {
+      if (react.emoji.name === '📷') {
+        const args = [react.message.content, 'random']
+        try {
+          client.commands.get('edit').execute(react.message, args, client, util)
+        } catch (err) {
+          react.message.react('🤯')
+          // we are failing silently
+          console.error(err)
+        }
+      }
+      if (react.emoji.name === '📏') {
+        try {
+          client.commands.get('rescale').execute(react.message, react.message.content.split(' '), client, util)
+        } catch (err) {
+          react.message.react('🤯')
+          console.error(err)
+        }
+      }
+      react.message.channel.stopTyping(true)
     }
   }
-  if (react.emoji.name === '📏') {
-    try {
-      client.commands.get('rescale').execute(react.message, react.message.content.split(' '), client, util)
-    } catch (err) {
-      react.message.react('🤯')
-      console.error(err)
-    }
-  }
+  )
 })
 
 // setup an interval to save time every 60 seconds to db

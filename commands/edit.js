@@ -192,7 +192,7 @@ module.exports = {
             })
           /*  // queue up a worker to run
           helper.pool.exec('editImage', [res.url, options])
-            .then(result => {
+            .then(result => {f
               // send out the resulting image as a Discord attachment
               // convert it to a node buffer
               message.channel.stopTyping(true)

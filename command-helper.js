@@ -37,6 +37,10 @@ async function checkValidType (url) {
 }
 // check image
 // returns <image URL, false if nothing found>
+// args - the msg content split into an array similar to how command
+// line arguments are processed
+// client - Discord client object
+// util - use the utility object passed from the index file
 async function checkImage (message, args, client, util) {
   message.channel.startTyping()
   // check first for a message
