@@ -1,4 +1,5 @@
 const Discord = require('discord.js')
+require('./../extended-msg')
 
 module.exports = {
   name: 'add_face',
@@ -11,7 +12,7 @@ module.exports = {
     cmdHelper.checkImage(message, args, client, helper).then(url => {
       if (!url) {
         console.log(`${message.author.username} failed to use ${this.name} correctly`)
-        message.reply(`You must specify an emote/mention in the command! \nusage: \`${this.usage}\``)
+        message.inlineReply(`You must specify an emote/mention in the command! \nusage: \`${this.usage}\``)
       } else {
         const res = {}
         res.url = url
@@ -38,7 +39,7 @@ module.exports = {
             })
             .catch(error => console.log(error))
         } else {
-          message.reply('emote not found!')
+          message.inlineReply('emote not found!')
         }
       }
       message.channel.stopTyping(true)

@@ -12,6 +12,7 @@ const workerpool = require('workerpool')
 const path = require('path')
 const moment = require('moment')
 const cmdHelper = require('./command-helper')
+require('./extended-msg')
 
 // firebase setup
 const fbAdmin = require('firebase-admin')
@@ -209,7 +210,7 @@ client.on('message', message => {
 
   // check the command whitelist
   if (!checkWhiteList(message.channel, cmd.name)) {
-    return message.reply('This command is not allowed in this channel.')
+    return message.inlineReply('This command is not allowed in this channel.')
   }
 
   // cooldown check and ensure that the command is allowed in the specific channel
@@ -236,7 +237,7 @@ client.on('message', message => {
         const timeLeft = (authorTimestamp.nextUsage - now) / 1000
         if (authorTimestamp.uses !== 1) {
           // don't penalize the user for making an initial mistake in their command
-          const msg = message.reply(`Please wait ${timeLeft.toFixed(0)} more seconds before executing \`${cmd.name}\`. *This message will delete itself once you can run the command again.*`)
+          const msg = message.inlineReply(`Please wait ${timeLeft.toFixed(0)} more seconds before executing \`${cmd.name}\`. *This message will delete itself once you can run the command again.*`)
           msg.then(resolvedMsg => {
             function delMsg (resolvedMsg) {
               resolvedMsg.delete()
@@ -266,7 +267,7 @@ client.on('message', message => {
     message.channel.stopTyping(true)
   } catch (error) {
     console.error(error)
-    message.reply('there was an error trying to execute that command!')
+    message.inlineReply('there was an error trying to execute that command!')
   }
 })
 

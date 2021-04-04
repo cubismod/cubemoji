@@ -1,3 +1,4 @@
+require('./../extended-msg')
 module.exports = {
   name: 'big',
   description: 'Creates a big version of an emote. If the emote is not found, then it performs a search and returns the emote closest matching the emote name. https://gitlab.com/cubismod/cubemoji/-/wikis/commands/big',
@@ -7,7 +8,7 @@ module.exports = {
   execute (message, args, _client, helper) {
     if (args.length < 1) {
       console.log(`${message.author.username} failed to use ${this.name} correctly`)
-      message.reply(`You must specify an emote in the command!\n \`${this.usage}\``)
+      message.inlineReply(`You must specify an emote in the command!\n \`${this.usage}\``)
     } else {
       // emoji names are only one word long so we will only consider the 0th element
       // also doing case insensitive searching
@@ -20,9 +21,9 @@ module.exports = {
         res = helper.cache.search(args[0])
         if (res.length > 1) {
           message.channel.send(res[0].item.url)
-          message.reply(`emote not found! Maybe try ${res[0].item} - \`${res[0].item.name}\`?`)
+          message.inlineReply(`emote not found! Maybe try ${res[0].item} - \`${res[0].item.name}\`?`)
         } else {
-          message.reply('emote not found!')
+          message.inlineReply('emote not found!')
         }
       }
     }
