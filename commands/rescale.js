@@ -6,6 +6,7 @@ const fs = require('fs')
 const path = require('path')
 const gm = require('gm').subClass({ imageMagick: true })
 const FileType = require('file-type')
+require('./../extended-msg')
 
 // note that this file requires imagemagick installed on the host os
 // TODO: add image throttling so we don't blast the CPU
@@ -21,11 +22,10 @@ module.exports = {
       if (!emote) {
         // no image or emote found
         console.log(`${message.author.username} failed to use ${this.name} correctly`)
-        return message.reply(`you must specify an emote or attachment \n \`${this.usage}\``)
+        return message.inlineReply(`you must specify an emote or attachment \n \`${this.usage}\``)
       }
       // indicate to the user that we are actually working
       message.channel.startTyping()
-      const cmdStart = Date.now()
       // if we have a guildemoji object, we need to pull the URL from it
       if (emote.url !== undefined) emote = emote.url
       // now try to download the file
@@ -63,16 +63,12 @@ module.exports = {
                 if (err) {
                   const errEmbed = cmdHelper.imgErr(err, helper, message.author)
                   console.error(err)
-                  return message.reply(errEmbed)
+                  return message.inlineReply(errEmbed)
                 }
                 // now we send out the message
                 const attach = new Discord.MessageAttachment(buff, `${Date.now()}.${ft.ext}`)
                 message.channel.stopTyping(true)
-                if (Date.now() - cmdStart > 30000) {
-                // if a command takes more than 30 seconds to process, we ping the user when its done
-                  message.channel.send(`${message.author}, your image has finished processing!`)
-                }
-                message.channel.send(attach).then(msg => {
+                message.inlineReply(attach).then(msg => {
                 // add delete reacts and save a reference to the creator of the original
                 // msg so users cant delete other users images
                   msg.react('🗑️')
@@ -87,7 +83,7 @@ module.exports = {
             .catch(err => {
               const errEmbed = cmdHelper.imgErr(err, helper, message.author)
               console.error(err)
-              return message.reply(errEmbed)
+              return message.inlineReply(errEmbed)
             })
         })
     })

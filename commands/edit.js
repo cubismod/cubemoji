@@ -7,6 +7,7 @@ const path = require('path')
 const FileType = require('file-type')
 const fs = require('fs')
 const effects = require('./img_effects.json')
+require('./../extended-msg')
 
 module.exports = {
   name: 'edit',
@@ -21,10 +22,9 @@ module.exports = {
       message.channel.startTyping()
       if (!url && (args.length !== 1 && args[0] !== 'hole')) {
         console.log(`${message.author.username} failed to use ${this.name} correctly`)
-        message.reply(`You must specify an emote name and filters in the command! \n \`${this.usage}\``)
+        message.inlineReply(`You must specify an emote name and filters in the command! \n \`${this.usage}\``)
       } else {
         let res
-        const cmdStart = Date.now()
         if (args[0].toLowerCase() === 'hole') {
           res = {}
           // easter egg time
@@ -165,19 +165,15 @@ module.exports = {
                   if (err) {
                     const errEmbed = cmdHelper.imgErr(err, helper, message.author)
                     console.error(err)
-                    return message.reply(errEmbed)
+                    return message.inlineReply(errEmbed)
                   }
                   // now we send out the message
                   const attach = new Discord.MessageAttachment(buff, `${Date.now()}.${ft.ext}`)
                   message.channel.stopTyping(true)
-                  if (Date.now() - cmdStart > 30000) {
-                    // if a command takes more than 30 seconds to process, we ping the user when its done
-                    message.channel.send(`${message.author}, your image has finished processing!`)
-                  }
                   let effects = ''
                   if (random) effects = `Effects chain used: ${options.join(' ')}`
                   // send out the effects chain
-                  message.channel.send(effects, attach).then(msg => {
+                  message.inlineReply(effects, attach).then(msg => {
                     // add delete reacts and save a reference to the creator of the original
                     // msg so users cant delete other users images
                     msg.react('🗑️')
@@ -205,7 +201,7 @@ module.exports = {
             })
             .catch(error => console.error(error)) */
         } else {
-          message.reply('emote not found!')
+          message.inlineReply('emote not found!')
         }
       }
       message.channel.stopTyping(true)

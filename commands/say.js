@@ -1,3 +1,4 @@
+require('./../extended-msg')
 module.exports = {
   name: 'say',
   description: 'Say something',
@@ -6,7 +7,7 @@ module.exports = {
   cooldown: 5,
   execute (message, args, client) {
     if (args.length < 2 || message.author.id !== '170358606590377984') {
-      message.reply('You must include a channel id and text in the command and be cubis!')
+      message.inlineReply('You must include a channel id and text in the command and be cubis!')
     } else {
       const channel = client.channels.fetch(args[0])
       channel.then(fetched => {
@@ -17,7 +18,7 @@ module.exports = {
       })
         .catch(reason => {
           console.error(reason)
-          message.reply('unable to retrieve the channel')
+          message.inlineReply('unable to retrieve the channel')
         })
     }
   }

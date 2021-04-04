@@ -1,3 +1,4 @@
+require('./../extended-msg')
 const ColorThief = require('colorthief')
 const util = require('discord.js').Util
 module.exports = {
@@ -9,7 +10,7 @@ module.exports = {
   requiresCache: true,
   execute (message, args, client, helper) {
     if (args.length < 1) {
-      message.reply('You must specify an emote name/user in the command!')
+      message.inlineReply('You must specify an emote name/user in the command!')
     } else {
       const user = helper.cache.parseMention(message.content, client)
       if (user) {
@@ -115,9 +116,9 @@ module.exports = {
         // retrieve a result from the cache
           res = helper.cache.search(args[0])
           if (res.length > 0) {
-            message.reply(`emote not found! Maybe try ${res[0].item} - \`${res[0].item.name}\`?`)
+            message.inlineReply(`emote not found! Maybe try ${res[0].item} - \`${res[0].item.name}\`?`)
           } else {
-            message.reply('emote not found!')
+            message.inlineReply('emote not found!')
           }
         }
       }

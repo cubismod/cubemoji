@@ -1,3 +1,4 @@
+require('./../extended-msg')
 const Fuse = require('fuse.js')
 const Pand = require('pandemonium')
 const Discord = require('discord.js')
@@ -9,10 +10,10 @@ module.exports = {
   cooldown: 10,
   execute (message, args, client, helper) {
     if (args.length < 2) {
-      return message.reply(`You must specify a player and wager amount in the command! \nusage: \`${this.usage}\``)
+      return message.inlineReply(`You must specify a player and wager amount in the command! \nusage: \`${this.usage}\``)
     }
     const wager = parseInt(args[1])
-    if (isNaN(wager) || wager < 0) return message.reply('you must specify a positive integer amount to steal')
+    if (isNaN(wager) || wager < 0) return message.inlineReply('you must specify a positive integer amount to steal')
 
     // first we try to see if there's a mention
     let user = helper.cache.parseMention(args[0], client)
@@ -39,7 +40,7 @@ module.exports = {
             const search = new Fuse(userArray, options)
             // second arg specifies we only want one result
             const results = search.search(args[0], 1)
-            if (results.length < 1) return message.reply('no user found matching that name!')
+            if (results.length < 1) return message.inlineReply('no user found matching that name!')
             // in the end we only care about the id
             user = results[0].item.id
             victimUsername = results[0].item.username
@@ -49,16 +50,16 @@ module.exports = {
           }
           // now at this point we should have the ID of the user we are looking for
           // check to ensure the user is not trying to steal from themeslves
-          if (user === message.author.id) return message.reply('you can\'t steal from yourself!')
+          if (user === message.author.id) return message.inlineReply('you can\'t steal from yourself!')
           // then double check to ensure that the victim is on the leaderboard
           const victim = snapshot.child(user)
-          if (!victim.exists()) return message.reply('that user is not on the leaderboard!')
+          if (!victim.exists()) return message.inlineReply('that user is not on the leaderboard!')
           const victimScore = victim.val().score
           const player = snapshot.child(message.author.id)
-          if (!player.exists()) return message.reply('you are not on the leaderboard! Start playing with `c!slots` to gain points')
+          if (!player.exists()) return message.inlineReply('you are not on the leaderboard! Start playing with `c!slots` to gain points')
           const playerScore = player.val().score
-          if (playerScore > victimScore) return message.reply(`you have ${playerScore} points and thus can't steal from your victim who has ${victimScore} points! Unlike real life, the wealthy here can't steal from the poor.`)
-          if (wager > victimScore) return message.reply(`you can't steal more points than your victim has, they have ${victimScore} points`)
+          if (playerScore > victimScore) return message.inlineReply(`you have ${playerScore} points and thus can't steal from your victim who has ${victimScore} points! Unlike real life, the wealthy here can't steal from the poor.`)
+          if (wager > victimScore) return message.inlineReply(`you can't steal more points than your victim has, they have ${victimScore} points`)
           // now comes the fun part where we determine how successful the steal will be
           // users are more likely to win a steal if they are waging less on the steal
           // sometimes get a value between the min amount to get above score or the victim's total score
@@ -77,13 +78,13 @@ module.exports = {
               .setTitle(`${message.author.username} lost ${lossAmount} points when trying to steal from ${victimUsername}`)
             thievesChannel.send(thiefEmbed)
 
-            const replyEmbed = new Discord.MessageEmbed()
+            const inlineReplyEmbed = new Discord.MessageEmbed()
               .setColor('RED')
               .setDescription(`${message.author}, your steal was unsuccessful and you lost ${lossAmount} points. Your new score is ${playerScore - lossAmount}`)
               .setTitle('Steal Unsuccessful')
               .addField(promo[0], promo[1])
 
-            return message.reply(replyEmbed)
+            return message.inlineReply(inlineReplyEmbed)
           } else {
           // successful steal
             const victimWriteable = helper.slotsDb.child(user)
@@ -98,22 +99,22 @@ module.exports = {
 
             if (stealAmount !== wager) {
               // the player will steal some of what the other player had
-              const replyEmbed = new Discord.MessageEmbed()
+              const inlineReplyEmbed = new Discord.MessageEmbed()
                 .setColor('YELLOW')
                 .setDescription(`${message.author}, partially successful steal from <@${user}> of ${stealAmount} points. You now have ${playerScore + stealAmount} points while they have ${victimScore - stealAmount} points.`)
                 .setTitle('Steal Partially Successful')
                 .addField(promo[0], promo[1])
 
-              return message.reply(replyEmbed)
+              return message.inlineReply(inlineReplyEmbed)
             } else {
             // the player steals that full amount
-              const replyEmbed = new Discord.MessageEmbed()
+              const inlineReplyEmbed = new Discord.MessageEmbed()
                 .setColor('GREEN')
                 .setDescription(`${message.author}, successful steal from <@${user}> of ${stealAmount} points. You now have ${playerScore + stealAmount} while they have ${victimScore - stealAmount} points.`)
                 .setTitle('Steal Successful')
                 .addField(promo[0], promo[1])
 
-              return message.reply(replyEmbed)
+              return message.inlineReply(inlineReplyEmbed)
             }
           }
         })

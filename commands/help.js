@@ -1,3 +1,4 @@
+require('./../extended-msg')
 module.exports = {
   name: 'help',
   description: 'Get more information on commands!',
@@ -19,7 +20,7 @@ module.exports = {
       command = client.commands.get(command) || client.commands.find(c => c.aliases.includes(command))
 
       if (!command) {
-        return message.reply("that's an invalid command.")
+        return message.inlineReply("that's an invalid command.")
       }
       let text = `\`${command.name}\`\n`
       if (command.aliases) {

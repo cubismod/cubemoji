@@ -1,3 +1,4 @@
+require('./../extended-msg')
 module.exports = {
   name: 'message',
   description: 'Send a message to the ether which will be received by another random person looking for a soulmate 🥺 https://gitlab.com/cubismod/cubemoji/-/wikis/Chat',
@@ -81,10 +82,10 @@ module.exports = {
 
     // begin actual code
     // initial command checks
-    if (message.channel.type !== 'dm') return message.reply('you can only use this command in DMs!')
+    if (message.channel.type !== 'dm') return message.inlineReply('you can only use this command in DMs!')
     if (args.length < 1) {
       console.log(`${message.author.username} failed to use ${this.name} correctly`)
-      message.reply(`you must specify a message!\n \`${this.usage}\``)
+      message.inlineReply(`you must specify a message!\n \`${this.usage}\``)
     } else {
       const chatEnded = 'Chat has ended now. Have a great day!'
       const lookingForMatch = 'we have added you to the matching queue and will let you know once we find a match for you! You can type `!leave` to leave the queue.'
@@ -135,11 +136,11 @@ module.exports = {
             sendRamble('*Someone got tired of waiting so left the queue.*')
             delete helper.matches[message.author.id]
             helper.openUsers.delete(message.author.id)
-            return message.reply('You have been removed from the queue.')
+            return message.inlineReply('You have been removed from the queue.')
           }
           helper.matches[message.author.id].msg = text
           sendRamble(matchRamble)
-          return message.reply(lookingForMatch)
+          return message.inlineReply(lookingForMatch)
         }
       } else {
         // create a user object
@@ -149,7 +150,7 @@ module.exports = {
           // no matches found yet so let's announce that to spark interest
           helper.openUsers.add(senderID)
           sendRamble(matchRamble)
-          return message.reply(lookingForMatch)
+          return message.inlineReply(lookingForMatch)
         }
         // here is where we found a match
         // choose a random unmatched user

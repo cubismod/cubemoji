@@ -1,3 +1,4 @@
+require('./../extended-msg')
 const Discord = require('discord.js')
 module.exports = {
   name: 'search',
@@ -7,7 +8,7 @@ module.exports = {
   cooldown: 2,
   execute (message, args, _client, helper) {
     if (args.length < 1) {
-      return message.reply(`you must specify an emote name to search for \nusage: \`${this.usage}\``)
+      return message.inlineReply(`you must specify an emote name to search for \nusage: \`${this.usage}\``)
     }
     const results = helper.cache.search(args[0])
     if (results.length === 0) {

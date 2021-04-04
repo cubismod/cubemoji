@@ -1,3 +1,4 @@
+require('./../extended-msg')
 module.exports = {
   name: 'emote',
   description: 'Inserts an emote into chat. https://gitlab.com/cubismod/cubemoji/-/wikis/commands/emote',
@@ -8,7 +9,7 @@ module.exports = {
   execute (message, args, _client, helper) {
     if (args.length < 1) {
       console.log(`${message.author.username} failed to use ${this.name} correctly`)
-      message.reply('You must specify an emote in the command!')
+      message.inlineReply('You must specify an emote in the command!')
     } else {
       // emoji names are only one word long so we will only consider the 0th element
       // also doing case insensitive searching
@@ -24,7 +25,7 @@ module.exports = {
           message.channel.send(res[0].item.toString())
         } else {
           console.log(`${message.author.username} failed to find emote ${emoteName}`)
-          message.reply('emote not found!')
+          message.inlineReply('emote not found!')
         }
       }
     }
