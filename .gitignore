@@ -121,3 +121,5 @@ data/
 
 serviceAccountKey.json
 download/
+
+npm-shrinkwrap.json
