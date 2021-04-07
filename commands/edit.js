@@ -15,7 +15,7 @@ module.exports = {
   usage: `edit <emote/@mention> (opt args): ${effects}`,
   aliases: ['ed', 'modify'],
   cooldown: 1,
-  execute (message, args, client, helper) {
+  execute (message, args, client, helper, blame) {
     const cmdHelper = require('./../command-helper')
     let random
     cmdHelper.checkImage(message, args, client, helper).then(url => {
@@ -176,8 +176,13 @@ module.exports = {
                   message.inlineReply(effects, attach).then(msg => {
                     // add delete reacts and save a reference to the creator of the original
                     // msg so users cant delete other users images
+                    // if this command is intiated through a react, then the person who reacted has the ability to delete the image, therefore we need to save a reference to them instead of the image creator
+                    if (blame !== undefined) {
+                      helper.rescaleMsgs[msg.id] = blame
+                    } else {
+                      helper.rescaleMsgs[msg.id] = message.author.id
+                    }
                     msg.react('🗑️')
-                    helper.rescaleMsgs[msg.id] = message.author.id
                   })
                   // delete the source file
                   fs.unlink(file, (err) => {
@@ -186,20 +191,6 @@ module.exports = {
                 })
               })
             })
-          /*  // queue up a worker to run
-          helper.pool.exec('editImage', [res.url, options])
-            .then(result => {f
-              // send out the resulting image as a Discord attachment
-              // convert it to a node buffer
-              message.channel.stopTyping(true)
-              const attach = new Discord.MessageAttachment(Buffer.from(result), 'most_likely_blursed.png')
-              message.channel.send(attach)
-              if (random) {
-              // send out the effects chain
-                message.channel.send(`Effects chain used: ${options.join(' ')}`)
-              }
-            })
-            .catch(error => console.error(error)) */
         } else {
           message.inlineReply('emote not found!')
         }

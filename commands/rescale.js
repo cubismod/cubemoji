@@ -16,7 +16,7 @@ module.exports = {
   usage: 'rescale <emote,@mention,image url(png/gif/jpg/jpeg)> (opt): <attachment image>',
   aliases: ['liquid', 'cas', 'content-scale', 'rs'],
   cooldown: 2,
-  execute (message, args, client, helper) {
+  execute (message, args, client, helper, blame) {
     cmdHelper.checkImage(message, args, client, helper).then(emote => {
       message.channel.startTyping()
       if (!emote) {
@@ -70,9 +70,14 @@ module.exports = {
                 message.channel.stopTyping(true)
                 message.inlineReply(attach).then(msg => {
                 // add delete reacts and save a reference to the creator of the original
-                // msg so users cant delete other users images
+                  // msg so users cant delete other users images
+                  // if this command is intiated through a react, then the person who reacted has the ability to delete the image, therefore we need to save a reference to them instead of the image creator
+                  if (blame !== undefined) {
+                    helper.rescaleMsgs[msg.id] = blame
+                  } else {
+                    helper.rescaleMsgs[msg.id] = message.author.id
+                  }
                   msg.react('🗑️')
-                  helper.rescaleMsgs[msg.id] = message.author.id
                 })
                 // delete the source file
                 fs.unlink(file, (err) => {

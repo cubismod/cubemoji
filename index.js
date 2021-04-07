@@ -300,7 +300,7 @@ client.on('messageReactionAdd', async (react, author) => {
       if (react.emoji.name === '📷') {
         const args = [react.message.content, 'random']
         try {
-          client.commands.get('edit').execute(react.message, args, client, util)
+          client.commands.get('edit').execute(react.message, args, client, util, author.id)
         } catch (err) {
           react.message.react('🤯')
           // we are failing silently
@@ -309,7 +309,7 @@ client.on('messageReactionAdd', async (react, author) => {
       }
       if (react.emoji.name === '📏') {
         try {
-          client.commands.get('rescale').execute(react.message, react.message.content.split(' '), client, util)
+          client.commands.get('rescale').execute(react.message, react.message.content.split(' '), client, util, author.id)
         } catch (err) {
           react.message.react('🤯')
           console.error(err)

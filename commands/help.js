@@ -12,7 +12,7 @@ module.exports = {
       client.commands.forEach(function (command) {
         text = text.concat(`\`${command.name}\`, `)
       })
-      text = text.concat('Type `c!help <command_name>` to get more info about a specific command. \n Get help online: https://gitlab.com/cubismod/cubemoji/-/wikis/home')
+      text = text.concat('Type `c!help <command_name>` to get more info about a specific command. \nGet help online: https://gitlab.com/cubismod/cubemoji/-/wikis/home\nReact 📏 on any message to rescale an image & 📷 to edit any image.')
       message.channel.send(text)
     } else {
       // specific command
