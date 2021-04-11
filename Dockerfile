@@ -6,7 +6,6 @@ COPY setupImage.sh .
 RUN ./setupImage.sh
 
 COPY package.json .
-COPY npm-shrinkwrap.json .
 
 RUN npm install
 COPY . .
