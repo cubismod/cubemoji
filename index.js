@@ -114,6 +114,8 @@ function checkWhiteList (channel, commandName) {
   return true
 }
 
+// 
+
 // ambiently adds a point whenever a user sends a message, requiring them to still
 // have run c!sl at least once
 // also check the cache
@@ -154,14 +156,14 @@ util.slotsDb.on('child_added', function (snapshot) {
 let thievesCount = 0
 
 util.slotsDb.orderByChild('score').limitToLast(1).on('child_added', function (snapshot) {
-  // to avoid sending thieves messages every single time we start up the bot, we keep a counter
-  // to make sure it doesn't go off the first time
+  // new user becomes top player
+  util.topPlayer = snapshot.key
+  util.beginTop = new Date()
+  util.topPlayerTime = snapshot.val().timeOnTop
+  // send a message to #thieves that we have a new top player
   if (thievesCount > 0) {
-    // new user becomes top player
-    util.topPlayer = snapshot.key
-    util.beginTop = new Date()
-    util.topPlayerTime = snapshot.val().timeOnTop
-    // send a message to #thieves that we have a new top player
+    // to avoid sending thieves messages every single time we start up the bot, we keep a counter
+    // to make sure it doesn't go off the first time
     client.channels.fetch('800411922499502113').then(thievesChannel => {
       const topPlayerEmbed = new Discord.MessageEmbed()
         .setColor('GOLD')
