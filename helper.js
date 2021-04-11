@@ -105,7 +105,7 @@ module.exports = class EmoteCache {
   getAvatar (msg, client) {
     const user = this.parseMention(msg, client)
     if (user) {
-      return (user.displayAvatarURL({ format: 'png', size: 128 }))
+      return (user.displayAvatarURL({ format: 'png', dynamic: true, size: 256 }))
     }
   }
 
