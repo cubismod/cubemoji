@@ -52,7 +52,7 @@ module.exports = {
           if (argLc === 'random' || argLc === 'r') {
             // random effects option
             random = true
-            const optLen = Pand.random(2, 30)
+            const optLen = Pand.random(1, 10)
             for (let i = 0; i < optLen; i++) {
               options.push(Pand.choice(effects))
             }
@@ -70,7 +70,7 @@ module.exports = {
                 options.forEach(option => {
                   switch (option) {
                     case 'blur':
-                      img.blur(Pand.randomFloat(0.1, 2))
+                      img.blur(5, 20)
                       break
                     case 'charcoal':
                       img.charcoal(Pand.randomFloat(0, 5))
@@ -103,7 +103,7 @@ module.exports = {
                       img.magnify()
                       break
                     case 'median':
-                      img.median()
+                      img.median(Pand.random(1, 10))
                       break
                     case 'minify':
                       img.minify(Pand.random(1, 10))
@@ -115,19 +115,19 @@ module.exports = {
                       img.mosaic()
                       break
                     case 'motionblur':
-                      img.motionBlur(0, 2, Pand.random(0, 360))
+                      img.motionBlur(10, 20, Pand.random(0, 360))
                       break
                     case 'noise':
-                      img.noise('uniform')
+                      img.noise(10)
                       break
                     case 'normalize':
                       img.normalize()
                       break
                     case 'paint':
-                      img.paint(Pand.randomFloat(0.1, 5))
+                      img.paint(10)
                       break
                     case 'roll':
-                      img.roll(Pand.randomIndex(-10, 10), Pand.randomIndex(-10, 10))
+                      img.roll(Pand.randomIndex(-360, 360), Pand.randomIndex(-360, 360))
                       break
                     case 'rotate':
                       img.rotate('white', Pand.random(-360, 360))
@@ -139,25 +139,25 @@ module.exports = {
                       img.shave(20, 20, 5)
                       break
                     case 'sharpen':
-                      img.sharpen(Pand.randomFloat(0.1, 5))
+                      img.unsharp(100)
                       break
                     case 'solarize':
                       img.solarize(Pand.randomFloat(0, 100))
                       break
                     case 'spread':
-                      img.spread(Pand.randomFloat(0, 100))
+                      img.spread(Pand.randomFloat(0, 5))
                       break
                     case 'swirl':
-                      img.swirl(5)
+                      img.swirl(Pand.random(-360, 360))
                       break
                     case 'threshold':
-                      img.threshold(Pand.random(1, 20))
+                      img.threshold(Pand.randomFloat(0, 20))
                       break
                     case 'trim':
                       img.trim()
                       break
                     case 'wave':
-                      img.wave(Pand.randomFloat(0.1, 10), Pand.randomFloat(0.1, 10))
+                      img.wave(Pand.randomFloat(0.01, 10), Pand.randomFloat(0.01, 10))
                       break
                   }
                 })
