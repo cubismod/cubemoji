@@ -115,6 +115,8 @@ function checkWhiteList (channel, commandName) {
   return true
 }
 
+
+
 // perform a reset of the leaderboard every 72 hours
 function resetLb () {
   // firstly post a leaderboard message in #slot-sluts
@@ -129,10 +131,18 @@ function resetLb () {
       util.beginTop = ''
       util.topPlayerTime = ''
       // clear the acutal leaderboard now
-      util.slotsDb.set(null)
+      util.slotsDb.once('value').then(snapshot => {
+        snapshot.forEach(user => {
+          util.slotsDb.child(user.key).update({
+            score: 0, timeOnTop: 0
+          })
+        })
+      })
     })
   })
 }
+
+setTimeout(resetLb, 30000)
 
 // ambiently adds a point whenever a user sends a message, requiring them to still
 // have run c!sl at least once
