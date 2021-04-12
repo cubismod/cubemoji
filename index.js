@@ -115,8 +115,6 @@ function checkWhiteList (channel, commandName) {
   return true
 }
 
-
-
 // perform a reset of the leaderboard every 72 hours
 function resetLb () {
   // firstly post a leaderboard message in #slot-sluts
@@ -142,7 +140,8 @@ function resetLb () {
   })
 }
 
-setTimeout(resetLb, 30000)
+// do a reset every 72 hours
+setInterval(resetLb, 2.592e+8)
 
 // ambiently adds a point whenever a user sends a message, requiring them to still
 // have run c!sl at least once
