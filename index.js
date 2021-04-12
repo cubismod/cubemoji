@@ -57,10 +57,11 @@ const util = {
   slotsUsers: new Set(),
   topPlayer: '', // cached local user to calculate time on top
   topPlayerTime: '',
-  beginTop: '',
+  beginTop: '', // when we began tracking the top player time
   matches: {},
   openUsers: new Set(),
-  rescaleMsgs: {} // used to determine whether we can delete a message
+  rescaleMsgs: {}, // used to determine whether we can delete a message
+  nextLbReset: moment().add(72, 'hours') // tracking leaderboard resets
 }
 
 util.cache.createEmoteArray()
@@ -114,7 +115,24 @@ function checkWhiteList (channel, commandName) {
   return true
 }
 
-// 
+// perform a reset of the leaderboard every 72 hours
+function resetLb () {
+  // firstly post a leaderboard message in #slot-sluts
+  client.channels.fetch('799767869465428050').then(slotsChannel => {
+    slotsChannel.send('The slots leaderboard has been reset! Next reset will be in 72 hours...').then(msg => {
+      // print out leaderboard message
+      client.commands.get('leaderboard').execute(msg, null, null, util)
+      // modify the reset time
+      util.nextLbReset = moment().add(72, 'hours')
+      // reset top player stats
+      util.topPlayer = ''
+      util.beginTop = ''
+      util.topPlayerTime = ''
+      // clear the acutal leaderboard now
+      util.slotsDb.set(null)
+    })
+  })
+}
 
 // ambiently adds a point whenever a user sends a message, requiring them to still
 // have run c!sl at least once

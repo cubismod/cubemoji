@@ -5,16 +5,17 @@ module.exports = {
   usage: 'leaderboard',
   aliases: ['lb'],
   cooldown: 5,
-  execute (message, _args, _client, helper) {
+  execute (message, _args, _client, util) {
     // get the leaderboard organized by scores
-    helper.slotsDb.orderByChild('score').once('value')
+    util.slotsDb.orderByChild('score').once('value')
       .then(async (snapshot) => {
         // since we store a reference to how many users are playing, we can
         // use that as an index to show user scores
-        let rank = helper.slotsUsers.size
+        let rank = util.slotsUsers.size
         let msg = []
         // push footer information
-        msg.push('*Users with scores of zeroes are omitted from the leaderboard.\nThe user with the highest time on top (in #1 spot) wins for the week.\nOnline Leaderboard: <https://lb.cubis.codes>*')
+        msg.push('*Users with scores of zeroes are omitted from the leaderboard.\nThe user with the highest time on top (in #1 spot) wins for the 72 hour period.\nOnline Leaderboard: <https://lb.cubis.codes>*')
+        msg.push(`\n**Next leaderboard reset is ${moment().to(util.nextLbReset)}**`)
         snapshot.forEach(user => {
           if (user.val().score !== 0) {
             // don't display users with scores of 0 on board
