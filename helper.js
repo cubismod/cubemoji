@@ -1,118 +1,165 @@
-// helper functions
-const Moment = require('moment')
-const Fuse = require('fuse.js')
-const Twemoji = require('twemoji-parser')
-// a class which can return an array version of emotes
-// and also only refreshes when necessary
-module.exports = class EmoteCache {
-  constructor (client) {
-    this.client = client
-    this.emoteCache = client.emojis.cache
-    this.arrayVersion = [] // init with an empty array
-    this.sortedArray = []
-    // we only want to do an update every ten minutes
-    this.nextUpdateTime = Moment().add(15, 'minutes')
-  }
+// helper functions typically used in index.js
+const Pandemonium = require('pandemonium')
+const fs = require('fs')
+const path = require('path')
+const whitelist = require('./whitelist.json')
+const moment = require('moment')
 
-  // sortable: returns just a list of names which can be easily sorted
-  createEmoteArray (sortable = false) {
-    // we are just manually iterating through the map to create a list
-    // ensure we only update if there is no data or the update time has lapsed
-    if ((this.arrayVersion === undefined || this.arrayVersion.length === 0) ||
-        (Moment().isAfter(this.nextUpdateTime))) {
-      // load up our blacklist.json file
-      // note that with the require(), you need to restart app
-      // for it to see changes to the file
-      const blacklist = require('./blacklist.json').blacklist
-      this.emoteCache = this.client.emojis.cache
-      this.arrayVersion = []
-      this.sortedArray = []
-      for (const [, value] of this.emoteCache) {
-        // utilize the blacklist.json file to remove bad emotes
-        // blacklist.json utiizes emote IDs
-        if (!blacklist.includes(value.id)) {
-          this.arrayVersion.push(value)
-          this.sortedArray.push(value.name)
-        }
-      }
-      this.sortedArray = this.sortedArray.sort(function (a, b) {
-        return a.toLowerCase().localeCompare(b.toLowerCase())
+/**
+ * set the status of the bot and also clean out the temporary image directory
+ * performed every 30 to 90 minutes
+ * @param {object} util - dictionary including a lot of helper functions and database code initialized in index.js
+ * @param {Discord.Client} client - reference to the Discord client
+ */
+function setStatus (util, client) {
+  const emotes = util.cache.createEmoteArray(true)
+  const msg = `c!help :${Pandemonium.choice(emotes)}:`
+  if (client.user != null) client.user.setActivity(msg, { type: 'WATCHING' })
+
+  // we also take this as an opportunity to clear out the downloaded
+  // images folder
+  const dir = './download/'
+  fs.readdir(dir, (err, files) => {
+    if (err) console.error(err)
+    files.forEach(file => {
+      fs.unlink(path.join(dir, file), err => {
+        if (err) console.error(err)
       })
-      // only perform an update every fifteen minutes
-      this.nextUpdateTime = Moment().add(15, 'minutes')
-    }
-    if (sortable) return this.sortedArray
-    return this.arrayVersion
-  }
+    })
+  })
+}
 
-  search (query) {
-    const options = {
-      keys: ['name'],
-      useExtendedSearch: true,
-      minMatchCharLength: 1,
-      threshold: 0.3
-    }
-    const search = new Fuse(this.createEmoteArray(), options)
-    const results = search.search(query)
-    return (results)
-  }
-
-  // TODO: move fuzzy searching here
-  // retrieves an emote based on title
-  // or the user actually embedding an emote in
-  // their message, then returns that emoji object
-  // if cubemoji doesn't have access to the emote then we return a URL
-  // to the emote image
-  retrieve (emote) {
-    // first convert the name to lowercase so we aren't case sensitive
-    const emoteName = emote.toLowerCase()
-
-    let res = this.arrayVersion.find(emote => emote.name.toLowerCase() === emoteName)
-    if (!res) {
-      // try and read the emote directly
-      // like <:flass:781664252058533908>
-      // so we take the "flass" part
-      const split = emoteName.split(':')
-      if (split.length > 2) {
-        res = this.arrayVersion.find(emote => emote.name.toLowerCase() === split[1])
-        if (res === undefined) {
-          res = {}
-          // return the url here
-          res.url = 'https://cdn.discordapp.com/emojis/' + split[2]
-          res.url = res.url.slice(0, res.url.length - 1) // chop off the '>'
-          res.external = true
-        }
+/**
+ * checks whether a command is allowed in a specific channel to avoid spam
+ * @param {Discord.Channel} channel - the channel that we are checking if it is on the whitelist
+ * @param {string} commandName - the command we are checking like leaderboard, or slots for example
+ * @returns {boolean} - t if command allowed in channel, f if command disallowed in channel
+ */
+function checkWhiteList (channel, commandName) {
+  /* so the command whitelist JSON file is organized like so:
+  {
+    (server id) {
+      (command name) {
+        (channel id)
       }
     }
-    return res
   }
+  channel whitelists are per server
+  */
 
-  // return the User object https://discord.js.org/#/docs/main/stable/class/User or false if no match found
-  parseMention (msg, client) {
-    const found = msg.match(/<@!?(\d+)>/)
-    if (found) {
-      // https://discord.js.org/#/docs/collection/master/class/Collection?scrollTo=get
-      // returns a nice undefined
-      const user = client.users.cache.get(found[1])
-      if (undefined) return false
-      else return user
+  if (channel.type !== 'dm') {
+    if (Object.prototype.hasOwnProperty.call(whitelist, channel.guild.id)) {
+      if (Object.prototype.hasOwnProperty.call(whitelist[channel.guild.id], commandName)) {
+        if (Object.prototype.hasOwnProperty.call(whitelist[channel.guild.id][commandName], channel.id)) {
+          return true
+        }
+      } else {
+        return true
+      }
+    } else {
+      return true
     }
     return false
   }
+  return true
+}
 
-  // given an argument in the form of <@86890631690977280> or <!@86890631690977280>
-  // this returns the URL of that avatar or null
-  getAvatar (msg, client) {
-    const user = this.parseMention(msg, client)
-    if (user) {
-      return (user.displayAvatarURL({ format: 'png', dynamic: true, size: 256 }))
+/**
+ * adds a point whenever a user sends a message in a channel cubemoji has access to
+ * @param {object} util - utility object from index.js
+ * @param {Discord.User} user - the user who sent the message
+ */
+function ambPointAdd (util, user) {
+  if (util.slotsUsers.has(user.id) &&
+  Pandemonium.choice([true, false])) {
+    util.slotsDb.once('value')
+      .then(snapshot => {
+        const childUser = snapshot.child(user.id)
+        if (childUser.exists()) {
+          const prevVal = childUser.val().score
+          const newScore = prevVal + Pandemonium.random(1, 40)
+          util.slotsDb.child(user.id).update({
+            score: newScore,
+            username: user.username
+          })
+        }
+      })
+  }
+}
+
+/**
+ * calculate how long a player has been on the top from the current time
+ * @param {object} util - utility object from index.js
+ * @returns the difference in time in ms
+ */
+function calcTimeDiff (util) {
+  const curTime = new Date()
+  // saving in seconds
+  const diff = (Math.abs(curTime - util.beginTop)) / 1000
+  // save that value
+  return util.topPlayerTime + diff
+}
+
+/**
+ * perform a leaderboard reset automatically
+ * @param {object} util - utility object from index.js
+ * @param {Discord.Client} client - reference to the Discord client
+ */
+function resetLb (util, client) {
+  // first we need to determine whether a reset is pending (aka the bot has been restarted)
+  util.cmSettings.orderByKey().equalTo('nextResetTime').once('value').then(snapshot => {
+    // snapshot has a reference to the nextResetTime var now
+    const resetRaw = snapshot.val().nextResetTime
+    const resetParsed = parseInt(resetRaw)
+    if (!isNaN(resetParsed)) {
+      // this indicates that a valid number was stored in that variable
+      const diff = resetParsed - Date.now()
+      if (diff > 0 && diff < 2.592e+8) {
+        // this indicates that it is not yet time for a reset
+        // so we queue up another timeout for this to happen
+        setTimeout(resetLb, diff, [util, client])
+      } else {
+        // trigger a reset
+        client.channels.fetch('799767869465428050').then(slotsChannel => {
+          slotsChannel.send('The slots leaderboard has been reset! Next reset will be in 72 hours...').then(msg => {
+            // print out leaderboard message
+            client.commands.get('leaderboard').execute(msg, null, null, util)
+            // modify the reset time
+            const nextLbReset = Date.now() + 2.592e+8
+            // save that value to db
+            util.cmSettings.update({
+              nextResetTime: nextLbReset
+            })
+            // reset top player stats
+            util.topPlayer = ''
+            util.beginTop = ''
+            util.topPlayerTime = ''
+            // clear the acutal leaderboard now
+            util.slotsDb.once('value').then(snapshot => {
+              snapshot.forEach(user => {
+                util.slotsDb.child(user.key).update({
+                  score: 0, timeOnTop: 0
+                })
+              })
+            })
+          })
+        })
+      }
+    } else {
+      // something went wrong... so lets setup a new reset for 1 minute from now
+      const resetTime = moment().add(1, 'minute')
+      util.cmSettings.update({
+        nextResetTime: resetTime
+      })
+      setTimeout(resetLb, 60000, [util, client])
     }
-  }
+  })
+}
 
-  // parse a twemoji and return a url
-  parseTwemoji (str) {
-    const entitites = Twemoji.parse(str, { assetType: 'png' })
-    if (entitites) return entitites[0]
-    else return ''
-  }
+module.exports = {
+  setStatus,
+  checkWhiteList,
+  ambPointAdd,
+  calcTimeDiff,
+  resetLb
 }

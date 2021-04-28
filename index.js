@@ -1,9 +1,8 @@
 const fs = require('fs')
 const Discord = require('discord.js')
 const secrets = require('./secrets.json')
-// https://discord.js.org/#/docs/main/master/topics/partials
 const client = new Discord.Client({ partials: ['MESSAGE', 'CHANNEL', 'REACTION'] })
-const EmoteCache = require('./helper')
+const EmoteCache = require('./emote-cache')
 const Pandemonium = require('pandemonium')
 client.commands = new Discord.Collection()
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'))
@@ -12,6 +11,7 @@ const workerpool = require('workerpool')
 const path = require('path')
 const moment = require('moment')
 const cmdHelper = require('./command-helper')
+const helper = require('./helper')
 require('./extended-msg')
 
 // firebase setup
@@ -29,6 +29,7 @@ fbAdmin.initializeApp({
 console.log('firebase active')
 const db = fbAdmin.database()
 
+// load up all our command files here
 for (const file of commandFiles) {
   const command = require(`./commands/${file}`)
 
@@ -36,23 +37,24 @@ for (const file of commandFiles) {
   // with the key as the command name and the value as the exported module
   client.commands.set(command.name, command)
 }
+
 client.once('ready', () => {
   console.log('cubemoji running!')
   const serverlist = []
   client.guilds.cache.forEach(key => serverlist.push(key.name))
   console.log(`active on the following servers: ${serverlist}`)
-  // wait to let the emote cache warm up
-  setTimeout(setStatus, 20000)
+  // wait to let the emote cache warm up before we set a status
+  setTimeout(helper.setStatus, 20000, util, client)
 })
 client.login(secrets.token)
 
-// helper serves as a catch-all reference object that
+// util serves as a catch-all reference object that
 // commands can use to spin up workers, access the emote cache
 // and update the firebase database
 const util = {
   cache: new EmoteCache(client),
   pool: workerpool.pool(path.join(__dirname, 'worker.js')),
-  emojiDb: db.ref('emojis/'),
+  cmSettings: db.ref('cmsettings/'), // global settings that need to be preserved through restarts
   slotsDb: db.ref('slots/'),
   slotsUsers: new Set(),
   topPlayer: '', // cached local user to calculate time on top
@@ -60,119 +62,19 @@ const util = {
   beginTop: '', // when we began tracking the top player time
   matches: {},
   openUsers: new Set(),
-  rescaleMsgs: {}, // used to determine whether we can delete a message
-  nextLbReset: moment().add(72, 'hours') // tracking leaderboard resets
+  rescaleMsgs: {} // used to determine whether we can delete a message
+  // nextLbReset: moment().add(72, 'hours') // tracking leaderboard resets
 }
 
 util.cache.createEmoteArray()
 console.log('initialized emote array')
 
-function setStatus () {
-  const emotes = util.cache.createEmoteArray(true)
-  const msg = `c!help :${Pandemonium.choice(emotes)}:`
-  client.user.setActivity(msg, { type: 'WATCHING' })
-  // we also take this as an opportunity to clear out the downloaded
-  // images folder
-  const dir = './download/'
-  fs.readdir(dir, (err, files) => {
-    if (err) console.error(err)
-    files.forEach(file => {
-      fs.unlink(path.join(dir, file), err => {
-        if (err) console.error(err)
-      })
-    })
-  })
-}
-
-// function returns true if the command is allowed in the specific channel
-// false if not
-function checkWhiteList (channel, commandName) {
-  /* so the command whitelist JSON file is organized like so:
-  {
-    (server id) {
-      (command name) {
-        (channel id)
-      }
-    }
-  }
-  channel whitelists are per server
-  */
-  const whitelist = require('./whitelist.json')
-  if (channel.type !== 'dm') {
-    if (Object.prototype.hasOwnProperty.call(whitelist, channel.guild.id)) {
-      if (Object.prototype.hasOwnProperty.call(whitelist[channel.guild.id], commandName)) {
-        if (Object.prototype.hasOwnProperty.call(whitelist[channel.guild.id][commandName], channel.id)) {
-          return true
-        }
-      } else {
-        return true
-      }
-    } else {
-      return true
-    }
-    return false
-  }
-  return true
-}
-
 // perform a reset of the leaderboard every 72 hours
-function resetLb () {
-  // firstly post a leaderboard message in #slot-sluts
-  client.channels.fetch('799767869465428050').then(slotsChannel => {
-    slotsChannel.send('The slots leaderboard has been reset! Next reset will be in 72 hours...').then(msg => {
-      // print out leaderboard message
-      client.commands.get('leaderboard').execute(msg, null, null, util)
-      // modify the reset time
-      util.nextLbReset = moment().add(72, 'hours')
-      // reset top player stats
-      util.topPlayer = ''
-      util.beginTop = ''
-      util.topPlayerTime = ''
-      // clear the acutal leaderboard now
-      util.slotsDb.once('value').then(snapshot => {
-        snapshot.forEach(user => {
-          util.slotsDb.child(user.key).update({
-            score: 0, timeOnTop: 0
-          })
-        })
-      })
-    })
-  })
-}
 
 // do a reset every 72 hours
-setInterval(resetLb, 2.592e+8)
+setInterval(helper.resetLb, 2.592e+8)
 
-// ambiently adds a point whenever a user sends a message, requiring them to still
-// have run c!sl at least once
-// also check the cache
-function ambPointAdd (user) {
-  if (util.slotsUsers.has(user.id) &&
-  Pandemonium.choice([true, false])) {
-    util.slotsDb.once('value')
-      .then(snapshot => {
-        const childUser = snapshot.child(user.id)
-        if (childUser.exists()) {
-          const prevVal = childUser.val().score
-          const newScore = prevVal + Pandemonium.random(1, 40)
-          util.slotsDb.child(user.id).update({
-            score: newScore,
-            username: user.username
-          })
-        }
-      })
-  }
-}
-
-// calculate the difference in time of a top player
-// adding that value to their existing time and returning it
-function calcTimeDiff () {
-  const curTime = new Date()
-  // saving in seconds
-  const diff = (Math.abs(curTime - util.beginTop)) / 1000
-  // save that value
-  return util.topPlayerTime + diff
-}
+// FIREBASE LISTENERS
 
 // here we cache a basic list of slots users so we don't have to check the database constantly for ambient msgs
 // as well as update the scoreboard obj
@@ -182,8 +84,8 @@ util.slotsDb.on('child_added', function (snapshot) {
 
 let thievesCount = 0
 
+// new user becomes top player
 util.slotsDb.orderByChild('score').limitToLast(1).on('child_added', function (snapshot) {
-  // new user becomes top player
   util.topPlayer = snapshot.key
   util.beginTop = new Date()
   util.topPlayerTime = snapshot.val().timeOnTop
@@ -203,10 +105,10 @@ util.slotsDb.orderByChild('score').limitToLast(1).on('child_added', function (sn
   thievesCount++
 })
 
+// user leaves top player spot
 util.slotsDb.orderByChild('score').limitToLast(1).on('child_removed', function () {
-  // user leaves top player spot
   util.slotsDb.child(util.topPlayer).update({
-    timeOnTop: calcTimeDiff()
+    timeOnTop: helper.calcTimeDiff(util)
   })
 })
 
@@ -215,9 +117,9 @@ client.on('message', message => {
   if (!message.content.toLowerCase().startsWith(secrets.prefix) || message.author.bot) {
     // random chance that we will ambiently add points for the user
     // for non command messages
-    ambPointAdd(message.author)
+    helper.ambPointAdd(util, message.author)
     if (message.channel.type === 'dm' && !message.author.bot) {
-      ambPointAdd(message.author)
+      helper.ambPointAdd(util, message.author)
       client.commands.get('message').execute(message, message.content.split(' '), client, util)
     }
     return
@@ -238,7 +140,7 @@ client.on('message', message => {
   }
 
   // check the command whitelist
-  if (!checkWhiteList(message.channel, cmd.name)) {
+  if (!helper.checkWhiteList(message.channel, cmd.name)) {
     return message.inlineReply('This command is not allowed in this channel.')
   }
 
@@ -354,11 +256,13 @@ client.on('messageReactionAdd', async (react, author) => {
 // and reset time tracking for the top player
 setInterval(function () {
   if (util.slotsUsers.has(util.topPlayer)) {
-    util.topPlayerTime = calcTimeDiff()
+    util.topPlayerTime = helper.calcTimeDiff(util)
     util.beginTop = new Date()
     util.slotsDb.child(util.topPlayer).update({ timeOnTop: util.topPlayerTime })
   }
 }, 60000)
 
 // here we change the "playing on discord" msg every now and then
-setInterval(setStatus, Pandemonium.random(30, 90) * 60000)
+setInterval(helper.setStatus, Pandemonium.random(30, 90) * 60000, util, client)
+
+helper.resetLb(util, client)
