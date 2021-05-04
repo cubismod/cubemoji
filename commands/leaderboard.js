@@ -11,18 +11,18 @@ module.exports = {
       .then(async (snapshot) => {
         // since we store a reference to how many users are playing, we can
         // use that as an index to show user scores
-        let rank = util.slotsUsers.size - 1
+        let rank = util.slotsUsers.size
         let msg = []
         // push footer information
-        msg.push('*Users with scores of zeroes are omitted from the leaderboard.\nThe user with the highest time on top (in #1 spot) wins for the 72 hour period.\nOnline Leaderboard: <https://lb.cubis.codes>*')
+        msg.push('*Users with time on top of zero min are omitted from the leaderboard.\nThe user with the highest time on top (in #1 spot) wins for the 72 hour period.\nOnline Leaderboard: <https://lb.cubis.codes>*')
         msg.push(`\n**Next leaderboard reset is ${moment().to(util.nextLbReset)}**`)
         snapshot.forEach(user => {
           // TODO: fix this ranking
-          rank--
-          if (user.val().score !== 0) {
+          if (Math.round(user.val().timeOnTop / 60) !== 0) {
             // don't display users with scores of 0 on board
             msg.push(`${rank}. \`${user.val().username}\`: **${user.val().score}** pts, ${Math.round(user.val().timeOnTop / 60)} minutes on top`)
           }
+          rank--
         })
         // push the header msg
         msg.push('<a:dieRoll:795419079254605834> Leaderboard <a:dieRoll:795419079254605834>')
