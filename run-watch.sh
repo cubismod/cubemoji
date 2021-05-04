@@ -5,7 +5,7 @@
 # you need to source the .env file first
 export $(xargs <.env)
 
-SPAM_DELAY=5
+SPAM_DELAY=2
 MAX_LENGTH=2000
 FILTER=''
 
