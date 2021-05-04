@@ -10,4 +10,4 @@ COPY package.json .
 RUN npm install
 COPY . .
 
-CMD ["npm","start"]
+CMD npm start 2>&1 | ./run-watch.sh
