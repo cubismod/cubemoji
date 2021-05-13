@@ -1,6 +1,6 @@
 {
   "name": "cubemoji",
-  "version": "2.16.1",
+  "version": "2.16.2",
   "description": "A Discord emoji bot.",
   "main": "index.js",
   "license": "MIT",
