@@ -107,19 +107,21 @@ function calcTimeDiff (util) {
  */
 function resetLb (util, client) {
   // first we need to determine whether a reset is pending (aka the bot has been restarted)
-  util.cmSettings.orderByKey().equalTo('nextResetTime').once('value').then(snapshot => {
+  util.cmSettings.once('value').then(snapshot => {
     // snapshot has a reference to the nextResetTime var now
-    const resetRaw = snapshot.val().nextResetTime
-    const resetParsed = parseInt(resetRaw)
+    const jsonVer = snapshot.toJSON().nextResetTime
+    const resetParsed = parseInt(jsonVer)
     if (!isNaN(resetParsed)) {
       // this indicates that a valid number was stored in that variable
       const diff = resetParsed - Date.now()
-      if (diff > 0 && diff < 2.592e+8) {
+      if (diff > 0 && diff < 2.592e+8 && util.queuedForReset === false) {
         // this indicates that it is not yet time for a reset
         // so we queue up another timeout for this to happen
-        setTimeout(resetLb, diff, [util, client])
+        setTimeout(resetLb, diff, util, client)
+        util.queuedForReset = true
+        util.nextLbReset = resetParsed
       } else {
-        // trigger a reset
+        // helper.resetLb, 15000, util, client) trigger a reset
         client.channels.fetch('799767869465428050').then(slotsChannel => {
           slotsChannel.send('The slots leaderboard has been reset! Next reset will be in 72 hours...').then(msg => {
             // print out leaderboard message
@@ -130,6 +132,7 @@ function resetLb (util, client) {
             util.cmSettings.update({
               nextResetTime: nextLbReset
             })
+            util.nextLbReset = nextLbReset
             // reset top player stats
             util.topPlayer = ''
             util.beginTop = ''

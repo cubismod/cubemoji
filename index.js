@@ -62,17 +62,18 @@ const util = {
   beginTop: '', // when we began tracking the top player time
   matches: {},
   openUsers: new Set(),
-  rescaleMsgs: {} // used to determine whether we can delete a message
-  // nextLbReset: moment().add(72, 'hours') // tracking leaderboard resets
+  rescaleMsgs: {}, // used to determine whether we can delete a message
+  queuedForReset: false, // checks whether to set a timeout for a lb reset check
+  nextLbReset: moment().add(72, 'hours') // tracking leaderboard resets
 }
 
 util.cache.createEmoteArray()
 console.log('initialized emote array')
 
-// perform a reset of the leaderboard every 72 hours
+// setInterval(helper.resetLb, 15000, util, client)
 
 // do a reset every 72 hours
-setInterval(helper.resetLb, 2.592e+8)
+setInterval(helper.resetLb, 2.592e+8, util, client)
 
 // FIREBASE LISTENERS
 
@@ -265,4 +266,5 @@ setInterval(function () {
 // here we change the "playing on discord" msg every now and then
 setInterval(helper.setStatus, Pandemonium.random(30, 90) * 60000, util, client)
 
-helper.resetLb(util, client)
+// check for a leaderboard reset after we let the firebase things load up
+setTimeout(helper.resetLb, 15000, util, client)
