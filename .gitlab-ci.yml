@@ -2,6 +2,10 @@
 # https://hub.docker.com/r/library/node/tags/
 image: node:14
 
+cache:
+    paths:
+    - node_modules/
+
 stages:
   - lint
   - build
@@ -13,15 +17,9 @@ eslint:
     - npm i eslint
     - node_modules/eslint/eslint/bin/eslint.js .
 
+
 build:
-  stage: build
-
-  # This folder is cached between builds
-  # http://docs.gitlab.com/ee/ci/yaml/README.html#cache
-  cache:
-    paths:
-      - node_modules/
-
-  test_build:
+    stage: build
+    
     script:
-      - npm install
+    - npm install
