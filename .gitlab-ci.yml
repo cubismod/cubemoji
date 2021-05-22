@@ -1,14 +1,27 @@
 # Official framework image. Look for the different tagged releases at:
 # https://hub.docker.com/r/library/node/tags/
-image: node:latest
+image: node:14
 
-# This folder is cached between builds
-# http://docs.gitlab.com/ee/ci/yaml/README.html#cache
-cache:
-  paths:
-    - node_modules/
+stages:
+  - lint
+  - build
 
-test_app:
+eslint:
+  stage: lint
+
   script:
-    - npm install
-    - npm start
+    - npm i eslint
+    - node_modules/eslint/eslint/bin/eslint.js .
+
+build:
+  stage: build
+
+  # This folder is cached between builds
+  # http://docs.gitlab.com/ee/ci/yaml/README.html#cache
+  cache:
+    paths:
+      - node_modules/
+
+  test_build:
+    script:
+      - npm install
