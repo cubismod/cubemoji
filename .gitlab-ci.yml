@@ -15,7 +15,7 @@ eslint:
 
   script:
     - npm i eslint
-    - node_modules/eslint/eslint/bin/eslint.js .
+    - node_modules/eslint/bin/eslint.js .
 
 
 build:
