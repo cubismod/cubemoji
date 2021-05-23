@@ -34,11 +34,11 @@ module.exports = class EmoteCache {
         if (!blacklist.includes(value.id)) {
           let inc = 0
           // save the original name before we modify it
-          const ogName = value.name
+          const ogName = value.name.toLowerCase()
           // check for duplicates
-          if (this.validNames.has(value.name)) {
+          if (this.validNames.has(ogName)) {
             // get the increment value from the map
-            inc = this.validNames.get(value.name) + 1
+            inc = this.validNames.get(ogName) + 1
             value.name = `${value.name}${inc}`
           }
           this.arrayVersion.push(value)
