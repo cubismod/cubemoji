@@ -70,7 +70,7 @@ module.exports = {
           const author = res.fetchAuthor()
           author.then((author) => {
             const embed = {
-              title: res.name,
+              title: emoteName,
               color: 7738070,
               fields: [
                 {

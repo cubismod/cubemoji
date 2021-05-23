@@ -12,6 +12,7 @@ module.exports = class EmoteCache {
     this.sortedArray = []
     // we only want to do an update every ten minutes
     this.nextUpdateTime = Moment().add(15, 'minutes')
+    this.validNames = new Map() // used to manage duplicate emotes
   }
 
   // sortable: returns just a list of names which can be easily sorted
@@ -29,10 +30,20 @@ module.exports = class EmoteCache {
       this.sortedArray = []
       for (const [, value] of this.emoteCache) {
         // utilize the blacklist.json file to remove bad emotes
-        // blacklist.json utiizes emote IDs
+        // blacklist.json utilizes emote IDs
         if (!blacklist.includes(value.id)) {
+          let inc = 0
+          // save the original name before we modify it
+          const ogName = value.name
+          // check for duplicates
+          if (this.validNames.has(value.name)) {
+            // get the increment value from the map
+            inc = this.validNames.get(value.name) + 1
+            value.name = `${value.name}${inc}`
+          }
           this.arrayVersion.push(value)
           this.sortedArray.push(value.name)
+          this.validNames.set(ogName, inc)
         }
       }
       this.sortedArray = this.sortedArray.sort(function (a, b) {
