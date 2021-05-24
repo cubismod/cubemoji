@@ -12,11 +12,11 @@ module.exports = class EmoteCache {
     this.sortedArray = []
     // we only want to do an update every ten minutes
     this.nextUpdateTime = Moment().add(15, 'minutes')
-    this.validNames = new Map() // used to manage duplicate emotes
   }
 
   // sortable: returns just a list of names which can be easily sorted
   createEmoteArray (sortable = false) {
+    const validNames = new Map()
     // we are just manually iterating through the map to create a list
     // ensure we only update if there is no data or the update time has lapsed
     if ((this.arrayVersion === undefined || this.arrayVersion.length === 0) ||
@@ -36,14 +36,14 @@ module.exports = class EmoteCache {
           // save the original name before we modify it
           const ogName = value.name.toLowerCase()
           // check for duplicates
-          if (this.validNames.has(ogName)) {
+          if (validNames.has(ogName)) {
             // get the increment value from the map
-            inc = this.validNames.get(ogName) + 1
-            value.name = `${value.name}${inc}`
+            inc = validNames.get(ogName) + 1
+            value.name = `${value.name}_${inc}`
           }
           this.arrayVersion.push(value)
           this.sortedArray.push(value.name)
-          this.validNames.set(ogName, inc)
+          validNames.set(ogName, inc)
         }
       }
       this.sortedArray = this.sortedArray.sort(function (a, b) {
