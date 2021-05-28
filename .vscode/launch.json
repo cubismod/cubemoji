@@ -11,8 +11,21 @@
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "type": "pwa-node",
-            
+            "type": "pwa-node"
         },
+        {
+            "type": "node",
+            "name": "vscode-jest-tests",
+            "request": "launch",
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen",
+            "disableOptimisticBPs": true,
+            "program": "${workspaceFolder}/jest",
+            "cwd": "${workspaceFolder}",
+            "args": [
+                "--runInBand",
+                "--watchAll=false"
+            ]
+        }
     ]
 }
