@@ -7,6 +7,14 @@
             "label": "Build Local Docker Container",
             "type": "shell",
             "command": "docker build --build-arg BUILD_FROM=\"homeassistant/amd64-base:latest\" -t local/cubemoji ."
+        },
+        {
+            "type": "npm",
+            "script": "test",
+            "group": "test",
+            "problemMatcher": [],
+            "label": "npm: test",
+            "detail": "jest"
         }
     ]
 }
