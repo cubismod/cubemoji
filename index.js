@@ -102,6 +102,10 @@ util.slotsDb.orderByChild('score').limitToLast(1).on('child_added', function (sn
         .addField('Time on Top', moment.duration(snapshot.val().timeOnTop, 'seconds').humanize())
       thievesChannel.send(topPlayerEmbed)
     })
+      .catch(err => {
+      // couldn't fetch the channel
+        console.error(err)
+      })
   }
   thievesCount++
 })
@@ -175,6 +179,9 @@ client.on('message', message => {
               resolvedMsg.delete()
             }
             setTimeout(delMsg, authorTimestamp.nextUsage - now, resolvedMsg)
+          }, reason => {
+            // can't resolve the message
+            console.error(reason)
           })
           return msg
         }

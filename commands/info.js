@@ -1,4 +1,5 @@
 require('./../extended-msg')
+const embeds = require('../embeds')
 const moment = require('moment')
 const ColorThief = require('colorthief')
 const discordUtil = require('discord.js').Util
@@ -59,8 +60,13 @@ module.exports = {
               }
               message.channel.send({ embed: embed })
             })
+              .catch(err => {
+              // leaderboard retrieval failed
+                console.error(err)
+              })
           }
         )
+          .catch(err => message.channel.send({ embed: embeds.errorEmbed(2, 'ColorInfo failed', err) }))
       } else {
         // emoji names are only one word long so we will only consider the 0th element
       // also doing case insensitive searching

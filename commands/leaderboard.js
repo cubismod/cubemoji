@@ -81,6 +81,8 @@ module.exports = {
               embed: embed
             })
           })
+          .catch(err => console.error(err))
       })
+      .catch(err => console.error(err))
   }
 }

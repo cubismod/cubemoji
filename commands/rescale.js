@@ -79,6 +79,7 @@ module.exports = {
                   }
                   msg.react('🗑️')
                 })
+                  .catch(err => console.error(err))
                 // delete the source file
                 fs.unlink(file, (err) => {
                   if (err) console.error(err)
@@ -90,6 +91,11 @@ module.exports = {
               console.error(err)
               return message.inlineReply(errEmbed)
             })
+        })
+        .catch(err => {
+          const errEmbed = cmdHelper.imgErr(err, helper, message.author)
+          console.error(err)
+          return message.inlineReply(errEmbed)
         })
     })
   }

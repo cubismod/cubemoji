@@ -49,6 +49,7 @@ module.exports = {
           }, 3.6e+7)
         })
       })
+        .catch(err => console.error(err))
     }
 
     // clean up the chat and related objects once its done

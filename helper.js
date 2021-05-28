@@ -84,6 +84,10 @@ function ambPointAdd (util, user) {
           })
         }
       })
+      .catch(err => {
+        // unable to get a snapshot of the db
+        console.error(err)
+      })
   }
 }
 

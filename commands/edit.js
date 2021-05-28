@@ -7,6 +7,7 @@ const path = require('path')
 const FileType = require('file-type')
 const fs = require('fs')
 const effects = require('./img_effects.json')
+const embeds = require('../embeds')
 require('./../extended-msg')
 
 module.exports = {
@@ -184,18 +185,25 @@ module.exports = {
                     }
                     msg.react('🗑️')
                   })
+                    .catch(err => {
+                    // couldn't grab message
+                      console.error(err)
+                    })
                   // delete the source file
                   fs.unlink(file, (err) => {
                     if (err) console.error(err)
                   })
                 })
               })
+                .catch(err => message.channel.send({ embed: embeds.errorEmbed(2, 'could not determine file type', err) }))
             })
+            .catch(err => message.channel.send({ embed: embeds.errorEmbed(2, 'could not download the image', err) }))
         } else {
           message.inlineReply('emote not found!')
         }
       }
       message.channel.stopTyping(true)
     })
+      .catch(err => message.channel.send({ embed: embeds.errorEmbed(2, 'checkImage failed', err) }))
   }
 }

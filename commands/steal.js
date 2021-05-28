@@ -118,6 +118,10 @@ module.exports = {
             }
           }
         })
+        .catch(err => {
+          // db snapshot failed
+          console.error(err)
+        })
     })
   }
 }

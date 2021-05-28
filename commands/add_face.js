@@ -44,5 +44,9 @@ module.exports = {
       }
       message.channel.stopTyping(true)
     })
+      .catch(err => {
+      // the checkImage func failed
+        console.error(err)
+      })
   }
 }
