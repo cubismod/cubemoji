@@ -156,6 +156,8 @@ function resetLb (util, client) {
       })
       setTimeout(resetLb, 60000, [util, client])
     }
+  }, reason => {
+    console.error(reason)
   })
 }
 
