@@ -112,9 +112,11 @@ util.slotsDb.orderByChild('score').limitToLast(1).on('child_added', function (sn
 
 // user leaves top player spot
 util.slotsDb.orderByChild('score').limitToLast(1).on('child_removed', function () {
-  util.slotsDb.child(util.topPlayer).update({
-    timeOnTop: helper.calcTimeDiff(util)
-  })
+  if (util.topPlayer !== '') {
+    util.slotsDb.child(util.topPlayer).update({
+      timeOnTop: helper.calcTimeDiff(util)
+    })
+  }
 })
 
 client.on('message', message => {
