@@ -8,20 +8,23 @@ module.exports = {
   cooldown: 2,
   execute (message, args, _client, helper) {
     if (args.length < 1) {
-      return message.inlineReply(`you must specify an emote name to search for \nusage: \`${this.usage}\``)
+      return message.inlineReply(`you must specify a query to search for \nusage: \`${this.usage}\``)
     }
-    const results = helper.cache.search(args[0])
+
+    const query = args.join(' ')
+
+    const results = helper.cache.search(query)
     if (results.length === 0) {
       message.channel.send(`No results found for your search query \`${args[0]}\``)
     } else {
       const description = []
       results.forEach((result) => {
         // try to avoid going over message limit
-        if (results.length > 20) description.push(`\`${result.item.name}\` `)
+        if (results.length > 50) description.push(`\`${result.item.name}\` `)
         else description.push(`${result.item} \`${result.item.name}\` `)
       })
       const embed = new Discord.MessageEmbed()
-        .setTitle(`Search for ${args[0]} (${results.length})`)
+        .setTitle(`Search for ${query} (${results.length})`)
         .setDescription(description.join('  ').slice(0, 2047))
         .setColor('BLUE')
         .setFooter('Searching yielding tons of results will be truncated. Use c!list to get a list of all emotes to your DMs.')

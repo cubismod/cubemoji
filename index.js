@@ -38,15 +38,7 @@ for (const file of commandFiles) {
   client.commands.set(command.name, command)
 }
 
-client.once('ready', () => {
-  console.log('cubemoji running!')
-  const serverlist = []
-  client.guilds.cache.forEach(key => serverlist.push(key.name))
-  console.log(`active on the following servers: ${serverlist}`)
-  // wait to let the emote cache warm up before we set a status
-  setTimeout(helper.setStatus, 20000, util, client)
-})
-client.login(secrets.token)
+// const pride = helper.checkPrideMonth()
 
 // util serves as a catch-all reference object that
 // commands can use to spin up workers, access the emote cache
@@ -64,8 +56,19 @@ const util = {
   openUsers: new Set(),
   rescaleMsgs: {}, // used to determine whether we can delete a message
   queuedForReset: false, // checks whether to set a timeout for a lb reset check
-  nextLbReset: moment().add(72, 'hours') // tracking leaderboard resets
+  nextLbReset: moment().add(72, 'hours'), // tracking leaderboard resets
+  specialEvent: helper.getSpecialEvent()
 }
+
+client.once('ready', () => {
+  console.log('cubemoji running!')
+  const serverlist = []
+  client.guilds.cache.forEach(key => serverlist.push(key.name))
+  console.log(`active on the following servers: ${serverlist}`)
+  // wait to let the emote cache warm up before we set a status
+  setTimeout(helper.setStatus, 20000, util, client)
+})
+client.login(secrets.token)
 
 util.cache.createEmoteArray()
 console.log('initialized emote array')

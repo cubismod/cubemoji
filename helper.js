@@ -165,10 +165,19 @@ function resetLb (util, client) {
   })
 }
 
+function getSpecialEvent () {
+  const curMon = new Date().getMonth()
+  switch (curMon) {
+    case 6:
+      return 'pride'
+  }
+}
+
 module.exports = {
   setStatus,
   checkWhiteList,
   ambPointAdd,
   calcTimeDiff,
-  resetLb
+  resetLb,
+  getSpecialEvent
 }
