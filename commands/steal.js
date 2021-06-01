@@ -58,17 +58,19 @@ module.exports = {
           const player = snapshot.child(message.author.id)
           if (!player.exists()) return message.inlineReply('you are not on the leaderboard! Start playing with `c!slots` to gain points')
           const playerScore = player.val().score
+
+          const ratioOnTop = player.val().timeOnTop / 2.592e+8
           if (playerScore > victimScore) return message.inlineReply(`you have ${playerScore} points and thus can't steal from your victim who has ${victimScore} points! Unlike real life, the wealthy here can't steal from the poor.`)
           if (wager > victimScore) return message.inlineReply(`you can't steal more points than your victim has, they have ${victimScore} points`)
           // now comes the fun part where we determine how successful the steal will be
           // users are more likely to win a steal if they are waging less on the steal
           // sometimes get a value between the min amount to get above score or the victim's total score
-          const stealChance = Pand.random(0, Pand.choice(victimScore, (victimScore - playerScore) + 5))
+          const stealChance = Pand.random(0, Pand.choice([victimScore, (victimScore - playerScore) + 5]))
           // have to get a new reference to the player to update their value
           const playerWriteable = helper.slotsDb.child(message.author.id)
 
           const promo = ['Watch live steals here', 'https://discord.gg/SjXbFbyVwf']
-          if (stealChance < wager) {
+          if (stealChance < Math.round((1 - ratioOnTop) * wager)) {
             // unsuccessful steal
             const lossAmount = Math.min(wager, stealChance, Math.round(playerScore * Pand.randomFloat(0, 1)))
             playerWriteable.update({ score: playerScore - lossAmount })
