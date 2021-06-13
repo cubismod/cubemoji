@@ -8,6 +8,6 @@ RUN ./setupImage.sh
 COPY package.json .
 
 RUN npm install
-COPY . .
+COPY ./src .
 
 CMD npm start 2>&1 | ./run-watch.sh

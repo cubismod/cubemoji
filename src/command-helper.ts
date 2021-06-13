@@ -1,8 +1,9 @@
 // helper functions for use in command files
-const Discord = require('discord.js')
-const Pandemonium = require('pandemonium')
-const FileType = require('file-type')
-const got = require('got')
+import Discord = require('discord.js')
+import Pandemonium = require('pandemonium')
+import FileType = require('file-type')
+import got = require('got')
+import stream = require('stream')
 // const secrets = require('./secrets.json')
 
 // checks if a mashup of two emotes is available via Google's Emoji
@@ -27,21 +28,22 @@ async function mashup (emotes) {
 } */
 
 // check whether an image is a valid type
-async function checkValidType (url) {
-  const stream = got.stream(url)
+async function checkValidType (url: string) {
+  const stream = got.default(url, {isStream: true})
   const type = await FileType.fromStream(stream)
   const validTypes = ['jpg', 'jpeg', 'gif', 'png']
 
   if (type !== undefined && validTypes.includes(type.ext)) return true
   else return false
 }
+
 // check image
 // returns <image URL, false if nothing found>
 // args - the msg content split into an array similar to how command
 // line arguments are processed
 // client - Discord client object
 // util - use the utility object passed from the index file
-async function checkImage (message, args, client, util) {
+async function checkImage (message: Discord.Message, args: string[], client: Discord.Client, util) {
   // check first for a message
   if (message.attachments.size > 0) {
     const attachment = message.attachments.random(1)

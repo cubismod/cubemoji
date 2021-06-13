@@ -14,5 +14,5 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["sr, "src/commands", "src/worker.js"c/**/*"]
+  "include": ["src/**/*"]
 }
