@@ -15,7 +15,7 @@ declare namespace Cubemoji {
     cmSettings: fbadmin.database.Reference; // global settings that need to be preserved through restarts
     slotsDb: fbadmin.database.Reference;  // slots db in firebase
     slotsUsers: Set<Discord.Snowflake>;  // set of user IDs who are currently on the leaderboard
-    topPlayer: string;
+    topPlayer: string;  // since this value is pulled from firebase, it's in string format rather than snowflake
     topPlayerTime: string;
     beginTop: string;
     matches: match;
