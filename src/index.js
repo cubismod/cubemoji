@@ -1,6 +1,6 @@
 const fs = require('fs')
 const Discord = require('discord.js')
-const secrets = require('./secrets.json')
+const secrets = require('../secrets.json')
 const client = new Discord.Client({ partials: ['MESSAGE', 'CHANNEL', 'REACTION'] })
 const EmoteCache = require('./emote-cache')
 const Pandemonium = require('pandemonium')
@@ -16,7 +16,7 @@ require('./extended-msg')
 
 // firebase setup
 const fbAdmin = require('firebase-admin')
-const svcAcct = require('./serviceAccountKey.json')
+const svcAcct = require('../serviceAccountKey.json')
 
 fbAdmin.initializeApp({
   credential: fbAdmin.credential.cert(svcAcct),

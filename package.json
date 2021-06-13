@@ -23,7 +23,9 @@
   },
   "homepage": "https://gitlab.com/cubismod/cubemoji#readme",
   "dependencies": {
+    "@types/workerpool": "^6.0.0",
     "colorthief": "^2.3.2",
+    "dayjs": "^1.10.5",
     "discord.js": "^12.5.1",
     "file-type": "^16.2.0",
     "firebase-admin": "^9.4.2",

@@ -1,4 +1,8 @@
 require('./../extended-msg')
+const dayjs = require('dayjs')
+const relativeTime = require('dayjs/plugin/relativeTime')
+dayjs.extend(relativeTime)
+
 module.exports = {
   name: 'message',
   description: 'Send a message to the ether which will be received by another random person looking for a soulmate 🥺 https://gitlab.com/cubismod/cubemoji/-/wikis/Chat',
@@ -6,13 +10,12 @@ module.exports = {
   aliases: ['m', 'msg'],
   cooldown: 1,
   execute (message, args, client, helper) {
-    const Moment = require('moment')
     const Pandemonium = require('pandemonium')
 
     // resolve and send a message to a user using their ID
     function sendDM (id, text, system = false) {
       const userObj = helper.matches[id]
-      let prefix = `*Chat ends ${Moment().to(userObj.timeLeft)}:*`
+      let prefix = `*Chat ends ${dayjs().to(userObj.timeLeft)}:*`
       if (system) prefix = '*System Message*: '
       client.users.fetch(id).then(receiver => {
         receiver.send(`${prefix} ${text}`)
@@ -76,7 +79,7 @@ module.exports = {
       // pick an emote to represent them in chat
       helper.matches[sender].emote = Pandemonium.choice(helper.cache.createEmoteArray())
       // store when the chat will end so its shows up in dms
-      const timeLeft = Moment().add(15, 'minutes')
+      const timeLeft = Date() + 900000
       helper.matches[sender].timeLeft = timeLeft
       helper.matches[sender].matched = true
     }
