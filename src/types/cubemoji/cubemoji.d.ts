@@ -1,4 +1,4 @@
-import * as EmoteCache from '../../emote-cache'
+import { EmoteCache } from '../../emote-cache'
 import workerpool = require('workerpool')
 import fbadmin = require('firebase-admin')
 import Discord = require('discord.js')
