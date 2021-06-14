@@ -23,12 +23,18 @@ declare namespace Cubemoji {
     rescaleMsgs: Discord.Snowflake[];
     queuedForReset: boolean;
   }
+  // cubemoji anon messaging match objects
   interface match {
     match: string;  // id of the matched player
     emote: Discord.GuildEmoji;  // the emoji used to represent that person in chat
     timeLeft: number; // time stored in ms of course
     timeout: NodeJS.Timeout; // an actual timeout obj
     id: boolean; // indicates the user wants to reveal their owen id
+  }
+  // simpler emoji representation
+  interface emoji {
+    url: string,
+    external: boolean
   }
 }
 

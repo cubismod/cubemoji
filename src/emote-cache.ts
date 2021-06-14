@@ -3,6 +3,7 @@ import Fuse = require('fuse.js')
 import Twemoji = require('twemoji-parser')
 import Discord = require('discord.js')
 import dayjs = require('dayjs')
+import { Cubemoji } from './types/cubemoji/cubemoji';
 
 // a class which can return an array version of emotes
 // and also only refreshes when necessary
@@ -98,11 +99,12 @@ class EmoteCache {
       if (split.length > 2) {
         res = this.arrayVersion.find(emote => emote.name.toLowerCase() === split[1])
         if (res === undefined) {
-          res = {}
-          // return the url here
-          res.url = 'https://cdn.discordapp.com/emojis/' + split[2]
-          res.url = res.url.slice(0, res.url.length - 1) // chop off the '>'
-          res.external = true
+          let emoji: Cubemoji.emoji = {
+            url: 'https://cdn.discordapp.com/emojis/' + split[2],
+            external: true
+          }
+          emoji.url = emoji.url.slice(0, emoji.url.length - 1) // chop off the '>'
+          return emoji
         }
       }
     }
@@ -110,8 +112,8 @@ class EmoteCache {
   }
 
   // return the User object https://discord.js.org/#/docs/main/stable/class/User or false if no match found
-  parseMention (msg, client) {
-    const found = msg.match(/<@!?(\d+)>/)
+  parseMention (body: string, client: Discord.Client) {
+    const found = body.match(/<@!?(\d+)>/)
     if (found) {
       // https://discord.js.org/#/docs/collection/master/class/Collection?scrollTo=get
       // returns a nice undefined
@@ -124,16 +126,16 @@ class EmoteCache {
 
   // given an argument in the form of <@86890631690977280> or <!@86890631690977280>
   // this returns the URL of that avatar or null
-  getAvatar (msg, client) {
-    const user = this.parseMention(msg, client)
+  getAvatar (body: string, client: Discord.Client) {
+    const user = this.parseMention(body, client)
     if (user) {
       return (user.displayAvatarURL({ format: 'png', dynamic: true, size: 256 }))
     }
   }
 
   // parse a twemoji and return a url
-  parseTwemoji (str) {
-    const entitites = Twemoji.parse(str, { assetType: 'png' })
+  parseTwemoji (body: string) {
+    const entitites = Twemoji.parse(body, { assetType: 'png' })
     if (entitites) return entitites[0]
     else return ''
   }
