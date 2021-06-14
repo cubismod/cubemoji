@@ -1,17 +1,25 @@
 // emote cache and some helper functions
-const Moment = require('moment')
-const Fuse = require('fuse.js')
-const Twemoji = require('twemoji-parser')
+import Fuse = require('fuse.js')
+import Twemoji = require('twemoji-parser')
+import Discord = require('discord.js')
+import dayjs = require('dayjs')
+
 // a class which can return an array version of emotes
 // and also only refreshes when necessary
-module.exports = class EmoteCache {
-  constructor (client) {
+class EmoteCache {
+  client: Discord.Client;
+  emoteCache: Discord.Collection<Discord.Snowflake, Discord.GuildEmoji>;
+  arrayVersion: Discord.GuildEmoji[];
+  sortedArray: string[];
+  nextUpdateTime: dayjs.Dayjs;
+
+  constructor (client: Discord.Client) {
     this.client = client
     this.emoteCache = client.emojis.cache
     this.arrayVersion = [] // init with an empty array
     this.sortedArray = []
     // we only want to do an update every ten minutes
-    this.nextUpdateTime = Moment().add(15, 'minutes')
+    this.nextUpdateTime = dayjs().add(15, 'minutes')
   }
 
   // sortable: returns just a list of names which can be easily sorted
@@ -20,7 +28,7 @@ module.exports = class EmoteCache {
     // we are just manually iterating through the map to create a list
     // ensure we only update if there is no data or the update time has lapsed
     if ((this.arrayVersion === undefined || this.arrayVersion.length === 0) ||
-        (Moment().isAfter(this.nextUpdateTime))) {
+        (dayjs().isAfter(this.nextUpdateTime))) {
       // load up our blacklist.json file
       // note that with the require(), you need to restart app
       // for it to see changes to the file
@@ -50,20 +58,23 @@ module.exports = class EmoteCache {
         return a.toLowerCase().localeCompare(b.toLowerCase())
       })
       // only perform an update every fifteen minutes
-      this.nextUpdateTime = Moment().add(15, 'minutes')
+      this.nextUpdateTime = dayjs().add(15, 'minutes')
     }
     if (sortable) return this.sortedArray
     return this.arrayVersion
   }
 
-  search (query) {
+  search (query: string) {
     const options = {
       keys: ['name'],
       useExtendedSearch: true,
       minMatchCharLength: 1,
       threshold: 0.3
     }
-    const search = new Fuse(this.createEmoteArray(), options)
+    // performing a type assertion as we know this will always return an array of emotes
+    const emotes = <Discord.GuildEmoji[]> this.createEmoteArray(false)
+
+    const search = new Fuse.default(emotes, options)
     const results = search.search(query)
     return (results)
   }
@@ -74,7 +85,7 @@ module.exports = class EmoteCache {
   // their message, then returns that emoji object
   // if cubemoji doesn't have access to the emote then we return a URL
   // to the emote image
-  retrieve (emote) {
+  retrieve (emote: string) {
     // first convert the name to lowercase so we aren't case sensitive
     const emoteName = emote.toLowerCase()
 

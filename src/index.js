@@ -9,7 +9,7 @@ const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('
 const cooldowns = new Discord.Collection()
 const workerpool = require('workerpool')
 const path = require('path')
-const moment = require('moment')
+const dayjs = require('dayjs')
 const cmdHelper = require('./command-helper')
 const helper = require('./helper')
 require('./extended-msg')
@@ -64,7 +64,7 @@ const util = {
   openUsers: new Set(),
   rescaleMsgs: {}, // used to determine whether we can delete a message
   queuedForReset: false, // checks whether to set a timeout for a lb reset check
-  nextLbReset: moment().add(72, 'hours') // tracking leaderboard resets
+  nextLbReset: dayjs().add(3, 'day') // tracking leaderboard resets
 }
 
 util.cache.createEmoteArray()
@@ -99,7 +99,7 @@ util.slotsDb.orderByChild('score').limitToLast(1).on('child_added', function (sn
         .setColor('GOLD')
         .setTitle(`👑 New Top Player: ${snapshot.val().username} 👑`)
         .addField('Score', snapshot.val().score)
-        .addField('Time on Top', moment.duration(snapshot.val().timeOnTop, 'seconds').humanize())
+        .addField('Time on Top', moment.duration(snapshot.val().timeOnTop, 'seconds').humanize()) // TODO: convert to dayjs
       thievesChannel.send(topPlayerEmbed)
     })
       .catch(err => {

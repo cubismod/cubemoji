@@ -4,6 +4,7 @@ import Pandemonium = require('pandemonium')
 import FileType = require('file-type')
 import got = require('got')
 import stream = require('stream')
+import { Cubemoji } from './types/cubemoji/cubemoji'
 // const secrets = require('./secrets.json')
 
 // checks if a mashup of two emotes is available via Google's Emoji
@@ -43,7 +44,7 @@ async function checkValidType (url: string) {
 // line arguments are processed
 // client - Discord client object
 // util - use the utility object passed from the index file
-async function checkImage (message: Discord.Message, args: string[], client: Discord.Client, util) {
+async function checkImage (message: Discord.Message, args: string[], client: Discord.Client, util: Cubemoji.util) {
   // check first for a message
   if (message.attachments.size > 0) {
     const attachment = message.attachments.random(1)
@@ -84,9 +85,9 @@ async function checkImage (message: Discord.Message, args: string[], client: Dis
 
 // image error, returns an embed of an error occured along with some
 // technical details in the form of an embed
-function imgErr (error, helper, author) {
+function imgErr (error: Error, util: Cubemoji.util, author: Discord.User) {
   // pick a random sad emote using Fuse.js extended syntax
-  const sadEmote = Pandemonium.choice(helper.cache.search('cry|sad|ohno')).item
+  const sadEmote = Pandemonium.choice(util.cache.search('cry|sad|ohno')).item
   const errEmbed = new Discord.MessageEmbed()
     .setColor('RED')
     .setTitle(`${sadEmote} an error occurred when processing your image!`)
