@@ -1,11 +1,15 @@
-const moment = require('moment')
-module.exports = {
-  name: 'about',
-  description: 'Provides information and stats about the bot. https://gitlab.com/cubismod/cubemoji/-/wikis/commands/about',
-  usage: 'about',
-  aliases: ['a'],
-  cooldown: 5,
-  execute (message, _args, client) {
+import Discord = require('discord.js')
+import { Cubemoji } from '../types/cubemoji/cubemoji'
+const dayjs = require('dayjs')
+
+export class About implements Cubemoji.Command {
+  name = 'About'
+  description = 'Provides information and stats about the bot. https://gitlab.com/cubismod/cubemoji/-/wikis/commands/about'
+  usage = 'about'
+  aliases = ['a']
+  cooldown = 5
+
+  exec(message: Discord.Message, _args: string[], client: Discord.Client) {
     const pkg = require('../package.json')
     const embed = {
       title: '<:cubemoji:793663899072200744>',
@@ -29,7 +33,7 @@ module.exports = {
         },
         {
           name: 'Stats',
-          value: `Current Emote Count: ${client.emojis.cache.size}\nUptime: ${moment().to(client.readyAt, true)}\nServers: ${client.guilds.cache.size}`
+          value: `Current Emote Count: ${client.emojis.cache.size}\nUptime: ${dayjs().to(client.readyAt, true)}\nServers: ${client.guilds.cache.size}`
         },
         {
           name: 'Discord',
@@ -43,4 +47,5 @@ module.exports = {
     }
     message.channel.send({ embed: embed })
   }
+  
 }

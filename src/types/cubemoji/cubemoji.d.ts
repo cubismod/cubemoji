@@ -9,7 +9,7 @@ declare namespace Cubemoji {
   // util serves as a catch-all reference object that
   // commands can use to spin up workers, access the emote cache
   // and update the firebase database
-  interface util {
+  interface Util {
     cache: EmoteCache;  // custom emote cache taking Discord's and charging it up
     pool: workerpool.WorkerPool;  // workers used for jimp actions
     cmSettings: fbadmin.database.Reference; // global settings that need to be preserved through restarts
@@ -18,13 +18,15 @@ declare namespace Cubemoji {
     topPlayer: string;  // since this value is pulled from firebase, it's in string format rather than snowflake
     topPlayerTime: string;
     beginTop: string;
-    matches: match;
+    matches: Match;
     openUsers: Set;
     rescaleMsgs: Discord.Snowflake[];
     queuedForReset: boolean;
+    nextLbReset: number;
+    commands: Discord.Collection;
   }
   // cubemoji anon messaging match objects
-  interface match {
+  interface Match {
     match: string;  // id of the matched player
     emote: Discord.GuildEmoji;  // the emoji used to represent that person in chat
     timeLeft: number; // time stored in ms of course
@@ -32,9 +34,16 @@ declare namespace Cubemoji {
     id: boolean; // indicates the user wants to reveal their owen id
   }
   // simpler emoji representation
-  interface emoji {
+  interface Emoji {
     url: string,
     external: boolean
+  }
+  // a command triggered by the user
+  interface Command {
+    name: string;
+    description: string;
+    usage: string;
+    aliases: string[];
   }
 }
 

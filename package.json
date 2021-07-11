@@ -34,7 +34,6 @@
     "got": "^11.8.2",
     "image-downloader": "^4.0.2",
     "jimp": "^0.16.1",
-    "moment": "^2.29.1",
     "node-emoji": "^1.10.0",
     "pandemonium": "^2.0.0",
     "request": "^2.88.2",

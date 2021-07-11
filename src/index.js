@@ -4,7 +4,7 @@ const secrets = require('../secrets.json')
 const client = new Discord.Client({ partials: ['MESSAGE', 'CHANNEL', 'REACTION'] })
 const EmoteCache = require('./emote-cache')
 const Pandemonium = require('pandemonium')
-client.commands = new Discord.Collection()
+client.commands = new Discord.Collection()  // move to util
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'))
 const cooldowns = new Discord.Collection()
 const workerpool = require('workerpool')
