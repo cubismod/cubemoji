@@ -99,7 +99,7 @@ export class EmoteCache {
       if (split.length > 2) {
         res = this.arrayVersion.find(emote => emote.name.toLowerCase() === split[1])
         if (res === undefined) {
-          let emoji: Cubemoji.emoji = {
+          let emoji: Cubemoji.Emoji = {
             url: 'https://cdn.discordapp.com/emojis/' + split[2],
             external: true
           }

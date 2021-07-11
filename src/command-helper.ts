@@ -21,7 +21,7 @@ export async function checkValidType (url: string) {
 // line arguments are processed
 // client - Discord client object
 // util - use the utility object passed from the index file
-export async function checkImage (message: Discord.Message, args: string[], client: Discord.Client, util: Cubemoji.util) {
+export async function checkImage (message: Discord.Message, args: string[], client: Discord.Client, util: Cubemoji.Util) {
   // check first for a message
   if (message.attachments.size > 0) {
     const attachment = message.attachments.random(1)
@@ -62,7 +62,7 @@ export async function checkImage (message: Discord.Message, args: string[], clie
 
 // image error, returns an embed of an error occured along with some
 // technical details in the form of an embed
-export function imgErr (error: Error, util: Cubemoji.util, author: Discord.User) {
+export function imgErr (error: Error, util: Cubemoji.Util, author: Discord.User) {
   // pick a random sad emote using Fuse.js extended syntax
   const sadEmote = Pandemonium.choice(util.cache.search('cry|sad|ohno')).item
   const errEmbed = new Discord.MessageEmbed()

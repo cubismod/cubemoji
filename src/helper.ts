@@ -11,10 +11,10 @@ module Helper {
   /**
    * set the status of the bot and also clean out the temporary image directory
    * performed every 30 to 90 minutes
-   * @param {Cubemoji.util} util - dictionary including a lot of helper functions and database code initialized in index.js
+   * @param {Cubemoji.Util} util - dictionary including a lot of helper functions and database code initialized in index.js
    * @param {Discord.Client} client - reference to the Discord client
    */
-  export function setStatus (util: Cubemoji.util, client: Discord.Client) {
+  export function setStatus (util: Cubemoji.Util, client: Discord.Client) {
     const emotes = <string[]> util.cache.createEmoteArray(true)
     const msg = `c!help :${Pandemonium.choice(emotes)}:`
     if (client.user != null) client.user.setActivity(msg, { type: 'WATCHING' })
@@ -51,6 +51,7 @@ module Helper {
     channel whitelists are per server
     */
 
+    // TODO: whitelist needs to go to firebase
     if (Object.prototype.hasOwnProperty.call(whitelist, channel.guild.id)) {
       if (Object.prototype.hasOwnProperty.call(whitelist[channel.guild.id], commandName)) {
         if (Object.prototype.hasOwnProperty.call(whitelist[channel.guild.id][commandName], channel.id)) {
@@ -70,7 +71,7 @@ module Helper {
    * @param {object} util - utility object from index.js
    * @param {Discord.User} user - the user who sent the message
    */
-  function ambPointAdd (util, user) {
+  export function ambPointAdd (util: Cubemoji.Util, user: Discord.User) {
     if (util.slotsUsers.has(user.id) &&
     Pandemonium.choice([true, false])) {
       util.slotsDb.once('value')
@@ -97,10 +98,10 @@ module Helper {
    * @param {object} util - utility object from index.js
    * @returns the difference in time in ms
    */
-  function calcTimeDiff (util) {
+  export function calcTimeDiff (util: Cubemoji.Util) {
     const curTime = new Date()
     // saving in seconds
-    const diff = (Math.abs(curTime - util.beginTop)) / 1000
+    const diff = (Math.abs(curTime.valueOf() - parseInt(util.beginTop))) / 1000
     // save that value
     return util.topPlayerTime + diff
   }
@@ -110,11 +111,13 @@ module Helper {
    * @param {object} util - utility object from index.js
    * @param {Discord.Client} client - reference to the Discord client
    */
-  function resetLb (util, client) {
+  export function resetLb (util: Cubemoji.Util, client: Discord.Client) {
     // first we need to determine whether a reset is pending (aka the bot has been restarted)
     util.cmSettings.once('value').then(snapshot => {
       // snapshot has a reference to the nextResetTime var now
-      const jsonVer = snapshot.toJSON().nextResetTime
+      const snJson = snapshot.
+      if (snJson != null) {
+        const jsonVer = snJson.nextResetTime
       const resetParsed = parseInt(jsonVer)
       if (!isNaN(resetParsed)) {
         // this indicates that a valid number was stored in that variable
@@ -127,10 +130,11 @@ module Helper {
           util.nextLbReset = resetParsed
         } else {
           // helper.resetLb, 15000, util, client) trigger a reset
-          client.channels.fetch('799767869465428050').then(slotsChannel => {
+          client.channels.fetch('799767869465428050').then(chan => {
+            let slotsChannel = chan as Discord.TextChannel
             slotsChannel.send('The slots leaderboard has been reset! Next reset will be in 72 hours...').then(msg => {
               // print out leaderboard message
-              client.commands.get('leaderboard').execute(msg, null, null, util)
+              util.commands.get('leaderboard').execute(msg, null, null, util)
               // modify the reset time
               const nextLbReset = Date.now() + 2.592e+8
               // save that value to db
@@ -145,9 +149,13 @@ module Helper {
               // clear the acutal leaderboard now
               util.slotsDb.once('value').then(snapshot => {
                 snapshot.forEach(user => {
-                  util.slotsDb.child(user.key).update({
-                    score: 0, timeOnTop: 0
-                  })
+                  if (user != null) {
+                    // null checking ofc
+                    util.slotsDb.child(user.key!).update({
+                      score: 0, timeOnTop: 0
+                    })
+                  }
+                  
                 })
               })
             })
@@ -155,14 +163,16 @@ module Helper {
         }
       } else {
         // something went wrong... so lets setup a new reset for 1 minute from now
-        const resetTime = moment().add(1, 'minute')
+        const resetTime = dayjs().add(1, 'minute')
         util.cmSettings.update({
           nextResetTime: resetTime
         })
         setTimeout(resetLb, 60000, [util, client])
       }
-    }, reason => {
-      console.error(reason)
-    })
-  }
+    }
+  }, reason => {
+    console.error(reason)
+  })
+      }
+      
 }
