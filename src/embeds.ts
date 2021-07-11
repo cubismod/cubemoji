@@ -1,13 +1,16 @@
 // useful embeds that can be used between files
-
 /**
  * log an error to the console and then return an embed obj
  * @param {number} severity - 0: info, 1: warn, 2: error
  * @param {string} message - the general error message title
  * @param {string} details - error trace produced by node
  */
-function errorEmbed (severity, message, details) {
-  const embed = {}
+export function errorEmbed (severity: number, message: string, details: string) {
+  const embed = {
+    title: '',
+    color: '',
+    description: '' 
+  }
   switch (severity) {
     case 0:
       embed.title = 'ℹ️ - ' + message
@@ -27,8 +30,4 @@ function errorEmbed (severity, message, details) {
   }
   embed.description = `\`\`\`\n ${details.slice(0, 2030)}\n\`\`\``
   return embed
-}
-
-module.exports = {
-  errorEmbed
 }

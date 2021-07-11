@@ -7,7 +7,7 @@ import { Cubemoji } from './types/cubemoji/cubemoji';
 
 // a class which can return an array version of emotes
 // and also only refreshes when necessary
-class EmoteCache {
+export class EmoteCache {
   client: Discord.Client;
   emoteCache: Discord.Collection<Discord.Snowflake, Discord.GuildEmoji>;
   arrayVersion: Discord.GuildEmoji[];
@@ -140,5 +140,3 @@ class EmoteCache {
     else return ''
   }
 }
-
-export {EmoteCache}
