@@ -1,20 +1,26 @@
-const Discord = require('discord.js')
-require('./../extended-msg')
+import { Cubemoji } from '../types/cubemoji/cubemoji'
+import Discord = require('discord.js')
+import CommandHelper = require('./../command-helper')
+import { ExtMsg } from '../extended-msg'
 
-module.exports = {
-  name: 'add_face',
-  description: 'Adds a face or...other to an avatar or emote. Animated emotes/avatars will return static images. https://gitlab.com/cubismod/cubemoji/-/wikis/commands/add_face',
-  usage: 'add_face <emote/@mention> (opt args): <flushed> <jfc> <joy> <pensive> <plead> <thinking> <triumph> <weary> <zany>; (opt): <attachment image>',
-  aliases: ['af', 'addflush'],
-  cooldown: 1,
-  execute (message, args, client, helper) {
-    const cmdHelper = require('./../command-helper')
-    cmdHelper.checkImage(message, args, client, helper).then(url => {
+export class AddFace implements Cubemoji.Command {
+  name = 'add_face'
+  description = 'Adds a face or...other to an avatar or emote. Animated emotes/avatars will return static images. https=//gitlab.com/cubismod/cubemoji/-/wikis/commands/add_face'
+  usage = 'add_face <emote/@mention> (opt args)= <flushed> <jfc> <joy> <pensive> <plead> <thinking> <triumph> <weary> <zany>; (opt)= <attachment image>'
+  aliases = ['af', 'addflush']
+  cooldown = 1
+
+  execute (message: Discord.Message, args: string[], client: Discord.Client, util: Cubemoji.Util) {
+    CommandHelper.checkImage(message, args, client, util).then(url => {
+      const extMsg = new ExtMsg(message)
       if (!url) {
         console.log(`${message.author.username} failed to use ${this.name} correctly`)
-        message.inlineReply(`You must specify an emote/mention in the command! \nusage: \`${this.usage}\``)
+        // figure out inline replies
+        extMsg.inlineReply(`You must specify an emote/mention in the command! \nusage: \`${this.usage}\``)
       } else {
-        const res = {}
+        const res = {
+          url: ''
+        }
         res.url = url
         if (res) {
           // determine the face specified, default to flushed if none found
@@ -27,7 +33,7 @@ module.exports = {
             }
           })
           // queue up another worker to run the image edit
-          helper.pool.exec('addFace', [res.url, path])
+          util.pool.exec('addFace', [res.url, path])
             .then(result => {
               // automatically spoiler 'jfc' images
               let fileName
@@ -39,7 +45,7 @@ module.exports = {
             })
             .catch(error => console.log(error))
         } else {
-          message.inlineReply('emote not found!')
+          extMsg.inlineReply('emote not found!')
         }
       }
       message.channel.stopTyping(true)

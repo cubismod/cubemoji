@@ -17,6 +17,7 @@
       "src/types"
     ],
     "allowJs": true,
+    "checkJs": false,
     "resolveJsonModule": true
   },
   "include": ["src/**/*"]

@@ -9,7 +9,7 @@ export class About implements Cubemoji.Command {
   aliases = ['a']
   cooldown = 5
 
-  exec(message: Discord.Message, _args: string[], client: Discord.Client) {
+  execute (message: Discord.Message, _args: string[], client: Discord.Client) {
     const pkg = require('../package.json')
     const embed = {
       title: '<:cubemoji:793663899072200744>',
