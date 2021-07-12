@@ -1,15 +1,15 @@
 import Discord = require('discord.js')
-import Pand = require('pandemonium')
+import Pandemonium = require('pandemonium')
 import Emoji = require('node-emoji')
 import gm = require('gm')
-import download = require('image-downloader')
 import path = require('path')
 import FileType = require('file-type')
 import fs = require('fs')
 import effects = require('./img_effects.json')
 import embeds = require('../embeds')
 import { Cubemoji } from '../types/cubemoji/cubemoji'
-require('./../extended-msg')
+import { checkImage } from '../command-helper'
+import { ExtMsg } from '../extended-msg'
 
 export class edit implements Cubemoji.Command {
   name = 'edit'
@@ -18,45 +18,43 @@ export class edit implements Cubemoji.Command {
   aliases = ['ed', 'modify']
   cooldown = 0
   execute (message: Discord.Message, args: string[], client: Discord.Client, util: Cubemoji.Util, blame: Discord.Snowflake) {
-    const cmdHelper = require('./../command-helper')
-    let random
-    cmdHelper.checkImage(message, args, client, helper).then(url => {
+    let random: boolean
+    checkImage(message, client, util).then(url => {
+      const extMsg = new ExtMsg(message)
       message.channel.startTyping()
       if (!url && (args.length !== 1 && args[0] !== 'hole')) {
         console.log(`${message.author.username} failed to use ${this.name} correctly`)
-        message.inlineReply(`You must specify an emote name and filters in the command! \n \`${this.usage}\``)
+        extMsg.inlineReply(`You must specify an emote name and filters in the command! \n \`${this.usage}\``)
       } else {
-        let res
+        let res: string | Discord.Emoji
+        let resolvedUrl: string
+        // secret!!!!
         if (args[0].toLowerCase() === 'hole') {
-          res = {}
           // easter egg time
-          if (Pand.choice([true, false])) res = Pand.choice(helper.cache.createEmoteArray())
+          if (Pandemonium.choice([true, false])) res = Pandemonium.choice<string|Discord.Emoji>(util.cache.createEmoteArray())
           // random option of twemoji
-          else res.url = helper.cache.parseTwemoji(Emoji.random().emoji)
+          else res = util.cache.parseTwemoji(Emoji.random().emoji)
           // change up the args
           args = ['hole', 'random']
-        } else {
-          res = {}
-          res.url = url
-        }
+        } else res = url
         if (res) {
           const file = path.resolve(`./download/${Date.now()}`)
           const imgOpts = {
-            url: res.url,
+            url: res,
             dest: file,
             extractFilename: false,
             timeout: 1000
           }
-          let options = []
+          let options: string[] = []
           let argLc
           if ((args.length > 1)) argLc = args[1].toLowerCase()
           else argLc = args[0].toLowerCase()
           if (argLc === 'random' || argLc === 'r') {
             // random effects option
             random = true
-            const optLen = Pand.random(1, 10)
+            const optLen = Pandemonium.random(1, 10)
             for (let i = 0; i < optLen; i++) {
-              options.push(Pand.choice(effects))
+              options.push(Pandemonium.choice(effects))
             }
           } else {
             // parse command arguments now, anything after the emote name
@@ -64,6 +62,7 @@ export class edit implements Cubemoji.Command {
             random = false
           }
           // download the image
+          // TODO: move this to code I write
           download.image(imgOpts)
             .then((_) => {
               FileType.fromFile(file).then(ft => {
@@ -75,13 +74,13 @@ export class edit implements Cubemoji.Command {
                       img.blur(5, 20)
                       break
                     case 'charcoal':
-                      img.charcoal(Pand.randomFloat(0, 5))
+                      img.charcoal(Pandemonium.randomFloat(0, 5))
                       break
                     case 'cycle':
-                      img.cycle(Pand.random(1, 10))
+                      img.cycle(Pandemonium.random(1, 10))
                       break
                     case 'edge':
-                      img.edge(Pand.randomFloat(0.1, 4))
+                      img.edge(Pandemonium.randomFloat(0.1, 4))
                       break
                     case 'emboss':
                       img.emboss()
@@ -105,10 +104,10 @@ export class edit implements Cubemoji.Command {
                       img.magnify()
                       break
                     case 'median':
-                      img.median(Pand.random(1, 10))
+                      img.median(Pandemonium.random(1, 10))
                       break
                     case 'minify':
-                      img.minify(Pand.random(1, 10))
+                      img.minify(Pandemonium.random(1, 10))
                       break
                     case 'monochrome':
                       img.monochrome()
@@ -117,7 +116,7 @@ export class edit implements Cubemoji.Command {
                       img.mosaic()
                       break
                     case 'motionblur':
-                      img.motionBlur(10, 20, Pand.random(0, 360))
+                      img.motionBlur(10, 20, Pandemonium.random(0, 360))
                       break
                     case 'noise':
                       img.noise(10)
@@ -129,10 +128,10 @@ export class edit implements Cubemoji.Command {
                       img.paint(10)
                       break
                     case 'roll':
-                      img.roll(Pand.randomIndex(-360, 360), Pand.randomIndex(-360, 360))
+                      img.roll(Pandemonium.randomIndex(-360, 360), Pandemonium.randomIndex(-360, 360))
                       break
                     case 'rotate':
-                      img.rotate('white', Pand.random(-360, 360))
+                      img.rotate('white', Pandemonium.random(-360, 360))
                       break
                     case 'sepia':
                       img.sepia()
@@ -144,22 +143,22 @@ export class edit implements Cubemoji.Command {
                       img.unsharp(100)
                       break
                     case 'solarize':
-                      img.solarize(Pand.randomFloat(0, 100))
+                      img.solarize(Pandemonium.randomFloat(0, 100))
                       break
                     case 'spread':
-                      img.spread(Pand.randomFloat(0, 5))
+                      img.spread(Pandemonium.randomFloat(0, 5))
                       break
                     case 'swirl':
-                      img.swirl(Pand.random(-360, 360))
+                      img.swirl(Pandemonium.random(-360, 360))
                       break
                     case 'threshold':
-                      img.threshold(Pand.randomFloat(0, 20))
+                      img.threshold(Pandemonium.randomFloat(0, 20))
                       break
                     case 'trim':
                       img.trim()
                       break
                     case 'wave':
-                      img.wave(Pand.randomFloat(0.01, 10), Pand.randomFloat(0.01, 10))
+                      img.wave(Pandemonium.randomFloat(0.01, 10), Pandemonium.randomFloat(0.01, 10))
                       break
                   }
                 })
