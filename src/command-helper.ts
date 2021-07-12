@@ -2,12 +2,16 @@
 import Discord = require('discord.js')
 import Pandemonium = require('pandemonium')
 import FileType = require('file-type')
-import got = require('got')
 import { Cubemoji } from './types/cubemoji/cubemoji'
+import got from 'got/dist/source'
+import { createWriteStream } from 'fs'
+import path = require('path')
+import { reject } from 'p-cancelable'
 
 // check whether an image is a valid type
+// TODO: implement promise rejection here
 export async function checkValidType (url: string) {
-  const stream = got.default(url, {isStream: true})
+  const stream = await got.stream(url,)
   const type = await FileType.fromStream(stream)
   const validTypes = ['jpg', 'jpeg', 'gif', 'png']
 
@@ -42,7 +46,7 @@ export async function checkImage (message: Discord.Message, client: Discord.Clie
   const twemoji = util.cache.parseTwemoji(argName)
 
   if (avatarUrl) return avatarUrl
-  if (twemoji) return twemoji.url
+  if (twemoji) return twemoji
   const urlReg = /^https?:\/\/.+.(png|jpeg|jpg|gif)$/
   if (args[0].match(urlReg)) {
     // check now whether the image is an okay type for cubemoji to edit
@@ -79,5 +83,23 @@ export function imgErr (error: Error, util: Cubemoji.Util, author: Discord.User)
   return errEmbed
 }
 
-
-
+/**
+ * download an image file to the local FS under the download folder
+ * @param url - link to the img
+ * @returns promise for a url or rejection if a download issue occurs
+ */
+export async function downloadImage (url: string) {
+  const fn = path.resolve(`./download/${Date.now()}`)
+  await got.stream(url)
+    .on('downloadProgress', progress => {
+      // cap downloads at 50MB
+      if (progress.total > 5e+7) {
+        reject(new Error(`Filesize of ${progress.total / 1e-6} MB greater than maximum size of 50MB`))
+      }
+    })
+    .on('error', (error: Error) => {
+      reject(error)
+    })
+  await createWriteStream(fn).on('error', (error: Error) => { reject(error) })
+  return fn
+}

@@ -8,7 +8,7 @@ import fs = require('fs')
 import effects = require('./img_effects.json')
 import embeds = require('../embeds')
 import { Cubemoji } from '../types/cubemoji/cubemoji'
-import { checkImage } from '../command-helper'
+import { checkImage, downloadImage } from '../command-helper'
 import { ExtMsg } from '../extended-msg'
 
 export class edit implements Cubemoji.Command {
@@ -38,13 +38,13 @@ export class edit implements Cubemoji.Command {
           args = ['hole', 'random']
         } else res = url
         if (res) {
-          const file = path.resolve(`./download/${Date.now()}`)
-          const imgOpts = {
-            url: res,
-            dest: file,
-            extractFilename: false,
-            timeout: 1000
-          }
+          // const file = path.resolve(`./download/${Date.now()}`)
+          // const imgOpts = {
+          //   url: res,
+          //   dest: file,
+          //   extractFilename: false,
+          //   timeout: 1000
+          // }
           let options: string[] = []
           let argLc
           if ((args.length > 1)) argLc = args[1].toLowerCase()
@@ -62,11 +62,10 @@ export class edit implements Cubemoji.Command {
             random = false
           }
           // download the image
-          // TODO: move this to code I write
-          download.image(imgOpts)
-            .then((_) => {
-              FileType.fromFile(file).then(ft => {
-                const img = gm(file)
+          downloadImage(url)
+            .then(path => {
+              FileType.fromFile(path).then(ft => {
+                const img = gm(path)
                 // process image effects
                 options.forEach(option => {
                   switch (option) {
@@ -190,7 +189,7 @@ export class edit implements Cubemoji.Command {
                       console.error(err)
                     })
                   // delete the source file
-                  fs.unlink(file, (err) => {
+                  fs.unlink(path, (err) => {
                     if (err) console.error(err)
                   })
                 })
