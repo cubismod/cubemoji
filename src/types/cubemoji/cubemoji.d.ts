@@ -14,7 +14,6 @@ declare namespace Cubemoji {
   timeout: NodeJS.Timeout // an actual timeout obj
   id: boolean; // indicates the user wants to reveal their owen id
 }
-
   // util serves as a catch-all reference object that
   // commands can use to spin up workers, access the emote cache
   // and update the firebase database
@@ -28,8 +27,8 @@ declare namespace Cubemoji {
     topPlayerTime: string;
     beginTop: string;
     matches: Match;
-    openUsers: Set;
-    rescaleMsgs: Discord.Snowflake[];
+    openUsers: Map<Discord.Snowflake, Discord.Snowflake>;
+    rescaleMsgs: Map<Discord.Snowflake, Discord.Snowflake>;
     queuedForReset: boolean;
     nextLbReset: number;
     commands: Discord.Collection;

@@ -2,13 +2,12 @@ import Discord = require('discord.js')
 import Pandemonium = require('pandemonium')
 import Emoji = require('node-emoji')
 import gm = require('gm')
-import path = require('path')
 import FileType = require('file-type')
 import fs = require('fs')
 import effects = require('./img_effects.json')
 import embeds = require('../embeds')
 import { Cubemoji } from '../types/cubemoji/cubemoji'
-import { checkImage, downloadImage } from '../command-helper'
+import { checkImage, downloadImage, imgErr } from '../command-helper'
 import { ExtMsg } from '../extended-msg'
 
 export class edit implements Cubemoji.Command {
@@ -27,7 +26,6 @@ export class edit implements Cubemoji.Command {
         extMsg.inlineReply(`You must specify an emote name and filters in the command! \n \`${this.usage}\``)
       } else {
         let res: string | Discord.Emoji
-        let resolvedUrl: string
         // secret!!!!
         if (args[0].toLowerCase() === 'hole') {
           // easter egg time
@@ -100,7 +98,7 @@ export class edit implements Cubemoji.Command {
                       img.implode()
                       break
                     case 'magnify':
-                      img.magnify()
+                      img.magnify(2)
                       break
                     case 'median':
                       img.median(Pandemonium.random(1, 10))
@@ -127,7 +125,7 @@ export class edit implements Cubemoji.Command {
                       img.paint(10)
                       break
                     case 'roll':
-                      img.roll(Pandemonium.randomIndex(-360, 360), Pandemonium.randomIndex(-360, 360))
+                      img.roll(Pandemonium.randomIndex([-360, 360]), Pandemonium.randomIndex([-360, 360]))
                       break
                     case 'rotate':
                       img.rotate('white', Pandemonium.random(-360, 360))
@@ -136,7 +134,7 @@ export class edit implements Cubemoji.Command {
                       img.sepia()
                       break
                     case 'shave':
-                      img.shave(20, 20, 5)
+                      img.shave(20, 20)
                       break
                     case 'sharpen':
                       img.unsharp(100)
@@ -161,30 +159,30 @@ export class edit implements Cubemoji.Command {
                       break
                   }
                 })
-                img.toBuffer(ft.ext, (err, buff) => {
+                img.toBuffer(ft!.ext, (err, buff) => {
                   if (err) {
-                    const errEmbed = cmdHelper.imgErr(err, helper, message.author)
+                    const errEmbed = imgErr(err, util, extMsg.author)
                     console.error(err)
-                    return message.inlineReply(errEmbed)
+                    return extMsg.inlineReply(errEmbed)
                   }
                   // now we send out the message
-                  const attach = new Discord.MessageAttachment(buff, `${Date.now()}.${ft.ext}`)
-                  message.channel.stopTyping(true)
+                  const attach = new Discord.MessageAttachment(buff, `${Date.now()}.${ft!.ext}`)
+                  extMsg.channel.stopTyping(true)
                   let effects = ''
                   if (random) effects = `Effects chain used: ${options.join(' ')}`
                   // send out the effects chain
-                  message.inlineReply(effects, attach).then(msg => {
+                  extMsg.inlineReply(effects, attach).then((msg: Discord.Message) => {
                     // add delete reacts and save a reference to the creator of the original
                     // msg so users cant delete other users images
                     // if this command is intiated through a react, then the person who reacted has the ability to delete the image, therefore we need to save a reference to them instead of the image creator
                     if (blame !== undefined) {
-                      helper.rescaleMsgs[msg.id] = blame
+                      util.rescaleMsgs.set(msg.id, blame)
                     } else {
-                      helper.rescaleMsgs[msg.id] = message.author.id
+                      util.rescaleMsgs.set(msg.id, message.author.id)
                     }
                     msg.react('🗑️')
                   })
-                    .catch(err => {
+                    .catch((err: Error) => {
                     // couldn't grab message
                       console.error(err)
                     })
@@ -198,21 +196,11 @@ export class edit implements Cubemoji.Command {
             })
             .catch(err => message.channel.send({ embed: embeds.errorEmbed(2, 'could not download the image', err) }))
         } else {
-          message.inlineReply('emote not found!')
+          extMsg.inlineReply('emote not found!')
         }
       }
       message.channel.stopTyping(true)
     })
       .catch(err => message.channel.send({ embed: embeds.errorEmbed(2, 'checkImage failed', err) }))
   }
-}
-
-module.exports = {
-  name: 'edit',
-  description: 'Edits an emote/avatar according to the effects you select. Effects are applied in the order you specify them. Animated emotes will return static images. This process is computationally intense so give it a few seconds to work. https://gitlab.com/cubismod/cubemoji/-/wikis/commands/modify',
-  usage: `edit <emote/@mention> (opt args): ${effects}`,
-  aliases: ['ed', 'modify'],
-  cooldown: 1,
-  execute (message, args, client, helper, blame) {
-    
 }
