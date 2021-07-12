@@ -31,7 +31,7 @@ declare namespace Cubemoji {
     rescaleMsgs: Map<Discord.Snowflake, Discord.Snowflake>;
     queuedForReset: boolean;
     nextLbReset: number;
-    commands: Discord.Collection;
+    commands: Discord.Collection<string, Cubemoji.Command>; // cubemoji command name and then a reference to the command class
   }
 
   // simpler emoji representation
