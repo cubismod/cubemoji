@@ -1,4 +1,10 @@
 {
     "editor.tabSize": 2,
-    "jest.jestCommandLine": "jest"
+    "jest.jestCommandLine": "jest",
+    "cSpell.words": [
+        "discord",
+        "import",
+        "js",
+        "require"
+    ]
 }
