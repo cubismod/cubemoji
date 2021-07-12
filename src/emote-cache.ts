@@ -3,7 +3,7 @@ import Fuse = require('fuse.js')
 import Twemoji = require('twemoji-parser')
 import Discord = require('discord.js')
 import dayjs = require('dayjs')
-import { Cubemoji } from './types/cubemoji/cubemoji';
+import { Cubemoji } from './types/cubemoji/cubemoji'
 
 // a class which can return an array version of emotes
 // and also only refreshes when necessary
@@ -99,7 +99,7 @@ export class EmoteCache {
       if (split.length > 2) {
         res = this.arrayVersion.find(emote => emote.name.toLowerCase() === split[1])
         if (res === undefined) {
-          let emoji: Cubemoji.Emoji = {
+          const emoji: Cubemoji.Emoji = {
             url: 'https://cdn.discordapp.com/emojis/' + split[2],
             external: true
           }
@@ -136,7 +136,7 @@ export class EmoteCache {
   // parse a twemoji and return a url
   parseTwemoji (body: string) {
     const entitites = Twemoji.parse(body, { assetType: 'png' })
-    if (entitites) return entitites[0]
+    if (entitites) return entitites[0].url
     else return ''
   }
 }

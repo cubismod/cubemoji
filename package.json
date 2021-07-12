@@ -32,7 +32,6 @@
     "fuse.js": "^6.4.4",
     "gm": "^1.23.1",
     "got": "^11.8.2",
-    "image-downloader": "^4.0.2",
     "jimp": "^0.16.1",
     "node-emoji": "^1.10.0",
     "pandemonium": "^2.0.0",
@@ -42,6 +41,7 @@
   },
   "devDependencies": {
     "@tsconfig/node14": "^1.0.1",
+    "@types/gm": "^1.18.10",
     "@types/node-emoji": "^1.8.1",
     "@types/twemoji-parser": "^13.1.1",
     "@typescript-eslint/eslint-plugin": "^4.26.1",
