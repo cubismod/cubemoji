@@ -1,22 +1,23 @@
-const Discord = require('discord.js')
-const Pand = require('pandemonium')
-const Emoji = require('node-emoji')
-const gm = require('gm')
-const download = require('image-downloader')
-const path = require('path')
-const FileType = require('file-type')
-const fs = require('fs')
-const effects = require('./img_effects.json')
-const embeds = require('../embeds')
+import Discord = require('discord.js')
+import Pand = require('pandemonium')
+import Emoji = require('node-emoji')
+import gm = require('gm')
+import download = require('image-downloader')
+import path = require('path')
+import FileType = require('file-type')
+import fs = require('fs')
+import effects = require('./img_effects.json')
+import embeds = require('../embeds')
+import { Cubemoji } from '../types/cubemoji/cubemoji'
 require('./../extended-msg')
 
-module.exports = {
-  name: 'edit',
-  description: 'Edits an emote/avatar according to the effects you select. Effects are applied in the order you specify them. Animated emotes will return static images. This process is computationally intense so give it a few seconds to work. https://gitlab.com/cubismod/cubemoji/-/wikis/commands/modify',
-  usage: `edit <emote/@mention> (opt args): ${effects}`,
-  aliases: ['ed', 'modify'],
-  cooldown: 1,
-  execute (message, args, client, helper, blame) {
+export class edit implements Cubemoji.Command {
+  name = 'edit'
+  description = 'Edits an emote/avatar according to the effects you select. Effects are applied in the order you specify them. This process is computationally intense so give it a few seconds to work. GIFs are unlikely to work if they are from tenor or giphy. https://gitlab.com/cubismod/cubemoji/-/wikis/commands/modify'
+  usage = 'edit emote|@mention|urlcommand arg1 arg2 opt:arg3 '
+  aliases = ['ed', 'modify']
+  cooldown = 0
+  execute (message: Discord.Message, args: string[], client: Discord.Client, util: Cubemoji.Util, blame: Discord.Snowflake) {
     const cmdHelper = require('./../command-helper')
     let random
     cmdHelper.checkImage(message, args, client, helper).then(url => {
@@ -206,4 +207,14 @@ module.exports = {
     })
       .catch(err => message.channel.send({ embed: embeds.errorEmbed(2, 'checkImage failed', err) }))
   }
+}
+
+module.exports = {
+  name: 'edit',
+  description: 'Edits an emote/avatar according to the effects you select. Effects are applied in the order you specify them. Animated emotes will return static images. This process is computationally intense so give it a few seconds to work. https://gitlab.com/cubismod/cubemoji/-/wikis/commands/modify',
+  usage: `edit <emote/@mention> (opt args): ${effects}`,
+  aliases: ['ed', 'modify'],
+  cooldown: 1,
+  execute (message, args, client, helper, blame) {
+    
 }

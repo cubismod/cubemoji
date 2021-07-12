@@ -11,7 +11,7 @@ export class AddFace implements Cubemoji.Command {
   cooldown = 1
 
   execute (message: Discord.Message, args: string[], client: Discord.Client, util: Cubemoji.Util) {
-    CommandHelper.checkImage(message, args, client, util).then(url => {
+    CommandHelper.checkImage(message, client, util).then(url => {
       const extMsg = new ExtMsg(message)
       if (!url) {
         console.log(`${message.author.username} failed to use ${this.name} correctly`)
