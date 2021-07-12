@@ -19,5 +19,20 @@
 		"scope": "javascript,typescript",
 		"body": "require('./../extended-msg')",
 		"description": "change folder path as appropriate"
+	},
+	"Command class": {
+		"scope": "typescript",
+		"body": [
+			"export class TestCmd implements Cubemoji.Command {",
+			"  name = ''",
+			"  description = ''",
+			"  usage = 'command arg1 arg2 opt:arg3 '",
+			"  aliases = ['af', 'addflush']",
+			"  cooldown = 0",
+			"  execute (message: Discord.Message, args: string[], client: Discord.Client, util: Cubemoji.Util) {",
+			"  }",
+			"}"
+		],
+		"description": "a cubemoji command"
 	}
 }

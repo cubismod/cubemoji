@@ -15,13 +15,15 @@ export async function checkValidType (url: string) {
   else return false
 }
 
-// check image
-// returns <image URL, false if nothing found>
-// args - the msg content split into an array similar to how command
-// line arguments are processed
-// client - Discord client object
-// util - use the utility object passed from the index file
-export async function checkImage (message: Discord.Message, args: string[], client: Discord.Client, util: Cubemoji.Util) {
+/**
+ * check image
+ * @param message - the discord message we are parsing
+ * @param client - a discord client object
+ * @param util - the utility object from index
+ * @returns promise to image url or '' if nothing found
+ */
+export async function checkImage (message: Discord.Message, client: Discord.Client, util: Cubemoji.Util) {
+  const args = message.content.split(' ')
   // check first for a message
   if (message.attachments.size > 0) {
     const attachment = message.attachments.random(1)
@@ -29,11 +31,11 @@ export async function checkImage (message: Discord.Message, args: string[], clie
     if (Object.prototype.hasOwnProperty.call(attachment[0], 'url')) {
       const valid = await checkValidType(attachment[0].url)
       if (valid) return attachment[0].url
-      return false
+      return ''
     }
   }
   // otherwise we check the args
-  if (args.length < 1) return false
+  if (args.length < 1) return ''
   // check if a mention or twemoji
   const argName = args[0].toLowerCase()
   const avatarUrl = util.cache.getAvatar(argName, client)
@@ -58,6 +60,7 @@ export async function checkImage (message: Discord.Message, args: string[], clie
   } else return res.url
   // we don't need to do any validity checks above since the cache is guaranteed to
   // return image urls
+  return ''
 }
 
 // image error, returns an embed of an error occured along with some

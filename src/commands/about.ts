@@ -1,6 +1,7 @@
 import Discord = require('discord.js')
 import { Cubemoji } from '../types/cubemoji/cubemoji'
-const dayjs = require('dayjs')
+import dayjs = require('dayjs')
+import pkg = require('../../package.json')
 
 export class About implements Cubemoji.Command {
   name = 'About'
@@ -10,7 +11,6 @@ export class About implements Cubemoji.Command {
   cooldown = 5
 
   execute (message: Discord.Message, _args: string[], client: Discord.Client) {
-    const pkg = require('../package.json')
     const embed = {
       title: '<:cubemoji:793663899072200744>',
       color: 0x91d7f2,
@@ -47,5 +47,4 @@ export class About implements Cubemoji.Command {
     }
     message.channel.send({ embed: embed })
   }
-  
 }
