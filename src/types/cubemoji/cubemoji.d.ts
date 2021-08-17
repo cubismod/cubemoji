@@ -6,14 +6,14 @@ import Discord = require('discord.js')
 
 // custom cubemoji types
 declare namespace Cubemoji {
- // cubemoji anon messaging match objects
- interface Match {
-  match: string; // id of the matched player
-  emote: Discord.GuildEmoji; // the emoji used to represent that person in chat
-  timeLeft: number; // time stored in ms of course
-  timeout: NodeJS.Timeout // an actual timeout obj
-  id: boolean; // indicates the user wants to reveal their owen id
-}
+  // cubemoji anon messaging match objects
+  interface Match {
+    match: string; // id of the matched player
+    emote: Discord.GuildEmoji; // the emoji used to represent that person in chat
+    timeLeft: number; // time stored in ms of course
+    timeout: NodeJS.Timeout // an actual timeout obj
+    id: boolean; // indicates the user wants to reveal their owen id
+  }
   // util serves as a catch-all reference object that
   // commands can use to spin up workers, access the emote cache
   // and update the firebase database
@@ -37,7 +37,8 @@ declare namespace Cubemoji {
   // simpler emoji representation
   interface Emoji {
     url: string,
-    external: boolean
+    external: boolean,
+    mutant: boolean // indicates whether this is a mutant emoji https://mutant.tech/
   }
   // a command triggered by the user
   interface Command {
