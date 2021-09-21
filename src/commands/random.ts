@@ -1,3 +1,15 @@
+import { Cubemoji } from "../types/cubemoji/cubemoji"
+
+export class Random implements Cubemoji.Command {
+  name = 'random'
+  description = 'Insert a random emote! https://gitlab.com/cubismod/cubemoji/-/wikis/commands/random'
+  usage = 'random (optional)<number of emotes to create, max of 50>'
+  aliases = ['r', 'rnd', 'rand']
+  cooldown = 2
+
+  execute (message: Discord.Message, args: string[], client: Discord.Client, util: Cubemoji.Util) {
+}
+
 module.exports = {
   name: 'random',
   description: 'Insert a random emote! https://gitlab.com/cubismod/cubemoji/-/wikis/commands/random',

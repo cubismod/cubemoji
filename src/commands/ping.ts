@@ -10,7 +10,7 @@ export class Ping implements Cubemoji.Command {
   aliases = ['pi']
   cooldown = 1
 
-  execute (message: Discord.Message, args: string[], client: Discord.Client, util: Cubemoji.Util) {
+  execute (message: Discord.Message) {
     const extMsg = new ExtMsg(message)
     extMsg.inlineReply('pong')
   }
