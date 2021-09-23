@@ -1,13 +1,12 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
-  "display": "Node 14",
   "extends": "@tsconfig/node14/tsconfig.json",
 
   "compilerOptions": {
-    "lib": ["es2020"],
+    "lib": ["es2020", "ESNext.AsyncIterable"],
     "module": "commonjs",
     "target": "es2020",
-    "outDir": "./built",
+    "outDir": "build",
 
     "strict": true,
     "esModuleInterop": true,
@@ -18,7 +17,12 @@
     ],
     "allowJs": true,
     "checkJs": false,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "noImplicitAny": false,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "importHelpers": true,
   },
-  "include": ["src/**/*"]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules"]
 }
