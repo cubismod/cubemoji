@@ -2,10 +2,10 @@
   "name": "cubemoji",
   "version": "3.0.0",
   "description": "A Discord emoji bot.",
-  "main": "index.js",
+  "main": "Main.ts",
   "license": "MIT",
   "scripts": {
-    "start": "node ."
+    "start": "ts-node Main.ts"
   },
   "repository": {
     "type": "git",
@@ -52,6 +52,7 @@
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^4.2.1",
+    "ts-node": "^10.2.1",
     "tslib": "^2.3.1",
     "typescript": "^4.4.3"
   }

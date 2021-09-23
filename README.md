@@ -75,3 +75,6 @@ A Discord emoji bot, written in Node JS!.
 - Swirl
 - Threshold
 - Wave
+
+
+https://github.com/owencalvin/discord.ts/tree/slash

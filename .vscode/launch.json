@@ -5,13 +5,15 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "type": "node",
             "name": "Launch Program",
-            "program": "${workspaceFolder}/index.js",
+            "program": "${workspaceFolder}/src/Main.ts",
             "request": "launch",
-            "skipFiles": [
-                "<node_internals>/**"
-            ],
-            "type": "pwa-node"
+            "preLaunchTask": "tsc: build - tsconfig.json",
+            "outFiles": [
+                "${workspaceFolder}/build/src/**/*.js",
+                "!**/node_modules/**"
+            ]
         },
         {
             "type": "node",
