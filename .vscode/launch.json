@@ -6,14 +6,14 @@
     "configurations": [
         {
             "type": "node",
-            "name": "Launch Program",
-            "program": "${workspaceFolder}/src/Main.ts",
             "request": "launch",
-            "preLaunchTask": "tsc: build - tsconfig.json",
-            "outFiles": [
-                "${workspaceFolder}/build/src/**/*.js",
-                "!**/node_modules/**"
-            ]
+            "name": "Debug bot",
+            "protocol": "inspector",
+            "args": ["${workspaceRoot}/src/Main.ts"],
+            "cwd": "${workspaceRoot}",
+            "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+            "internalConsoleOptions": "neverOpen",
+            "runtimeVersion": "16"
         },
         {
             "type": "node",
