@@ -1,26 +1,44 @@
 /* eslint-disable node/no-path-concat */
 import 'reflect-metadata'
 import { Intents } from 'discord.js'
-import { Client } from '@typeit/discord'
+import { Client } from 'discordx'
 import secrets from '../secrets.json'
 import pkginfo from '../package.json'
 
-async function start () {
-  const client = new Client({
-    intents: [
-      Intents.FLAGS.GUILD_EMOJIS_AND_STICKERS,
-      Intents.FLAGS.GUILD_MESSAGES,
-      Intents.FLAGS.GUILD_MESSAGE_REACTIONS
-    ],
-    classes: [
-      `${__dirname}/*Discord.ts`, // glob string to load the classes
-      `${__dirname}/*Discord.js` // If you compile using "tsc" the file extension change to .js
-    ],
-    silent: false
-  })
+export class Main {
+  private static _client: Client
 
-  await client.login(secrets.token)
-  console.log(`cubemoji ${pkginfo.version} is now running...`)
+  static get Client (): Client {
+    return this._client
+  }
+
+  static async start () {
+    this._client = new Client({
+      botGuilds: ['545784892492087303'],
+      intents: [
+        Intents.FLAGS.GUILD_EMOJIS_AND_STICKERS,
+        Intents.FLAGS.GUILD_MESSAGES,
+        Intents.FLAGS.GUILD_MESSAGE_REACTIONS
+      ],
+      classes: [
+        `${__dirname}/discords/*Discord.ts`, // glob string to load the classes
+        `${__dirname}/discords/*Discord.js` // If you compile using "tsc" the file extension change to .js
+      ],
+      // for testing purposes in cubemoji server
+      silent: false
+
+    })
+    await this._client.login(secrets.token)
+
+    this._client.once('ready', async () => {
+      await this._client.initApplicationCommands()
+      console.log(`cubemoji ${pkginfo.version} is now running...`)
+    })
+
+    this._client.on('interaction', (interaction) => {
+      this._client.executeInteraction(interaction)
+    })
+  }
 }
 
-start()
+Main.start()

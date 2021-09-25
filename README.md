@@ -77,4 +77,4 @@ A Discord emoji bot, written in Node JS!.
 - Wave
 
 
-https://github.com/owencalvin/discord.ts/tree/slash
+https://oceanroleplay.github.io/discord.ts/

@@ -22,10 +22,10 @@
   },
   "homepage": "https://gitlab.com/cubismod/cubemoji#readme",
   "dependencies": {
-    "@typeit/discord": "^5.0.13",
     "@types/workerpool": "^6.0.0",
     "dayjs": "^1.10.5",
-    "discord.js": "github:discordjs/discord.js",
+    "discord.js": "^13.1.0",
+    "discordx": "^5.9.4",
     "file-type": "^16.2.0",
     "firebase-admin": "^9.4.2",
     "fuse.js": "^6.4.4",
