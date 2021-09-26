@@ -2,58 +2,59 @@
 // emote cache and some helper functions
 import Fuse = require('fuse.js')
 import Twemoji = require('twemoji-parser')
-import Discord = require('discord.js')
+import Discord = require('discordx')
 import dayjs = require('dayjs')
-import { Companion, Cmoji, Source } from './Cubemoji'
+import { Cmoji, Source } from './Cubemoji'
 
 // a class which can return an array version of emotes
 // and also only refreshes when necessary
 export class EmoteCache {
   client: Discord.Client
-  discVersion: Discord.GuildEmoji[] // base version
-  arrayVersion: Discord.GuildEmoji[]
+  emojis: Cmoji[]
   sortedArray: string[]
   nextUpdateTime: dayjs.Dayjs;
 
   constructor (client: Discord.Client) {
     this.client = client
-    this.discVersion = this.grabEmojis(client)
-    this.arrayVersion = [] // init with an empty array
+    this.emojis = []
     this.sortedArray = []
     // we only want to do an update every ten minutes
     this.nextUpdateTime = dayjs().add(15, 'minutes')
   }
 
-  private grabEmojis (client: Discord.Client) {
-    const emojis: Discord.GuildEmoji[] = []
-    client.guilds.fetch()
-    client.guilds.cache.forEach(guild => {
-      guild.emojis.fetch()
+  async init () {
+    this.emojis = await this.grabEmojis()
+    this.sortedArray = await this.sortedTxtEmoteArray()
+  }
+
+  private async grabEmojis () {
+    const emojis: Cmoji[] = []
+    await this.client.guilds.fetch()
+    this.client.guilds.cache.forEach(guild => {
       for (const emoji of guild.emojis.cache.values()) {
-        emojis.push(emoji)
+        emojis.push(new Cmoji(emoji.name, emoji.url, Source.Discord, emoji))
       }
     })
     return emojis
   }
 
-  // sortable: returns just a list of names which can be easily sorted
-  createEmoteArray (sortable = false) {
+  // grab emotes from the heavens and return them as well as update the state of this class
+  async emoteArray () {
+    const _emojis: Cmoji[] = []
     const validNames = new Map()
     // we are just manually iterating through the map to create a list
     // ensure we only update if there is no data or the update time has lapsed
-    if ((this.arrayVersion === undefined || this.arrayVersion.length === 0) ||
+    if ((this.emojis.length === 0) ||
         (dayjs().isAfter(this.nextUpdateTime))) {
       // load up our blacklist.json file
       // note that with the require(), you need to restart app
       // for it to see changes to the file
       const blacklist = require('./blacklist.json').blacklist
-      this.discVersion = this.grabEmojis(this.client)
-      this.arrayVersion = []
-      this.sortedArray = []
-      this.discVersion.forEach(value => {
+      const rawEmojis = await this.grabEmojis()
+      rawEmojis.forEach(value => {
         // utilize the blacklist.json file to remove bad emotes
         // blacklist.json utilizes emote IDs
-        if (!blacklist.includes(value.id) && value.name != null) {
+        if (value.guildEmoji != null && !blacklist.includes(value.guildEmoji.id)) {
           let inc = 0
           // save the original name before we modify it
           const ogName = value.name.toLowerCase()
@@ -63,19 +64,25 @@ export class EmoteCache {
             inc = validNames.get(ogName) + 1
             value.name = `${value.name}_${inc}`
           }
-          this.arrayVersion.push(value)
-          this.sortedArray.push(value.name)
+          _emojis.push(value)
           validNames.set(ogName, inc)
         }
       })
-      this.sortedArray = this.sortedArray.sort(function (a, b) {
-        return a.toLowerCase().localeCompare(b.toLowerCase())
-      })
-      // only perform an update every fifteen minutes
       this.nextUpdateTime = dayjs().add(15, 'minutes')
+      // only perform an update every fifteen minutes
+      this.emojis = _emojis
     }
-    if (sortable) return this.sortedArray
-    return this.arrayVersion
+    return _emojis
+  }
+
+  // much easier to work with for certain applications in cubemoji
+  // just the emoji names sorted alphabetically
+  // updates state of the class
+  async sortedTxtEmoteArray () {
+    this.emojis = await this.emoteArray()
+    const txtVers = this.emojis.map(cmoji => cmoji.name)
+    txtVers.sort()
+    return txtVers
   }
 
   search (query: string) {
@@ -85,10 +92,8 @@ export class EmoteCache {
       minMatchCharLength: 1,
       threshold: 0.3
     }
-    // performing a type assertion as we know this will always return an array of emotes
-    const emotes = <Discord.GuildEmoji[]> this.createEmoteArray(false)
 
-    const search = new Fuse.default(emotes, options)
+    const search = new Fuse.default(this.emojis, options)
     const results = search.search(query)
     return (results)
   }
@@ -102,7 +107,7 @@ export class EmoteCache {
   retrieve (emote: string) {
     // first convert the name to lowercase so we aren't case sensitive
     const emoteName = emote.toLowerCase()
-    let res = this.arrayVersion.find(emote => {
+    let res = this.emojis.find(emote => {
       // need to watch out for null emote names
       if (emote.name != null) return emote.name.toLowerCase() === emoteName
       return false
@@ -113,17 +118,12 @@ export class EmoteCache {
       // so we take the "flass" part
       const split = emoteName.split(':')
       if (split.length > 2) {
-        res = this.arrayVersion.find(emote => {
+        res = this.emojis.find(emote => {
           if (emote.name != null) return emote.name.toLowerCase() === split[1]
           return false
         })
         if (res === undefined) {
-          const emoji = new Cmoji()
-          Cubemoji.Emoji = {
-            url: 'https://cdn.discordapp.com/emojis/' + split[2],
-            external: true,
-            mutant: false
-          }
+          const emoji = new Cmoji(split[1], 'https://cdn.discordapp.com/emojis/' + split[2], Source.URL)
           emoji.url = emoji.url.slice(0, emoji.url.length - 1) // chop off the '>'
           return emoji
         }
