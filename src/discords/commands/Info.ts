@@ -72,8 +72,8 @@ export abstract class Info {
           console.error(err)
         }
       }
-    }
-    if (member !== undefined) {
+    } else if (member !== undefined) {
+      // user code
       const avatarURL = member.user.displayAvatarURL({ format: 'png', dynamic: true, size: 256 })
       const embed = new MessageEmbed()
       embed.setColor('RANDOM')

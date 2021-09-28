@@ -36,8 +36,8 @@ export abstract class Big {
           console.error(err)
         }
       }
-    }
-    if (member !== undefined) {
+    } else if (member !== undefined) {
+      // user code
       await interaction.reply(member.user.displayAvatarURL({ format: 'png', dynamic: true, size: 256 }))
     }
     if ((member === undefined) && (emote === undefined)) {

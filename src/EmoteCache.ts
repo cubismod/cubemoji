@@ -100,13 +100,15 @@ export class EmoteCache {
   // if cubemoji doesn't have access to the emote then we return a URL
   // to the emote image
   async retrieve (emote: string) {
-    // first convert the name to lowercase so we aren't case sensitive
-    const emoteName = emote.toLowerCase()
-    // try and see if its a nitro emote that we can just grab the URL for
-    // try and read the emote directly
+    // discord emojis are represented in text
     // like <:flass:781664252058533908>
-    // so we take the "flass" part
-    const split = emoteName.slice(1, -1).split(':')
+    // so we split to get the components including name and ID
+    const split = emote.slice(1, -1).split(':')
+    // search by ID or name w/ fuse's extended syntax https://fusejs.io/examples.html#extended-search
+    if (split.length > 2) emote = `${split[2]}|${split[1]}`
+    const searchResults = await this.search(emote)
+    if (searchResults.length > 0) return searchResults[0].item
+    // now we see if we have a nitro emote cubemoji doesn't have in its guilds
     if (split.length > 2) {
       const url = `https://cdn.discordapp.com/emojis/${split[2]}`
       // see if the URL will resolve
@@ -118,14 +120,10 @@ export class EmoteCache {
         // don't do anything on error, means that this is not a nitro emote
       }
     }
-    // if that doesn't work, we do a fuzzy search that should pull an emote
-    const searchResults = await this.search(emoteName)
-    if (searchResults.length > 0) return searchResults[0].item
-    // try to parse a twemoji
+    // else try to parse a twemoji
     const twemoji = this.parseTwemoji(emote)
-    if (twemoji !== '') return new Cmoji(emoteName, twemoji, Source.URL, null)
-    // failure, nothing found at all
-    else return false
+    if (twemoji !== '') return new Cmoji(emote, twemoji, Source.URL, null)
+    return false // nothing found at all
   }
 
   // return the User object https://discord.js.org/#/docs/main/stable/class/User or false if no match found
