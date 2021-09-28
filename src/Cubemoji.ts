@@ -36,13 +36,16 @@ export class Cmoji {
     url: string
     source: Source
     guildEmoji: Discord.GuildEmoji | null // null if our source isn't Discord
+    id: Discord.Snowflake // unique ID is generated for emojis missing an ID otherwise it should be copied from the Discord OBJ
 
-    constructor (name: string | null, url: string, source: Source, guildEmoji: Discord.GuildEmoji | null = null) {
+    constructor (name: string | null, url: string, source: Source, guildEmoji: Discord.GuildEmoji | null = null, id: Discord.Snowflake = Discord.SnowflakeUtil.generate()) {
       // hate this nonsense of a null name, never seen it in the wild
       if (name != null) this.name = name
       else this.name = '??'
       this.url = url
       this.source = source
       this.guildEmoji = guildEmoji
+      // auto generate an ID
+      this.id = id
     }
 }

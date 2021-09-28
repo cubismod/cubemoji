@@ -9,7 +9,7 @@ export abstract class Info {
     description: 'Provides information about an emote or user'
   })
   async info (
-    @SlashOption('emote', { description: 'an emote name or actual emote' })
+    @SlashOption('emote', { description: 'an emote name or actual emote, nitro is fine' })
       emote: string,
     @SlashOption('member', { description: 'a mention of a server member' })
       member: GuildMember,
@@ -20,8 +20,8 @@ export abstract class Info {
     if (emote !== undefined) {
       // emote parsing code
       const emoteName = emote.toLowerCase()
-      const res = companion.cache.retrieve(emoteName)
-      if (res != null) {
+      const res = await companion.cache.retrieve(emoteName)
+      if (res !== false) {
         try {
           await interaction.deferReply()
         } catch (err) {
