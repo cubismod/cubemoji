@@ -3,8 +3,8 @@
 import Fuse = require('fuse.js')
 import Twemoji = require('twemoji-parser')
 import Discord = require('discordx')
-import dayjs = require('dayjs')
 import { Cmoji, Source } from './Cubemoji'
+import mutantNames from './res/emojiNames.json'
 
 // a class which can return an array version of emotes
 // and also only refreshes when necessary
@@ -12,14 +12,11 @@ export class EmoteCache {
   client: Discord.Client
   emojis: Cmoji[]
   sortedArray: string[]
-  nextUpdateTime: dayjs.Dayjs;
 
   constructor (client: Discord.Client) {
     this.client = client
     this.emojis = []
     this.sortedArray = []
-    // we only want to do an update every ten minutes
-    this.nextUpdateTime = dayjs().add(15, 'minutes')
   }
 
   async init () {
@@ -30,10 +27,17 @@ export class EmoteCache {
   private async grabEmojis () {
     const emojis: Cmoji[] = []
     await this.client.guilds.fetch()
+    // add discord emojis
     this.client.guilds.cache.forEach(guild => {
       for (const emoji of guild.emojis.cache.values()) {
         emojis.push(new Cmoji(emoji.name, emoji.url, Source.Discord, emoji))
       }
+    })
+    // then add mutant emojis
+    mutantNames.forEach(emoji => {
+      const url = `https://storage.googleapis.com/cubemoji.appspot.com/mutant-emotes/${emoji}`
+      const name = emoji.slice(0, -4)
+      emojis.push(new Cmoji(name, url, Source.Mutant, null))
     })
     return emojis
   }
@@ -42,14 +46,9 @@ export class EmoteCache {
   async emoteArray () {
     const _emojis: Cmoji[] = []
     const validNames = new Map()
-    // we are just manually iterating through the map to create a list
-    // ensure we only update if there is no data or the update time has lapsed
-    if ((this.emojis.length === 0) ||
-        (dayjs().isAfter(this.nextUpdateTime))) {
-      // load up our blacklist.json file
-      // note that with the require(), you need to restart app
-      // for it to see changes to the file
-      const blacklist = require('./blacklist.json').blacklist
+    const blacklist = require('./blacklist.json').blacklist
+    if (this.emojis.length === 0) {
+      // only initialize emotes at launch
       const rawEmojis = await this.grabEmojis()
       rawEmojis.forEach(value => {
         // utilize the blacklist.json file to remove bad emotes
@@ -68,8 +67,6 @@ export class EmoteCache {
           validNames.set(ogName, inc)
         }
       })
-      this.nextUpdateTime = dayjs().add(15, 'minutes')
-      // only perform an update every fifteen minutes
       this.emojis = _emojis
     }
     return _emojis
