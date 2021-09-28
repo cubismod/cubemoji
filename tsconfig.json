@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
-    "lib": ["es2017", "ESNext.AsyncIterable"],
+    "lib": ["ES2021", "ESNext.AsyncIterable"],
     "module": "commonjs",
-    "target": "es2017",
+    "target": "ES2021",
     "outDir": "build",
     "sourceMap": true,
 
@@ -20,7 +20,8 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "importHelpers": true,
+    "moduleResolution": "node"
   },
-  "include": ["./**/*"],
+  "include": ["src/**/*"],
   "exclude": ["node_modules"]
 }

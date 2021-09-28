@@ -77,9 +77,7 @@ export class EmoteCache {
 
   // much easier to work with for certain applications in cubemoji
   // just the emoji names sorted alphabetically
-  // updates state of the class
   async sortedTxtEmoteArray () {
-    this.emojis = await this.emoteArray()
     const txtVers = this.emojis.map(cmoji => cmoji.name)
     txtVers.sort()
     return txtVers

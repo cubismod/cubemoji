@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import { EmoteCache } from './emote-cache'
+import { EmoteCache } from './EmoteCache'
 import workerpool = require('workerpool')
 import fbadmin = require('firebase-admin')
 import Discord = require('discord.js')

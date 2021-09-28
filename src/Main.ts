@@ -6,8 +6,6 @@ import secrets from '../secrets.json'
 import pkginfo from '../package.json'
 import { Companion } from './Cubemoji'
 
-var cubem
-
 export class Main {
   private static _client: Client
 
@@ -25,8 +23,7 @@ export class Main {
         Intents.FLAGS.GUILD_MESSAGE_REACTIONS
       ],
       classes: [
-        `${__dirname}/discords/*Discord.ts`, // glob string to load the classes
-        `${__dirname}/discords/*Discord.js` // If you compile using "tsc" the file extension change to .js
+        `${__dirname}/**/*.{js,ts}` // glob string to load the classes
       ],
       // for testing purposes in cubemoji server
       silent: false
@@ -35,11 +32,12 @@ export class Main {
     await this._client.login(secrets.token)
 
     this._client.once('ready', async () => {
-      await this._client.initApplicationCommands()
       // now we need to load up our global var
       globalThis.companion = new Companion(this.Client)
       // let the client actually load the emotes in now
-      await global.companion.cache.init()
+      await globalThis.companion.cache.init()
+
+      await this._client.initApplicationCommands()
 
       console.log(`cubemoji ${pkginfo.version} is now running...`)
     })
