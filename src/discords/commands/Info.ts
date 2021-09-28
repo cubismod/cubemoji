@@ -54,6 +54,15 @@ export abstract class Info {
             } catch (err) {
               console.error(err)
             }
+            break
+          }
+          default: {
+            embed.setFooter('Note that this emote may actually be animated but the Discord embed is not, click and open in your browser to check.')
+            try {
+              await interaction.editReply({ embeds: [embed] })
+            } catch (err) {
+              console.error(err)
+            }
           }
         }
       } else {
