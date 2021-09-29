@@ -40,11 +40,17 @@ export class Main {
       await globalThis.companion.cache.init()
 
       await this._client.initApplicationCommands()
+      await this._client.initApplicationPermissions()
 
       console.log(`cubemoji ${pkginfo.version} is now running...`)
     })
 
     this._client.on('interaction', (interaction) => {
+      if (interaction.isButton() || interaction.isSelectMenu()) {
+        if (interaction.customId.startsWith('discordx@pagination@')) {
+          return
+        }
+      }
       this._client.executeInteraction(interaction)
     })
   }
