@@ -6,6 +6,7 @@ import { Cmoji, Source } from './Cubemoji'
 import mutantNames from './res/emojiNames.json'
 import got from 'got/dist/source'
 import Fuse from 'fuse.js'
+import { GuildEmoji } from 'discord.js'
 
 // a class which can return an array version of emotes
 // and also only refreshes when necessary
@@ -13,11 +14,14 @@ export class EmoteCache {
   client: Discord.Client
   emojis: Cmoji[]
   sortedArray: string[]
+  discEmojis: GuildEmoji[] // save references to discord emojis for functions that wouldn't work well
+  // with image emojis
 
   constructor (client: Discord.Client) {
     this.client = client
     this.emojis = []
     this.sortedArray = []
+    this.discEmojis = []
   }
 
   async init () {
@@ -32,6 +36,7 @@ export class EmoteCache {
     this.client.guilds.cache.forEach(guild => {
       for (const emoji of guild.emojis.cache.values()) {
         emojis.push(new Cmoji(emoji.name, emoji.url, Source.Discord, emoji, emoji.id))
+        this.discEmojis.push(emoji)
       }
     })
     // then add mutant emojis
@@ -90,8 +95,19 @@ export class EmoteCache {
     }
 
     const search = new Fuse(this.emojis, options)
-    const results = search.search(query)
-    return (results)
+    return (search.search(query))
+  }
+
+  // only search Discord emojis
+  searchDiscord (query: string) {
+    const options = {
+      keys: ['name'],
+      useExtendedSearch: true,
+      minMatchCharLength: 1,
+      threshold: 0.3
+    }
+    const search = new Fuse(this.discEmojis, options)
+    return (search.search(query))
   }
 
   // retrieves an emote based on title
