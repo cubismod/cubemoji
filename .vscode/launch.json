@@ -13,7 +13,8 @@
             "cwd": "${workspaceRoot}",
             "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
             "internalConsoleOptions": "neverOpen",
-            "runtimeVersion": "16"
+            "runtimeVersion": "16",
+            "smartStep": true
         },
         {
             "type": "node",

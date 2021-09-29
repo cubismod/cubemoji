@@ -2,6 +2,7 @@
 import { CommandInteraction, MessageEmbed, GuildMember } from 'discord.js'
 import { Discord, Slash, SlashOption } from 'discordx'
 import { Companion, Source } from '../../Cubemoji'
+import strings from '../../res/strings.json'
 
 @Discord()
 export abstract class Info {
@@ -9,9 +10,9 @@ export abstract class Info {
     description: 'Provides information about an emote or user'
   })
   async info (
-    @SlashOption('emote', { description: 'an emote name or actual emote, nitro is fine' })
+    @SlashOption('emote', { description: strings.emoteSlash })
       emote: string,
-    @SlashOption('member', { description: 'a mention of a server member' })
+    @SlashOption('member', { description: strings.memberSlash })
       member: GuildMember,
       interaction: CommandInteraction
   ) {
@@ -67,7 +68,7 @@ export abstract class Info {
         }
       } else {
         try {
-          await interaction.reply({ content: '**Error**: Emote not found!', ephemeral: true })
+          await interaction.reply({ content: strings.noEmoteFound, ephemeral: true })
         } catch (err) {
           console.error(err)
         }
@@ -91,7 +92,7 @@ export abstract class Info {
     }
     if ((member === undefined) && (emote === undefined)) {
       try {
-        await interaction.reply({ content: '**Error**: No arguments specified', ephemeral: true })
+        await interaction.reply({ content: strings.noArgs, ephemeral: true })
       } catch (err) {
         console.error(err)
       }
