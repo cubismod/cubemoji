@@ -1,0 +1,51 @@
+import { CommandInteraction, GuildEmoji } from 'discord.js'
+import { Discord, Slash, SlashOption } from 'discordx'
+import { choice, geometricReservoirSample } from 'pandemonium'
+import { Companion } from '../../Cubemoji'
+
+@Discord()
+export abstract class Random {
+  @Slash('random', {
+    description: 'insert a random emote'
+  })
+  async random (
+    @SlashOption('copies', { description: 'how many emotes would you like in the chat, max 25' })
+      copies: number,
+    @SlashOption('flushed', { description: 'whether you want only flushed emotes' })
+      flushed: boolean,
+      interaction: CommandInteraction
+  ) {
+    const companion : Companion = globalThis.companion
+    try {
+      await interaction.deferReply()
+    } catch (error) {
+      console.error(error)
+    }
+    // depending on the user option, we will either grab all discord emojis to sample from or
+    // just flushed emojis
+    let emoteOptions: GuildEmoji[]
+    if (flushed) emoteOptions = companion.cache.searchDiscord('flushed').map(fuseResult => fuseResult.item)
+    else emoteOptions = companion.cache.discEmojis
+
+    if (copies < 26) {
+      // we will need to use a different sampling method like this
+
+      const emotes = geometricReservoirSample(copies, emoteOptions)
+      try {
+        // here we are iterating through the emotes to get textual representations in a string[]
+        // and then we join that list to send back to the user
+        await interaction.editReply(
+          emotes.map(emote => emote.toString()).join('')
+        )
+      } catch (error) {
+        console.error(error)
+      }
+    } else {
+      try {
+        await interaction.editReply(choice(emoteOptions).toString())
+      } catch (error) {
+        console.error(error)
+      }
+    }
+  }
+}
