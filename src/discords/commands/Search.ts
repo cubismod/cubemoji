@@ -49,7 +49,8 @@ export abstract class Search {
         .setTitle(`Search for ${query} (${results.length})`)
         .setDescription(discEmotes.join('').slice(0, 2047)) // avoid api error of going over char count
         .setColor('BLUE')
-        .setFooter('Searching yielding tons of results will be truncated. Use `/list` to get a list of all emotes. Below are emotes from the Mutant emote pack (https://mutant.tech/) that you can use with Cubemoji!')
+        .setFooter('Searches yielding tons of results will be truncated. Use `/list` to get a list of all emotes.')
+        .addField('Mutant Emojis', 'Below there may be emotes from the [Mutant emote pack](https://mutant.tech/) that you can use with Cubemoji as well with their names!')
       embeds.unshift(discEmbed)
       try {
         await interaction.editReply({ embeds: embeds })
