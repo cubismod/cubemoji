@@ -54,7 +54,7 @@ export async function checkImage (message: Discord.Message) {
     if (valid) return args[0]
   }
   // or else try the cache
-  const res = companion.cache.retrieve(argName)
+  const res = await companion.cache.retrieve(argName)
   if (!res) {
   // if not that then we search
     const searchRes = companion.cache.search(args[0])
