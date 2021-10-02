@@ -27,6 +27,7 @@ export abstract class Info {
           await interaction.deferReply()
         } catch (err) {
           console.error(err)
+          return
         }
         const embed = new MessageEmbed()
         embed.setColor('RANDOM')

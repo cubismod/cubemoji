@@ -10,8 +10,22 @@ import { Companion } from './Cubemoji'
 
 const companion : Companion = globalThis.companion
 
+// return true if this is a URL w/ a valid extension, false if it isn't
+export async function isUrl (url: string) {
+  const urlReg = /^https?:\/\/.+/
+  if (url.match(urlReg)) {
+    // looks like an https url
+    // now check the filetype
+    const stream = await got.stream(url)
+    const type = await FileType.fromStream(stream)
+    const validTypes = ['jpg', 'jpeg', 'gif', 'png']
+
+    if (type !== undefined && validTypes.includes(type.ext)) return true
+    else return false
+  } else return false
+}
+
 // check whether an image is a valid type
-// TODO: implement promise rejection here
 export async function checkValidType (url: string) {
   const stream = await got.stream(url)
   const type = await FileType.fromStream(stream)

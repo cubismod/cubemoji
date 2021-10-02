@@ -1,6 +1,5 @@
 /* eslint-disable no-unused-vars */
 import { EmoteCache } from './EmoteCache'
-import workerpool = require('workerpool')
 import fbadmin = require('firebase-admin')
 import Discord = require('discord.js')
 import { Client } from 'discordx'
@@ -52,14 +51,12 @@ export enum Effects {
 // a class that we can pass around and carry useful objects on
 export class Companion {
   cache: EmoteCache // custom emote cache that extends what just the discord client offers
-  pool: workerpool.WorkerPool // workers used for jimp actions
-  rescaleMsgs: Map<Discord.Snowflake, Discord.Snowflake>
+  imgMsgs: Map<Discord.Snowflake, Discord.Snowflake> // keep track of what messages we send for edits, rescales, afs
 
   // start up a fresh companion
   constructor (client: Client) {
     this.cache = new EmoteCache(client)
-    this.pool = workerpool.pool()
-    this.rescaleMsgs = new Map<Discord.Snowflake, Discord.Snowflake>()
+    this.imgMsgs = new Map<Discord.Snowflake, Discord.Snowflake>()
   }
 }
 

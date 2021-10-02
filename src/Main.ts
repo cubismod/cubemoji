@@ -5,7 +5,6 @@ import { Client } from 'discordx'
 import secrets from '../secrets.json'
 import pkginfo from '../package.json'
 import { Companion } from './Cubemoji'
-import workerpool from 'workerpool'
 export class Main {
   private static _client: Client
 
@@ -53,13 +52,6 @@ export class Main {
       }
       this._client.executeInteraction(interaction)
     })
-  }
-
-  static initWorkerPool () {
-    const companion : Companion = globalThis.companion
-    const pool = workerpool.pool(`${__dirname}/EmoteCache.ts`)
-    console.log(pool.stats)
-    companion.pool = pool
   }
 }
 

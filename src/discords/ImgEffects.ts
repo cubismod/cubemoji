@@ -13,7 +13,7 @@ const projDir = path.resolve('../../')
 
 // perform a liquid rescale/ seam carving on an image
 // returns the path to the image file
-export async function rescale (externalUrl: string) {
+export async function performRescale (externalUrl: string) {
   const localUrl = await downloadImage(externalUrl)
   // now we need build our edit parameters for graphicsmagick
   let newSize = ''
@@ -68,7 +68,7 @@ export async function addFace (baseUrl: string, face: string) {
 
 // edits an image
 // returns the file path to the edited image
-export async function edit (baseUrl: string, effects: Effects[]) {
+export async function performEdit (baseUrl: string, effects: Effects[]) {
   const localUrl = await downloadImage(baseUrl)
   const ft = await fromFile(localUrl)
   if (ft !== undefined) {
@@ -170,4 +170,16 @@ export async function edit (baseUrl: string, effects: Effects[]) {
   } else {
     throw Error(strings.fileTypeUndetermined)
   }
+}
+
+// generate a set of up to 10 random edit options
+export function generateEditOptions () {
+  const options: Effects[] = []
+  const optLen = random(1, 10)
+  for (let i = 0; i < optLen; i++) {
+    // there are 29 effects options in the enum
+    // if i ever add more i'll need to change this bit
+    options.push(random(0, 29))
+  }
+  return options
 }
