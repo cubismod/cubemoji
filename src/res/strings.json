@@ -2,5 +2,6 @@
   "emoteSlash": "inserts an emote into chat",
   "memberSlash": "a mention of a server member",
   "noEmoteFound": "**Error:** no emote found",
-  "noArgs": "**Error**: No arguments specified"
+  "noArgs": "**Error**: No arguments specified",
+  "fileTypeUndetermined": "could not determine filetype of image"
 }

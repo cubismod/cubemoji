@@ -32,7 +32,6 @@
     "fuse.js": "^6.4.4",
     "gm": "^1.23.1",
     "got": "^11.8.2",
-    "jimp": "^0.16.1",
     "node-emoji": "^1.10.0",
     "pandemonium": "^2.0.0",
     "reflect-metadata": "^0.1.13",
