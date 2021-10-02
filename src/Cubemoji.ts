@@ -16,6 +16,39 @@ export enum Source {
   URL
 }
 
+// effects used in an edit operation
+export enum Effects {
+  Blur,
+  Charcoal,
+  Cycle,
+  Edge,
+  Emboss,
+  Enhance,
+  Equalize,
+  Flip,
+  Flop,
+  Implode,
+  Magnify,
+  Median,
+  Minify,
+  Monochrome,
+  Mosaic,
+  Motionblur,
+  Noise,
+  Normalize,
+  Paint,
+  Roll,
+  Rotate,
+  Sepia,
+  Shave,
+  Sharpen,
+  Solarize,
+  Spread,
+  Swirl,
+  Threshold,
+  Trim,
+  Wave
+}
 // a class that we can pass around and carry useful objects on
 export class Companion {
   cache: EmoteCache // custom emote cache that extends what just the discord client offers
