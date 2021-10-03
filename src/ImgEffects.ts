@@ -3,13 +3,11 @@
 // from the fs once done
 import { fromFile } from 'file-type'
 import { random, randomFloat, randomIndex } from 'pandemonium'
-import { downloadImage } from '../CommandHelper'
+import { downloadImage } from './CommandHelper'
 import gm = require('gm')
 import path = require('path')
-import strings from '../res/strings.json'
-import { Effects } from '../Cubemoji'
-
-const projDir = path.resolve('../../')
+import strings from './res/strings.json'
+import { Effects } from './Cubemoji'
 
 // perform a liquid rescale/ seam carving on an image
 // returns the path to the image file
@@ -33,7 +31,7 @@ export async function performRescale (externalUrl: string) {
   // get the file type of the image file
   const ft = await fromFile(localUrl)
   if (ft !== undefined) {
-    const filePath = path.join(projDir, `download/${Date.now()}.${ft.ext}}`)
+    const filePath = path.resolve(`download/${Date.now()}.${ft.ext}}`)
     // imagemagick only has liquid rescale, not graphicsmagick
     gm.subClass({ imageMagick: true })(localUrl)
       .out('-liquidrescale', newSize)
@@ -42,7 +40,7 @@ export async function performRescale (externalUrl: string) {
       })
     return filePath
   } else {
-    throw Error(strings.fileTypeUndetermined)
+    return undefined
   }
 }
 
@@ -53,16 +51,16 @@ export async function addFace (baseUrl: string, face: string) {
   // this also determines if the base image exists
   const ft = await fromFile(localUrl)
   if (ft !== undefined) {
-    const filePath = path.join(projDir, `download/${Date.now()}.${ft.ext}}`)
+    const filePath = path.resolve(`download/${Date.now()}.${ft.ext}}`)
     gm(localUrl)
       // test this
-      .composite(path.join(projDir, `assets/${face}.png`))
+      .composite(path.resolve(`assets/${face}.png`))
       .write(filePath, (err) => {
         if (err) throw (err)
       })
     return filePath
   } else {
-    throw Error(strings.fileTypeUndetermined)
+    return undefined
   }
 }
 
@@ -72,7 +70,7 @@ export async function performEdit (baseUrl: string, effects: Effects[]) {
   const localUrl = await downloadImage(baseUrl)
   const ft = await fromFile(localUrl)
   if (ft !== undefined) {
-    const filePath = path.join(projDir, `download/${Date.now()}.${ft.ext}}`)
+    const filePath = path.resolve(`download/${Date.now()}.${ft.ext}}`)
     const img = gm(filePath)
     // apply all the image effects one by one according to the string
     effects.forEach(effect => {
@@ -168,7 +166,7 @@ export async function performEdit (baseUrl: string, effects: Effects[]) {
     })
     return filePath
   } else {
-    throw Error(strings.fileTypeUndetermined)
+    return undefined
   }
 }
 

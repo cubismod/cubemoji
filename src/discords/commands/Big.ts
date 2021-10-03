@@ -18,35 +18,19 @@ export abstract class Big {
     const companion : Companion = globalThis.companion
     if (emote !== undefined) {
       // emote parsing code
-      try {
-        await interaction.deferReply()
-      } catch (err) {
-        console.error(err)
-      }
+      await interaction.deferReply()
       const retrievedEmoji = await companion.cache.retrieve(emote)
-      if (retrievedEmoji) {
-        try {
-          await interaction.editReply(retrievedEmoji.url)
-        } catch (err) {
-          console.error(err)
-        }
+      if (retrievedEmoji !== undefined) {
+        await interaction.editReply(retrievedEmoji.url)
       } else {
-        try {
-          await interaction.editReply(strings.noEmoteFound)
-        } catch (err) {
-          console.error(err)
-        }
+        await interaction.editReply(strings.noEmoteFound)
       }
     } else if (member !== undefined) {
       // user code
       await interaction.reply(member.user.displayAvatarURL({ format: 'png', dynamic: true, size: 256 }))
     }
     if ((member === undefined) && (emote === undefined)) {
-      try {
-        await interaction.reply({ content: strings.noArgs, ephemeral: true })
-      } catch (err) {
-        console.error(err)
-      }
+      await interaction.reply({ content: strings.noArgs, ephemeral: true })
     }
   }
 }

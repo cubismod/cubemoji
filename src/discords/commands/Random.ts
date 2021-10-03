@@ -29,23 +29,14 @@ export abstract class Random {
 
     if (copies < 26) {
       // we will need to use a different sampling method like this
-
       const emotes = geometricReservoirSample(copies, emoteOptions)
-      try {
-        // here we are iterating through the emotes to get textual representations in a string[]
-        // and then we join that list to send back to the user
-        await interaction.editReply(
-          emotes.map(emote => emote.toString()).join('')
-        )
-      } catch (error) {
-        console.error(error)
-      }
+      // here we are iterating through the emotes to get textual representations in a string[]
+      // and then we join that list to send back to the user
+      await interaction.editReply(
+        emotes.map(emote => emote.toString()).join('')
+      )
     } else {
-      try {
-        await interaction.editReply(choice(emoteOptions).toString())
-      } catch (error) {
-        console.error(error)
-      }
+      await interaction.editReply(choice(emoteOptions).toString())
     }
   }
 }

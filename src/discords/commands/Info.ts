@@ -22,7 +22,7 @@ export abstract class Info {
       // emote parsing code
       const emoteName = emote.toLowerCase()
       const res = await companion.cache.retrieve(emoteName)
-      if (res !== false) {
+      if (res !== undefined) {
         try {
           await interaction.deferReply()
         } catch (err) {

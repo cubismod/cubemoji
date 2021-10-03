@@ -47,10 +47,7 @@ export abstract class About {
         value: 'https://gitlab.com/cubismod/cubemoji/-/issues'
       }
     ])
-    try {
-      await interaction.reply({ embeds: [embed] })
-    } catch (err) {
-      console.error(err)
-    }
+
+    await interaction.reply({ embeds: [embed] })
   }
 }

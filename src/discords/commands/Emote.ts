@@ -14,14 +14,10 @@ export abstract class Emote {
       interaction: CommandInteraction
   ) {
     if (emote !== undefined) {
-      try {
-        await interaction.deferReply()
-      } catch (err) {
-        console.error(err)
-      }
+      await interaction.deferReply()
       const companion : Companion = globalThis.companion
       const retrievedEmoji = await companion.cache.retrieve(emote)
-      if (retrievedEmoji !== false) {
+      if (retrievedEmoji !== undefined) {
         let msg = ''
         // now send a different obj depending on what type of emote we are sending
         switch (retrievedEmoji.source) {
@@ -33,24 +29,12 @@ export abstract class Emote {
           case Source.URL:
             msg = retrievedEmoji.url
         }
-        try {
-          await interaction.editReply(msg)
-        } catch (err) {
-          console.error(err)
-        }
+        await interaction.editReply(msg)
       } else {
-        try {
-          await interaction.editReply({ content: strings.noEmoteFound })
-        } catch (err) {
-          console.error(err)
-        }
+        await interaction.editReply({ content: strings.noEmoteFound })
       }
     } else {
-      try {
-        await interaction.reply({ content: strings.noArgs, ephemeral: true })
-      } catch (err) {
-        console.error(err)
-      }
+      await interaction.reply({ content: strings.noArgs, ephemeral: true })
     }
   }
 }

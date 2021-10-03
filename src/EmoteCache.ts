@@ -139,7 +139,7 @@ export class EmoteCache {
     // else try to parse a twemoji
     const twemoji = this.parseTwemoji(emote)
     if (twemoji !== '') return new Cmoji(emote, twemoji, Source.URL, null)
-    return false // nothing found at all
+    return undefined // nothing found at all
   }
 
   // return the User object https://discord.js.org/#/docs/main/stable/class/User or false if no match found
@@ -149,7 +149,7 @@ export class EmoteCache {
       // https://discord.js.org/#/docs/collection/master/class/Collection?scrollTo=get
       // returns a nice undefined
       const user = client.users.cache.get(found[1])
-      if (undefined) return false
+      if (undefined) return undefined
       else return user
     }
     return false

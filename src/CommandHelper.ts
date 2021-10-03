@@ -41,7 +41,7 @@ export async function getUrl (source: string) {
  * @returns promise for a url or rejection if a download issue occurs
  */
 export async function downloadImage (url: string) {
-  const fn = path.resolve(`./download/${Date.now()}`)
+  const fn = path.resolve(`download/${Date.now()}`)
   got.stream(url)
     .on('downloadProgress', progress => {
       // cap downloads at 50MB

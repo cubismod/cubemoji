@@ -13,11 +13,8 @@ export abstract class Search {
       query: string,
       interaction: CommandInteraction
   ) {
-    try {
-      await interaction.deferReply({ ephemeral: true }) // ephemeral to avoid spam
-    } catch (err) {
-      console.error(err)
-    }
+    await interaction.deferReply({ ephemeral: true }) // ephemeral to avoid spam
+
     const companion : Companion = globalThis.companion
     const results = companion.cache.search(query)
     if (results.length > 0) {
@@ -52,17 +49,9 @@ export abstract class Search {
         .setFooter('Searches yielding tons of results will be truncated. Use `/list` to get a list of all emotes.')
         .addField('Mutant Emojis', 'Below there may be emotes from the [Mutant emote pack](https://mutant.tech/) that you can use with Cubemoji as well with their names!')
       embeds.unshift(discEmbed)
-      try {
-        await interaction.editReply({ embeds: embeds })
-      } catch (error) {
-        console.error(error)
-      }
+      await interaction.editReply({ embeds: embeds })
     } else {
-      try {
-        await interaction.editReply(strings.noEmoteFound)
-      } catch (error) {
-        console.error(error)
-      }
+      await interaction.editReply(strings.noEmoteFound)
     }
   }
 }

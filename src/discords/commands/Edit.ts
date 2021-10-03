@@ -1,10 +1,10 @@
 import { CommandInteraction, MessageAttachment } from 'discord.js'
 import { Discord, Slash, SlashOption } from 'discordx'
-import { Companion, Effects } from '../../Cubemoji'
+import { Effects } from '../../Cubemoji'
 import strings from '../../res/strings.json'
 import imgEffects from '../../res/imgEffects.json'
-import { isUrl } from '../../CommandHelper'
-import { generateEditOptions, performEdit } from '../ImgEffects'
+import { getUrl } from '../../CommandHelper'
+import { generateEditOptions, performEdit } from '../../ImgEffects'
 
 @Discord()
 export abstract class Edit {
@@ -18,7 +18,6 @@ export abstract class Edit {
       list: boolean,
       interaction: CommandInteraction
   ) {
-    const companion : Companion = globalThis.companion
     if (list) {
       // just give the user back the effects options
       try {
@@ -136,42 +135,24 @@ export abstract class Edit {
           })
         }
         // done parsing the effects, now let's try and parse what we're trying to edit
-        let url = false
-        try {
-          url = await isUrl(source)
-        } catch (err) {
-          console.error(err)
+        const url = await getUrl(source)
+        if (url !== undefined) {
+          // now perform the edit
           try {
-            await interaction.editReply(strings.sourceErr)
+            const editedPath = await performEdit(url, parsedEffects)
+            const attach = new MessageAttachment(editedPath)
+            await interaction.editReply({ files: [attach] })
           } catch (err) {
-            console.error(err)
-          }
-        }
-        // url is true if we have a valid URL otherwise, let's check if we have an emote
-        let urlToEdit = ''
-        if (url) urlToEdit = source
-        else {
-          // let's see if we can find an emote
-          const res = await companion.cache.retrieve(source)
-          if (res === false) {
             try {
-              // nothing found
-              await interaction.editReply(strings.noEmoteFound)
+              await interaction.editReply(strings.imgErr)
               return
             } catch (err) {
               console.error(err)
             }
-          } else urlToEdit = res.url
-        }
-        // now perform the edit
-        try {
-          const editedPath = await performEdit(urlToEdit, parsedEffects)
-          const attach = new MessageAttachment(editedPath)
-          await interaction.editReply({ files: [attach] })
-        } catch (err) {
+          }
+        } else {
           try {
             await interaction.editReply(strings.imgErr)
-            return
           } catch (err) {
             console.error(err)
           }
