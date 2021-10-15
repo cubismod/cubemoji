@@ -87,23 +87,26 @@ export class CubeMessageManager {
     this.sentMessages = new Map()
   }
 
-  registerDelete (interaction: CommandInteraction, msg: Message) {
+  registerTrashReact (interaction: CommandInteraction, msg: Message) {
     if (interaction.guild &&
       interaction.guild.me &&
       interaction.channel &&
       interaction.guild.me.permissionsIn(interaction.channelId).has('MANAGE_MESSAGES') &&
       interaction.guild.me.permissionsIn(interaction.channelId).has('ADD_REACTIONS') &&
-      msg.member) {
+      interaction.member) {
       // all these checks to ensure cubemoji can delete the message and can also add a react
       msg.react('🗑️')
-      this.sentMessages.set(msg.id, msg.member.id)
+      this.sentMessages.set(msg.id, interaction.member.user.id)
     }
   }
 
-  unregisterMessage (msg: Message) {
-    if (msg.member) {
-      this.sentMessages.delete(msg.id)
-    }
+  // retrieves the user ID in snowflake form or undefined if there is no message associated with that id
+  retrieveUser (messageID: Snowflake) {
+    return this.sentMessages.get(messageID)
+  }
+
+  unregisterMessage (msgID: Snowflake) {
+    this.sentMessages.delete(msgID)
   }
 }
 

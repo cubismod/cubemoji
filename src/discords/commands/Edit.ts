@@ -137,7 +137,7 @@ export abstract class Edit {
               const msg = await interaction.editReply({ files: [attach] })
               await watcher.close()
               // now add a trash can reaction
-              if (msg instanceof Message) cubeMessageManager.registerDelete(interaction, msg)
+              if (msg instanceof Message) cubeMessageManager.registerTrashReact(interaction, msg)
             })
           } else {
             await interaction.editReply('**Error**: could not perform the edit')
