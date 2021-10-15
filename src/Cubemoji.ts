@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import { Snowflake } from 'discord-api-types'
-import { GuildEmoji, SnowflakeUtil } from 'discord.js'
+import { CommandInteraction, GuildEmoji, Message, SnowflakeUtil } from 'discord.js'
 import { Discord } from 'discordx'
 import { unlink } from 'fs'
 import { injectable } from 'tsyringe'
@@ -57,7 +57,7 @@ export enum Effects {
 // and when we hit 20 images, we delete the last one so that we aren't
 // filling the disk
 export class ImageQueue {
-  images: string[]
+  private images: string[]
   constructor () {
     this.images = []
   }
@@ -74,6 +74,36 @@ export class ImageQueue {
       }
     }
     this.images.push(image)
+  }
+}
+
+@Discord()
+@injectable()
+// used to keep track of cubemoji sent messages
+export class CubeMessageManager {
+  // first option is the message ID, second option is the user ID who sent the message
+  private sentMessages: Map<Snowflake, Snowflake>
+  constructor () {
+    this.sentMessages = new Map()
+  }
+
+  registerDelete (interaction: CommandInteraction, msg: Message) {
+    if (interaction.guild &&
+      interaction.guild.me &&
+      interaction.channel &&
+      interaction.guild.me.permissionsIn(interaction.channelId).has('MANAGE_MESSAGES') &&
+      interaction.guild.me.permissionsIn(interaction.channelId).has('ADD_REACTIONS') &&
+      msg.member) {
+      // all these checks to ensure cubemoji can delete the message and can also add a react
+      msg.react('🗑️')
+      this.sentMessages.set(msg.id, msg.member.id)
+    }
+  }
+
+  unregisterMessage (msg: Message) {
+    if (msg.member) {
+      this.sentMessages.delete(msg.id)
+    }
   }
 }
 

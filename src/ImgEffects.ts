@@ -67,6 +67,7 @@ export async function addFace (baseUrl: string, face: string) {
 
 // edits an image
 // returns the file path to the edited image
+// TODO: figure out why images occasionally return 0 byte files
 export async function performEdit (baseUrl: string, effects: Effects[]) {
   const localUrl = await downloadImage(baseUrl)
   const ft = await fromFile(localUrl)

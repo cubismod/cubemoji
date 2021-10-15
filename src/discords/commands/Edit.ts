@@ -1,11 +1,12 @@
-import { CommandInteraction, MessageAttachment } from 'discord.js'
+import { CommandInteraction, Message, MessageAttachment } from 'discord.js'
 import { Discord, Slash, SlashOption } from 'discordx'
-import { Effects } from '../../Cubemoji'
+import { CubeMessageManager, Effects } from '../../Cubemoji'
 import strings from '../../res/strings.json'
 import imgEffects from '../../res/imgEffects.json'
 import { getUrl } from '../../CommandHelper'
 import { generateEditOptions, performEdit } from '../../ImgEffects'
 import { watch } from 'chokidar'
+import { container } from 'tsyringe'
 
 @Discord()
 export abstract class Edit {
@@ -127,13 +128,16 @@ export abstract class Edit {
         if (url) {
           // now perform the edit
           const filename = await performEdit(url, parsedEffects)
+          const cubeMessageManager = container.resolve(CubeMessageManager)
           if (filename) {
             const watcher = watch(filename)
             watcher.on('add', async () => {
               // most likely the file has been created by now
               const attach = new MessageAttachment(filename)
-              await interaction.editReply({ files: [attach] })
+              const msg = await interaction.editReply({ files: [attach] })
               await watcher.close()
+              // now add a trash can reaction
+              if (msg instanceof Message) cubeMessageManager.registerDelete(interaction, msg)
             })
           } else {
             await interaction.editReply('**Error**: could not perform the edit')

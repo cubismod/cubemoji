@@ -70,7 +70,6 @@ export async function downloadImage (url: string) {
  * undefined if there is no container
  */
 export function grabEmoteCache () {
-  if (DIService.container) {
-    return container.resolve(EmoteCache)
-  } else return undefined
+  if (DIService.container) return container.resolve(EmoteCache)
+  else return undefined
 }
