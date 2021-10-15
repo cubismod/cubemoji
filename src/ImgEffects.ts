@@ -6,8 +6,9 @@ import { random, randomFloat, randomIndex } from 'pandemonium'
 import { downloadImage } from './CommandHelper'
 import gm = require('gm')
 import path = require('path')
-import { Effects } from './Cubemoji'
+import { Effects, ImageQueue } from './Cubemoji'
 import { randomUUID } from 'crypto'
+import { container } from 'tsyringe'
 
 // perform a liquid rescale/ seam carving on an image
 // returns the path to the image file
@@ -69,7 +70,8 @@ export async function addFace (baseUrl: string, face: string) {
 export async function performEdit (baseUrl: string, effects: Effects[]) {
   const localUrl = await downloadImage(baseUrl)
   const ft = await fromFile(localUrl)
-  if (ft !== undefined) {
+  const imageQueue = container.resolve(ImageQueue)
+  if (ft && imageQueue) {
     const filename = path.resolve(`download/${randomUUID()}.${ft.ext}`)
     const img = gm(localUrl)
     // apply all the image effects one by one according to the string
@@ -161,9 +163,11 @@ export async function performEdit (baseUrl: string, effects: Effects[]) {
           break
       }
     })
-    img.write(filename, (err) => {
+    img.write(filename, async (err) => {
       if (err) console.error(err)
     })
+    await imageQueue.enqueue(localUrl)
+    await imageQueue.enqueue(filename)
     return filename
   } else {
     return undefined

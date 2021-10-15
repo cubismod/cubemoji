@@ -124,14 +124,14 @@ export abstract class Edit {
         }
         // done parsing the effects, now let's try and parse what we're trying to edit
         const url = await getUrl(source)
-        if (url !== undefined) {
+        if (url) {
           // now perform the edit
-          const editedPath = await performEdit(url, parsedEffects)
-          if (editedPath !== undefined) {
-            const watcher = watch(editedPath)
+          const filename = await performEdit(url, parsedEffects)
+          if (filename) {
+            const watcher = watch(filename)
             watcher.on('add', async () => {
               // most likely the file has been created by now
-              const attach = new MessageAttachment(editedPath)
+              const attach = new MessageAttachment(filename)
               await interaction.editReply({ files: [attach] })
               await watcher.close()
             })

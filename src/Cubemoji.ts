@@ -1,6 +1,9 @@
 /* eslint-disable no-unused-vars */
 import { Snowflake } from 'discord-api-types'
 import { GuildEmoji, SnowflakeUtil } from 'discord.js'
+import { Discord } from 'discordx'
+import { unlink } from 'fs'
+import { injectable } from 'tsyringe'
 
 // the emoji can come from a few places
 // Discord implies that this carries a GuildEmoji object
@@ -45,6 +48,33 @@ export enum Effects {
   Threshold,
   Trim,
   Wave
+}
+
+@Discord()
+@injectable()
+// used to keep track of images saved on disk
+// basically we just add another image to the queue
+// and when we hit 20 images, we delete the last one so that we aren't
+// filling the disk
+export class ImageQueue {
+  images: string[]
+  constructor () {
+    this.images = []
+  }
+
+  async enqueue (image: string) {
+    if (this.images.length > 19) {
+      // delete first item
+      const first = this.images.shift()
+      if (first) {
+        console.log(`deleting ${first}`)
+        await unlink(first, (err) => {
+          if (err) console.error(err)
+        })
+      }
+    }
+    this.images.push(image)
+  }
 }
 
 // an individual emote
