@@ -4,7 +4,9 @@ import got from 'got/dist/source'
 import { createWriteStream } from 'fs'
 import path = require('path')
 import { reject } from 'p-cancelable'
-import { Companion } from './Cubemoji'
+import { DIService } from 'discordx'
+import { container } from 'tsyringe'
+import { EmoteCache } from './EmoteCache'
 
 // return true if this is a URL w/ a valid extension, false if it isn't
 export async function isUrl (url: string) {
@@ -24,15 +26,15 @@ export async function isUrl (url: string) {
 // checks a string to see if there is an emote or URL there and then returns the URL
 // that we will use for edits
 export async function getUrl (source: string) {
-  const companion : Companion = globalThis.companion
+  const emoteCache = grabEmoteCache()
   // yes that's a URL we can use for editing
   if (await isUrl(source)) return source
-  else {
+  else if (emoteCache !== undefined) {
     // see if it's an emote
-    const res = await companion.cache.retrieve(source)
+    const res = await emoteCache.retrieve(source)
     if (res === undefined) return undefined
     else return res.url
-  }
+  } else return ''
 }
 
 /**
@@ -54,4 +56,14 @@ export async function downloadImage (url: string) {
     })
   await createWriteStream(fn).on('error', (error: Error) => { reject(error) })
   return fn
+}
+
+/**
+ * grab an emote cache TSyringe container or return
+ * undefined if there is no container
+ */
+export function grabEmoteCache () {
+  if (DIService.container) {
+    return container.resolve(EmoteCache)
+  } else return undefined
 }

@@ -1,23 +1,26 @@
 /* eslint-disable new-cap */
 // emote cache and some helper functions
 import Twemoji = require('twemoji-parser')
-import Discord = require('discordx')
+import { Client, Discord } from 'discordx'
+import { inject, injectable } from 'tsyringe'
 import { Cmoji, Source } from './Cubemoji'
 import mutantNames from './res/emojiNames.json'
 import got from 'got/dist/source'
 import Fuse from 'fuse.js'
 import { GuildEmoji } from 'discord.js'
 
+@Discord()
+@injectable()
 // a class which can return an array version of emotes
 // and also only refreshes when necessary
 export class EmoteCache {
-  client: Discord.Client
+  client: Client
   emojis: Cmoji[]
   sortedArray: string[]
   discEmojis: GuildEmoji[] // save references to discord emojis for functions that wouldn't work well
   // with image emojis
 
-  constructor (client: Discord.Client) {
+  constructor (@inject('Client') client: Client) {
     this.client = client
     this.emojis = []
     this.sortedArray = []
@@ -140,28 +143,6 @@ export class EmoteCache {
     const twemoji = this.parseTwemoji(emote)
     if (twemoji !== '') return new Cmoji(emote, twemoji, Source.URL, null)
     return undefined // nothing found at all
-  }
-
-  // return the User object https://discord.js.org/#/docs/main/stable/class/User or false if no match found
-  parseMention (body: string, client: Discord.Client) {
-    const found = body.match(/<@!?(\d+)>/)
-    if (found) {
-      // https://discord.js.org/#/docs/collection/master/class/Collection?scrollTo=get
-      // returns a nice undefined
-      const user = client.users.cache.get(found[1])
-      if (undefined) return undefined
-      else return user
-    }
-    return false
-  }
-
-  // given an argument in the form of <@86890631690977280> or <!@86890631690977280>
-  // this returns the URL of that avatar or null
-  getAvatar (body: string) {
-    const user = this.parseMention(body, this.client)
-    if (user) {
-      return (user.displayAvatarURL({ format: 'png', dynamic: true, size: 256 }))
-    }
   }
 
   // parse a twemoji and return a url

@@ -1,8 +1,6 @@
 /* eslint-disable no-unused-vars */
-import { EmoteCache } from './EmoteCache'
-import fbadmin = require('firebase-admin')
-import Discord = require('discord.js')
-import { Client } from 'discordx'
+import { Snowflake } from 'discord-api-types'
+import { GuildEmoji, SnowflakeUtil } from 'discord.js'
 
 // the emoji can come from a few places
 // Discord implies that this carries a GuildEmoji object
@@ -48,27 +46,16 @@ export enum Effects {
   Trim,
   Wave
 }
-// a class that we can pass around and carry useful objects on
-export class Companion {
-  cache: EmoteCache // custom emote cache that extends what just the discord client offers
-  imgMsgs: Map<Discord.Snowflake, Discord.Snowflake> // keep track of what messages we send for edits, rescales, afs
-
-  // start up a fresh companion
-  constructor (client: Client) {
-    this.cache = new EmoteCache(client)
-    this.imgMsgs = new Map<Discord.Snowflake, Discord.Snowflake>()
-  }
-}
 
 // an individual emote
 export class Cmoji {
     name: string
     url: string
     source: Source
-    guildEmoji: Discord.GuildEmoji | null // null if our source isn't Discord
-    id: Discord.Snowflake // unique ID is generated for emojis missing an ID otherwise it should be copied from the Discord OBJ
+    guildEmoji: GuildEmoji | null // null if our source isn't Discord
+    id: Snowflake // unique ID is generated for emojis missing an ID otherwise it should be copied from the Discord OBJ
 
-    constructor (name: string | null, url: string, source: Source, guildEmoji: Discord.GuildEmoji | null = null, id: Discord.Snowflake = Discord.SnowflakeUtil.generate()) {
+    constructor (name: string | null, url: string, source: Source, guildEmoji: GuildEmoji | null = null, id: Snowflake = SnowflakeUtil.generate()) {
       // hate this nonsense of a null name, never seen it in the wild
       if (name != null) this.name = name
       else this.name = '??'

@@ -1,4 +1,4 @@
-import { CommandInteraction, MessageAttachment } from 'discord.js'
+import { CommandInteraction } from 'discord.js'
 import { Discord, Slash, SlashOption } from 'discordx'
 import { Effects } from '../../Cubemoji'
 import strings from '../../res/strings.json'
@@ -20,27 +20,14 @@ export abstract class Edit {
   ) {
     if (list) {
       // just give the user back the effects options
-      try {
-        interaction.reply({ content: imgEffects.join(), ephemeral: true })
-      } catch (err) {
-        console.error(err)
-      }
+      interaction.reply({ content: imgEffects.join(), ephemeral: true })
     } else {
       if (source === undefined) {
-        try {
-          interaction.reply({ content: `${strings.missingArg} source`, ephemeral: true })
-        } catch (err) {
-          console.error(err)
-        }
+        interaction.reply({ content: `${strings.missingArg} source`, ephemeral: true })
       } else {
         // actual edit work begins here as we have the source arg specified
         let parsedEffects: Effects[] = []
-        try {
-          await interaction.deferReply()
-        } catch (err) {
-          console.error(err)
-          return
-        }
+        await interaction.deferReply()
         // if no edit options specified, we will generate some
         if (effects === undefined) parsedEffects = generateEditOptions()
         else {
@@ -138,24 +125,14 @@ export abstract class Edit {
         const url = await getUrl(source)
         if (url !== undefined) {
           // now perform the edit
-          try {
-            const editedPath = await performEdit(url, parsedEffects)
-            const attach = new MessageAttachment(editedPath)
-            await interaction.editReply({ files: [attach] })
-          } catch (err) {
-            try {
-              await interaction.editReply(strings.imgErr)
-              return
-            } catch (err) {
-              console.error(err)
-            }
+          const editedPath = await performEdit(url, parsedEffects)
+          if (editedPath !== undefined) {
+            console.log('succ edit')
+          } else {
+            await interaction.editReply('**Error**: could not perform the edit')
           }
         } else {
-          try {
-            await interaction.editReply(strings.imgErr)
-          } catch (err) {
-            console.error(err)
-          }
+          await interaction.editReply(strings.imgErr)
         }
       }
     }

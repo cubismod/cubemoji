@@ -1,10 +1,11 @@
 /* eslint-disable node/no-path-concat */
 import 'reflect-metadata'
 import { Intents } from 'discord.js'
-import { Client } from 'discordx'
+import { Client, DIService } from 'discordx'
 import secrets from '../secrets.json'
 import pkginfo from '../package.json'
-import { Companion } from './Cubemoji'
+import { container } from 'tsyringe'
+import { EmoteCache } from './EmoteCache'
 export class Main {
   private static _client: Client
 
@@ -13,6 +14,7 @@ export class Main {
   }
 
   static async start () {
+    DIService.container = container
     this._client = new Client({
       botGuilds: ['545784892492087303'],
       intents: [
@@ -33,10 +35,13 @@ export class Main {
     await this._client.login(secrets.token)
 
     this._client.once('ready', async () => {
-      // now we need to load up our global var
-      globalThis.companion = new Companion(this.Client)
-      // let the client actually load the emotes in now
-      await globalThis.companion.cache.init()
+      if (DIService.container !== undefined) {
+        DIService.container.register('Client', { useValue: this._client })
+        console.log('initializing emotes')
+        // load up cubemoji emote cache
+        const companion = container.resolve(EmoteCache)
+        await companion.init()
+      }
 
       await this._client.initApplicationCommands()
       await this._client.initApplicationPermissions()

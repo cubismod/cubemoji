@@ -8,6 +8,14 @@
             "type": "node",
             "request": "launch",
             "name": "Debug bot",
+            "program": "${workspaceFolder}/src/Main.ts",
+            "preLaunchTask": "tsc: build - tsconfig.json",
+            "console": "integratedTerminal"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Debug bot ts-node",
             "protocol": "inspector",
             "args": ["${workspaceRoot}/src/Main.ts"],
             "cwd": "${workspaceRoot}",

@@ -6,7 +6,6 @@ import { random, randomFloat, randomIndex } from 'pandemonium'
 import { downloadImage } from './CommandHelper'
 import gm = require('gm')
 import path = require('path')
-import strings from './res/strings.json'
 import { Effects } from './Cubemoji'
 
 // perform a liquid rescale/ seam carving on an image
@@ -65,13 +64,12 @@ export async function addFace (baseUrl: string, face: string) {
 }
 
 // edits an image
-// returns the file path to the edited image
+// returns a buffer to the edited image
 export async function performEdit (baseUrl: string, effects: Effects[]) {
   const localUrl = await downloadImage(baseUrl)
   const ft = await fromFile(localUrl)
   if (ft !== undefined) {
-    const filePath = path.resolve(`download/${Date.now()}.${ft.ext}}`)
-    const img = gm(filePath)
+    const img = gm(localUrl)
     // apply all the image effects one by one according to the string
     effects.forEach(effect => {
       switch (effect) {
@@ -161,10 +159,12 @@ export async function performEdit (baseUrl: string, effects: Effects[]) {
           break
       }
     })
-    img.write(filePath, (err) => {
-      if (err) throw (err)
+    return img.toBuffer((err, buffer) => {
+      if (err) console.error(err)
+      else {
+        return buffer
+      }
     })
-    return filePath
   } else {
     return undefined
   }
