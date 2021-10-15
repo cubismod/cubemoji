@@ -1,10 +1,11 @@
-import { CommandInteraction } from 'discord.js'
+import { CommandInteraction, MessageAttachment } from 'discord.js'
 import { Discord, Slash, SlashOption } from 'discordx'
 import { Effects } from '../../Cubemoji'
 import strings from '../../res/strings.json'
 import imgEffects from '../../res/imgEffects.json'
 import { getUrl } from '../../CommandHelper'
 import { generateEditOptions, performEdit } from '../../ImgEffects'
+import { watch } from 'chokidar'
 
 @Discord()
 export abstract class Edit {
@@ -127,7 +128,13 @@ export abstract class Edit {
           // now perform the edit
           const editedPath = await performEdit(url, parsedEffects)
           if (editedPath !== undefined) {
-            console.log('succ edit')
+            const watcher = watch(editedPath)
+            watcher.on('add', async () => {
+              // most likely the file has been created by now
+              const attach = new MessageAttachment(editedPath)
+              await interaction.editReply({ files: [attach] })
+              await watcher.close()
+            })
           } else {
             await interaction.editReply('**Error**: could not perform the edit')
           }

@@ -7,6 +7,7 @@ import { downloadImage } from './CommandHelper'
 import gm = require('gm')
 import path = require('path')
 import { Effects } from './Cubemoji'
+import { randomUUID } from 'crypto'
 
 // perform a liquid rescale/ seam carving on an image
 // returns the path to the image file
@@ -64,11 +65,12 @@ export async function addFace (baseUrl: string, face: string) {
 }
 
 // edits an image
-// returns a buffer to the edited image
+// returns the file path to the edited image
 export async function performEdit (baseUrl: string, effects: Effects[]) {
   const localUrl = await downloadImage(baseUrl)
   const ft = await fromFile(localUrl)
   if (ft !== undefined) {
+    const filename = path.resolve(`download/${randomUUID()}.${ft.ext}`)
     const img = gm(localUrl)
     // apply all the image effects one by one according to the string
     effects.forEach(effect => {
@@ -159,12 +161,10 @@ export async function performEdit (baseUrl: string, effects: Effects[]) {
           break
       }
     })
-    return img.toBuffer((err, buffer) => {
+    img.write(filename, (err) => {
       if (err) console.error(err)
-      else {
-        return buffer
-      }
     })
+    return filename
   } else {
     return undefined
   }

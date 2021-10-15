@@ -7,6 +7,9 @@ import { reject } from 'p-cancelable'
 import { DIService } from 'discordx'
 import { container } from 'tsyringe'
 import { EmoteCache } from './EmoteCache'
+import { randomUUID } from 'crypto'
+import { promisify } from 'util'
+import { pipeline } from 'stream'
 
 // return true if this is a URL w/ a valid extension, false if it isn't
 export async function isUrl (url: string) {
@@ -43,18 +46,22 @@ export async function getUrl (source: string) {
  * @returns promise for a url or rejection if a download issue occurs
  */
 export async function downloadImage (url: string) {
-  const fn = path.resolve(`download/${Date.now()}`)
-  got.stream(url)
-    .on('downloadProgress', progress => {
-      // cap downloads at 50MB
-      if (progress.total > 5e+7) {
-        reject(new Error(`Filesize of ${progress.total / 1e-6} MB greater than maximum size of 50MB`))
-      }
-    })
-    .on('error', (error: Error) => {
-      console.error(error.message)
-    })
-  await createWriteStream(fn).on('error', (error: Error) => { reject(error) })
+  const fn = path.resolve(`download/${randomUUID()}`)
+  const pl = promisify(pipeline)
+  await pl(
+    got.stream(url)
+      .on('downloadProgress', progress => {
+        console.log(progress)
+        // cap downloads at 50MB
+        if (progress.total > 5e+7) {
+          reject(new Error(`Filesize of ${progress.total / 1e-6} MB greater than maximum size of 50MB`))
+        }
+      })
+      .on('error', (error: Error) => {
+        console.error(error.message)
+      }),
+    createWriteStream(fn).on('error', (error: Error) => { reject(error) })
+  )
   return fn
 }
 

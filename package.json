@@ -24,6 +24,7 @@
   "dependencies": {
     "@discordx/utilities": "^1.2.2",
     "@types/workerpool": "^6.0.0",
+    "chokidar": "^3.5.2",
     "dayjs": "^1.10.5",
     "discord.js": "^13.1.0",
     "discordx": "^6.0.2",
@@ -36,7 +37,8 @@
     "pandemonium": "^2.0.0",
     "reflect-metadata": "^0.1.13",
     "tsyringe": "^4.6.0",
-    "twemoji-parser": "^13.0.0"
+    "twemoji-parser": "^13.0.0",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@types/gm": "^1.18.10",
