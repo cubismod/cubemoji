@@ -334,7 +334,7 @@ async function reply (context: MsgContext, content: MessageAttachment | string) 
       if (repMsg instanceof Message) msg = repMsg
     }
     if (context instanceof ContextMenuInteraction) {
-      const repMsg = await context.reply({ files: [content], fetchReply: true })
+      const repMsg = await context.editReply({ files: [content] })
       if (repMsg instanceof Message) msg = repMsg
     }
     if (context instanceof MessageReaction) msg = await context.message.reply({ files: [content] })
@@ -345,7 +345,7 @@ async function reply (context: MsgContext, content: MessageAttachment | string) 
       if (repMsg instanceof Message) msg = repMsg
     }
     if (context instanceof ContextMenuInteraction) {
-      const repMsg = await context.reply({ content: content, fetchReply: true })
+      const repMsg = await context.editReply({ content: content })
       if (repMsg instanceof Message) msg = repMsg
     }
   }

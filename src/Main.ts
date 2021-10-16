@@ -29,6 +29,7 @@ export class Main {
       classes: [
         `${__dirname}/**/*.{js,ts}` // glob string to load the classes
       ],
+      partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
       // for testing purposes in cubemoji server
       silent: false
     })
@@ -36,14 +37,17 @@ export class Main {
 
     this._client.once('ready', async () => {
       if (DIService.container !== undefined) {
+        DIService.container.register('Client', { useValue: this._client })
         console.log('creating ImageQueue')
         DIService.container.register(ImageQueue, { useValue: new ImageQueue() })
         console.log('creating CubeMessageManager')
         DIService.container.register(CubeMessageManager, { useValue: new CubeMessageManager() })
         console.log('initializing emotes')
+        DIService.container.register(EmoteCache, { useValue: new EmoteCache(this._client) })
         // load up cubemoji emote cache
-        const companion = container.resolve(EmoteCache)
-        await companion.init()
+        const emoteCache = container.resolve(EmoteCache)
+        await emoteCache.init()
+        console.log('emote cache started up')
       }
 
       await this._client.initApplicationCommands()

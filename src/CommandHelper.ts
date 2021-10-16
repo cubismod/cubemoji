@@ -10,6 +10,7 @@ import { EmoteCache } from './EmoteCache'
 import { randomUUID } from 'crypto'
 import { promisify } from 'util'
 import { pipeline } from 'stream'
+import { Message } from 'discord.js'
 
 // return true if this is a URL w/ a valid extension, false if it isn't
 export async function isUrl (url: string) {
@@ -72,4 +73,14 @@ export async function downloadImage (url: string) {
 export function grabEmoteCache () {
   if (DIService.container) return container.resolve(EmoteCache)
   else return undefined
+}
+
+/**
+ * gets either a message attachment or content of a message
+ * and returns that
+ */
+export function getMessageImage (message: Message) {
+  if (message.attachments.size > 0) {
+    return message.attachments.random().url
+  } else return message.content
 }

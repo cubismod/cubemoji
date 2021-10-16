@@ -6,6 +6,7 @@
 import { MessageReaction } from 'discord.js'
 import { ArgsOf, Discord, On } from 'discordx'
 import { container } from 'tsyringe'
+import { getMessageImage } from '../CommandHelper'
 import { CubeMessageManager } from '../Cubemoji'
 import { editDiscord } from '../ImgEffects'
 
@@ -24,7 +25,8 @@ export abstract class EventListeners {
           // delete a message
           // ensure that only the author of that edit can actually delete their own message
           const author = cubeMessageManager.retrieveUser(reaction.message.id)
-          if (author && reaction.users.cache.has(author)) {
+          if (author && reaction.users.cache.has(author) && author !== '792878401589477377') {
+            // ensure cubemoji isn't deleting its own messages
             // perform the delete now
             await reaction.message.delete()
             cubeMessageManager.unregisterMessage(reaction.message.id)
@@ -33,10 +35,10 @@ export abstract class EventListeners {
         }
         case '📷': {
           // perform an edit
-          // TODO: figure out why self reacts aren't working
+          const source = getMessageImage(await reaction.message.fetch())
           if (reaction instanceof MessageReaction) {
             console.log('edit in process')
-            await editDiscord(reaction, '', reaction.message.content)
+            await editDiscord(reaction, '', source)
           }
         }
       }
