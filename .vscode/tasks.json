@@ -15,6 +15,11 @@
             "problemMatcher": [],
             "label": "npm: test",
             "detail": "jest"
+        },
+        {
+            "label": "Delete downloaded files",
+            "type": "shell",
+            "command": "rm download/*"
         }
     ]
 }

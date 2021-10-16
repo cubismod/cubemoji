@@ -37,10 +37,11 @@ export async function performRescale (externalUrl: string) {
   // get the file type of the image file
   const ft = await fromFile(localUrl)
   if (ft !== undefined) {
-    const filePath = path.resolve(`download/${Date.now()}.${ft.ext}}`)
+    const filePath = path.resolve(`download/${randomUUID()}.${ft.ext}`)
     // imagemagick only has liquid rescale, not graphicsmagick
-    gm.subClass({ imageMagick: true })(localUrl)
-      .out('-liquidrescale', newSize)
+    const im = gm.subClass({ imageMagick: true })
+    im(localUrl)
+      .out('-liquid-rescale', newSize)
       .write(filePath, (err) => {
         if (err) throw (err)
       })
@@ -292,6 +293,31 @@ export function parseEffects (effects: string) {
   return parsedEffects
 }
 
+// discord logic for doing a rescale
+export async function rescaleDiscord (context: MsgContext, source: string) {
+  if (source === null) return
+  const url = await getUrl(source)
+  if (url) {
+    // do the rescale
+    const filename = await performRescale(url)
+    const cubeMessageManager = container.resolve(CubeMessageManager)
+    if (filename) {
+      const watcher = watch(filename, { awaitWriteFinish: true })
+      watcher.on('add', async () => {
+        // now we send out the rescaled message
+        const msg = await reply(context, new MessageAttachment(filename))
+        await watcher.close()
+        // add trash can reaction
+        if (!msg) {
+          console.error('could not get a message during rescale, not proceeding with adding trash react')
+        } else {
+          if (msg instanceof Message) cubeMessageManager.registerTrashReact(context, msg)
+        }
+      })
+    } else await reply(context, '**Error**: could not perform rescale')
+  } else await reply(context, strings.imgErr)
+}
+
 // the actual discord logic for doing an edit
 // source is an emote or other parsable
 export async function editDiscord (context: MsgContext, effects: string, source: string | null) {
@@ -304,7 +330,7 @@ export async function editDiscord (context: MsgContext, effects: string, source:
     const filename = await performEdit(url, parsedEffects)
     const cubeMessageManager = container.resolve(CubeMessageManager)
     if (filename) {
-      const watcher = watch(filename)
+      const watcher = watch(filename, { awaitWriteFinish: true })
       watcher.on('add', async () => {
         // file has finished processing from gm
         const msg = await reply(context, new MessageAttachment(filename))

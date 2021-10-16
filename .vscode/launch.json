@@ -10,7 +10,8 @@
             "name": "Debug bot",
             "program": "${workspaceFolder}/src/Main.ts",
             "preLaunchTask": "tsc: build - tsconfig.json",
-            "console": "integratedTerminal"
+            "console": "integratedTerminal",
+            "postDebugTask": "Delete downloaded files"
         },
         {
             "type": "node",
