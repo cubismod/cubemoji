@@ -19,6 +19,7 @@ export abstract class EventListeners {
     if (cubeMessageManager) {
       switch (reaction.emoji.toString()) {
         case '🗑️': {
+          // delete a message
           // ensure that only the author of that edit can actually delete their own message
           const author = cubeMessageManager.retrieveUser(reaction.message.id)
           if (author && reaction.users.cache.has(author)) {
@@ -26,8 +27,15 @@ export abstract class EventListeners {
             await reaction.message.delete()
             cubeMessageManager.unregisterMessage(reaction.message.id)
           }
+          break
+        }
+        case '📷': {
+          // perform an edit
+          
         }
       }
     }
   }
 }
+
+function doEdit()

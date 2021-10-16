@@ -186,3 +186,102 @@ export function generateEditOptions () {
   }
   return options
 }
+
+// parse effects strings to enums
+export function parseEffects (effects: string) {
+  let parsedEffects: Effects[] = []
+  // if no edit options specified, we will generate some
+  if (effects === undefined) parsedEffects = generateEditOptions()
+  else {
+    // here comes tedious parsing
+    effects.split(' ').forEach(effect => {
+      switch (effect.toLowerCase()) {
+        case 'blur':
+          parsedEffects.push(Effects.Blur)
+          break
+        case 'charcoal':
+          parsedEffects.push(Effects.Charcoal)
+          break
+        case 'cycle':
+          parsedEffects.push(Effects.Cycle)
+          break
+        case 'edge':
+          parsedEffects.push(Effects.Edge)
+          break
+        case 'emboss':
+          parsedEffects.push(Effects.Emboss)
+          break
+        case 'enhance':
+          parsedEffects.push(Effects.Enhance)
+          break
+        case 'equalize':
+          parsedEffects.push(Effects.Equalize)
+          break
+        case 'flip':
+          parsedEffects.push(Effects.Flip)
+          break
+        case 'flop':
+          parsedEffects.push(Effects.Flop)
+          break
+        case 'implode':
+          parsedEffects.push(Effects.Implode)
+          break
+        case 'magnify':
+          parsedEffects.push(Effects.Magnify)
+          break
+        case 'median':
+          parsedEffects.push(Effects.Median)
+          break
+        case 'minify':
+          parsedEffects.push(Effects.Minify)
+          break
+        case 'monochrome':
+          parsedEffects.push(Effects.Monochrome)
+          break
+        case 'mosaic':
+          parsedEffects.push(Effects.Monochrome)
+          break
+        case 'motionblur':
+          parsedEffects.push(Effects.Motionblur)
+          break
+        case 'noise':
+          parsedEffects.push(Effects.Noise)
+          break
+        case 'normalize':
+          parsedEffects.push(Effects.Normalize)
+          break
+        case 'paint':
+          parsedEffects.push(Effects.Paint)
+          break
+        case 'roll':
+          parsedEffects.push(Effects.Roll)
+          break
+        case 'sepia':
+          parsedEffects.push(Effects.Sepia)
+          break
+        case 'sharpen':
+          parsedEffects.push(Effects.Sharpen)
+          break
+        case 'solarize':
+          parsedEffects.push(Effects.Solarize)
+          break
+        case 'spread':
+          parsedEffects.push(Effects.Spread)
+          break
+        case 'swirl':
+          parsedEffects.push(Effects.Swirl)
+          break
+        case 'threshold':
+          parsedEffects.push(Effects.Threshold)
+          break
+        case 'trim':
+          parsedEffects.push(Effects.Trim)
+          break
+        case 'wave':
+          parsedEffects.push(Effects.Wave)
+          break
+      }
+    })
+  }
+  return parsedEffects
+}
