@@ -1,9 +1,10 @@
 /* eslint-disable no-unused-vars */
 import { Snowflake } from 'discord-api-types'
-import { CommandInteraction, GuildEmoji, Message, SnowflakeUtil } from 'discord.js'
-import { Discord } from 'discordx'
+import { CommandInteraction, ContextMenuInteraction, GuildEmoji, Message, MessageReaction, SnowflakeUtil } from 'discord.js'
+import { ContextMenu, Discord } from 'discordx'
 import { unlink } from 'fs'
 import { injectable } from 'tsyringe'
+import { MsgContext } from './ImgEffects'
 
 // the emoji can come from a few places
 // Discord implies that this carries a GuildEmoji object
@@ -87,16 +88,28 @@ export class CubeMessageManager {
     this.sentMessages = new Map()
   }
 
-  registerTrashReact (interaction: CommandInteraction, msg: Message) {
-    if (interaction.guild &&
-      interaction.guild.me &&
-      interaction.channel &&
-      interaction.guild.me.permissionsIn(interaction.channelId).has('MANAGE_MESSAGES') &&
-      interaction.guild.me.permissionsIn(interaction.channelId).has('ADD_REACTIONS') &&
-      interaction.member) {
-      // all these checks to ensure cubemoji can delete the message and can also add a react
-      msg.react('🗑️')
-      this.sentMessages.set(msg.id, interaction.member.user.id)
+  registerTrashReact (context: MsgContext, msg: Message) {
+    if (context instanceof ContextMenuInteraction || context instanceof CommandInteraction) {
+      if (context.guild &&
+        context.guild.me &&
+        context.channel &&
+        context.guild.me.permissionsIn(context.channelId).has('MANAGE_MESSAGES') &&
+        context.guild.me.permissionsIn(context.channelId).has('ADD_REACTIONS') &&
+        context.member) {
+        // all these checks to ensure cubemoji can delete the message and can also add a react
+        msg.react('🗑️')
+        this.sentMessages.set(msg.id, context.member.user.id)
+      }
+    }
+    if (context instanceof MessageReaction) {
+      if (context.message.guild &&
+        context.message.guild.me &&
+        context.message.author?.id &&
+        context.message.guild.me.permissionsIn(context.message.channelId).has('MANAGE_MESSAGES') &&
+        context.message.guild.me.permissionsIn(context.message.channelId).has('ADD_REACTIONS')) {
+        msg.react('🗑️')
+        this.sentMessages.set(msg.id, context.message.author.id)
+      }
     }
   }
 

@@ -31,13 +31,11 @@ export class Main {
       ],
       // for testing purposes in cubemoji server
       silent: false
-
     })
     await this._client.login(secrets.token)
 
     this._client.once('ready', async () => {
       if (DIService.container !== undefined) {
-        DIService.container.register('Client', { useValue: this._client })
         console.log('creating ImageQueue')
         DIService.container.register(ImageQueue, { useValue: new ImageQueue() })
         console.log('creating CubeMessageManager')

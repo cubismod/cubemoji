@@ -3,12 +3,17 @@
 // from the fs once done
 import { fromFile } from 'file-type'
 import { random, randomFloat, randomIndex } from 'pandemonium'
-import { downloadImage } from './CommandHelper'
+import { downloadImage, getUrl } from './CommandHelper'
 import gm = require('gm')
 import path = require('path')
-import { Effects, ImageQueue } from './Cubemoji'
+import { CubeMessageManager, Effects, ImageQueue } from './Cubemoji'
 import { randomUUID } from 'crypto'
 import { container } from 'tsyringe'
+import { CommandInteraction, ContextMenuInteraction, Message, MessageAttachment, MessageReaction } from 'discord.js'
+import { watch } from 'chokidar'
+import strings from './res/strings.json'
+
+export type MsgContext = ContextMenuInteraction | CommandInteraction | MessageReaction
 
 // perform a liquid rescale/ seam carving on an image
 // returns the path to the image file
@@ -187,11 +192,12 @@ export function generateEditOptions () {
   return options
 }
 
-// parse effects strings to enums
+// parse effects strings to enums or generate random
+// effects with an undefined
 export function parseEffects (effects: string) {
   let parsedEffects: Effects[] = []
   // if no edit options specified, we will generate some
-  if (effects === undefined) parsedEffects = generateEditOptions()
+  if (effects === undefined || effects === '') parsedEffects = generateEditOptions()
   else {
     // here comes tedious parsing
     effects.split(' ').forEach(effect => {
@@ -284,4 +290,63 @@ export function parseEffects (effects: string) {
     })
   }
   return parsedEffects
+}
+
+// the actual discord logic for doing an edit
+// source is an emote or other parsable
+export async function editDiscord (context: MsgContext, effects: string, source: string | null) {
+  if (source === null) return
+  const parsedEffects = parseEffects(effects)
+  // done parsing the effects, now let's try and parse what we're trying to edit
+  const url = await getUrl(source)
+  if (url) {
+    // now perform the edit
+    const filename = await performEdit(url, parsedEffects)
+    const cubeMessageManager = container.resolve(CubeMessageManager)
+    if (filename) {
+      const watcher = watch(filename)
+      watcher.on('add', async () => {
+        // file has finished processing from gm
+        const msg = await reply(context, new MessageAttachment(filename))
+        await watcher.close()
+        // now add a trash can reaction
+        if (!msg) {
+          console.error('could not get a message during edit, not proceeding with adding trash react')
+        } else {
+          if (msg instanceof Message) cubeMessageManager.registerTrashReact(context, msg)
+        }
+      })
+    } else {
+      await reply(context, '**Error**: could not perform the edit')
+    }
+  } else {
+    await reply(context, strings.imgErr)
+  }
+}
+
+// do a different reply depending on the context we have
+async function reply (context: MsgContext, content: MessageAttachment | string) {
+  let msg: Message | undefined
+  if (content instanceof MessageAttachment) {
+    // different logic depending on which context we are passing in
+    if (context instanceof CommandInteraction) {
+      const repMsg = await context.editReply({ files: [content] })
+      if (repMsg instanceof Message) msg = repMsg
+    }
+    if (context instanceof ContextMenuInteraction) {
+      const repMsg = await context.reply({ files: [content], fetchReply: true })
+      if (repMsg instanceof Message) msg = repMsg
+    }
+    if (context instanceof MessageReaction) msg = await context.message.reply({ files: [content] })
+    return msg
+  } else {
+    if (context instanceof CommandInteraction) {
+      const repMsg = await context.editReply(content)
+      if (repMsg instanceof Message) msg = repMsg
+    }
+    if (context instanceof ContextMenuInteraction) {
+      const repMsg = await context.reply({ content: content, fetchReply: true })
+      if (repMsg instanceof Message) msg = repMsg
+    }
+  }
 }

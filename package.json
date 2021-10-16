@@ -27,7 +27,7 @@
     "chokidar": "^3.5.2",
     "dayjs": "^1.10.5",
     "discord.js": "^13.1.0",
-    "discordx": "^6.0.2",
+    "discordx": "^6.2.0",
     "file-type": "^16.2.0",
     "firebase-admin": "^9.4.2",
     "fuse.js": "^6.4.4",

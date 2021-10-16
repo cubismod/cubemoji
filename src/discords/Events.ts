@@ -3,9 +3,11 @@
 // TODO: remove emoji
 // TODO: edit emoji
 
+import { MessageReaction } from 'discord.js'
 import { ArgsOf, Discord, On } from 'discordx'
 import { container } from 'tsyringe'
 import { CubeMessageManager } from '../Cubemoji'
+import { editDiscord } from '../ImgEffects'
 
 @Discord()
 export abstract class EventListeners {
@@ -31,11 +33,13 @@ export abstract class EventListeners {
         }
         case '📷': {
           // perform an edit
-          
+          // TODO: figure out why self reacts aren't working
+          if (reaction instanceof MessageReaction) {
+            console.log('edit in process')
+            await editDiscord(reaction, '', reaction.message.content)
+          }
         }
       }
     }
   }
 }
-
-function doEdit()
