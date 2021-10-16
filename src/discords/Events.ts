@@ -8,7 +8,7 @@ import { ArgsOf, Discord, On } from 'discordx'
 import { container } from 'tsyringe'
 import { getMessageImage } from '../CommandHelper'
 import { CubeMessageManager } from '../Cubemoji'
-import { editDiscord } from '../ImgEffects'
+import { editDiscord, rescaleDiscord } from '../ImgEffects'
 
 @Discord()
 export abstract class EventListeners {
@@ -37,8 +37,15 @@ export abstract class EventListeners {
           // perform an edit
           const source = getMessageImage(await reaction.message.fetch())
           if (reaction instanceof MessageReaction) {
-            console.log('edit in process')
             await editDiscord(reaction, '', source)
+          }
+          break
+        }
+        case '📏': {
+          // perform a rescale
+          const source = getMessageImage(await reaction.message.fetch())
+          if (reaction instanceof MessageReaction) {
+            await rescaleDiscord(reaction, source)
           }
         }
       }

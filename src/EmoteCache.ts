@@ -126,7 +126,8 @@ export class EmoteCache {
     // search by ID or name w/ fuse's extended syntax https://fusejs.io/examples.html#extended-search
     if (split.length > 2) emote = `${split[2]}|${split[1]}`
     const searchResults = await this.search(emote)
-    if (searchResults.length > 0) return searchResults[0].item
+    // want an exact match
+    if (searchResults.length > 0 && searchResults[0].item.id === split[2]) return searchResults[0].item
     // now we see if we have a nitro emote cubemoji doesn't have in its guilds
     if (split.length > 2) {
       const url = `https://cdn.discordapp.com/emojis/${split[2]}`
@@ -139,9 +140,11 @@ export class EmoteCache {
         // don't do anything on error, means that this is not a nitro emote
       }
     }
-    // else try to parse a twemoji
+    // try to parse a twemoji
     const twemoji = this.parseTwemoji(emote)
     if (twemoji !== '') return new Cmoji(emote, twemoji, Source.URL, null)
+    // last resort, return a similar emoji
+    if (searchResults.length > 0) return searchResults[0].item
     return undefined // nothing found at all
   }
 

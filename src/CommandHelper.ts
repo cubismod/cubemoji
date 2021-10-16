@@ -44,26 +44,31 @@ export async function getUrl (source: string) {
 /**
  * download an image file to the local FS under the download folder
  * @param url - link to the img
- * @returns promise for a url or rejection if a download issue occurs
+ * @returns promise for a url or undefined
  */
 export async function downloadImage (url: string) {
-  const fn = path.resolve(`download/${randomUUID()}`)
-  const pl = promisify(pipeline)
-  await pl(
-    got.stream(url)
-      .on('downloadProgress', progress => {
-        console.log(progress)
-        // cap downloads at 50MB
-        if (progress.total > 5e+7) {
-          reject(new Error(`Filesize of ${progress.total / 1e-6} MB greater than maximum size of 50MB`))
+  // check first whether the file isn't too big
+  const headers = await got.head(url)
+  if (headers.headers['content-length'] && parseInt(headers.headers['content-length']) < 2e+6) {
+    // limit to 2mb download
+    const fn = path.resolve(`download/${randomUUID()}`)
+    const pl = promisify(pipeline)
+    await pl(
+      got.stream(url, {
+        retry: {
+          limit: 0
+        },
+        timeout: {
+          request: 500
         }
       })
-      .on('error', (error: Error) => {
-        console.error(error.message)
-      }),
-    createWriteStream(fn).on('error', (error: Error) => { reject(error) })
-  )
-  return fn
+        .on('error', (error: Error) => {
+          console.error(error.message)
+        }),
+      createWriteStream(fn).on('error', (error: Error) => { reject(error) })
+    )
+    return fn
+  }
 }
 
 /**

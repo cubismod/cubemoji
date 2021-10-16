@@ -1,7 +1,7 @@
 import { ContextMenuInteraction } from 'discord.js'
 import { ContextMenu, Discord } from 'discordx'
 import { getMessageImage } from '../CommandHelper'
-import { editDiscord } from '../ImgEffects'
+import { editDiscord, rescaleDiscord } from '../ImgEffects'
 
 @Discord()
 export abstract class CubeMessageContext {
@@ -12,6 +12,15 @@ export abstract class CubeMessageContext {
       await interaction.deferReply()
       const source = getMessageImage(await interaction.channel.messages.fetch(interaction.targetId))
       await editDiscord(interaction, '', source)
+    }
+  }
+
+  @ContextMenu('MESSAGE', 'Rescale an image')
+  async rescaleHandler (interaction: ContextMenuInteraction) {
+    if (interaction.channel) {
+      await interaction.deferReply()
+      const source = getMessageImage(await interaction.channel.messages.fetch(interaction.targetId))
+      await rescaleDiscord(interaction, source)
     }
   }
 }
