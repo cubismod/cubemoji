@@ -22,6 +22,9 @@
     "importHelpers": true,
     "moduleResolution": "node"
   },
+  "ts-node": {
+    "transpileOnly": true
+  },
   "include": ["src/**/*"],
   "exclude": ["node_modules"]
 }
