@@ -19,7 +19,8 @@ export type MsgContext = ContextMenuInteraction | CommandInteraction | MessageRe
 // returns the path to the image file
 export async function performRescale (externalUrl: string) {
   const localUrl = await downloadImage(externalUrl)
-  if (localUrl) {
+  const imageQueue = container.resolve(ImageQueue)
+  if (localUrl && imageQueue) {
     // now we need build our edit parameters for graphicsmagick
     let newSize = ''
     switch (random(0, 2)) {
@@ -46,6 +47,8 @@ export async function performRescale (externalUrl: string) {
         .write(filePath, (err) => {
           if (err) throw (err)
         })
+      await imageQueue.enqueue(localUrl)
+      await imageQueue.enqueue(filePath)
       return filePath
     } else {
       return undefined
@@ -55,19 +58,31 @@ export async function performRescale (externalUrl: string) {
 
 // add an emoji (face) to any image
 // return the file path to the edited image
-export async function addFace (baseUrl: string, face: string) {
+export async function performAddFace (baseUrl: string, face: string) {
   const localUrl = await downloadImage(baseUrl)
-  if (localUrl) {
+  const imageQueue = container.resolve(ImageQueue)
+  if (localUrl && imageQueue) {
     // this also determines if the base image exists
     const ft = await fromFile(localUrl)
     if (ft !== undefined) {
-      const filePath = path.resolve(`download/${Date.now()}.${ft.ext}}`)
-      gm(localUrl)
-      // test this
-        .composite(path.resolve(`assets/${face}.png`))
-        .write(filePath, (err) => {
-          if (err) throw (err)
-        })
+      const filePath = path.resolve(`download/${randomUUID()}.${ft.ext}`)
+      const faceUrl = `assets/${face}.png`
+      // now need to determine width and height of background image
+      gm(faceUrl).identify((err, info) => {
+        if (err) console.error(err)
+        else {
+          const im = gm.subClass({ imageMagick: true })
+          im(localUrl)
+            .composite(path.resolve(faceUrl))
+            .geometry(info.size.width, info.size.height, '!')
+            .write(filePath, (err) => {
+              if (err) console.error(err)
+            })
+        }
+      })
+
+      imageQueue.enqueue(localUrl)
+      imageQueue.enqueue(filePath)
       return filePath
     } else {
       return undefined

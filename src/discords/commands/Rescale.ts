@@ -5,16 +5,13 @@ import strings from '../../res/strings.json'
 
 @Discord()
 export abstract class Rescale {
-  @Slash('rescale', { description: 'Rescale an image using Seam carving to humorous results' })
+  @Slash('rescale', { description: 'Rescale an image or emote using Seam carving to humorous results' })
   async rescale (
-    @SlashOption('source', { description: strings.sourceSlash })
+    @SlashOption('source', { description: strings.sourceSlash, required: true })
       source: string,
       interaction: CommandInteraction
   ) {
-    if (source === undefined) interaction.reply({ content: `${strings.missingArg} source`, ephemeral: true })
-    else {
-      await interaction.deferReply()
-      await rescaleDiscord(interaction, source)
-    }
+    await interaction.deferReply()
+    await rescaleDiscord(interaction, source)
   }
 }

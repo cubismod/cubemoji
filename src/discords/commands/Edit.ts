@@ -6,7 +6,7 @@ import { editDiscord } from '../../ImgEffects'
 
 @Discord()
 export abstract class Edit {
-  @Slash('edit', { description: 'Edits an emote/avatar according to the effects you select' })
+  @Slash('edit', { description: 'Edits an emote or image according to the effects you select' })
   async edit (
     @SlashOption('source', { description: strings.sourceSlash })
       source: string,
