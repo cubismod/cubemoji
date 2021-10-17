@@ -1,13 +1,16 @@
-FROM node:14
-WORKDIR /usr/src/app
+FROM node:latest
+WORKDIR /usr/src/cubemoji
 
 # setup any requisite packages
 COPY setupImage.sh .
 RUN ./setupImage.sh
 
 COPY package.json .
+COPY secrets.json .
+COPY run-watch.sh .
+COPY src/ .
+
 
 RUN npm install
-COPY ./src .
 
 CMD npm start 2>&1 | ./run-watch.sh

@@ -11,7 +11,11 @@
             "program": "${workspaceFolder}/src/Main.ts",
             "preLaunchTask": "tsc: build - tsconfig.json",
             "console": "integratedTerminal",
-            "postDebugTask": "Delete downloaded files"
+            "postDebugTask": "Delete downloaded files",
+            "outFiles": [
+                "${workspaceFolder}/**/*.js",
+                "!**/node_modules/**"
+            ]
         },
         {
             "type": "node",

@@ -15,9 +15,18 @@ export class Main {
   }
 
   static async start () {
+    console.log('🅲🆄🅱🅴🅼🅾🅹🅸')
     DIService.container = container
+    let botGuilds: string[] = []
+    if (secrets.environment === 'prd') {
+      console.log('running in PRD')
+      botGuilds = this._client.guilds.cache.map((guild) => guild.id)
+    } else {
+      console.log('Running in NPR')
+      botGuilds = ['545784892492087303']
+    }
     this._client = new Client({
-      botGuilds: ['545784892492087303'],
+      botGuilds: botGuilds,
       intents: [
         Intents.FLAGS.GUILDS,
         Intents.FLAGS.GUILD_EMOJIS_AND_STICKERS,

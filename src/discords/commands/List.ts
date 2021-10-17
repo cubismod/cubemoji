@@ -16,7 +16,7 @@ export abstract class List {
       const emotes: string[] = []
       let curEmotePage = ''
       emoteCache.discEmojis.forEach((emote, i) => {
-        if (i !== 0 && !(i % 50)) {
+        if (i !== 0 && !(i % 60)) {
         // append page to emotes obj
         // clear working page
           emotes.push(curEmotePage)

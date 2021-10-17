@@ -1,4 +1,4 @@
-import { CommandInteraction } from 'discord.js'
+import { CommandInteraction, GuildMember } from 'discord.js'
 import { Discord, Slash, SlashOption } from 'discordx'
 import strings from '../../res/strings.json'
 import imgEffects from '../../res/imgEffects.json'
@@ -8,8 +8,10 @@ import { editDiscord } from '../../ImgEffects'
 export abstract class Edit {
   @Slash('edit', { description: 'Edits an emote or image according to the effects you select' })
   async edit (
-    @SlashOption('source', { description: strings.sourceSlash })
-      source: string,
+    @SlashOption('emote', { description: strings.missingArg })
+      emote: string,
+    @SlashOption('user', { description: 'a user' })
+      user: GuildMember,
     @SlashOption('effects', { description: 'a list of effects with spaces between them, if not chosen then random effects will be applied' })
       effects: string,
     @SlashOption('list', { description: 'get a list of the available effects' })
@@ -20,12 +22,14 @@ export abstract class Edit {
       // just give the user back the effects options
       interaction.reply({ content: imgEffects.join(), ephemeral: true })
     } else {
-      if (source === undefined) {
+      if (!emote && !user) {
         interaction.reply({ content: `${strings.missingArg} source`, ephemeral: true })
-      } else {
-        // actual edit work begins here as we have the source arg specified
+      } else if (emote) {
         await interaction.deferReply()
-        await editDiscord(interaction, effects, source)
+        await editDiscord(interaction, effects, emote)
+      } else if (user) {
+        await interaction.deferReply()
+        await editDiscord(interaction, effects, user.displayAvatarURL({ format: 'png', dynamic: true, size: 256 }))
       }
     }
   }
