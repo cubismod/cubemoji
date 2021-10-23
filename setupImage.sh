@@ -7,12 +7,13 @@ export DEBIAN_FRONTEND=noninteractive
 
 apt-get update
 apt-get -y upgrade
+apt-get -y install apt-utils
 apt-get -y remove imagemagick imagemagick-6.q16
 
 # manual install of imagemagick so we can get q8 quality instead of 16 for speedier performance
 cd ~
-git clone https://github.com/ImageMagick/ImageMagick.git ImageMagick-7.0.11
-cd ImageMagick-7.0.11
+git clone https://github.com/ImageMagick/ImageMagick.git ImageMagick
+cd ImageMagick
 # try and clean up the install as much as possible and remove bloat
 ./configure --with-quantum-depth=8 --without-magick-plus-plus --without-perl --without-dps \
 --without-freetype --without-jbig --without-tiff --without-wmf --without-xml --enable-hdri=no --enable-shared=yes
@@ -22,6 +23,7 @@ ldconfig /usr/local/lib
 
 # get imagemagick installed
 apt-get -y install --no-install-recommends graphicsmagick
+apt autoremove -y
 
 # Delete cached files we don't need anymore:
 apt-get clean

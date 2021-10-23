@@ -1,4 +1,11 @@
 {
     "editor.tabSize": 2,
-    "jest.jestCommandLine": "jest"
+    "jest.jestCommandLine": "jest",
+    "cSpell.words": [
+        "Cubemoji",
+        "discord",
+        "import",
+        "js",
+        "require"
+    ]
 }

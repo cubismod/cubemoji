@@ -9,8 +9,6 @@ SPAM_DELAY=2
 MAX_LENGTH=2000
 FILTER=''
 
-echo $WEBHOOK
-
 function send {
   local message=${1//\"/\\\"}
   echo "$message" | awk -v len=${MAX_LENGTH} '{ if (length($0) > len) print substr($0, 1, len-3) "..."; else print; }'

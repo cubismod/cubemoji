@@ -1,12 +1,11 @@
 {
   "name": "cubemoji",
-  "version": "2.16.8",
+  "version": "3.0.0",
   "description": "A Discord emoji bot.",
-  "main": "index.js",
+  "main": "Main.ts",
   "license": "MIT",
   "scripts": {
-    "start": "node .",
-    "test": "jest"
+    "start": "ts-node src/Main.ts"
   },
   "repository": {
     "type": "git",
@@ -23,30 +22,38 @@
   },
   "homepage": "https://gitlab.com/cubismod/cubemoji#readme",
   "dependencies": {
-    "colorthief": "^2.3.2",
-    "discord.js": "^12.5.1",
-    "eslint-plugin-jest": "^24.3.6",
+    "@discordx/utilities": "^1.2.2",
+    "@types/workerpool": "^6.0.0",
+    "chokidar": "^3.5.2",
+    "dayjs": "^1.10.5",
+    "discord.js": "^13.1.0",
+    "discordx": "^6.2.0",
     "file-type": "^16.2.0",
     "firebase-admin": "^9.4.2",
     "fuse.js": "^6.4.4",
     "gm": "^1.23.1",
     "got": "^11.8.2",
-    "image-downloader": "^4.0.2",
-    "imagemagick": "^0.1.3",
-    "jimp": "^0.16.1",
-    "moment": "^2.29.1",
     "node-emoji": "^1.10.0",
     "pandemonium": "^2.0.0",
-    "request": "^2.88.2",
+    "reflect-metadata": "^0.1.13",
+    "tsyringe": "^4.6.0",
     "twemoji-parser": "^13.0.0",
-    "workerpool": "^6.0.3"
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
-    "eslint": "^7.16.0",
+    "@types/gm": "^1.18.10",
+    "@types/node": "^16.9.6",
+    "@types/node-emoji": "^1.8.1",
+    "@types/twemoji-parser": "^13.1.1",
+    "@typescript-eslint/eslint-plugin": "^4.26.1",
+    "@typescript-eslint/parser": "^4.32.0",
+    "eslint": "^7.28.0",
     "eslint-config-standard": "^16.0.2",
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^4.2.1",
-    "jest": "^27.0.1"
+    "eslint-plugin-promise": "^5.1.0",
+    "ts-node": "^10.2.1",
+    "tslib": "^2.3.1",
+    "typescript": "^4.4.3"
   }
 }

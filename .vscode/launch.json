@@ -5,13 +5,29 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Launch Program",
-            "program": "${workspaceFolder}/index.js",
+            "type": "node",
             "request": "launch",
-            "skipFiles": [
-                "<node_internals>/**"
-            ],
-            "type": "pwa-node"
+            "name": "Debug bot",
+            "program": "${workspaceFolder}/src/Main.ts",
+            "preLaunchTask": "tsc: build - tsconfig.json",
+            "console": "integratedTerminal",
+            "postDebugTask": "Delete downloaded files",
+            "outFiles": [
+                "${workspaceFolder}/**/*.js",
+                "!**/node_modules/**"
+            ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Debug bot ts-node",
+            "protocol": "inspector",
+            "args": ["${workspaceRoot}/src/Main.ts"],
+            "cwd": "${workspaceRoot}",
+            "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+            "internalConsoleOptions": "neverOpen",
+            "runtimeVersion": "16",
+            "smartStep": true
         },
         {
             "type": "node",

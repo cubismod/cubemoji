@@ -75,3 +75,6 @@ A Discord emoji bot, written in Node JS!.
 - Swirl
 - Threshold
 - Wave
+
+
+https://oceanroleplay.github.io/discord.ts/

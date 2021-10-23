@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "lib": ["ES2021", "ESNext.AsyncIterable"],
+    "module": "commonjs",
+    "target": "ES2021",
+    "outDir": "build",
+    "sourceMap": true,
+
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "typeRoots": [
+      "src/types"
+    ],
+    "allowJs": true,
+    "checkJs": false,
+    "resolveJsonModule": true,
+    "noImplicitAny": false,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "moduleResolution": "node"
+  },
+  "ts-node": {
+    "transpileOnly": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules"]
+}
