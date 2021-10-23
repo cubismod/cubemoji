@@ -10,8 +10,9 @@
             "name": "Debug bot",
             "program": "${workspaceFolder}/src/Main.ts",
             "preLaunchTask": "tsc: build - tsconfig.json",
-            "console": "integratedTerminal",
+            "sourceMaps": true,
             "postDebugTask": "Delete downloaded files",
+            "runtimeVersion": "16",
             "outFiles": [
                 "${workspaceFolder}/**/*.js",
                 "!**/node_modules/**"

@@ -11,7 +11,7 @@ import strings from '../../res/strings.json'
 export abstract class AddFace {
   @Slash('addface', { description: 'Adds a face or...other to an emote or image' })
   async addface (
-    @SlashOption('emote', { description: strings.missingArg, required: true })
+    @SlashOption('emote', { description: strings.sourceSlash, required: true })
       source: string,
     @SlashChoice('joy')
     @SlashChoice('pensive')

@@ -7,7 +7,7 @@ import strings from '../../res/strings.json'
 export abstract class Rescale {
   @Slash('rescale', { description: 'Rescale an image or emote using Seam carving to humorous results' })
   async rescale (
-    @SlashOption('emote', { description: strings.missingArg })
+    @SlashOption('emote', { description: strings.sourceSlash })
       emote: string,
     @SlashOption('user', { description: 'a user' })
       user: GuildMember,

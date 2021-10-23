@@ -59,19 +59,32 @@ export class Main {
         console.log('emote cache started up')
       }
 
+      if (secrets.environment === 'prd') await this._client.clearApplicationCommands()
       await this._client.initApplicationCommands()
       await this._client.initApplicationPermissions()
 
       console.log(`cubemoji ${pkginfo.version} is now running...`)
     })
 
-    this._client.on('interaction', (interaction) => {
-      if (interaction.isButton() || interaction.isSelectMenu()) {
-        if (interaction.customId.startsWith('discordx@pagination@')) {
-          return
+    this._client.on('interaction', async (interaction) => {
+      // we limit the test bot to only interacting in my own #bot-test channel
+      // while prd can interact with any channel
+      if (!interaction.channel ||
+        (secrets.environment === 'prd' && interaction.channel.id !== '793650181533859880') ||
+        (secrets.environment === 'npr' && interaction.channel.id === '793650181533859880')) {
+        if (interaction.isButton() || interaction.isSelectMenu()) {
+          if (interaction.customId.startsWith('discordx@pagination@')) {
+            return
+          }
+        }
+        try {
+          await this._client.executeInteraction(interaction)
+        } catch (err) {
+          console.error('INTERACTION FAILURE')
+          console.error(`Type: ${interaction.type}\nTimestamp: ${Date()}\nGuild: ${interaction.guild}\nUser: ${interaction.user.tag}\nChannel: ${interaction.channel}`)
+          console.error(`Failure details: ${err}`)
         }
       }
-      this._client.executeInteraction(interaction)
     })
   }
 }
