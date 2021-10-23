@@ -28,11 +28,11 @@ export class EmoteCache {
   }
 
   async init () {
-    this.emojis = await this.grabEmojis()
+    this.emojis = await this.grabEmotes()
     this.sortedArray = await this.sortedTxtEmoteArray()
   }
 
-  private async grabEmojis () {
+  private async grabEmotes () {
     const emojis: Cmoji[] = []
     await this.client.guilds.fetch()
     // add discord emojis
@@ -51,6 +51,28 @@ export class EmoteCache {
     return emojis
   }
 
+  // add an emote to the array
+  async addEmote (emote: GuildEmoji) {
+    console.log(`new emoji registered: ${emote.name}`)
+    this.emojis.push(new Cmoji(emote.name, emote.url, Source.Discord, emote, emote.id))
+  }
+
+  // remove an emote
+  async removeEmote (emote: GuildEmoji) {
+    const res = this.search(emote.id)
+    if (res.length > 0 && res[0].item.id === emote.id) {
+      this.emojis.splice(res[0].refIndex, 1)
+      console.log(`emoij removed: ${emote.name}`)
+    }
+  }
+
+  // edit an emote
+  async editEmote (oldEmote: GuildEmoji, newEmote: GuildEmoji) {
+    // just remove and add!
+    await this.removeEmote(oldEmote)
+    await this.addEmote(newEmote)
+  }
+
   // grab emotes from the heavens and return them as well as update the state of this class
   async emoteArray () {
     const _emojis: Cmoji[] = []
@@ -58,7 +80,7 @@ export class EmoteCache {
     const blacklist = require('./blacklist.json').blacklist
     if (this.emojis.length === 0) {
       // only initialize emotes at launch
-      const rawEmojis = await this.grabEmojis()
+      const rawEmojis = await this.grabEmotes()
       rawEmojis.forEach(value => {
         // utilize the blacklist.json file to remove bad emotes
         // blacklist.json utilizes emote IDs
