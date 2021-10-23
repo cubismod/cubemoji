@@ -333,7 +333,7 @@ export async function rescaleDiscord (context: MsgContext, source: string, user:
         if (!msg) {
           console.error('could not get a message during rescale, not proceeding with adding trash react')
         } else {
-          if (context instanceof MessageReaction) cubeMessageManager.registerTrashReact(context, msg, user.id)
+          if (msg instanceof Message) cubeMessageManager.registerTrashReact(context, msg, user.id)
         }
       })
     } else await reply(context, '**Error**: could not perform rescale')
