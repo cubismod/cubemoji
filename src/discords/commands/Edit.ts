@@ -26,10 +26,10 @@ export abstract class Edit {
         interaction.reply({ content: `${strings.missingArg} source`, ephemeral: true })
       } else if (emote) {
         await interaction.deferReply()
-        await editDiscord(interaction, effects, emote)
+        await editDiscord(interaction, effects, emote, interaction.user)
       } else if (user) {
         await interaction.deferReply()
-        await editDiscord(interaction, effects, user.displayAvatarURL({ format: 'png', dynamic: true, size: 256 }))
+        await editDiscord(interaction, effects, user.displayAvatarURL({ format: 'png', dynamic: true, size: 256 }), interaction.user)
       }
     }
   }

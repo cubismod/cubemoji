@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 import { Snowflake } from 'discord-api-types'
 import { CommandInteraction, ContextMenuInteraction, GuildEmoji, Message, MessageReaction, SnowflakeUtil } from 'discord.js'
-import { ContextMenu, Discord } from 'discordx'
+import { Discord } from 'discordx'
 import { unlink } from 'fs'
 import { injectable } from 'tsyringe'
 import { MsgContext } from './ImgEffects'
@@ -68,7 +68,6 @@ export class ImageQueue {
       // delete first item
       const first = this.images.shift()
       if (first) {
-        console.log(`deleting ${first}`)
         await unlink(first, (err) => {
           if (err) console.error(err)
         })
@@ -88,7 +87,8 @@ export class CubeMessageManager {
     this.sentMessages = new Map()
   }
 
-  registerTrashReact (context: MsgContext, msg: Message) {
+  // register a new trash react to save to our list of reacts
+  registerTrashReact (context: MsgContext, msg: Message, sender: Snowflake) {
     if (context instanceof ContextMenuInteraction || context instanceof CommandInteraction) {
       if (context.guild &&
         context.guild.me &&
@@ -98,7 +98,7 @@ export class CubeMessageManager {
         context.member) {
         // all these checks to ensure cubemoji can delete the message and can also add a react
         msg.react('🗑️')
-        this.sentMessages.set(msg.id, context.member.user.id)
+        this.sentMessages.set(msg.id, sender)
       }
     }
     if (context instanceof MessageReaction) {
@@ -108,7 +108,7 @@ export class CubeMessageManager {
         context.message.guild.me.permissionsIn(context.message.channelId).has('MANAGE_MESSAGES') &&
         context.message.guild.me.permissionsIn(context.message.channelId).has('ADD_REACTIONS')) {
         msg.react('🗑️')
-        this.sentMessages.set(msg.id, context.message.author.id)
+        this.sentMessages.set(msg.id, sender)
       }
     }
   }

@@ -19,7 +19,10 @@ export abstract class EventListeners {
     [reaction]: ArgsOf<'messageReactionAdd'>
   ) {
     const cubeMessageManager = container.resolve(CubeMessageManager)
-    if (cubeMessageManager) {
+    const reactionUsers = await reaction.users.fetch()
+    // last person to react is the user who initated this reaction event
+    const user = reactionUsers.last()
+    if (cubeMessageManager && user) {
       switch (reaction.emoji.toString()) {
         case '🗑️': {
           // delete a message
@@ -37,7 +40,7 @@ export abstract class EventListeners {
           // perform an edit
           const source = getMessageImage(await reaction.message.fetch())
           if (reaction instanceof MessageReaction) {
-            await editDiscord(reaction, '', source)
+            await editDiscord(reaction, '', source, user)
           }
           break
         }
@@ -45,7 +48,7 @@ export abstract class EventListeners {
           // perform a rescale
           const source = getMessageImage(await reaction.message.fetch())
           if (reaction instanceof MessageReaction) {
-            await rescaleDiscord(reaction, source)
+            await rescaleDiscord(reaction, source, user)
           }
         }
       }

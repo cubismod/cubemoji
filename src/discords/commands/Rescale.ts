@@ -17,9 +17,9 @@ export abstract class Rescale {
     if (!emote && !user) {
       interaction.reply({ content: `${strings.missingArg} source`, ephemeral: true })
     } else if (emote) {
-      await rescaleDiscord(interaction, emote)
+      await rescaleDiscord(interaction, emote, interaction.user)
     } else if (user) {
-      await rescaleDiscord(interaction, user.displayAvatarURL({ format: 'png', dynamic: true, size: 256 }))
+      await rescaleDiscord(interaction, user.displayAvatarURL({ format: 'png', dynamic: true, size: 256 }), interaction.user)
     }
   }
 }

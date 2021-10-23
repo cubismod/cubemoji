@@ -11,7 +11,7 @@ export abstract class CubeMessageContext {
       // fetch the message from the API
       await interaction.deferReply()
       const source = getMessageImage(await interaction.channel.messages.fetch(interaction.targetId))
-      await editDiscord(interaction, '', source)
+      await editDiscord(interaction, '', source, interaction.user)
     }
   }
 
@@ -20,7 +20,7 @@ export abstract class CubeMessageContext {
     if (interaction.channel) {
       await interaction.deferReply()
       const source = getMessageImage(await interaction.channel.messages.fetch(interaction.targetId))
-      await rescaleDiscord(interaction, source)
+      await rescaleDiscord(interaction, source, interaction.user)
     }
   }
 }

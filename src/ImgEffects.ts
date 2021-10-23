@@ -9,7 +9,7 @@ import path = require('path')
 import { CubeMessageManager, Effects, ImageQueue } from './Cubemoji'
 import { randomUUID } from 'crypto'
 import { container } from 'tsyringe'
-import { CommandInteraction, ContextMenuInteraction, Message, MessageAttachment, MessageReaction } from 'discord.js'
+import { CommandInteraction, ContextMenuInteraction, Message, MessageAttachment, MessageReaction, PartialUser, User } from 'discord.js'
 import { watch } from 'chokidar'
 import strings from './res/strings.json'
 
@@ -315,10 +315,11 @@ export function parseEffects (effects: string) {
 }
 
 // discord logic for doing a rescale
-export async function rescaleDiscord (context: MsgContext, source: string) {
+export async function rescaleDiscord (context: MsgContext, source: string, user: User | PartialUser) {
   if (source === null) return
   const url = await getUrl(source)
   if (url) {
+    startTyping(context)
     // do the rescale
     const filename = await performRescale(url)
     const cubeMessageManager = container.resolve(CubeMessageManager)
@@ -332,7 +333,7 @@ export async function rescaleDiscord (context: MsgContext, source: string) {
         if (!msg) {
           console.error('could not get a message during rescale, not proceeding with adding trash react')
         } else {
-          if (msg instanceof Message) cubeMessageManager.registerTrashReact(context, msg)
+          if (context instanceof MessageReaction) cubeMessageManager.registerTrashReact(context, msg, user.id)
         }
       })
     } else await reply(context, '**Error**: could not perform rescale')
@@ -341,12 +342,13 @@ export async function rescaleDiscord (context: MsgContext, source: string) {
 
 // the actual discord logic for doing an edit
 // source is an emote or other parsable
-export async function editDiscord (context: MsgContext, effects: string, source: string | null) {
+export async function editDiscord (context: MsgContext, effects: string, source: string | null, user: User | PartialUser) {
   if (source === null) return
   const parsedEffects = parseEffects(effects)
   // done parsing the effects, now let's try and parse what we're trying to edit
   const url = await getUrl(source)
   if (url) {
+    startTyping(context)
     // now perform the edit
     const filename = await performEdit(url, parsedEffects)
     const cubeMessageManager = container.resolve(CubeMessageManager)
@@ -360,7 +362,7 @@ export async function editDiscord (context: MsgContext, effects: string, source:
         if (!msg) {
           console.error('could not get a message during edit, not proceeding with adding trash react')
         } else {
-          if (msg instanceof Message) cubeMessageManager.registerTrashReact(context, msg)
+          if (msg instanceof Message) cubeMessageManager.registerTrashReact(context, msg, user.id)
         }
       })
     } else {
@@ -384,7 +386,7 @@ async function reply (context: MsgContext, content: MessageAttachment | string) 
       const repMsg = await context.editReply({ files: [content] })
       if (repMsg instanceof Message) msg = repMsg
     }
-    if (context instanceof MessageReaction) msg = await context.message.reply({ files: [content] })
+    if (context instanceof MessageReaction) msg = await context.message.reply({ files: [content], allowedMentions: { repliedUser: false } })
     return msg
   } else {
     if (context instanceof CommandInteraction) {
@@ -395,5 +397,13 @@ async function reply (context: MsgContext, content: MessageAttachment | string) 
       const repMsg = await context.editReply({ content: content })
       if (repMsg instanceof Message) msg = repMsg
     }
+    if (context instanceof MessageReaction) msg = await context.message.reply({ content: content, allowedMentions: { repliedUser: false } })
+  }
+}
+
+// type to indicate that cubemoji is working on the edit/rescale
+async function startTyping (context: MsgContext) {
+  if (context instanceof MessageReaction) {
+    context.message.channel.sendTyping()
   }
 }

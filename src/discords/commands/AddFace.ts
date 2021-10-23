@@ -39,7 +39,7 @@ export abstract class AddFace {
           if (!msg) {
             console.error('could not get a message during rescale, not proceeding with adding trash react')
           } else {
-            if (msg instanceof Message) cubeMessageManager.registerTrashReact(interaction, msg)
+            if (msg instanceof Message) cubeMessageManager.registerTrashReact(interaction, msg, interaction.user.id)
           }
         })
       }
