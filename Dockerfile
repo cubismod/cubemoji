@@ -5,8 +5,6 @@ WORKDIR /usr/src/cubemoji
 COPY setup-image.sh .
 RUN ./setup-image.sh
 
-COPY build-im.sh .
-RUN ./build-im.sh
 
 COPY package.json .
 COPY secrets.json .

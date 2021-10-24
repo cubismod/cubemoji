@@ -8,10 +8,9 @@ export DEBIAN_FRONTEND=noninteractive
 apt-get update
 apt-get -y install apt-utils
 apt-get -y upgrade
-apt-get -y remove imagemagick imagemagick-6.q16
 
 # get imagemagick installed
-apt-get -y install --no-install-recommends graphicsmagick
+apt-get -y install --no-install-recommends graphicsmagick imagemagick
 apt-get autoremove -y
 apt-get autoclean -y
 

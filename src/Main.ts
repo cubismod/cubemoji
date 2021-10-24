@@ -18,31 +18,44 @@ export class Main {
   static async start () {
     console.log('🅲🆄🅱🅴🅼🅾🅹🅸')
     DIService.container = container
-    let botGuilds: string[] = []
     if (secrets.environment === 'prd') {
       console.log('running in PRD')
-      botGuilds = this._client.guilds.cache.map((guild) => guild.id)
+      this._client = new Client({
+        intents: [
+          Intents.FLAGS.GUILDS,
+          Intents.FLAGS.GUILD_EMOJIS_AND_STICKERS,
+          Intents.FLAGS.GUILD_MESSAGES,
+          Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
+          Intents.FLAGS.GUILD_MEMBERS,
+          Intents.FLAGS.GUILD_PRESENCES
+        ],
+        silent: true,
+        classes: [
+            `${__dirname}/**/*.{js,ts}` // glob string to load the classes
+        ],
+        partials: ['MESSAGE', 'CHANNEL', 'REACTION']
+
+      })
     } else {
       console.log('Running in NPR')
-      botGuilds = ['545784892492087303']
+      this._client = new Client({
+        botGuilds: ['545784892492087303'],
+        intents: [
+          Intents.FLAGS.GUILDS,
+          Intents.FLAGS.GUILD_EMOJIS_AND_STICKERS,
+          Intents.FLAGS.GUILD_MESSAGES,
+          Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
+          Intents.FLAGS.GUILD_MEMBERS,
+          Intents.FLAGS.GUILD_PRESENCES
+        ],
+        classes: [
+            `${__dirname}/**/*.{js,ts}` // glob string to load the classes
+        ],
+        partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
+        // for testing purposes in cubemoji server
+        silent: false
+      })
     }
-    this._client = new Client({
-      botGuilds: botGuilds,
-      intents: [
-        Intents.FLAGS.GUILDS,
-        Intents.FLAGS.GUILD_EMOJIS_AND_STICKERS,
-        Intents.FLAGS.GUILD_MESSAGES,
-        Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
-        Intents.FLAGS.GUILD_MEMBERS,
-        Intents.FLAGS.GUILD_PRESENCES
-      ],
-      classes: [
-        `${__dirname}/**/*.{js,ts}` // glob string to load the classes
-      ],
-      partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
-      // for testing purposes in cubemoji server
-      silent: false
-    })
     await this._client.login(secrets.token)
 
     this._client.once('ready', async () => {
