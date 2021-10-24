@@ -2,15 +2,24 @@ FROM node:latest
 WORKDIR /usr/src/cubemoji
 
 # setup any requisite packages
-COPY setupImage.sh .
-RUN ./setupImage.sh
+COPY setup-image.sh .
+RUN ./setup-image.sh
+
+COPY build-im.sh .
+RUN ./build-im.sh
 
 COPY package.json .
 COPY secrets.json .
 COPY run-watch.sh .
-COPY src/ .
+COPY tsconfig.json .
+COPY assets/ ./assets/
+COPY src/ ./src/
+COPY .env .
 
+RUN npm install --production
+RUN npm install -g typescript 
+RUN npm run build
 
-RUN npm install
+RUN mkdir download
 
-CMD npm start 2>&1 | ./run-watch.sh
+CMD node build/src/Main.js 2>&1 | ./run-watch.sh
