@@ -4,13 +4,25 @@ import got from 'got/dist/source'
 import { createWriteStream } from 'fs'
 import path = require('path')
 import { reject } from 'p-cancelable'
-import { DIService } from 'discordx'
+import { DIService, Client } from 'discordx'
 import { container } from 'tsyringe'
 import { EmoteCache } from './EmoteCache'
 import { randomUUID } from 'crypto'
 import { promisify } from 'util'
 import { pipeline } from 'stream'
 import { Message } from 'discord.js'
+import { choice } from 'pandemonium'
+
+// display  a random status message
+export function setStatus (client: Client) {
+  const status = choice([
+    'Type / in chat to use my slash commands!',
+    'React 📏 to a message to rescale that message content!',
+    'React 📷 to a message to randomly edit that message content!',
+    'React 🌟 on a generated image to save to best of!'
+  ])
+  client.user?.setActivity(status, { type: 'PLAYING' })
+}
 
 // return true if this is a URL w/ a valid extension, false if it isn't
 export async function isUrl (url: string) {

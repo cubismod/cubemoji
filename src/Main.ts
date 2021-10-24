@@ -7,6 +7,7 @@ import pkginfo from '../package.json'
 import { container } from 'tsyringe'
 import { EmoteCache } from './EmoteCache'
 import { CubeMessageManager, ImageQueue } from './Cubemoji'
+import { setStatus } from './CommandHelper'
 export class Main {
   private static _client: Client
 
@@ -64,6 +65,9 @@ export class Main {
       await this._client.initApplicationPermissions()
 
       console.log(`cubemoji ${pkginfo.version} is now running...`)
+      // set a status message
+      setStatus(this._client)
+      setInterval(setStatus, 600000, this._client)
     })
 
     this._client.on('interaction', async (interaction) => {
