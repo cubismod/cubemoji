@@ -1,6 +1,4 @@
-#!/bin/bash
-set -euo pipefail
-
+#!/bin/ash
 apk update
 apk upgrade
-apk install imagemagick graphicsmagick
+apk add imagemagick graphicsmagick
