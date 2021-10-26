@@ -1,6 +1,7 @@
 #!/bin/bash
 # builds imagemagick from source
 
+apt-get -y remove imagemagick*
 # manual install of imagemagick so we can get q8 quality instead of 16 for speedier performance
 cd ~
 git clone https://github.com/ImageMagick/ImageMagick.git ImageMagick
