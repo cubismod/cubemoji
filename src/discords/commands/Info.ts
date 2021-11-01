@@ -41,7 +41,8 @@ export abstract class Info {
           embed.setTitle(res.name)
           switch (res.source) {
             case Source.Discord: {
-              if (res.guildEmoji?.createdAt) embed.addField('Creation Date', res.guildEmoji.createdAt.toLocaleString())
+              console.log(res.guildEmoji?.createdAt.getTime())
+              if (res.guildEmoji?.createdAt) embed.addField('Creation Date', `<t:${Math.round(res.guildEmoji.createdAt.getTime() / 1000)}>`)
               if (res.guildEmoji?.id) embed.addField('ID', res.guildEmoji.id)
               embed.addField('URL', res.url)
               if (res.guildEmoji?.animated) embed.addField('Animated', 'Yes')
@@ -88,8 +89,8 @@ export abstract class Info {
         embed.setTitle(member.user.tag)
         embed.setImage(avatarURL)
         embed.addField('ID', member.user.id)
-        embed.addField('Discord Join Date', member.user.createdAt.toLocaleString())
-        if (member.joinedAt) embed.addField('Server Join Date', member.joinedAt.toLocaleString())
+        embed.addField('Discord Join Date', `<t:${Math.round(member.user.createdAt.getTime() / 1000)}>`)
+        if (member.joinedAt) embed.addField('Server Join Date', `<t:${Math.round(member.joinedAt.getTime() / 1000)}>`)
         embed.addField('Bot', member.user.bot.toString())
         try {
           await interaction.reply({ embeds: [embed] })

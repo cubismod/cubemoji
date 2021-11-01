@@ -28,8 +28,10 @@ export class EmoteCache {
   }
 
   async init () {
+    // setup emoji cache and fix duplicate names
     this.emojis = await this.grabEmotes()
     this.sortedArray = await this.sortedTxtEmoteArray()
+    this.deduper()
   }
 
   private async grabEmotes () {
@@ -175,5 +177,22 @@ export class EmoteCache {
     const entitites = Twemoji.parse(body, { assetType: 'png' })
     if (entitites.length !== 0) return entitites[0].url
     else return ''
+  }
+
+  // removes duplicate names from emojis
+  deduper () {
+    // keep track of each name and the increments on it
+    const names = new Map<string, number>()
+    this.discEmojis.forEach(emoji => {
+      let inc: number | undefined = 0
+      if (emoji.name && names.has(emoji.name.toLowerCase())) {
+        // perform a name change
+        inc = names.get(emoji.name.toLowerCase())
+        if (inc) {
+          emoji.name = `${emoji.name}_${inc}`
+          names.set(emoji.name.toLowerCase(), inc)
+        }
+      }
+    })
   }
 }
