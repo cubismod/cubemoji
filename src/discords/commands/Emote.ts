@@ -13,34 +13,31 @@ export abstract class Emote {
     @SlashOption('emote', {
       description: strings.emoteSlash,
       autocomplete: (interaction: AutocompleteInteraction) => acResolver(interaction),
+      required: true,
       type: 'STRING'
     })
       emote: string,
       interaction: CommandInteraction
   ) {
-    if (emote !== undefined) {
-      await interaction.deferReply()
-      const emoteCache = grabEmoteCache()
-      if (emoteCache !== undefined) {
-        const retrievedEmoji = await emoteCache.retrieve(emote)
-        if (retrievedEmoji !== undefined) {
-          let msg = ''
-          // now send a different obj depending on what type of emote we are sending
-          switch (retrievedEmoji.source) {
-            case Source.Discord: {
-              if (retrievedEmoji.guildEmoji != null) msg = retrievedEmoji.guildEmoji.toString()
-              break
-            }
-            case Source.Mutant:
-            case Source.URL:
-              msg = retrievedEmoji.url
+    await interaction.deferReply()
+    const emoteCache = grabEmoteCache()
+    if (emoteCache !== undefined) {
+      const retrievedEmoji = await emoteCache.retrieve(emote)
+      if (retrievedEmoji !== undefined) {
+        let msg = ''
+        // now send a different obj depending on what type of emote we are sending
+        switch (retrievedEmoji.source) {
+          case Source.Discord: {
+            if (retrievedEmoji.guildEmoji != null) msg = retrievedEmoji.guildEmoji.toString()
+            break
           }
-          await interaction.editReply(msg)
-        } else {
-          await interaction.editReply({ content: strings.noEmoteFound })
+          case Source.Mutant:
+          case Source.URL:
+            msg = retrievedEmoji.url
         }
+        await interaction.editReply(msg)
       } else {
-        await interaction.reply({ content: strings.noArgs, ephemeral: true })
+        await interaction.editReply({ content: strings.noEmoteFound })
       }
     }
   }

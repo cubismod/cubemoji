@@ -179,6 +179,7 @@ export class EmoteCache {
     else return ''
   }
 
+  // TODO: check if this actually works
   // removes duplicate names from emojis
   deduper () {
     // keep track of each name and the increments on it

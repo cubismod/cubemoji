@@ -32,6 +32,7 @@ export abstract class Big {
         }
       } else if (member !== undefined) {
         // user code
+        // no need to defer a reply since we don't have to search through the emote cache
         await interaction.reply(member.user.displayAvatarURL({ format: 'png', dynamic: true, size: 256 }))
       }
       if ((member === undefined) && (emote === undefined)) {

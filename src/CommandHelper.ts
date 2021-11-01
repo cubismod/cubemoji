@@ -11,7 +11,7 @@ import { randomUUID } from 'crypto'
 import { promisify } from 'util'
 import { pipeline } from 'stream'
 import { AutocompleteInteraction, Message } from 'discord.js'
-import { choice } from 'pandemonium'
+import { choice, geometricReservoirSample } from 'pandemonium'
 
 // display  a random status message
 export function setStatus (client: Client) {
@@ -118,6 +118,12 @@ export function acResolver (interaction: AutocompleteInteraction) {
         // if we actually get some choices back we send to cubemoji
         interaction.respond(res.slice(0, 8).map(result => {
           return { name: result.item.name, value: result.item.name }
+        }))
+      } else {
+        // otherwise we return some random emojis
+        const res = geometricReservoirSample(8, emoteCache.emojis)
+        interaction.respond(res.map(result => {
+          return { name: result.name, value: result.name }
         }))
       }
     }

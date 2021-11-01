@@ -18,12 +18,13 @@ export abstract class Rescale {
       user: GuildMember,
       interaction: CommandInteraction
   ) {
-    await interaction.deferReply()
     if (!emote && !user) {
-      interaction.reply({ content: `${strings.missingArg} source`, ephemeral: true })
+      interaction.reply({ content: strings.noArgs, ephemeral: true })
     } else if (emote) {
+      await interaction.deferReply()
       await rescaleDiscord(interaction, emote, interaction.user)
     } else if (user) {
+      await interaction.deferReply()
       await rescaleDiscord(interaction, user.displayAvatarURL({ format: 'png', dynamic: true, size: 256 }), interaction.user)
     }
   }

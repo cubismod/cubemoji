@@ -28,7 +28,7 @@ export abstract class Edit {
       interaction.reply({ content: imgEffects.join(), ephemeral: true })
     } else {
       if (!emote && !user) {
-        interaction.reply({ content: `${strings.missingArg} source`, ephemeral: true })
+        interaction.reply({ content: strings.noArgs, ephemeral: true })
       } else if (emote) {
         await interaction.deferReply()
         await editDiscord(interaction, effects, emote, interaction.user)
