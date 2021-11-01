@@ -90,7 +90,7 @@ export abstract class Info {
         embed.setImage(avatarURL)
         embed.addField('ID', member.user.id)
         embed.addField('Discord Join Date', `<t:${Math.round(member.user.createdAt.getTime() / 1000)}>`)
-        if (member.joinedAt) embed.addField('Server Join Date', `<t:${Math.round(member.joinedAt.getTime() / 1000)}>`)
+        if (member.joinedAt) embed.addField('This Server Join Date', `<t:${Math.round(member.joinedAt.getTime() / 1000)}>`)
         embed.addField('Bot', member.user.bot.toString())
         try {
           await interaction.reply({ embeds: [embed] })
