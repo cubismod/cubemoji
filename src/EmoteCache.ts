@@ -16,22 +16,24 @@ import { GuildEmoji } from 'discord.js'
 export class EmoteCache {
   client: Client
   emojis: Cmoji[]
-  sortedArray: string[]
-  discEmojis: GuildEmoji[] // save references to discord emojis for functions that wouldn't work well
-  // with image emojis
+  sortedArray: string[] // sorted list of emoji names
+  discEmojis: Cmoji[] // save references to discord emojis for functions that wouldn't work well w/ images
+  mutantEmojis: Cmoji[] // references to mutant emojis
 
   constructor (@inject('Client') client: Client) {
     this.client = client
     this.emojis = []
-    this.sortedArray = []
+    this.sortedArray = [] // sorted list of emoji names
     this.discEmojis = []
+    this.mutantEmojis = []
   }
 
   async init () {
     // setup emoji cache and fix duplicate names
     this.emojis = await this.grabEmotes()
-    this.sortedArray = await this.sortedTxtEmoteArray()
     this.deduper()
+    this.extractEmojis()
+    this.sortedArray = await this.sortedTxtEmoteArray()
   }
 
   private async grabEmotes () {
@@ -41,12 +43,12 @@ export class EmoteCache {
     this.client.guilds.cache.forEach(guild => {
       for (const emoji of guild.emojis.cache.values()) {
         emojis.push(new Cmoji(emoji.name, emoji.url, Source.Discord, emoji, emoji.id))
-        this.discEmojis.push(emoji)
       }
     })
     // then add mutant emojis
     mutantNames.forEach(emoji => {
       const url = `https://storage.googleapis.com/cubemoji.appspot.com/mutant-emotes/${emoji}`
+      // remove the file extension
       const name = emoji.slice(0, -4)
       emojis.push(new Cmoji(name, url, Source.Mutant, null))
     })
@@ -179,7 +181,6 @@ export class EmoteCache {
     else return ''
   }
 
-  // TODO: check if this actually works
   // removes duplicate names from emojis
   deduper () {
     // keep track of each name and the increments on it
@@ -200,5 +201,26 @@ export class EmoteCache {
         names.set(emoji.name.toLowerCase(), inc)
       }
     })
+  }
+
+  // extracts Mutant emojis and Discord emojis
+  // and places them each into their own sorted arrays
+  extractEmojis () {
+    const discord: Cmoji[] = []
+    const mutant: Cmoji[] = []
+    this.emojis.forEach(emoji => {
+      switch (emoji.source) {
+        case (Source.Discord):
+          discord.push(emoji)
+          break
+        case (Source.Mutant):
+          mutant.push(emoji)
+          break
+      }
+    })
+    // now sort each array
+    // on name values
+    this.discEmojis = discord.sort((a, b) => a.name.localeCompare(b.name))
+    this.mutantEmojis = mutant.sort((a, b) => a.name.localeCompare(b.name))
   }
 }

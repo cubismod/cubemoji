@@ -1,7 +1,8 @@
-import { CommandInteraction, GuildEmoji } from 'discord.js'
+import { CommandInteraction } from 'discord.js'
 import { Discord, Slash, SlashOption } from 'discordx'
 import { choice, geometricReservoirSample } from 'pandemonium'
 import { grabEmoteCache } from '../../CommandHelper'
+import { Cmoji } from '../../Cubemoji'
 
 @Discord()
 export abstract class Random {
@@ -24,7 +25,7 @@ export abstract class Random {
       }
       // depending on the user option, we will either grab all discord emojis to sample from or
       // just flushed emojis
-      let emoteOptions: GuildEmoji[]
+      let emoteOptions: Cmoji[]
       if (flushed) emoteOptions = emoteCache.searchDiscord('flushed').map(fuseResult => fuseResult.item)
       else emoteOptions = emoteCache.discEmojis
 
@@ -34,7 +35,10 @@ export abstract class Random {
         // here we are iterating through the emotes to get textual representations in a string[]
         // and then we join that list to send back to the user
         await interaction.editReply(
-          emotes.map(emote => emote.toString()).join('')
+          emotes.map(emote => {
+            if (emote.guildEmoji) return emote.guildEmoji.toString()
+            else return ''
+          }).join('')
         )
       } else {
         await interaction.editReply(choice(emoteOptions).toString())
