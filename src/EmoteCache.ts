@@ -184,15 +184,20 @@ export class EmoteCache {
   deduper () {
     // keep track of each name and the increments on it
     const names = new Map<string, number>()
-    this.discEmojis.forEach(emoji => {
+    this.emojis.forEach((emoji, index) => {
       let inc: number | undefined = 0
       if (emoji.name && names.has(emoji.name.toLowerCase())) {
         // perform a name change
         inc = names.get(emoji.name.toLowerCase())
-        if (inc) {
-          emoji.name = `${emoji.name}_${inc}`
-          names.set(emoji.name.toLowerCase(), inc)
+        if (inc !== undefined) {
+          ++inc
+          // save reference to original name
+          const ogName = emoji.name
+          this.emojis[index].name = `${emoji.name}_${inc}`
+          names.set(ogName.toLowerCase(), inc)
         }
+      } else if (emoji.name) {
+        names.set(emoji.name.toLowerCase(), inc)
       }
     })
   }
