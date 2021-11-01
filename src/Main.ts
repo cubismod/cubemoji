@@ -34,7 +34,6 @@ export class Main {
             `${__dirname}/**/*.{js,ts}` // glob string to load the classes
         ],
         partials: ['MESSAGE', 'CHANNEL', 'REACTION']
-
       })
     } else {
       console.log('Running in NPR')
