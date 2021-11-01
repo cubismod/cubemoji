@@ -1,4 +1,4 @@
-FROM node:17-alpine3.13
+FROM node:latest
 WORKDIR /usr/src/cubemoji
 
 # setup any requisite packages
