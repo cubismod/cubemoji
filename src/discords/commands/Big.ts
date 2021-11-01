@@ -1,6 +1,6 @@
-import { CommandInteraction, GuildMember } from 'discord.js'
+import { AutocompleteInteraction, CommandInteraction, GuildMember } from 'discord.js'
 import { Discord, Slash, SlashOption } from 'discordx'
-import { grabEmoteCache } from '../../CommandHelper'
+import { acResolver, grabEmoteCache } from '../../CommandHelper'
 import strings from '../../res/strings.json'
 
 @Discord()
@@ -9,7 +9,11 @@ export abstract class Big {
     description: 'enlarges the input object'
   })
   async big (
-    @SlashOption('emote', { description: strings.emoteSlash })
+    @SlashOption('emote', {
+      description: strings.emoteSlash,
+      autocomplete: (interaction: AutocompleteInteraction) => acResolver(interaction),
+      type: 'STRING'
+    })
       emote: string,
     @SlashOption('member', { description: strings.memberSlash })
       member: GuildMember,

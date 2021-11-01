@@ -1,6 +1,6 @@
 import { CommandInteraction } from 'discord.js'
 import { Discord, Slash } from 'discordx'
-import { sendPaginatedEmbeds } from '@discordx/utilities'
+import { Pagination } from '@discordx/utilities'
 import { grabEmoteCache } from '../../CommandHelper'
 
 @Discord()
@@ -28,9 +28,9 @@ export abstract class List {
           curEmotePage = curEmotePage.concat(emote.toString())
         }
       })
-      await sendPaginatedEmbeds(interaction, emotes, {
+      await new Pagination(interaction, emotes, {
         type: 'SELECT_MENU'
-      })
+      }).send()
     }
   }
 }

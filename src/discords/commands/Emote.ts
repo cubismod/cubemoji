@@ -1,6 +1,6 @@
-import { CommandInteraction } from 'discord.js'
+import { AutocompleteInteraction, CommandInteraction } from 'discord.js'
 import { Discord, Slash, SlashOption } from 'discordx'
-import { grabEmoteCache } from '../../CommandHelper'
+import { acResolver, grabEmoteCache } from '../../CommandHelper'
 import { Source } from '../../Cubemoji'
 import strings from '../../res/strings.json'
 
@@ -10,7 +10,11 @@ export abstract class Emote {
     description: 'inserts an emote into chat'
   })
   async emote (
-    @SlashOption('emote', { description: strings.emoteSlash })
+    @SlashOption('emote', {
+      description: strings.emoteSlash,
+      autocomplete: (interaction: AutocompleteInteraction) => acResolver(interaction),
+      type: 'STRING'
+    })
       emote: string,
       interaction: CommandInteraction
   ) {

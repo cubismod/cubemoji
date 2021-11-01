@@ -10,7 +10,7 @@ import { EmoteCache } from './EmoteCache'
 import { randomUUID } from 'crypto'
 import { promisify } from 'util'
 import { pipeline } from 'stream'
-import { Message } from 'discord.js'
+import { AutocompleteInteraction, Message } from 'discord.js'
 import { choice } from 'pandemonium'
 
 // display  a random status message
@@ -97,7 +97,29 @@ export function grabEmoteCache () {
  * and returns that
  */
 export function getMessageImage (message: Message) {
-  if (message.attachments.size > 0) {
-    return message.attachments.random().url
+  const attach = message.attachments.random()
+  if (message.attachments.size > 0 && attach) {
+    return attach.url
   } else return message.content
+}
+
+/**
+ * autocomplete resolver, follows the user's
+ * query and presents them with emotes that match
+ * whatever they are typing
+ */
+export function acResolver (interaction: AutocompleteInteraction) {
+  const emoteCache = grabEmoteCache()
+  if (emoteCache) {
+    const query = interaction.options.getFocused(true).value
+    if (typeof query === 'string') {
+      const res = emoteCache.search(query)
+      if (res.length > 0) {
+        // if we actually get some choices back we send to cubemoji
+        interaction.respond(res.slice(0, 8).map(result => {
+          return { name: result.item.name, value: result.item.name }
+        }))
+      }
+    }
+  }
 }

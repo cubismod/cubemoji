@@ -1,14 +1,19 @@
-import { CommandInteraction, GuildMember } from 'discord.js'
+import { AutocompleteInteraction, CommandInteraction, GuildMember } from 'discord.js'
 import { Discord, Slash, SlashOption } from 'discordx'
 import strings from '../../res/strings.json'
 import imgEffects from '../../res/imgEffects.json'
 import { editDiscord } from '../../ImgEffects'
+import { acResolver } from '../../CommandHelper'
 
 @Discord()
 export abstract class Edit {
   @Slash('edit', { description: 'Edits an emote or image according to the effects you select' })
   async edit (
-    @SlashOption('emote', { description: strings.missingArg })
+    @SlashOption('source', {
+      description: strings.sourceSlash,
+      autocomplete: (interaction: AutocompleteInteraction) => acResolver(interaction),
+      type: 'STRING'
+    })
       emote: string,
     @SlashOption('user', { description: 'a user' })
       user: GuildMember,

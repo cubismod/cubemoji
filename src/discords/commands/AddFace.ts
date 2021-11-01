@@ -1,8 +1,8 @@
 import { watch } from 'chokidar'
-import { CommandInteraction, Message, MessageAttachment } from 'discord.js'
+import { AutocompleteInteraction, CommandInteraction, Message, MessageAttachment } from 'discord.js'
 import { Discord, Slash, SlashChoice, SlashOption } from 'discordx'
 import { container } from 'tsyringe'
-import { getUrl } from '../../CommandHelper'
+import { acResolver, getUrl } from '../../CommandHelper'
 import { CubeMessageManager } from '../../Cubemoji'
 import { performAddFace } from '../../ImgEffects'
 import strings from '../../res/strings.json'
@@ -11,7 +11,12 @@ import strings from '../../res/strings.json'
 export abstract class AddFace {
   @Slash('addface', { description: 'Adds a face or...other to an emote or image' })
   async addface (
-    @SlashOption('emote', { description: strings.sourceSlash, required: true })
+    @SlashOption('source', {
+      description: strings.sourceSlash,
+      required: true,
+      autocomplete: (interaction: AutocompleteInteraction) => acResolver(interaction),
+      type: 'STRING'
+    })
       source: string,
     @SlashChoice('joy')
     @SlashChoice('pensive')
