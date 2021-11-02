@@ -203,7 +203,6 @@ export class EmoteCache {
     })
   }
 
-
   /**
    * extracts Mutant and Discord emojis
    * and places each into their own sorted arrays

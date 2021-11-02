@@ -152,18 +152,18 @@ export function sendPagination (interaction: CommandInteraction, type: Source, e
         break
       case Source.Mutant:
         emoteSource = emoteCache.mutantEmojis
-        emotesPerPage = 200
+        emotesPerPage = 120
         break
       case Source.Any:
         emoteSource = emoteCache.emojis
-        emotesPerPage = 200
+        emotesPerPage = 120
     }
     emoteSource.forEach((emote, i) => {
       // for discord emojis we want 60 emojis in one embed
       // mutant and any we can do 100 in one embed
       if (embedBody === '') {
         // beginning a new page so let's mark that
-        menuItem = `${emote.name} - `
+        menuItem = `(${menuText.length + 1}): ${emote.name} - `
       }
       // append to emote list
       if (type === Source.Discord && emote.guildEmoji) {
@@ -173,6 +173,11 @@ export function sendPagination (interaction: CommandInteraction, type: Source, e
       if (type === Source.Any || type === Source.Mutant) {
         // just grab names for these objects
         embedBody = `${embedBody} \`${emote.name}\``
+        if (type === Source.Any) {
+          // append (D) for Discord (M) for Mutant
+          if (emote.source === Source.Discord) embedBody = `${embedBody} (D)`
+          else embedBody = `${embedBody} (M)`
+        }
       }
       if (i !== 0 && (i % emotesPerPage === 0)) {
         // this is when we reach the max emotes per page
