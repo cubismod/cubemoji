@@ -14,7 +14,8 @@ import { MsgContext } from './ImgEffects'
 export enum Source {
   Discord,
   Mutant,
-  URL
+  URL,
+  Any
 }
 
 // effects used in an edit operation

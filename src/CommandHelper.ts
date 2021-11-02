@@ -10,8 +10,10 @@ import { EmoteCache } from './EmoteCache'
 import { randomUUID } from 'crypto'
 import { promisify } from 'util'
 import { pipeline } from 'stream'
-import { AutocompleteInteraction, Message } from 'discord.js'
+import { AutocompleteInteraction, CommandInteraction, Message, MessageEmbed } from 'discord.js'
 import { choice, geometricReservoirSample } from 'pandemonium'
+import { Cmoji, Source } from './Cubemoji'
+import { Pagination } from '@discordx/utilities'
 
 // display  a random status message
 export function setStatus (client: Client) {
@@ -128,4 +130,94 @@ export function acResolver (interaction: AutocompleteInteraction) {
       }
     }
   }
+}
+
+/**
+ * send a new pagination to the specified interaction
+ */
+export function sendPagination (interaction: CommandInteraction, type: Source, emoteCache: EmoteCache) {
+  // first setup embeds
+  const embeds: MessageEmbed[] = []
+  const menuText: string[] = [] // page markers like alphabet-bean for example
+  let menuItem = ''
+  let embedBody = ''
+  let curEmotePage = newPage(new MessageEmbed(), type)
+  let emotesPerPage = 0
+  let emoteSource: Cmoji[] = [] // the source of our list
+  if (curEmotePage) {
+    switch (type) {
+      case Source.Discord:
+        emoteSource = emoteCache.discEmojis
+        emotesPerPage = 60
+        break
+      case Source.Mutant:
+        emoteSource = emoteCache.mutantEmojis
+        emotesPerPage = 100
+        break
+      case Source.Any:
+        emoteSource = emoteCache.emojis
+        emotesPerPage = 100
+    }
+    emoteSource.forEach((emote, i) => {
+      // for discord emojis we want 60 emojis in one embed
+      // mutant and any we can do 100 in one embed
+      if (embedBody === '') {
+        // beginning a new page so let's mark that
+        menuItem = `${emote.name} -`
+      }
+      // append to emote list
+      if (type === Source.Discord && emote.guildEmoji) {
+        // discord emoji specific code
+        embedBody = embedBody.concat(emote.guildEmoji.toString())
+      }
+      if (type === Source.Any || type === Source.Mutant) {
+        // just grab names for these objects
+        embedBody = `${embedBody}, \`${emote.name}\``
+      }
+      if (i !== 0 && (i % emotesPerPage)) {
+        // this is when we reach the max emotes per page
+        // get the last emote that we added to the page
+        // and add to menu text
+        menuItem = menuItem.concat(emoteSource[i - 1].name)
+        curEmotePage.setDescription(embedBody)
+        // append page to embeds
+        embeds.push(curEmotePage)
+        menuText.push(menuItem)
+        // clear working page and menu item
+        curEmotePage = newPage(new MessageEmbed(), type)
+      } else if (i === emoteSource.length - 1) {
+        // if the size of the array isn't a multiple of the emotes per page
+        // then we need to also end now
+        menuItem = menuItem.concat(emoteSource[i - 1].name)
+        curEmotePage.setDescription(embedBody)
+        embeds.push(curEmotePage)
+        menuText.push(menuItem)
+      }
+    })
+    // now we send an actual pagination
+    new Pagination(interaction, embeds, {
+      type: 'SELECT_MENU',
+      ephemeral: true,
+      pageText: menuText
+    }).send()
+  }
+}
+
+/**
+ * Initializes a new page
+ */
+function newPage (embed: MessageEmbed, type: Source) {
+  switch (type) {
+    case Source.Discord:
+      embed.setTitle('List of Discord Emotes')
+      break
+    case Source.Any:
+      embed.setTitle('List of All Emotes')
+      break
+    case Source.Mutant:
+      embed.setTitle('List of Mutant Emoji')
+      embed.setFooter('This bot uses Mutant Standard emoji (https://mutant.tech) which are licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License (https://creativecommons.org/licenses/by-nc-sa/4.0/)')
+  }
+  embed.setColor('RANDOM')
+  return embed
 }
