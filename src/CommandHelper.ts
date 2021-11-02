@@ -152,18 +152,18 @@ export function sendPagination (interaction: CommandInteraction, type: Source, e
         break
       case Source.Mutant:
         emoteSource = emoteCache.mutantEmojis
-        emotesPerPage = 100
+        emotesPerPage = 200
         break
       case Source.Any:
         emoteSource = emoteCache.emojis
-        emotesPerPage = 100
+        emotesPerPage = 200
     }
     emoteSource.forEach((emote, i) => {
       // for discord emojis we want 60 emojis in one embed
       // mutant and any we can do 100 in one embed
       if (embedBody === '') {
         // beginning a new page so let's mark that
-        menuItem = `${emote.name} -`
+        menuItem = `${emote.name} - `
       }
       // append to emote list
       if (type === Source.Discord && emote.guildEmoji) {
@@ -172,24 +172,28 @@ export function sendPagination (interaction: CommandInteraction, type: Source, e
       }
       if (type === Source.Any || type === Source.Mutant) {
         // just grab names for these objects
-        embedBody = `${embedBody}, \`${emote.name}\``
+        embedBody = `${embedBody} \`${emote.name}\``
       }
-      if (i !== 0 && (i % emotesPerPage)) {
+      if (i !== 0 && (i % emotesPerPage === 0)) {
         // this is when we reach the max emotes per page
         // get the last emote that we added to the page
         // and add to menu text
         menuItem = menuItem.concat(emoteSource[i - 1].name)
         curEmotePage.setDescription(embedBody)
+        curEmotePage.setFooter(menuItem)
         // append page to embeds
         embeds.push(curEmotePage)
         menuText.push(menuItem)
-        // clear working page and menu item
+        // clear working page, menu item
         curEmotePage = newPage(new MessageEmbed(), type)
+        menuItem = ''
+        embedBody = ''
       } else if (i === emoteSource.length - 1) {
         // if the size of the array isn't a multiple of the emotes per page
         // then we need to also end now
         menuItem = menuItem.concat(emoteSource[i - 1].name)
         curEmotePage.setDescription(embedBody)
+        curEmotePage.setFooter(menuItem)
         embeds.push(curEmotePage)
         menuText.push(menuItem)
       }
@@ -198,7 +202,8 @@ export function sendPagination (interaction: CommandInteraction, type: Source, e
     new Pagination(interaction, embeds, {
       type: 'SELECT_MENU',
       ephemeral: true,
-      pageText: menuText
+      pageText: menuText,
+      showStartEnd: false
     }).send()
   }
 }
@@ -207,16 +212,18 @@ export function sendPagination (interaction: CommandInteraction, type: Source, e
  * Initializes a new page
  */
 function newPage (embed: MessageEmbed, type: Source) {
+  const mutantAttr = 'This bot uses Mutant Standard emoji (https://mutant.tech) which are licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License (https://creativecommons.org/licenses/by-nc-sa/4.0/)'
   switch (type) {
     case Source.Discord:
       embed.setTitle('List of Discord Emotes')
       break
     case Source.Any:
       embed.setTitle('List of All Emotes')
+      embed.addField('License Info', mutantAttr)
       break
     case Source.Mutant:
       embed.setTitle('List of Mutant Emoji')
-      embed.setFooter('This bot uses Mutant Standard emoji (https://mutant.tech) which are licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License (https://creativecommons.org/licenses/by-nc-sa/4.0/)')
+      embed.addField('License Info', mutantAttr)
   }
   embed.setColor('RANDOM')
   return embed

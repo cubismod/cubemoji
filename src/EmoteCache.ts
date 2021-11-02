@@ -28,14 +28,23 @@ export class EmoteCache {
     this.mutantEmojis = []
   }
 
+  /**
+   * initializes the class by copying the client emoji list,
+   * performing de-duplication of emote names, extracting
+   * emojis into separate list, and sorting the main list
+   */
   async init () {
     // setup emoji cache and fix duplicate names
     this.emojis = await this.grabEmotes()
     this.deduper()
     this.extractEmojis()
-    this.sortedArray = await this.sortedTxtEmoteArray()
+    this.sortArray()
   }
 
+  /**
+   * copies discord client emojis as well as adds Mutant emojis
+   * @returns list of all emojis
+   */
   private async grabEmotes () {
     const emojis: Cmoji[] = []
     await this.client.guilds.fetch()
@@ -55,13 +64,20 @@ export class EmoteCache {
     return emojis
   }
 
-  // add an emote to the array
+  /**
+ * Adds an emote to the list, does not perform sorting
+ * @param emote the emote to add
+ */
   async addEmote (emote: GuildEmoji) {
     console.log(`new emoji registered: ${emote.name}`)
     this.emojis.push(new Cmoji(emote.name, emote.url, Source.Discord, emote, emote.id))
   }
 
-  // remove an emote
+  /**
+   * removes an emote from the list,
+   * checks using the emoji's ID
+   * @param emote emote that you want to remove
+   */
   async removeEmote (emote: GuildEmoji) {
     const res = this.search(emote.id)
     if (res.length > 0 && res[0].item.id === emote.id) {
@@ -70,51 +86,23 @@ export class EmoteCache {
     }
   }
 
-  // edit an emote
+  /**
+ * edit an emoji by removing the old one and adding a new one
+ * again, does this using emote ids
+ * @param oldEmote emote to remove
+ * @param newEmote emote to add
+ */
   async editEmote (oldEmote: GuildEmoji, newEmote: GuildEmoji) {
     // just remove and add!
     await this.removeEmote(oldEmote)
     await this.addEmote(newEmote)
   }
 
-  // grab emotes from the heavens and return them as well as update the state of this class
-  async emoteArray () {
-    const _emojis: Cmoji[] = []
-    const validNames = new Map()
-    const blacklist = require('./blacklist.json').blacklist
-    if (this.emojis.length === 0) {
-      // only initialize emotes at launch
-      const rawEmojis = await this.grabEmotes()
-      rawEmojis.forEach(value => {
-        // utilize the blacklist.json file to remove bad emotes
-        // blacklist.json utilizes emote IDs
-        if (value.guildEmoji != null && !blacklist.includes(value.guildEmoji.id)) {
-          let inc = 0
-          // save the original name before we modify it
-          const ogName = value.name.toLowerCase()
-          // check for duplicates
-          if (validNames.has(ogName)) {
-            // get the increment value from the map
-            inc = validNames.get(ogName) + 1
-            value.name = `${value.name}_${inc}`
-          }
-          _emojis.push(value)
-          validNames.set(ogName, inc)
-        }
-      })
-      this.emojis = _emojis
-    }
-    return _emojis
-  }
-
-  // much easier to work with for certain applications in cubemoji
-  // just the emoji names sorted alphabetically
-  async sortedTxtEmoteArray () {
-    const txtVers = this.emojis.map(cmoji => cmoji.name)
-    txtVers.sort()
-    return txtVers
-  }
-
+  /**
+   * searches the emote cache for a match
+   * @param query search either by name or emote id
+   * @returns a list of results
+   */
   search (query: string) {
     const options = {
       keys: ['name', 'id'],
@@ -127,7 +115,11 @@ export class EmoteCache {
     return (search.search(query))
   }
 
-  // only search Discord emojis
+  /**
+ * search limited only to Discord emoji
+ * @param query emoji name or id
+ * @returns a list of results
+ */
   searchDiscord (query: string) {
     const options = {
       keys: ['name'],
@@ -139,19 +131,21 @@ export class EmoteCache {
     return (search.search(query))
   }
 
-  // retrieves an emote based on title
-  // or the user actually embedding an emote in
-  // their message, then returns that emoji object
-  // if cubemoji doesn't have access to the emote then we return a URL
-  // to the emote image
-  async retrieve (emote: string) {
+  /**
+   * returns an emote based on name or if the user sent an
+   * emote object in their message, we return that emote object
+   * if it is a nitro emote then we return a URL to the emote image
+   * @param identifier an emote name or message content
+   * @returns a Cmoji or nothing if we can't find an emote
+   */
+  async retrieve (identifier: string) {
     // discord emojis are represented in text
     // like <:flass:781664252058533908>
     // so we split to get the components including name and ID
-    const split = emote.slice(1, -1).split(':')
+    const split = identifier.slice(1, -1).split(':')
     // search by ID or name w/ fuse's extended syntax https://fusejs.io/examples.html#extended-search
-    if (split.length > 2) emote = `${split[2]}|${split[1]}`
-    const searchResults = await this.search(emote)
+    if (split.length > 2) identifier = `${split[2]}|${split[1]}`
+    const searchResults = await this.search(identifier)
     // want an exact match
     if (searchResults.length > 0 && searchResults[0].item.id === split[2]) return searchResults[0].item
     // now we see if we have a nitro emote cubemoji doesn't have in its guilds
@@ -167,21 +161,27 @@ export class EmoteCache {
       }
     }
     // try to parse a twemoji
-    const twemoji = this.parseTwemoji(emote)
-    if (twemoji !== '') return new Cmoji(emote, twemoji, Source.URL, null)
+    const twemoji = this.parseTwemoji(identifier)
+    if (twemoji !== '') return new Cmoji(identifier, twemoji, Source.URL, null)
     // last resort, return a similar emoji
     if (searchResults.length > 0) return searchResults[0].item
     return undefined // nothing found at all
   }
 
-  // parse a twemoji and return a url
+  /**
+   * for parsing a twemoji
+   * @param body message body
+   * @returns url
+   */
   parseTwemoji (body: string) {
     const entitites = Twemoji.parse(body, { assetType: 'png' })
     if (entitites.length !== 0) return entitites[0].url
     else return ''
   }
 
-  // removes duplicate names from emojis
+  /**
+ * iterates through emojis and ensures they each have a unique name
+ */
   deduper () {
     // keep track of each name and the increments on it
     const names = new Map<string, number>()
@@ -203,8 +203,11 @@ export class EmoteCache {
     })
   }
 
-  // extracts Mutant emojis and Discord emojis
-  // and places them each into their own sorted arrays
+
+  /**
+   * extracts Mutant and Discord emojis
+   * and places each into their own sorted arrays
+   */
   extractEmojis () {
     const discord: Cmoji[] = []
     const mutant: Cmoji[] = []
@@ -222,5 +225,12 @@ export class EmoteCache {
     // on name values
     this.discEmojis = discord.sort((a, b) => a.name.localeCompare(b.name))
     this.mutantEmojis = mutant.sort((a, b) => a.name.localeCompare(b.name))
+  }
+
+  /**
+   * sorts the emoji array in place
+   */
+  sortArray () {
+    this.emojis = this.emojis.sort((a, b) => a.name.localeCompare(b.name))
   }
 }
