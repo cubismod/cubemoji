@@ -93,13 +93,13 @@ export class Main {
             return
           }
         }
-        try {
-          await this._client.executeInteraction(interaction)
-        } catch (err) {
-          console.error('INTERACTION FAILURE')
-          console.error(`Type: ${interaction.type}\nTimestamp: ${Date()}\nGuild: ${interaction.guild}\nUser: ${interaction.user.tag}\nChannel: ${interaction.channel}`)
-          console.error(`Failure details: ${err}`)
-        }
+        await this._client.executeInteraction(interaction).catch(
+          err => {
+            console.error('INTERACTION FAILURE')
+            console.error(`Type: ${interaction.type}\nTimestamp: ${Date()}\nGuild: ${interaction.guild}\nUser: ${interaction.user.tag}\nChannel: ${interaction.channel}`)
+            console.error(`Failure details: ${err}`)
+          }
+        )
       }
     })
   }
