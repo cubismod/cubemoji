@@ -125,3 +125,4 @@ download/
 npm-shrinkwrap.json
 
 build/
+serviceKey.json

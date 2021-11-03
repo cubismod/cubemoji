@@ -77,9 +77,9 @@ export class Main {
       await this._client.initApplicationPermissions()
 
       console.log(`cubemoji ${pkginfo.version} is now running...`)
-      // set a status message
+      // set a new status msg every 5 min
       setStatus(this._client)
-      setInterval(setStatus, 600000, this._client)
+      setInterval(setStatus, 300000, this._client)
     })
 
     this._client.on('interaction', async (interaction) => {

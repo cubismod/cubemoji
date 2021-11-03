@@ -1,3 +1,4 @@
+import dayjs from 'dayjs'
 import { CommandInteraction, MessageAttachment } from 'discord.js'
 import { Discord, Slash, SlashChoice, SlashOption } from 'discordx'
 import { createWriteStream, unlink, writeFile } from 'fs'
@@ -25,12 +26,13 @@ export abstract class List {
         const listPath = path.resolve('download/emoji-list.txt')
         // create a downloadable list
         // if we don't already have one
-        await interaction.deferReply({ ephemeral: true })
+        await interaction.deferReply()
         try {
           await access(path.resolve(listPath))
           console.log('reusing existing emoji list')
           // the file does exist!
         } catch {
+          emoteCache.nextListDelete = dayjs().add(30, 'min').unix()
           console.log('writing new emoji list')
           // the file does not exist so let's create one now
           writeFile(listPath, 'Cubemoji emote list\n(M) indicates a Mutant emoji while (D) indicates a Discord emoji\n\n', err => {
@@ -44,15 +46,15 @@ export abstract class List {
             else stream.write(' (M)\n')
           })
           stream.end()
-          // set a timeout to delete this file after an hour so we have something up to date
-          setTimeout(async () => {
-            await unlink(listPath, (err) => {
-              if (err) console.error(err)
-            })
-          }, 3.6e+6)
         }
         // now we send that file
         interaction.editReply({ files: [new MessageAttachment(listPath)] })
+        // delete the file after 30 minutes to generate a new file next time
+        if (dayjs().unix() > emoteCache.nextListDelete) {
+          await unlink(listPath, (err) => {
+            if (err) console.error(err)
+          })
+        }
       } else {
         // the code for paginating is encapsulated in this other function
         let type = Source.Any

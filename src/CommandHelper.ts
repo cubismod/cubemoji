@@ -17,13 +17,20 @@ import { Pagination } from '@discordx/utilities'
 
 // display  a random status message
 export function setStatus (client: Client) {
-  const status = choice([
-    'Type / in chat to use my slash commands!',
-    'React 📏 to a message to rescale that message content!',
-    'React 📷 to a message to randomly edit that message content!',
-    'React 🌟 on a generated image to save to best of!'
-  ])
-  client.user?.setActivity(status, { type: 'PLAYING' })
+  if (choice([true, false])) {
+    // useful help text
+    const status = choice([
+      'Type / in chat to use my slash commands!',
+      'React 📏 to a message to rescale that message content!',
+      'React 📷 to a message to randomly edit that message content!',
+      'React 🌟 on a generated image to save to best of!'
+    ])
+    client.user?.setActivity(status, { type: 'PLAYING' })
+  } else {
+    // display an emote status
+    const emoteCache = grabEmoteCache()
+    if (emoteCache) client.user?.setActivity(`:${choice(emoteCache.emojis).name}:`, { type: 'WATCHING' })
+  }
 }
 
 // return true if this is a URL w/ a valid extension, false if it isn't
@@ -206,7 +213,7 @@ export function sendPagination (interaction: CommandInteraction, type: Source, e
     // now we send an actual pagination
     new Pagination(interaction, embeds, {
       type: 'SELECT_MENU',
-      ephemeral: true,
+      // ephemeral: true, have a feeling this is causing api errors
       pageText: menuText,
       showStartEnd: false
     }).send()

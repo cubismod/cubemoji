@@ -24,6 +24,7 @@
   "homepage": "https://gitlab.com/cubismod/cubemoji#readme",
   "dependencies": {
     "@discordx/utilities": "3.0.2",
+    "@google-cloud/storage": "^5.15.4",
     "@types/workerpool": "^6.0.0",
     "chokidar": "^3.5.2",
     "dayjs": "^1.10.5",
