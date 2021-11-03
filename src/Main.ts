@@ -6,7 +6,7 @@ import secrets from '../secrets.json'
 import pkginfo from '../package.json'
 import { container } from 'tsyringe'
 import { EmoteCache } from './EmoteCache'
-import { CubeMessageManager, ImageQueue } from './Cubemoji'
+import { CubeMessageManager, CubeStorage, ImageQueue } from './Cubemoji'
 import { setStatus } from './CommandHelper'
 export class Main {
   private static _client: Client
@@ -64,6 +64,8 @@ export class Main {
         DIService.container.register(ImageQueue, { useValue: new ImageQueue() })
         console.log('creating CubeMessageManager')
         DIService.container.register(CubeMessageManager, { useValue: new CubeMessageManager() })
+        console.log('creating CubeStorage')
+        DIService.container.register(CubeStorage, { useValue: new CubeStorage() })
         console.log('initializing emotes')
         DIService.container.register(EmoteCache, { useValue: new EmoteCache(this._client) })
         // load up cubemoji emote cache

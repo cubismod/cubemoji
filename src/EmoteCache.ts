@@ -19,7 +19,6 @@ export class EmoteCache {
   sortedArray: string[] // sorted list of emoji names
   discEmojis: Cmoji[] // save references to discord emojis for functions that wouldn't work well w/ images
   mutantEmojis: Cmoji[] // references to mutant emojis
-  nextListDelete: number // for List.ts
 
   constructor (@inject('Client') client: Client) {
     this.client = client
@@ -27,7 +26,6 @@ export class EmoteCache {
     this.sortedArray = [] // sorted list of emoji names
     this.discEmojis = []
     this.mutantEmojis = []
-    this.nextListDelete = 0
   }
 
   /**

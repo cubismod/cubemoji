@@ -13,6 +13,7 @@ COPY tsconfig.json .
 COPY assets/ ./assets/
 COPY src/ ./src/
 COPY .env .
+COPY serviceKey.json .
 
 RUN npm install --production
 RUN npm install -g typescript 

@@ -12,7 +12,7 @@ import { promisify } from 'util'
 import { pipeline } from 'stream'
 import { AutocompleteInteraction, CommandInteraction, Message, MessageEmbed } from 'discord.js'
 import { choice, geometricReservoirSample } from 'pandemonium'
-import { Cmoji, Source } from './Cubemoji'
+import { Cmoji, CubeStorage, Source } from './Cubemoji'
 import { Pagination } from '@discordx/utilities'
 
 // display  a random status message
@@ -98,6 +98,14 @@ export async function downloadImage (url: string) {
  */
 export function grabEmoteCache () {
   if (DIService.container) return container.resolve(EmoteCache)
+  else return undefined
+}
+
+/**
+ * grabs gcp storage from tsyringe container
+ */
+export function grabStorage () {
+  if (DIService.container) return container.resolve(CubeStorage)
   else return undefined
 }
 

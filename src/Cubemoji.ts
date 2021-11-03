@@ -1,5 +1,6 @@
 /* eslint-disable no-unused-vars */
 import { Storage } from '@google-cloud/storage'
+import dayjs from 'dayjs'
 import { Snowflake } from 'discord-api-types'
 import { CommandInteraction, ContextMenuInteraction, GuildEmoji, Message, MessageReaction, SnowflakeUtil } from 'discord.js'
 import { Discord } from 'discordx'
@@ -132,9 +133,11 @@ export class CubeMessageManager {
  */
 export class CubeStorage {
   storage: Storage
+  refreshTime: number // unix timestamp to keep track of the next time we should refresh the storage list
 
   constructor () {
-    this.storage = new Storage()
+    this.storage = new Storage({ keyFilename: 'serviceKey.json' })
+    this.refreshTime = dayjs().unix()
   }
 }
 
