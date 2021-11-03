@@ -1,4 +1,5 @@
 /* eslint-disable no-unused-vars */
+import { Storage } from '@google-cloud/storage'
 import { Snowflake } from 'discord-api-types'
 import { CommandInteraction, ContextMenuInteraction, GuildEmoji, Message, MessageReaction, SnowflakeUtil } from 'discord.js'
 import { Discord } from 'discordx'
@@ -121,6 +122,19 @@ export class CubeMessageManager {
 
   unregisterMessage (msgID: Snowflake) {
     this.sentMessages.delete(msgID)
+  }
+}
+
+@Discord()
+@injectable()
+/**
+ * gcp storage
+ */
+export class CubeStorage {
+  storage: Storage
+
+  constructor () {
+    this.storage = new Storage()
   }
 }
 
