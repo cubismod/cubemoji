@@ -21,6 +21,7 @@ export class Main {
     if (secrets.environment === 'prd') {
       console.log('running in PRD')
       this._client = new Client({
+        botGuilds: [(client) => client.guilds.cache.map((guild) => guild.id)],
         intents: [
           Intents.FLAGS.GUILDS,
           Intents.FLAGS.GUILD_EMOJIS_AND_STICKERS,
@@ -38,7 +39,7 @@ export class Main {
     } else {
       console.log('Running in NPR')
       this._client = new Client({
-        botGuilds: ['545784892492087303'],
+        botGuilds: [secrets.testGuild],
         intents: [
           Intents.FLAGS.GUILDS,
           Intents.FLAGS.GUILD_EMOJIS_AND_STICKERS,
@@ -74,7 +75,6 @@ export class Main {
         console.log('emote cache started up')
       }
 
-      if (secrets.environment === 'prd') await this._client.clearApplicationCommands()
       await this._client.initApplicationCommands()
       await this._client.initApplicationPermissions()
 
@@ -88,8 +88,8 @@ export class Main {
       // we limit the test bot to only interacting in my own #bot-test channel
       // while prd can interact with any channel
       if (!interaction.channel ||
-        (secrets.environment === 'prd' && interaction.channel.id !== '793650181533859880') ||
-        (secrets.environment === 'npr' && interaction.channel.id === '793650181533859880')) {
+        (secrets.environment === 'prd' && interaction.channel.id !== secrets.testChannel) ||
+        (secrets.environment === 'npr' && interaction.channel.id === secrets.testChannel)) {
         if (interaction.isButton() || interaction.isSelectMenu()) {
           if (interaction.customId.startsWith('discordx@pagination@')) {
             return
