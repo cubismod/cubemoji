@@ -20,6 +20,7 @@ export function setStatus (client: Client) {
   if (choice([true, false])) {
     // useful help text
     const status = choice([
+      'Type /help to learn more about me!',
       'Type / in chat to use my slash commands!',
       'React 📏 to a message to rescale that message content!',
       'React 📷 to a message to randomly edit that message content!',

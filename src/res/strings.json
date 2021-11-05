@@ -7,5 +7,13 @@
   "missingArg": "**Error**: Missing required argument(s)",
   "fileTypeUndetermined": "could not determine filetype of image",
   "sourceErr": "**Error**: An error occurred when trying to parse the source",
-  "imgErr": "**Error**: your image could not be processed"
+  "imgErr": "**Error**: your image could not be processed",
+  "helpDescription": "Howdy there, I'm cubemoji, a useful emoji bot for all your emoji needs. I work by collecting all the emotes on the servers I'm a member of. From there, you can use the emojis in chat as if you had Nitro as well as perform effects on them. I'm made by <@170358606590377984>/cubis#0024. If you're interested in adding me to your server or learning more about the bot, feel free to dm cubis. Below is a description of my commands and usage.",
+  "helpSlashes": "I use Slash commands to function which is a replacement for the existing basic commands such as `c!help`, `c!ping`, etc. To use a slash command, just type `/` in your client and then you'll get a list of available commands. Each command tells you the arguments needed to execute it as well as has a short description.",
+  "helpReacts": "I use various reacts to perform effects. You can react with 📷 to do an `/edit` on the emoji/image in the message. 📏 does a `/rescale`/content-aware scale on the emoji/image in the message. And 🌟 will add the emoji to the best of channel on my server (type `/about` to find the server invite link). 🗑️ is also used on edits/rescales to delete a message if the results didn't turn out great.",
+  "helpFinding": "You can find new emotes by using `/search` with a query or with `/random` to pull up a set of random emojis that I have access to. `/list` allows you to list all the emojis available to cubemoji. Once you have an emote you like, then you can use `/emote` to place it in the chat or `/big` to place a bigger version of that emoji in the chat. All my Slash commands with emotes have autocomplete as well so once you start typing an emoji name, you will see suggested results.",
+  "helpEditing": "You can apply edits to an emote or image url using `/edit`. There are a number of effects available by typing `/edit list`. Content-aware scaling/liquid rescaling is done with `/rescale` which can produce super funny results. You've probably seen memes like it. `/addface` allows you to overlay emoji faces over emotes/images. These commands also work with Discord avatars.",
+  "helpUtilities": "There are several utility commands available such as `/about` which displays general information about the bot, `/info` which shows more information about a particular emote, and `/help` which you are reading about right now.",
+  "helpFeedback": "If you have feedback or questions about the bot, feel free to dm cubis above or let him know on https://gitlab.com/cubismod/cubemoji. Enjoy!"
+
 }
