@@ -1,0 +1,28 @@
+# Official framework image. Look for the different tagged releases at:
+# https://hub.docker.com/r/library/node/tags/
+image: node:17
+
+cache:
+    paths:
+    - node_modules/
+
+stages:
+  - lint
+  - build
+
+eslint:
+  stage: lint
+
+  script:
+    - npm i eslint
+    - node_modules/eslint/eslint/bin/eslint.js .
+     
+     
+build:
+    stage: build
+    
+    script:
+    - npm i -g typescript
+    - npm run build
+    - npm install
+
