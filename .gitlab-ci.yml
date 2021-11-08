@@ -9,21 +9,9 @@ cache:
   paths:
   - node_modules/
 stages:
-- lint
 - build
 - test
-eslint:
-  stage: lint
-  script:
-  - |
-    npm i eslint \
-    eslint-config-standard \
-    eslint-plugin-import \
-    eslint-plugin-node \
-    eslint-plugin-promises \
-    @typescript-eslint/eslint-plugin \
-    @typescript-eslint/parser \
-  - node_modules/eslint/eslint/bin/eslint.js .
+
 build:
   stage: build
   script:
