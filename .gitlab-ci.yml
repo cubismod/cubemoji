@@ -16,6 +16,8 @@ build:
   stage: build
   script:
   - npm install
+  - chmod +x setup-ci.sh
+  - bash setup-ci.sh
   - npm i -g typescript
   - npm run build
 
