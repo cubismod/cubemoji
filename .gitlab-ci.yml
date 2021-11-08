@@ -15,9 +15,10 @@ stages:
 build:
   stage: build
   script:
+  - npm install
   - npm i -g typescript
   - npm run build
-  - npm install
+
 sast:
   variables:
     SAST_EXCLUDED_ANALYZERS: bandit, brakeman, flawfinder, gosec, kubesec, phpcs-security-audit,
