@@ -15,13 +15,75 @@ import strings from './res/strings.json'
 
 export type MsgContext = ContextMenuInteraction | CommandInteraction | MessageReaction
 
-// perform a liquid rescale/ seam carving on an image
-// returns the path to the image file
+/**
+ * compress an image down a bit if over 0.5MB
+ * @param fn - path to the image
+ * @param size - content-length in bytes of image
+ * @param compress - flag indicating whether we want to compress since we're passing this as a callback
+ */
+export function compressImage (fn, compress = true) {
+  return new Promise<string>((resolve, reject) => {
+    if (compress) {
+      gm(fn).identify((err, imgInfo) => {
+        if (err) {
+          console.error(err)
+        } else if (
+          (imgInfo.Filesize.includes('Ki') && parseFloat(imgInfo.Filesize) > 0.5) || (imgInfo.Filesize.includes('Mi'))) {
+          // filesize notated as either
+          // 1.2Ki for kb
+          // 6.2Mi for mb for example
+          console.log(imgInfo.Filesize)
+          if (imgInfo.format.toLowerCase().includes('jpg') || imgInfo.format.toLowerCase().includes('jpeg')) {
+            // perform jpeg compression
+            gm(fn)
+              .quality(20)
+              .geometry('70%')
+              .write(fn, (err) => {
+                if (err) reject(err)
+                else resolve(fn)
+              })
+          }
+          if (imgInfo.format.toLowerCase().includes('png')) {
+            gm(fn)
+              .dither(true)
+              .colors(50)
+              .geometry('50%')
+              .write(fn, (err) => {
+                if (err) reject(err)
+                else resolve(fn)
+              })
+          }
+          if (imgInfo.format.toLowerCase().includes('gif')) {
+            gm(fn)
+              .bitdepth(8)
+              .colors(50)
+              .write(fn, (err) => {
+                if (err) reject(err)
+                else resolve(fn)
+              })
+          }
+        }
+      })
+    } else {
+      // no compression done so we just return the file
+      resolve(fn)
+    }
+  })
+}
+/**
+ * perform a liquid rescale/ seam carving on an image
+ * @param externalUrl the url of the image we will download and rescale
+ * @returns path to image file
+ */
 export async function performRescale (externalUrl: string) {
-  const localUrl = await downloadImage(externalUrl)
+  const localUrl = await downloadImage(externalUrl, true).catch(
+    err => {
+      console.error(err)
+    }
+  )
   const imageQueue = container.resolve(ImageQueue)
   if (localUrl && imageQueue) {
-    // now we need build our edit parameters for graphicsmagick
+    // now we need build our rescale parameters for graphicsmagick
     let newSize = ''
     switch (random(0, 2)) {
       case 0:
