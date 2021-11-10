@@ -14,6 +14,7 @@ import { AutocompleteInteraction, CommandInteraction, Message, MessageEmbed } fr
 import { choice, geometricReservoirSample } from 'pandemonium'
 import { Cmoji, CubeStorage, Source } from './Cubemoji'
 import { Pagination } from '@discordx/utilities'
+import { compressImage } from './ImgEffects'
 
 // display  a random status message
 export function setStatus (client: Client) {
@@ -66,12 +67,17 @@ export async function getUrl (source: string) {
 /**
  * download an image file to the local FS under the download folder
  * @param url - link to the img
+ * @param compress - optionally compress the image if its above 0.5MB
  * @returns promise for a url or undefined
  */
-export async function downloadImage (url: string) {
+export async function downloadImage (url: string, compress = false) {
   // check first whether the file isn't too big
   const headers = await got.head(url)
-  if (headers.headers['content-length'] && parseInt(headers.headers['content-length']) < 2e+6) {
+    .catch(err => {
+      console.error(err)
+      return undefined
+    })
+  if (headers && headers.headers['content-length'] && parseInt(headers.headers['content-length']) < 2e+7) {
     // limit to 2mb download
     const fn = path.resolve(`download/${randomUUID()}`)
     const pl = promisify(pipeline)
@@ -87,7 +93,9 @@ export async function downloadImage (url: string) {
         .on('error', (error: Error) => {
           console.error(error.message)
         }),
-      createWriteStream(fn).on('error', (error: Error) => { reject(error) })
+      createWriteStream(fn)
+        .on('error', (error: Error) => { reject(error) })
+        .on('finish', () => compressImage(fn, true))
     )
     return fn
   }
