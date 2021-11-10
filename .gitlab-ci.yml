@@ -11,7 +11,6 @@ cache:
 stages:
 - build
 - test
-
 build:
   stage: build
   script:
@@ -20,11 +19,11 @@ build:
   - bash setup-ci.sh
   - npm i -g typescript
   - npm run build
-
 sast:
   variables:
     SAST_EXCLUDED_ANALYZERS: bandit, brakeman, flawfinder, gosec, kubesec, phpcs-security-audit,
-      pmd-apex, security-code-scan, sobelow, spotbugs
+      pmd-apex, security-code-scan, sobelow, spotbugs, semgrep
   stage: test
 include:
 - template: Security/SAST.gitlab-ci.yml
+- template: Security/Dependency-Scanning.gitlab-ci.yml
