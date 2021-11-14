@@ -1,7 +1,7 @@
 // Image Effects like Rescale, Add Face, etc. are done in here
 // all these functions produce files and the calling function is responsible for removing those
 // from the fs once done
-import { fromFile } from 'file-type'
+import { FileTypeResult, fromFile } from 'file-type'
 import { random, randomFloat, randomIndex } from 'pandemonium'
 import { downloadImage, getUrl } from './CommandHelper'
 import gm = require('gm')
@@ -12,64 +12,26 @@ import { container } from 'tsyringe'
 import { CommandInteraction, ContextMenuInteraction, Message, MessageAttachment, MessageReaction, PartialUser, User } from 'discord.js'
 import { watch } from 'chokidar'
 import strings from './res/strings.json'
+import { stat } from 'fs/promises'
 
 export type MsgContext = ContextMenuInteraction | CommandInteraction | MessageReaction
 
-/**
- * compress an image down a bit if over 0.5MB
- * @param fn - path to the image
- * @param size - content-length in bytes of image
- * @param compress - flag indicating whether we want to compress since we're passing this as a callback
- */
-export function compressImage (fn, compress = true) {
-  return new Promise<string>((resolve, reject) => {
-    if (compress) {
-      gm(fn).identify((err, imgInfo) => {
-        if (err) {
-          console.error(err)
-        } else if (
-          (imgInfo.Filesize.includes('Ki') && parseFloat(imgInfo.Filesize) > 0.5) || (imgInfo.Filesize.includes('Mi'))) {
-          // filesize notated as either
-          // 1.2Ki for kb
-          // 6.2Mi for mb for example
-          console.log(imgInfo.Filesize)
-          if (imgInfo.format.toLowerCase().includes('jpg') || imgInfo.format.toLowerCase().includes('jpeg')) {
-            // perform jpeg compression
-            gm(fn)
-              .quality(20)
-              .geometry('70%')
-              .write(fn, (err) => {
-                if (err) reject(err)
-                else resolve(fn)
-              })
-          }
-          if (imgInfo.format.toLowerCase().includes('png')) {
-            gm(fn)
-              .dither(true)
-              .colors(50)
-              .geometry('50%')
-              .write(fn, (err) => {
-                if (err) reject(err)
-                else resolve(fn)
-              })
-          }
-          if (imgInfo.format.toLowerCase().includes('gif')) {
-            gm(fn)
-              .bitdepth(8)
-              .colors(50)
-              .write(fn, (err) => {
-                if (err) reject(err)
-                else resolve(fn)
-              })
-          }
-        }
-      })
-    } else {
-      // no compression done so we just return the file
-      resolve(fn)
-    }
-  })
+function compressImage (img: gm.State, ft: FileTypeResult) {
+  switch (ft.ext) {
+    case 'jpg':
+      return img.quality(20)
+        .geometry('60%')
+    case 'png':
+      return img.dither(true)
+        .colors(50)
+        .geometry('60%')
+    case 'gif':
+      return img.bitdepth(8)
+        .colors(50)
+  }
+  return img
 }
+
 /**
  * perform a liquid rescale/ seam carving on an image
  * @param externalUrl the url of the image we will download and rescale
@@ -104,7 +66,14 @@ export async function performRescale (externalUrl: string) {
       const filePath = path.resolve(`download/${randomUUID()}.${ft.ext}`)
       // imagemagick only has liquid rescale, not graphicsmagick
       const im = gm.subClass({ imageMagick: true })
-      im(localUrl)
+      let ourImg = im(localUrl)
+      const fileInfo = await stat(localUrl)
+      if (fileInfo.size > 500000) {
+        // if the file size is greater than 0.5 mb we try to perform some compression
+        // on that file
+        ourImg = compressImage(ourImg, ft)
+      }
+      ourImg
         .out('-liquid-rescale', newSize)
         .write(filePath, (err) => {
           if (err) throw (err)

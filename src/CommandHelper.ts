@@ -14,7 +14,6 @@ import { AutocompleteInteraction, CommandInteraction, Message, MessageEmbed } fr
 import { choice, geometricReservoirSample } from 'pandemonium'
 import { Cmoji, CubeStorage, Source } from './Cubemoji'
 import { Pagination } from '@discordx/utilities'
-import { compressImage } from './ImgEffects'
 
 // display  a random status message
 export function setStatus (client: Client) {
@@ -95,7 +94,6 @@ export async function downloadImage (url: string, compress = false) {
         }),
       createWriteStream(fn)
         .on('error', (error: Error) => { reject(error) })
-        .on('finish', () => compressImage(fn, true))
     )
     return fn
   }
