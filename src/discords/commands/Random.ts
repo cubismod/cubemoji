@@ -41,7 +41,9 @@ export abstract class Random {
           }).join('')
         )
       } else {
-        await interaction.editReply(choice(emoteOptions).toString())
+        const chosenEmote = choice(emoteOptions)
+        if (chosenEmote.guildEmoji) await interaction.editReply(chosenEmote.guildEmoji.toString())
+        else await interaction.deleteReply()
       }
     }
   }
