@@ -393,6 +393,11 @@ export async function editDiscord (context: MsgContext, effects: string, source:
     startTyping(context)
     // now perform the edit
     const filename = await performEdit(url, parsedEffects)
+    if (filename === undefined) {
+      // error in performing the command, react with emote
+      reactErr(context)
+      return
+    }
     const cubeMessageManager = container.resolve(CubeMessageManager)
     if (filename) {
       const watcher = watch(filename, { awaitWriteFinish: true })

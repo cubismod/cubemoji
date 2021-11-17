@@ -70,13 +70,13 @@ export async function getUrl (source: string) {
  * @returns promise for a url or undefined
  */
 export async function downloadImage (url: string, compress = false) {
-  // disable timeouts and limit retries with got
+  // add timeouts and limit retries with got
   const gotOptions = {
     retry: {
-      limit: 1
+      limit: 2
     },
     timeout: {
-      request: 10
+      request: 3000
     }
   }
   // check first whether the file isn't too big
