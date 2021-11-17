@@ -13,6 +13,7 @@ import { CommandInteraction, ContextMenuInteraction, Message, MessageAttachment,
 import { watch } from 'chokidar'
 import strings from './res/strings.json'
 import { stat } from 'fs/promises'
+import secrets from '../secrets.json'
 
 export type MsgContext = ContextMenuInteraction | CommandInteraction | MessageReaction
 
@@ -90,7 +91,7 @@ export async function performRescale (externalUrl: string) {
 // add an emoji (face) to any image
 // return the file path to the edited image
 export async function performAddFace (baseUrl: string, face: string) {
-  const localUrl = await downloadImage(baseUrl)
+  const localUrl = await downloadImage(baseUrl).catch(err => console.error(err))
   const imageQueue = container.resolve(ImageQueue)
   if (localUrl && imageQueue) {
     // this also determines if the base image exists
@@ -125,14 +126,19 @@ export async function performAddFace (baseUrl: string, face: string) {
 // returns the file path to the edited image
 // TODO: figure out why images occasionally return 0 byte files
 export async function performEdit (baseUrl: string, effects: Effects[]) {
-  const localUrl = await downloadImage(baseUrl)
+  const localUrl = await downloadImage(baseUrl).catch(err => console.error(err))
   if (localUrl) {
     const ft = await fromFile(localUrl)
     const imageQueue = container.resolve(ImageQueue)
+
     if (ft && imageQueue) {
       const filename = path.resolve(`download/${randomUUID()}.${ft.ext}`)
-      const img = gm(localUrl)
+      let img = gm(localUrl)
       // apply all the image effects one by one according to the string
+      const fileInfo = await stat(localUrl)
+      if (fileInfo.size > 500000) {
+        img = compressImage(img, ft)
+      }
       effects.forEach(effect => {
         switch (effect) {
           case Effects.Blur:
@@ -353,6 +359,11 @@ export async function rescaleDiscord (context: MsgContext, source: string, user:
     startTyping(context)
     // do the rescale
     const filename = await performRescale(url)
+    if (filename === undefined) {
+      // error in performing the command, react with emote
+      reactErr(context)
+      return
+    }
     const cubeMessageManager = container.resolve(CubeMessageManager)
     if (filename) {
       const watcher = watch(filename, { awaitWriteFinish: true })
@@ -367,7 +378,7 @@ export async function rescaleDiscord (context: MsgContext, source: string, user:
           if (msg instanceof Message) cubeMessageManager.registerTrashReact(context, msg, user.id)
         }
       })
-    } else await reply(context, '**Error**: could not perform rescale')
+    }
   } else await reply(context, strings.imgErr)
 }
 
@@ -396,8 +407,6 @@ export async function editDiscord (context: MsgContext, effects: string, source:
           if (msg instanceof Message) cubeMessageManager.registerTrashReact(context, msg, user.id)
         }
       })
-    } else {
-      await reply(context, '**Error**: could not perform the edit')
     }
   } else {
     await reply(context, strings.imgErr)
@@ -429,6 +438,32 @@ async function reply (context: MsgContext, content: MessageAttachment | string) 
       if (repMsg instanceof Message) msg = repMsg
     }
     if (context instanceof MessageReaction) msg = await context.message.reply({ content: content, allowedMentions: { repliedUser: false } })
+  }
+}
+
+/**
+ * reacts with custom error emote defined in secrets.json
+ * when an image fails its operation if its not a / command
+ * @param context either a message or interaction
+ */
+async function reactErr (context: MsgContext) {
+  const cubeMessageManager = container.resolve(CubeMessageManager)
+  if (context instanceof CommandInteraction) {
+    const reply = await context.editReply(`${secrets.cubemojiBroken} this operation failed!`)
+    if (reply instanceof Message) {
+      // allow user to delete the error message
+      cubeMessageManager.registerTrashReact(context, reply, context.user.id)
+    }
+  }
+  if (context instanceof ContextMenuInteraction) {
+    const msg = await context.channel?.messages.fetch(context.targetId)
+    if (msg) {
+      msg.react(secrets.cubemojiBroken)
+    }
+    await context.deleteReply()
+  }
+  if (context instanceof MessageReaction) {
+    await (await context.fetch()).message.react(secrets.cubemojiBroken)
   }
 }
 

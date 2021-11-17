@@ -1,7 +1,4 @@
 // responses to Discord events
-// TODO: add emoji
-// TODO: remove emoji
-// TODO: edit emoji
 
 import { GuildEmoji, MessageEmbed, MessageReaction, TextChannel } from 'discord.js'
 import { ArgsOf, Discord, On } from 'discordx'

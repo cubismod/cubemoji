@@ -11,9 +11,12 @@ The bot depends on the following secrets/auth files to function:
 ```json
 {
   "token": "your_discord_bot_token",
-  "environment": "prd/npr",
-  "testGuild": "id",
-  "testChannel": "id"
+  "environment": "prd/npr", // slightly increases logging in npr and limits bot to
+  // working in certain channels
+  "testGuild": "id",  // guild that you want the bot to work in whilst in npr
+  "testChannel": "id",  // channel that commands will only work in npr
+  "cubemojiBroken": "<:cubemoji_broken:910351670188339212>" // an emoji used to react when
+  // there is an error
 }
 ```
 prd mode enables global application commands minus the test guild + test channel you specify  

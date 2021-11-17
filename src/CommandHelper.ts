@@ -70,8 +70,17 @@ export async function getUrl (source: string) {
  * @returns promise for a url or undefined
  */
 export async function downloadImage (url: string, compress = false) {
+  // disable timeouts and limit retries with got
+  const gotOptions = {
+    retry: {
+      limit: 1
+    },
+    timeout: {
+      request: 10
+    }
+  }
   // check first whether the file isn't too big
-  const headers = await got.head(url)
+  const headers = await got.head(url, gotOptions)
     .catch(err => {
       console.error(err)
       return undefined
@@ -81,14 +90,7 @@ export async function downloadImage (url: string, compress = false) {
     const fn = path.resolve(`download/${randomUUID()}`)
     const pl = promisify(pipeline)
     await pl(
-      got.stream(url, {
-        retry: {
-          limit: 0
-        },
-        timeout: {
-          request: 500
-        }
-      })
+      got.stream(url, gotOptions)
         .on('error', (error: Error) => {
           console.error(error.message)
         }),
