@@ -11,12 +11,19 @@ The bot depends on the following secrets/auth files to function:
 ```json
 {
   "token": "your_discord_bot_token",
-  "environment": "prd/npr", // slightly increases logging in npr and limits bot to
-  // working in certain channels
-  "testGuild": "id",  // guild that you want the bot to work in whilst in npr
-  "testChannel": "id",  // channel that commands will only work in npr
-  "cubemojiBroken": "<:cubemoji_broken:910351670188339212>" // an emoji used to react when
-  // there is an error
+  // npr limits app commands to running in your testGuild & testChannel
+  // as well as increases logging
+  "environment": "prd/npr", 
+  // guild that you want commands to react to while in NPR
+  "testGuild": "id",
+  // channel to limit command functionality in npr
+  "testChannel": "id",
+  // an emoji used to react when there is an error
+  // obviously, cubemoji must have access to this emoji
+  // by being on the same guild the emoji is located on
+  "cubemojiBroken": "<:cubemoji_broken:910351670188339212>", 
+  // path to where level database will store its values
+  "dbPath": "/home/ryan/cubemoji-npr-db"
 }
 ```
 prd mode enables global application commands minus the test guild + test channel you specify  
@@ -30,6 +37,6 @@ https://cloud.google.com/iam/docs/creating-managing-service-account-keys
 
 ### .env
 ```sh
-WEBHOOK=https://discordapp.com/api/webhooks/{yourwebhookinfohere}/?wait=true
+WEBHOOK={webhooktoken}
 ```
-Used in the run-watch.sh script which follows the log output and then sends to a Discord webhook for real time logging in Discord.
+Used in the [pipe-to-webhook-ds](https://gitlab.com/cubismod/pipe-to-webhook-ds) binary. Just include your webhook token without the Discord URL
