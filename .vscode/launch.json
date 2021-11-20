@@ -13,6 +13,7 @@
             "sourceMaps": true,
             "postDebugTask": "Delete downloaded files",
             "runtimeVersion": "16",
+            "outputCapture": "std",
             "outFiles": [
                 "${workspaceFolder}/**/*.js",
                 "!**/node_modules/**"

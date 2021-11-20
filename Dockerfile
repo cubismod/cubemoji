@@ -21,4 +21,4 @@ RUN npm run build
 
 RUN mkdir download
 
-CMD node build/src/Main.js 2>&1 | ./run-watch.sh
+CMD node build/src/Main.js 2>&1 | ./pipe-to-webhook-ds

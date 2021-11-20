@@ -1,9 +1,8 @@
 {
   "compilerOptions": {
-    "lib": ["ES2021", "ESNext.AsyncIterable"],
-    "module": "commonjs",
-    "target": "ES2021",
-    "outDir": "build",
+    "module": "ESNext",
+    "target": "ESNext",
+    "outDir": "./build",
     "sourceMap": true,
 
     "strict": true,
@@ -20,7 +19,7 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "importHelpers": true,
-    "moduleResolution": "node"
+    "moduleResolution": "Node"
   },
   "ts-node": {
     "transpileOnly": true
