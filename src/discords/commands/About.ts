@@ -1,8 +1,8 @@
 import { CommandInteraction, MessageEmbed } from 'discord.js'
 import { Discord, Slash } from 'discordx'
-import pkg = require('../../../package.json')
-import dayjs = require('dayjs')
-import relativeTime = require('dayjs/plugin/relativeTime')
+import pkg from '../../../package.json'
+import dayjs from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime'
 import { grabEmoteCache } from '../../CommandHelper'
 
 dayjs.extend(relativeTime)

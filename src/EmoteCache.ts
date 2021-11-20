@@ -1,6 +1,6 @@
 /* eslint-disable new-cap */
 // emote cache and some helper functions
-import Twemoji = require('twemoji-parser')
+import Twemoji from 'twemoji-parser'
 import { Client, Discord } from 'discordx'
 import { inject, injectable } from 'tsyringe'
 import { Cmoji, Source } from './Cubemoji'

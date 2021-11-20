@@ -8,6 +8,7 @@ import { container } from 'tsyringe'
 import { EmoteCache } from './EmoteCache'
 import { CubeMessageManager, CubeStorage, ImageQueue } from './Cubemoji'
 import { setStatus } from './CommandHelper'
+import { importx } from '@discordx/importer'
 export class Main {
   private static _client: Client
 
@@ -16,6 +17,7 @@ export class Main {
   }
 
   static async start () {
+    await importx(__dirname + '**/*.{ts,js}')
     console.log('🅲🆄🅱🅴🅼🅾🅹🅸')
     DIService.container = container
     if (secrets.environment === 'prd') {
@@ -31,9 +33,6 @@ export class Main {
           Intents.FLAGS.GUILD_PRESENCES
         ],
         silent: true,
-        classes: [
-            `${__dirname}/**/*.{js,ts}` // glob string to load the classes
-        ],
         partials: ['MESSAGE', 'CHANNEL', 'REACTION']
       })
     } else {

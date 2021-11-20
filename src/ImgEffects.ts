@@ -4,8 +4,8 @@
 import { FileTypeResult, fromFile } from 'file-type'
 import { random, randomFloat, randomIndex } from 'pandemonium'
 import { downloadImage, getUrl } from './CommandHelper'
-import gm = require('gm')
-import path = require('path')
+import gm from 'gm'
+import path from 'path'
 import { CubeMessageManager, Effects, ImageQueue } from './Cubemoji'
 import { randomUUID } from 'crypto'
 import { container } from 'tsyringe'
