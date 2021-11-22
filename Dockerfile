@@ -8,7 +8,6 @@ RUN ./setup-image.sh
 
 COPY package.json .
 COPY secrets.json .
-COPY run-watch.sh .
 COPY tsconfig.json .
 COPY assets/ ./assets/
 COPY src/ ./src/
@@ -21,4 +20,4 @@ RUN npm run build
 
 RUN mkdir download
 
-CMD node build/src/Main.js 2>&1 | ./run-watch.sh
+CMD node build/src/Main.js

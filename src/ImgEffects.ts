@@ -4,14 +4,13 @@
 import { FileTypeResult, fromFile } from 'file-type'
 import { random, randomFloat, randomIndex } from 'pandemonium'
 import { downloadImage, getUrl } from './CommandHelper'
-import gm = require('gm')
-import path = require('path')
+import gm from 'gm'
+import path from 'path'
 import { CubeMessageManager, Effects, ImageQueue } from './Cubemoji'
 import { randomUUID } from 'crypto'
 import { container } from 'tsyringe'
 import { CommandInteraction, ContextMenuInteraction, Message, MessageAttachment, MessageReaction, PartialUser, User } from 'discord.js'
 import { watch } from 'chokidar'
-import strings from './res/strings.json'
 import { stat } from 'fs/promises'
 import secrets from '../secrets.json'
 
@@ -379,7 +378,11 @@ export async function rescaleDiscord (context: MsgContext, source: string, user:
         }
       })
     }
-  } else await reply(context, strings.imgErr)
+  } else {
+    // image error of some sort
+    console.error(`Rescale failed for ${user.id} (user id) on ${source} (source)`)
+    await reactErr(context)
+  }
 }
 
 // the actual discord logic for doing an edit
@@ -414,7 +417,8 @@ export async function editDiscord (context: MsgContext, effects: string, source:
       })
     }
   } else {
-    await reply(context, strings.imgErr)
+    console.error(`Edit failed for ${user.id} (user id) on ${source} (source url)`)
+    await reactErr(context)
   }
 }
 
@@ -448,12 +452,14 @@ async function reply (context: MsgContext, content: MessageAttachment | string) 
 
 /**
  * reacts with custom error emote defined in secrets.json
+ * and log an error to the console
  * when an image fails its operation if its not a / command
  * @param context either a message or interaction
  */
 async function reactErr (context: MsgContext) {
   const cubeMessageManager = container.resolve(CubeMessageManager)
   if (context instanceof CommandInteraction) {
+    console.error(`Command interaction failure on channel id: ${context.channelId}, guild id: ${context.guildId}`)
     const reply = await context.editReply(`${secrets.cubemojiBroken} this operation failed!`)
     if (reply instanceof Message) {
       // allow user to delete the error message
@@ -461,6 +467,7 @@ async function reactErr (context: MsgContext) {
     }
   }
   if (context instanceof ContextMenuInteraction) {
+    console.error(`Context menu failure on channel id: ${context.channelId}, guild id: ${context.guildId}`)
     const msg = await context.channel?.messages.fetch(context.targetId)
     if (msg) {
       msg.react(secrets.cubemojiBroken)
@@ -468,6 +475,7 @@ async function reactErr (context: MsgContext) {
     await context.deleteReply()
   }
   if (context instanceof MessageReaction) {
+    console.error(`Message reaction failure on channel id ${context.message.channelId}, guild id: ${context.message.guildId}, message id: ${context.message.id}`)
     await (await context.fetch()).message.react(secrets.cubemojiBroken)
   }
 }
