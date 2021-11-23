@@ -8,6 +8,7 @@ import { container } from 'tsyringe'
 import { EmoteCache } from './EmoteCache'
 import { CubeMessageManager, CubeStorage, ImageQueue } from './Cubemoji'
 import { setStatus } from './CommandHelper'
+import { importx } from '@discordx/importer'
 export class Main {
   private static _client: Client
 
@@ -31,9 +32,6 @@ export class Main {
           Intents.FLAGS.GUILD_PRESENCES
         ],
         silent: true,
-        classes: [
-            `${__dirname}/**/*.{js,ts}` // glob string to load the classes
-        ],
         partials: ['MESSAGE', 'CHANNEL', 'REACTION']
       })
     } else {
@@ -48,14 +46,13 @@ export class Main {
           Intents.FLAGS.GUILD_MEMBERS,
           Intents.FLAGS.GUILD_PRESENCES
         ],
-        classes: [
-            `${__dirname}/**/*.{js,ts}` // glob string to load the classes
-        ],
         partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
         // for testing purposes in cubemoji server
         silent: false
       })
     }
+    await importx(__dirname + '/**/*.{ts,js}')
+    console.log()
     await this._client.login(secrets.token)
 
     this._client.once('ready', async () => {

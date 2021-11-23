@@ -1,9 +1,8 @@
 {
   "compilerOptions": {
-    "lib": ["ES2021", "ESNext.AsyncIterable"],
-    "module": "commonjs",
+    "module": "CommonJS",
     "target": "ES2021",
-    "outDir": "build",
+    "outDir": "./build",
     "sourceMap": true,
 
     "strict": true,
@@ -13,6 +12,11 @@
     "typeRoots": [
       "src/types"
     ],
+    "lib": [
+      "es2021",
+      "esnext.asynciterable"
+    ],
+    "allowSyntheticDefaultImports": true,
     "allowJs": true,
     "checkJs": false,
     "resolveJsonModule": true,
@@ -26,5 +30,5 @@
     "transpileOnly": true
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "build"]
 }

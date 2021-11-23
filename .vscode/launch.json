@@ -13,6 +13,8 @@
             "sourceMaps": true,
             "postDebugTask": "Delete downloaded files",
             "runtimeVersion": "16",
+            "outputCapture": "std",
+            "args": ["--experimental-specifier-resolution=node"],
             "outFiles": [
                 "${workspaceFolder}/**/*.js",
                 "!**/node_modules/**"

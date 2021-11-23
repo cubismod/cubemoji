@@ -1,8 +1,8 @@
 // helper functions for use in command files
-import FileType = require('file-type')
+import FileType from 'file-type'
 import got from 'got/dist/source'
 import { createWriteStream } from 'fs'
-import path = require('path')
+import path from 'path'
 import { reject } from 'p-cancelable'
 import { DIService, Client } from 'discordx'
 import { container } from 'tsyringe'
