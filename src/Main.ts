@@ -17,7 +17,6 @@ export class Main {
   }
 
   static async start () {
-    await importx(__dirname + '**/*.{ts,js}')
     console.log('🅲🆄🅱🅴🅼🅾🅹🅸')
     DIService.container = container
     if (secrets.environment === 'prd') {
@@ -55,6 +54,8 @@ export class Main {
         silent: false
       })
     }
+    await importx(__dirname + '/**/*.{ts,js}')
+    console.log()
     await this._client.login(secrets.token)
 
     this._client.once('ready', async () => {

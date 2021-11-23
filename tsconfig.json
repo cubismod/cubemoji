@@ -12,6 +12,11 @@
     "typeRoots": [
       "src/types"
     ],
+    "lib": [
+      "es2021",
+      "esnext.asynciterable"
+    ],
+    "allowSyntheticDefaultImports": true,
     "allowJs": true,
     "checkJs": false,
     "resolveJsonModule": true,
@@ -19,11 +24,11 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "importHelpers": true,
-    "moduleResolution": "Node"
+    "moduleResolution": "node"
   },
   "ts-node": {
     "transpileOnly": true
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "build"]
 }
