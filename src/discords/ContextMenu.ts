@@ -24,6 +24,7 @@ export abstract class CubeMessageContext {
     }
   }
 
+  /* TODO: actually test these!
   @ContextMenu('MESSAGE', 'Add 🥺 to this message')
   async pleadHandler (interaction: ContextMenuInteraction) {
     await this.addFaceHelper(interaction, 'plead')
@@ -32,7 +33,7 @@ export abstract class CubeMessageContext {
   @ContextMenu('MESSAGE', 'Add 😳 to this message')
   async flushedHandler (interaction: ContextMenuInteraction) {
     await this.addFaceHelper(interaction, 'flushed')
-  }
+  } */
 
   /**
    * adds the correct args to perform an add face from context menu
