@@ -46,9 +46,6 @@ export class Main {
           Intents.FLAGS.GUILD_MEMBERS,
           Intents.FLAGS.GUILD_PRESENCES
         ],
-        classes: [
-            `${__dirname}/**/*.{js,ts}` // glob string to load the classes
-        ],
         partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
         // for testing purposes in cubemoji server
         silent: false
