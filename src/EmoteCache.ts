@@ -1,16 +1,15 @@
 /* eslint-disable new-cap */
 // emote cache and some helper functions
 import Twemoji from 'twemoji-parser'
-import { Client, Discord } from 'discordx'
-import { inject, injectable } from 'tsyringe'
+import { Client } from 'discordx'
+import { singleton } from 'tsyringe'
 import { Cmoji, Source } from './Cubemoji'
 import mutantNames from './res/emojiNames.json'
 import got from 'got/dist/source'
 import Fuse from 'fuse.js'
 import { GuildEmoji } from 'discord.js'
 
-@Discord()
-@injectable()
+@singleton()
 // a class which can return an array version of emotes
 // and also only refreshes when necessary
 export class EmoteCache {
@@ -20,7 +19,7 @@ export class EmoteCache {
   discEmojis: Cmoji[] // save references to discord emojis for functions that wouldn't work well w/ images
   mutantEmojis: Cmoji[] // references to mutant emojis
 
-  constructor (@inject('Client') client: Client) {
+  constructor (client: Client) {
     this.client = client
     this.emojis = []
     this.sortedArray = [] // sorted list of emoji names

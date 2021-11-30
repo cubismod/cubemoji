@@ -1,10 +1,10 @@
-version: 3.3
+version: '3.3'
 services:
   cubemoji:
     build: .
-    container_name: "cubemoji:${VERSION}"
+    container_name: "cubemoji_${VERSION}"
     restart: unless-stopped
     logging:
           driver: journald
           options:
-            tag: 'cubemoji:${VERSION}'
+            tag: 'cubemoji_${VERSION}'

@@ -22,9 +22,7 @@ function compressImage (img: gm.State, ft: FileTypeResult) {
       return img.quality(20)
         .geometry('60%')
     case 'png':
-      return img.dither(true)
-        .colors(50)
-        .geometry('60%')
+      return img.geometry('60%')
     case 'gif':
       return img.bitdepth(8)
         .colors(50)
