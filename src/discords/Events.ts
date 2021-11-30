@@ -9,6 +9,9 @@ import { getMessageImage, grabEmoteCache, isUrl } from '../CommandHelper'
 import { CubeMessageManager } from '../Cubemoji'
 import { editDiscord, rescaleDiscord } from '../ImgEffects'
 
+// event handling doesn't go through the usual executeInteraction flow in
+// Main.ts
+
 @Discord()
 export abstract class EventListeners {
   // messageReactionAdd
