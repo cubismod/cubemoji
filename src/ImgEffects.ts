@@ -222,6 +222,21 @@ export async function performEdit (baseUrl: string, effects: Effects[]) {
           case Effects.Wave:
             img.wave(randomFloat(0.01, 10), randomFloat(0.01, 10))
             break
+          case Effects.Contrast:
+            img.contrast(+2)
+            break
+          case Effects.Desaturate:
+            img.modulate(100, 50)
+            break
+          case Effects.Negative:
+            img.negative()
+            break
+          case Effects.Saturate:
+            img.modulate(100, 150)
+            break
+          case Effects.Shear:
+            img.shear(random(0, 360), random(0, 360))
+            break
         }
       })
       img.write(filename, async (err) => {
@@ -341,6 +356,21 @@ export function parseEffects (effects: string) {
           break
         case 'wave':
           parsedEffects.push(Effects.Wave)
+          break
+        case 'contrast':
+          parsedEffects.push(Effects.Contrast)
+          break
+        case 'desaturate':
+          parsedEffects.push(Effects.Desaturate)
+          break
+        case 'negative':
+          parsedEffects.push(Effects.Negative)
+          break
+        case 'saturate':
+          parsedEffects.push(Effects.Saturate)
+          break
+        case 'shear':
+          parsedEffects.push(Effects.Shear)
           break
       }
     })

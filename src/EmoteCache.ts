@@ -1,6 +1,6 @@
 /* eslint-disable new-cap */
 // emote cache and some helper functions
-import Twemoji from 'twemoji-parser'
+import { parse } from 'twemoji-parser'
 import { Client } from 'discordx'
 import { singleton } from 'tsyringe'
 import { Cmoji, Source } from './Cubemoji'
@@ -173,7 +173,7 @@ export class EmoteCache {
    * @returns url
    */
   parseTwemoji (body: string) {
-    const entitites = Twemoji.parse(body, { assetType: 'png' })
+    const entitites = parse(body, { assetType: 'png' })
     if (entitites.length !== 0) return entitites[0].url
     else return ''
   }

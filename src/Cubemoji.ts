@@ -24,7 +24,9 @@ export enum Source {
 export enum Effects {
   Blur,
   Charcoal,
+  Contrast,
   Cycle,
+  Desaturate,
   Edge,
   Emboss,
   Enhance,
@@ -38,14 +40,17 @@ export enum Effects {
   Monochrome,
   Mosaic,
   Motionblur,
+  Negative,
   Noise,
   Normalize,
   Paint,
   Roll,
   Rotate,
+  Saturate,
   Sepia,
   Shave,
   Sharpen,
+  Shear,
   Solarize,
   Spread,
   Swirl,
@@ -143,20 +148,20 @@ export class CubeStorage {
 
 // an individual emote
 export class Cmoji {
-    name: string
-    url: string
-    source: Source
-    guildEmoji: GuildEmoji | null // null if our source isn't Discord
-    id: Snowflake // unique ID is generated for emojis missing an ID otherwise it should be copied from the Discord OBJ
+  name: string
+  url: string
+  source: Source
+  guildEmoji: GuildEmoji | null // null if our source isn't Discord
+  id: Snowflake // unique ID is generated for emojis missing an ID otherwise it should be copied from the Discord OBJ
 
-    constructor (name: string | null, url: string, source: Source, guildEmoji: GuildEmoji | null = null, id: Snowflake = SnowflakeUtil.generate()) {
-      // hate this nonsense of a null name, never seen it in the wild
-      if (name != null) this.name = name
-      else this.name = '??'
-      this.url = url
-      this.source = source
-      this.guildEmoji = guildEmoji
-      // auto generate an ID
-      this.id = id
-    }
+  constructor (name: string | null, url: string, source: Source, guildEmoji: GuildEmoji | null = null, id: Snowflake = SnowflakeUtil.generate()) {
+    // hate this nonsense of a null name, never seen it in the wild
+    if (name != null) this.name = name
+    else this.name = '??'
+    this.url = url
+    this.source = source
+    this.guildEmoji = guildEmoji
+    // auto generate an ID
+    this.id = id
+  }
 }

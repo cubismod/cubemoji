@@ -17,15 +17,17 @@ export abstract class Edit {
       emote: string,
     @SlashOption('user', { description: 'a user' })
       user: GuildMember,
-    @SlashOption('effects', { description: 'a list of effects with spaces between them, if not chosen then random effects will be applied' })
+    @SlashOption('effects', { description: 'a list of effects (space separated). If not specified/invalid then random effects will be applied' })
       effects: string,
+    @SlashOption('deepfry', { description: 'deep fry your image!' })
+      deepfry: boolean,
     @SlashOption('list', { description: 'get a list of the available effects' })
       list: boolean,
       interaction: CommandInteraction
   ) {
     if (list) {
       // just give the user back the effects options
-      interaction.reply({ content: imgEffects.join(), ephemeral: true })
+      interaction.reply({ content: imgEffects.join(' '), ephemeral: true })
     } else {
       if (!emote && !user) {
         interaction.reply({ content: strings.noArgs, ephemeral: true })

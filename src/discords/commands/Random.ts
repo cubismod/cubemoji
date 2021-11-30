@@ -18,11 +18,7 @@ export abstract class Random {
   ) {
     const emoteCache = grabEmoteCache()
     if (emoteCache !== undefined) {
-      try {
-        await interaction.deferReply()
-      } catch (error) {
-        console.error(error)
-      }
+      await interaction.deferReply()
       // depending on the user option, we will either grab all discord emojis to sample from or
       // just flushed emojis
       let emoteOptions: Cmoji[]
