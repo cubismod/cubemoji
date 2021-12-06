@@ -5,9 +5,9 @@ import { ArgsOf, Discord, On } from 'discordx'
 import { choice } from 'pandemonium'
 import { container } from 'tsyringe'
 import { adjectives, animals, colors, names, uniqueNamesGenerator } from 'unique-names-generator'
-import { getMessageImage, grabEmoteCache, isUrl } from '../CommandHelper'
-import { CubeMessageManager } from '../Cubemoji'
-import { editDiscord, rescaleDiscord } from '../ImgEffects'
+import { getMessageImage, grabEmoteCache, isUrl } from '../util/CommandHelper'
+import { CubeMessageManager } from '../util/Cubemoji'
+import { editDiscord, rescaleDiscord } from '../util/ImgEffects'
 
 // event handling doesn't go through the usual executeInteraction flow in
 // Main.ts

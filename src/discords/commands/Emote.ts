@@ -1,7 +1,7 @@
 import { AutocompleteInteraction, CommandInteraction } from 'discord.js'
 import { Discord, Slash, SlashOption } from 'discordx'
-import { acResolver, grabEmoteCache } from '../../CommandHelper'
-import { Source } from '../../Cubemoji'
+import { acResolver, grabEmoteCache } from '../../util/CommandHelper'
+import { Source } from '../../util/Cubemoji'
 import strings from '../../res/strings.json'
 
 @Discord()

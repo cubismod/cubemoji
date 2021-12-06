@@ -20,45 +20,6 @@ export enum Source {
   Any
 }
 
-// effects used in an edit operation
-export enum Effects {
-  Blur,
-  Charcoal,
-  Contrast,
-  Cycle,
-  Desaturate,
-  Edge,
-  Emboss,
-  Enhance,
-  Equalize,
-  Flip,
-  Flop,
-  Implode,
-  Magnify,
-  Median,
-  Minify,
-  Monochrome,
-  Mosaic,
-  Motionblur,
-  Negative,
-  Noise,
-  Normalize,
-  Paint,
-  Roll,
-  Rotate,
-  Saturate,
-  Sepia,
-  Shave,
-  Sharpen,
-  Shear,
-  Solarize,
-  Spread,
-  Swirl,
-  Threshold,
-  Trim,
-  Wave
-}
-
 @Discord()
 @injectable()
 // used to keep track of images saved on disk

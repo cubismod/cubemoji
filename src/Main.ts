@@ -5,9 +5,9 @@ import { Client, DIService } from 'discordx'
 import secrets from '../secrets.json'
 import pkginfo from '../package.json'
 import { container } from 'tsyringe'
-import { EmoteCache } from './EmoteCache'
-import { CubeMessageManager, CubeStorage, ImageQueue } from './Cubemoji'
-import { setStatus } from './CommandHelper'
+import { EmoteCache } from './util/EmoteCache'
+import { CubeMessageManager, CubeStorage, ImageQueue } from './util/Cubemoji'
+import { setStatus } from './util/CommandHelper'
 import { importx } from '@discordx/importer'
 export class Main {
   private static _client: Client

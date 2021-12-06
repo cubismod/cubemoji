@@ -1,7 +1,7 @@
 import { AutocompleteInteraction, CommandInteraction, GuildMember } from 'discord.js'
 import { Discord, Slash, SlashOption } from 'discordx'
-import { acResolver } from '../../CommandHelper'
-import { rescaleDiscord } from '../../ImgEffects'
+import { acResolver } from '../../util/CommandHelper'
+import { rescaleDiscord } from '../../util/ImgEffects'
 import strings from '../../res/strings.json'
 
 @Discord()

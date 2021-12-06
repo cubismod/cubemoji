@@ -2,17 +2,18 @@
 // all these functions produce files and the calling function is responsible for removing those
 // from the fs once done
 import { FileTypeResult, fromFile } from 'file-type'
-import { random, randomFloat, randomIndex } from 'pandemonium'
+import { choice, random, randomFloat, randomIndex } from 'pandemonium'
 import { downloadImage, getUrl } from './CommandHelper'
 import gm from 'gm'
 import path from 'path'
-import { CubeMessageManager, Effects, ImageQueue } from './Cubemoji'
+import { CubeMessageManager, ImageQueue } from './Cubemoji'
 import { randomUUID } from 'crypto'
 import { container } from 'tsyringe'
 import { CommandInteraction, ContextMenuInteraction, Message, MessageAttachment, MessageReaction, PartialUser, User } from 'discord.js'
 import { watch } from 'chokidar'
 import { stat } from 'fs/promises'
-import secrets from '../secrets.json'
+import secrets from '../../secrets.json'
+import imgEffects from '../res/imgEffects.json'
 
 export type MsgContext = ContextMenuInteraction | CommandInteraction | MessageReaction
 
@@ -253,12 +254,12 @@ export async function performEdit (baseUrl: string, effects: Effects[]) {
 
 // generate a set of up to 10 random edit options
 export function generateEditOptions () {
-  const options: Effects[] = []
+  const options: string[] = []
   const optLen = random(1, 10)
   for (let i = 0; i < optLen; i++) {
     // there are 29 effects options in the enum
     // if i ever add more i'll need to change this bit
-    options.push(random(0, 29))
+    options.push(choice(imgEffects))
   }
   return options
 }
@@ -266,116 +267,13 @@ export function generateEditOptions () {
 // parse effects strings to enums or generate random
 // effects with an undefined
 export function parseEffects (effects: string) {
-  let parsedEffects: Effects[] = []
+  let effectsList: string[] = []
   // if no edit options specified, we will generate some
-  if (effects === undefined || effects === '') parsedEffects = generateEditOptions()
+  if (effects === undefined || effects === '') effectsList = generateEditOptions()
   else {
-    // here comes tedious parsing
-    effects.split(' ').forEach(effect => {
-      switch (effect.toLowerCase()) {
-        case 'blur':
-          parsedEffects.push(Effects.Blur)
-          break
-        case 'charcoal':
-          parsedEffects.push(Effects.Charcoal)
-          break
-        case 'cycle':
-          parsedEffects.push(Effects.Cycle)
-          break
-        case 'edge':
-          parsedEffects.push(Effects.Edge)
-          break
-        case 'emboss':
-          parsedEffects.push(Effects.Emboss)
-          break
-        case 'enhance':
-          parsedEffects.push(Effects.Enhance)
-          break
-        case 'equalize':
-          parsedEffects.push(Effects.Equalize)
-          break
-        case 'flip':
-          parsedEffects.push(Effects.Flip)
-          break
-        case 'flop':
-          parsedEffects.push(Effects.Flop)
-          break
-        case 'implode':
-          parsedEffects.push(Effects.Implode)
-          break
-        case 'magnify':
-          parsedEffects.push(Effects.Magnify)
-          break
-        case 'median':
-          parsedEffects.push(Effects.Median)
-          break
-        case 'minify':
-          parsedEffects.push(Effects.Minify)
-          break
-        case 'monochrome':
-          parsedEffects.push(Effects.Monochrome)
-          break
-        case 'mosaic':
-          parsedEffects.push(Effects.Monochrome)
-          break
-        case 'motionblur':
-          parsedEffects.push(Effects.Motionblur)
-          break
-        case 'noise':
-          parsedEffects.push(Effects.Noise)
-          break
-        case 'normalize':
-          parsedEffects.push(Effects.Normalize)
-          break
-        case 'paint':
-          parsedEffects.push(Effects.Paint)
-          break
-        case 'roll':
-          parsedEffects.push(Effects.Roll)
-          break
-        case 'sepia':
-          parsedEffects.push(Effects.Sepia)
-          break
-        case 'sharpen':
-          parsedEffects.push(Effects.Sharpen)
-          break
-        case 'solarize':
-          parsedEffects.push(Effects.Solarize)
-          break
-        case 'spread':
-          parsedEffects.push(Effects.Spread)
-          break
-        case 'swirl':
-          parsedEffects.push(Effects.Swirl)
-          break
-        case 'threshold':
-          parsedEffects.push(Effects.Threshold)
-          break
-        case 'trim':
-          parsedEffects.push(Effects.Trim)
-          break
-        case 'wave':
-          parsedEffects.push(Effects.Wave)
-          break
-        case 'contrast':
-          parsedEffects.push(Effects.Contrast)
-          break
-        case 'desaturate':
-          parsedEffects.push(Effects.Desaturate)
-          break
-        case 'negative':
-          parsedEffects.push(Effects.Negative)
-          break
-        case 'saturate':
-          parsedEffects.push(Effects.Saturate)
-          break
-        case 'shear':
-          parsedEffects.push(Effects.Shear)
-          break
-      }
-    })
+    effectsList = effects.split(' ')
   }
-  return parsedEffects
+  return effectsList
 }
 
 // discord logic for doing a rescale
@@ -485,6 +383,7 @@ async function reply (context: MsgContext, content: MessageAttachment | string) 
  * @param context either a message or interaction
  */
 async function reactErr (context: MsgContext) {
+  // TODO: add ephermal followup explaining error details
   const cubeMessageManager = container.resolve(CubeMessageManager)
   if (context instanceof CommandInteraction) {
     console.error(`Command interaction failure on channel id: ${context.channelId}, guild id: ${context.guildId}`)

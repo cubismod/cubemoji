@@ -3,8 +3,8 @@ import { CommandInteraction } from 'discord.js'
 import { Discord, Slash, SlashChoice, SlashOption } from 'discordx'
 import { createWriteStream, writeFile } from 'fs'
 import path from 'path'
-import { grabEmoteCache, grabStorage, sendPagination } from '../../CommandHelper'
-import { Source } from '../../Cubemoji'
+import { grabEmoteCache, grabStorage, sendPagination } from '../../util/CommandHelper'
+import { Source } from '../../util/Cubemoji'
 
 @Discord()
 export abstract class List {

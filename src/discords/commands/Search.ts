@@ -1,6 +1,6 @@
 import { CommandInteraction, MessageEmbed } from 'discord.js'
 import { Discord, Slash, SlashOption } from 'discordx'
-import { grabEmoteCache } from '../../CommandHelper'
+import { grabEmoteCache } from '../../util/CommandHelper'
 import strings from '../../res/strings.json'
 
 @Discord()

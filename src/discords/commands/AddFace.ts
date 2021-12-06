@@ -2,9 +2,9 @@ import { watch } from 'chokidar'
 import { AutocompleteInteraction, CommandInteraction, Message, MessageAttachment } from 'discord.js'
 import { Discord, Slash, SlashChoice, SlashOption } from 'discordx'
 import { container } from 'tsyringe'
-import { acResolver, getUrl } from '../../CommandHelper'
-import { CubeMessageManager } from '../../Cubemoji'
-import { performAddFace } from '../../ImgEffects'
+import { acResolver, getUrl } from '../../util/CommandHelper'
+import { CubeMessageManager } from '../../util/Cubemoji'
+import { performAddFace } from '../../util/ImgEffects'
 import strings from '../../res/strings.json'
 
 @Discord()

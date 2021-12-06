@@ -3,6 +3,10 @@ A Discord emoji bot, written in Node JS!.
 ---
 This bot uses TypeScript and Node.JS to perform fun image effects. Type / in chat to get an idea of the commands available. Browse here for source code.
 
+Backend Storage
+---------------
+Cubemoji uses [Keyv](https://www.npmjs.com/package/keyv) w/ the [keyv-file](https://github.com/zaaack/keyv-file) adapter for persistent storage. These files are saved to data/ subdirectory which can then be mapped to an external folder w/ Docker.
+
 Secrets
 -------
 The bot depends on the following secrets/auth files to function:
@@ -22,8 +26,6 @@ The bot depends on the following secrets/auth files to function:
   // obviously, cubemoji must have access to this emoji
   // by being on the same guild the emoji is located on
   "cubemojiBroken": "<:cubemoji_broken:910351670188339212>", 
-  // path to where level database will store its values
-  "dbPath": "/home/ryan/cubemoji-npr-db"
 }
 ```
 prd mode enables global application commands minus the test guild + test channel you specify  
@@ -33,10 +35,3 @@ ids refer to the discord ids of these objects
 ### serviceKey.json  
 this is used for gcp storage  
 https://cloud.google.com/iam/docs/creating-managing-service-account-keys
-
-
-### .env
-```sh
-WEBHOOK={webhooktoken}
-```
-Used in the [pipe-to-webhook-ds](https://gitlab.com/cubismod/pipe-to-webhook-ds) binary. Just include your webhook token without the Discord URL

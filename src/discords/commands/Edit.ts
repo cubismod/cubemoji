@@ -2,8 +2,8 @@ import { AutocompleteInteraction, CommandInteraction, GuildMember } from 'discor
 import { Discord, Slash, SlashOption } from 'discordx'
 import strings from '../../res/strings.json'
 import imgEffects from '../../res/imgEffects.json'
-import { editDiscord } from '../../ImgEffects'
-import { acResolver } from '../../CommandHelper'
+import { editDiscord } from '../../util/ImgEffects'
+import { acResolver } from '../../util/CommandHelper'
 
 @Discord()
 export abstract class Edit {

@@ -127,3 +127,4 @@ npm-shrinkwrap.json
 build/
 serviceKey.json
 pipe-to-webhook-ds
+data/
