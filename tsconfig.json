@@ -16,6 +16,9 @@
       "es2021",
       "esnext.asynciterable"
     ],
+    "types": [
+      "@types/jest"
+    ],
     "allowSyntheticDefaultImports": true,
     "allowJs": true,
     "checkJs": false,
@@ -30,5 +33,5 @@
     "transpileOnly": true
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "build"]
+  "exclude": ["node_modules", "build", "**/tests/*.test.ts"]
 }
