@@ -2,7 +2,7 @@
 // all these functions produce files and the calling function is responsible for removing those
 // from the fs once done
 import { FileTypeResult, fromFile } from 'file-type'
-import { choice, random, randomFloat, randomIndex } from 'pandemonium'
+import { choice, random } from 'pandemonium'
 import { downloadImage, getUrl } from './CommandHelper'
 import gm from 'gm'
 import path from 'path'
@@ -14,10 +14,11 @@ import { watch } from 'chokidar'
 import { stat } from 'fs/promises'
 import secrets from '../../secrets.json'
 import imgEffects from '../res/imgEffects.json'
+import { performEdit } from './PerformEdit'
 
 export type MsgContext = ContextMenuInteraction | CommandInteraction | MessageReaction
 
-function compressImage (img: gm.State, ft: FileTypeResult) {
+export function compressImage (img: gm.State, ft: FileTypeResult) {
   switch (ft.ext) {
     case 'jpg':
       return img.quality(20)
@@ -120,138 +121,6 @@ export async function performAddFace (baseUrl: string, face: string) {
   }
 }
 
-// edits an image
-// returns the file path to the edited image
-// TODO: figure out why images occasionally return 0 byte files
-export async function performEdit (baseUrl: string, effects: Effects[]) {
-  const localUrl = await downloadImage(baseUrl).catch(err => console.error(err))
-  if (localUrl) {
-    const ft = await fromFile(localUrl)
-    const imageQueue = container.resolve(ImageQueue)
-
-    if (ft && imageQueue) {
-      const filename = path.resolve(`download/${randomUUID()}.${ft.ext}`)
-      let img = gm(localUrl)
-      // apply all the image effects one by one according to the string
-      const fileInfo = await stat(localUrl)
-      if (fileInfo.size > 500000) {
-        img = compressImage(img, ft)
-      }
-      effects.forEach(effect => {
-        switch (effect) {
-          case Effects.Blur:
-            img.blur(5, 20)
-            break
-          case Effects.Charcoal:
-            img.charcoal(randomFloat(0, 5))
-            break
-          case Effects.Cycle:
-            img.cycle(random(1, 10))
-            break
-          case Effects.Edge:
-            img.edge(randomFloat(0.1, 4))
-            break
-          case Effects.Emboss:
-            img.emboss()
-            break
-          case Effects.Enhance:
-            img.enhance()
-            break
-          case Effects.Equalize:
-            img.equalize()
-            break
-          case Effects.Flip:
-            img.flip()
-            break
-          case Effects.Flop:
-            img.flop()
-            break
-          case Effects.Implode:
-            img.implode()
-            break
-          case Effects.Magnify:
-            img.magnify(2)
-            break
-          case Effects.Median:
-            img.median(random(1, 10))
-            break
-          case Effects.Minify:
-            img.minify(random(1, 10))
-            break
-          case Effects.Monochrome:
-            img.monochrome()
-            break
-          case Effects.Mosaic:
-            img.mosaic()
-            break
-          case Effects.Motionblur:
-            img.motionBlur(10, 20, random(0, 360))
-            break
-          case Effects.Noise:
-            img.noise(10)
-            break
-          case Effects.Normalize:
-            img.normalize()
-            break
-          case Effects.Paint:
-            img.paint(10)
-            break
-          case Effects.Roll:
-            img.roll(randomIndex([-360, 360]), randomIndex([-360, 360]))
-            break
-          case Effects.Sepia:
-            img.sepia()
-            break
-          case Effects.Sharpen:
-            img.sharpen(100)
-            break
-          case Effects.Solarize:
-            img.solarize(randomFloat(0, 100))
-            break
-          case Effects.Spread:
-            img.spread(randomFloat(0, 5))
-            break
-          case Effects.Swirl:
-            img.swirl(random(-360, 360))
-            break
-          case Effects.Threshold:
-            img.threshold(randomFloat(0, 20))
-            break
-          case Effects.Trim:
-            img.trim()
-            break
-          case Effects.Wave:
-            img.wave(randomFloat(0.01, 10), randomFloat(0.01, 10))
-            break
-          case Effects.Contrast:
-            img.contrast(+2)
-            break
-          case Effects.Desaturate:
-            img.modulate(100, 50)
-            break
-          case Effects.Negative:
-            img.negative()
-            break
-          case Effects.Saturate:
-            img.modulate(100, 150)
-            break
-          case Effects.Shear:
-            img.shear(random(0, 360), random(0, 360))
-            break
-        }
-      })
-      img.write(filename, async (err) => {
-        if (err) console.error(err)
-      })
-      await imageQueue.enqueue(localUrl)
-      await imageQueue.enqueue(filename)
-      return filename
-    } else {
-      return undefined
-    }
-  }
-}
-
 // generate a set of up to 10 random edit options
 export function generateEditOptions () {
   const options: string[] = []
@@ -266,7 +135,7 @@ export function generateEditOptions () {
 
 // parse effects strings to enums or generate random
 // effects with an undefined
-export function parseEffects (effects: string) {
+export function splitEffects (effects: string) {
   let effectsList: string[] = []
   // if no edit options specified, we will generate some
   if (effects === undefined || effects === '') effectsList = generateEditOptions()
@@ -315,7 +184,7 @@ export async function rescaleDiscord (context: MsgContext, source: string, user:
 // source is an emote or other parsable
 export async function editDiscord (context: MsgContext, effects: string, source: string | null, user: User | PartialUser) {
   if (source === null) return
-  const parsedEffects = parseEffects(effects)
+  const parsedEffects = splitEffects(effects)
   // done parsing the effects, now let's try and parse what we're trying to edit
   const url = await getUrl(source)
   if (url) {
