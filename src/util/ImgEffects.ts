@@ -122,11 +122,19 @@ export async function performAddFace (baseUrl: string, face: string) {
 }
 
 // generate a set of up to 10 random edit options
-export function generateEditOptions () {
+export function generateEditOptions (preset = '') {
   const options: string[] = []
-  const optLen = random(1, 20)
+  const optLen = random(1, 10)
+  let effs = imgEffects
+  // specific dumb presets for effects by limiting
+  // the options that can be chosen
+  switch (preset) {
+    case 'deepfry': {
+      effs = ['emboss', 'sharpen', 'magnify', 'median', 'emboss', 'saturate', 'normalize', 'negative']
+    }
+  }
   for (let i = 0; i < optLen; i++) {
-    options.push(choice(imgEffects))
+    options.push(choice(effs))
   }
   return options
 }

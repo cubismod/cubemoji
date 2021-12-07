@@ -1,9 +1,9 @@
 import { AutocompleteInteraction, CommandInteraction, GuildMember } from 'discord.js'
-import { Discord, Slash, SlashOption } from 'discordx'
+import { Discord, Slash, SlashChoice, SlashOption } from 'discordx'
 import strings from '../../res/strings.json'
 import imgEffects from '../../res/imgEffects.json'
 import { editDiscord } from '../../util/ImgEffects'
-import { acResolver } from '../../util/CommandHelper'
+import { emoteAutocomplete } from '../../util/Autocomplete'
 
 @Discord()
 export abstract class Edit {
@@ -11,16 +11,17 @@ export abstract class Edit {
   async edit (
     @SlashOption('source', {
       description: strings.sourceSlash,
-      autocomplete: (interaction: AutocompleteInteraction) => acResolver(interaction),
+      autocomplete: (interaction: AutocompleteInteraction) => emoteAutocomplete(interaction),
       type: 'STRING'
     })
       emote: string,
     @SlashOption('user', { description: 'a user' })
       user: GuildMember,
-    @SlashOption('effects', { description: 'a list of effects (space separated, max 10). If not specified/invalid then random effects will be applied' })
+    @SlashOption('effects', { description: 'list of effects (space separated, max 20). If not specified then random effects will be applied' })
       effects: string,
-    @SlashOption('deepfry', { description: 'deep fry your image!' })
-      deepfry: boolean,
+    @SlashChoice('deepfry')
+    @SlashOption('preset', { description: 'choose a preset for how to ruin your image' })
+      preset: string,
     @SlashOption('list', { description: 'get a list of the available effects' })
       list: boolean,
       interaction: CommandInteraction

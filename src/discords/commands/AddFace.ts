@@ -2,7 +2,8 @@ import { watch } from 'chokidar'
 import { AutocompleteInteraction, CommandInteraction, Message, MessageAttachment } from 'discord.js'
 import { Discord, Slash, SlashChoice, SlashOption } from 'discordx'
 import { container } from 'tsyringe'
-import { acResolver, getUrl } from '../../util/CommandHelper'
+import { getUrl } from '../../util/CommandHelper'
+import { emoteAutocomplete } from '../../util/Autocomplete'
 import { CubeMessageManager } from '../../util/Cubemoji'
 import { performAddFace } from '../../util/ImgEffects'
 import strings from '../../res/strings.json'
@@ -14,7 +15,7 @@ export abstract class AddFace {
     @SlashOption('source', {
       description: strings.sourceSlash,
       required: true,
-      autocomplete: (interaction: AutocompleteInteraction) => acResolver(interaction),
+      autocomplete: (interaction: AutocompleteInteraction) => emoteAutocomplete(interaction),
       type: 'STRING'
     })
       source: string,

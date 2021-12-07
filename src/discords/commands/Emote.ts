@@ -1,6 +1,7 @@
 import { AutocompleteInteraction, CommandInteraction } from 'discord.js'
 import { Discord, Slash, SlashOption } from 'discordx'
-import { acResolver, grabEmoteCache } from '../../util/CommandHelper'
+import { grabEmoteCache } from '../../util/CommandHelper'
+import { emoteAutocomplete } from '../../util/Autocomplete'
 import { Source } from '../../util/Cubemoji'
 import strings from '../../res/strings.json'
 
@@ -12,7 +13,7 @@ export abstract class Emote {
   async emote (
     @SlashOption('emote', {
       description: strings.emoteSlash,
-      autocomplete: (interaction: AutocompleteInteraction) => acResolver(interaction),
+      autocomplete: (interaction: AutocompleteInteraction) => emoteAutocomplete(interaction),
       required: true,
       type: 'STRING'
     })

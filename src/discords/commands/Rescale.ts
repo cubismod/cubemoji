@@ -1,6 +1,6 @@
 import { AutocompleteInteraction, CommandInteraction, GuildMember } from 'discord.js'
 import { Discord, Slash, SlashOption } from 'discordx'
-import { acResolver } from '../../util/CommandHelper'
+import { emoteAutocomplete } from '../../util/Autocomplete'
 import { rescaleDiscord } from '../../util/ImgEffects'
 import strings from '../../res/strings.json'
 
@@ -10,7 +10,7 @@ export abstract class Rescale {
   async rescale (
     @SlashOption('source', {
       description: strings.sourceSlash,
-      autocomplete: (interaction: AutocompleteInteraction) => acResolver(interaction),
+      autocomplete: (interaction: AutocompleteInteraction) => emoteAutocomplete(interaction),
       type: 'STRING'
     })
       emote: string,

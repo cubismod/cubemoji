@@ -10,8 +10,8 @@ import { EmoteCache } from './EmoteCache'
 import { randomUUID } from 'crypto'
 import { promisify } from 'util'
 import { pipeline } from 'stream'
-import { AutocompleteInteraction, CommandInteraction, Message, MessageEmbed } from 'discord.js'
-import { choice, geometricReservoirSample } from 'pandemonium'
+import { CommandInteraction, Message, MessageEmbed } from 'discord.js'
+import { choice } from 'pandemonium'
 import { Cmoji, CubeStorage, Source } from './Cubemoji'
 import { Pagination } from '@discordx/utilities'
 
@@ -127,33 +127,6 @@ export function getMessageImage (message: Message) {
   if (message.attachments.size > 0 && attach) {
     return attach.url
   } else return message.content
-}
-
-/**
- * autocomplete resolver, follows the user's
- * query and presents them with emotes that match
- * whatever they are typing
- */
-export function acResolver (interaction: AutocompleteInteraction) {
-  const emoteCache = grabEmoteCache()
-  if (emoteCache) {
-    const query = interaction.options.getFocused(true).value
-    if (typeof query === 'string') {
-      const res = emoteCache.search(query)
-      if (res.length > 0) {
-        // if we actually get some choices back we send to cubemoji
-        interaction.respond(res.slice(0, 8).map(result => {
-          return { name: result.item.name, value: result.item.name }
-        }))
-      } else {
-        // otherwise we return some random emojis
-        const res = geometricReservoirSample(8, emoteCache.emojis)
-        interaction.respond(res.map(result => {
-          return { name: result.name, value: result.name }
-        }))
-      }
-    }
-  }
 }
 
 /**

@@ -1,7 +1,8 @@
 // https://github.com/oceanroleplay/discord.ts-example/blob/main/src/commands/slashes.ts
 import { CommandInteraction, MessageEmbed, GuildMember, AutocompleteInteraction } from 'discord.js'
 import { Discord, Slash, SlashOption } from 'discordx'
-import { acResolver, grabEmoteCache } from '../../util/CommandHelper'
+import { grabEmoteCache } from '../../util/CommandHelper'
+import { emoteAutocomplete } from '../../util/Autocomplete'
 import { Source } from '../../util/Cubemoji'
 import strings from '../../res/strings.json'
 
@@ -13,7 +14,7 @@ export abstract class Info {
   async info (
     @SlashOption('emote', {
       description: strings.emoteSlash,
-      autocomplete: (interaction: AutocompleteInteraction) => acResolver(interaction),
+      autocomplete: (interaction: AutocompleteInteraction) => emoteAutocomplete(interaction),
       type: 'STRING'
     })
       emote: string,
