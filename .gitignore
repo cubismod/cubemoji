@@ -128,3 +128,4 @@ build/
 serviceKey.json
 pipe-to-webhook-ds
 data/
+junit.xml
