@@ -17,7 +17,7 @@ export abstract class Edit {
       emote: string,
     @SlashOption('user', { description: 'a user' })
       user: GuildMember,
-    @SlashOption('effects', { description: 'a list of effects (space separated). If not specified/invalid then random effects will be applied' })
+    @SlashOption('effects', { description: 'a list of effects (space separated, max 10). If not specified/invalid then random effects will be applied' })
       effects: string,
     @SlashOption('deepfry', { description: 'deep fry your image!' })
       deepfry: boolean,

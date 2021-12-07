@@ -124,10 +124,8 @@ export async function performAddFace (baseUrl: string, face: string) {
 // generate a set of up to 10 random edit options
 export function generateEditOptions () {
   const options: string[] = []
-  const optLen = random(1, 10)
+  const optLen = random(1, 20)
   for (let i = 0; i < optLen; i++) {
-    // there are 29 effects options in the enum
-    // if i ever add more i'll need to change this bit
     options.push(choice(imgEffects))
   }
   return options
@@ -140,7 +138,7 @@ export function splitEffects (effects: string) {
   // if no edit options specified, we will generate some
   if (effects === undefined || effects === '') effectsList = generateEditOptions()
   else {
-    effectsList = effects.split(' ')
+    effectsList = effects.split(' ').slice(0, 20)
   }
   return effectsList
 }

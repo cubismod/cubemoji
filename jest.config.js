@@ -5,4 +5,5 @@ module.exports = {
   testRegex: '/*.test.ts',
   roots: ['<rootDir>/tests'],
   transform: {},
+  reporters: ['default', 'jest-junit']
 };
