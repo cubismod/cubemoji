@@ -1,5 +1,5 @@
 import { AutocompleteInteraction, CommandInteraction, GuildMember } from 'discord.js'
-import { Discord, Slash, SlashChoice, SlashOption } from 'discordx'
+import { Discord, Slash, SlashOption } from 'discordx'
 import strings from '../../res/strings.json'
 import imgEffects from '../../res/imgEffects.json'
 import { editDiscord } from '../../util/ImgEffects'
@@ -23,9 +23,6 @@ export abstract class Edit {
       type: 'STRING'
     })
       effects: string,
-    @SlashChoice('deepfry')
-    @SlashOption('preset', { description: 'choose a preset for how to ruin your image' })
-      preset: string,
     @SlashOption('list', { description: 'get a list of the available effects' })
       list: boolean,
       interaction: CommandInteraction

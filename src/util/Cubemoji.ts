@@ -5,7 +5,7 @@ import { Snowflake } from 'discord-api-types'
 import { CommandInteraction, ContextMenuInteraction, GuildEmoji, Message, MessageReaction, SnowflakeUtil } from 'discord.js'
 import { Discord } from 'discordx'
 import { unlink } from 'fs'
-import { injectable } from 'tsyringe'
+import { injectable, singleton } from 'tsyringe'
 import { MsgContext } from './ImgEffects'
 
 // the emoji can come from a few places
@@ -20,8 +20,7 @@ export enum Source {
   Any
 }
 
-@Discord()
-@injectable()
+@singleton()
 // used to keep track of images saved on disk
 // basically we just add another image to the queue
 // and when we hit 20 images, we delete the last one so that we aren't
@@ -46,8 +45,7 @@ export class ImageQueue {
   }
 }
 
-@Discord()
-@injectable()
+@singleton()
 // used to keep track of cubemoji sent messages
 export class CubeMessageManager {
   // first option is the message ID, second option is the user ID who sent the message
@@ -92,12 +90,11 @@ export class CubeMessageManager {
   }
 }
 
-@Discord()
-@injectable()
+@singleton()
 /**
  * gcp storage
  */
-export class CubeStorage {
+export class CubeGCP {
   storage: Storage
   refreshTime: number // unix timestamp to keep track of the next time we should refresh the storage list
 

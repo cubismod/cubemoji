@@ -6,9 +6,10 @@ import secrets from '../secrets.json'
 import pkginfo from '../package.json'
 import { container } from 'tsyringe'
 import { EmoteCache } from './util/EmoteCache'
-import { CubeMessageManager, CubeStorage, ImageQueue } from './util/Cubemoji'
+import { CubeMessageManager, CubeGCP, ImageQueue } from './util/Cubemoji'
 import { setStatus } from './util/CommandHelper'
 import { importx } from '@discordx/importer'
+import { CubeStorage } from './util/Storage'
 export class Main {
   private static _client: Client
 
@@ -57,13 +58,18 @@ export class Main {
 
     this._client.once('ready', async () => {
       if (DIService.container !== undefined) {
-        DIService.container.register('Client', { useValue: this._client })
         console.log('creating ImageQueue')
         DIService.container.register(ImageQueue, { useValue: new ImageQueue() })
+
         console.log('creating CubeMessageManager')
         DIService.container.register(CubeMessageManager, { useValue: new CubeMessageManager() })
+
         console.log('creating CubeStorage')
         DIService.container.register(CubeStorage, { useValue: new CubeStorage() })
+
+        console.log('creating CubeGCP')
+        DIService.container.register(CubeGCP, { useValue: new CubeGCP() })
+
         console.log('initializing emotes')
         DIService.container.register(EmoteCache, { useValue: new EmoteCache(this._client) })
         // load up cubemoji emote cache
