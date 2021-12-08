@@ -3,7 +3,7 @@ import { Discord, Slash, SlashChoice, SlashOption } from 'discordx'
 import strings from '../../res/strings.json'
 import imgEffects from '../../res/imgEffects.json'
 import { editDiscord } from '../../util/ImgEffects'
-import { emoteAutocomplete } from '../../util/Autocomplete'
+import { editAutocomplete, emoteAutocomplete } from '../../util/Autocomplete'
 
 @Discord()
 export abstract class Edit {
@@ -17,7 +17,11 @@ export abstract class Edit {
       emote: string,
     @SlashOption('user', { description: 'a user' })
       user: GuildMember,
-    @SlashOption('effects', { description: 'list of effects (space separated, max 20). If not specified then random effects will be applied' })
+    @SlashOption('effects', {
+      description: 'list of effects (space separated, max 20). If not specified then random effects will be applied',
+      autocomplete: (interaction: AutocompleteInteraction) => editAutocomplete(interaction),
+      type: 'STRING'
+    })
       effects: string,
     @SlashChoice('deepfry')
     @SlashOption('preset', { description: 'choose a preset for how to ruin your image' })

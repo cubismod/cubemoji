@@ -2,6 +2,8 @@ import { AutocompleteInteraction } from 'discord.js'
 import { choice, geometricReservoirSample } from 'pandemonium'
 import { grabEmoteCache } from './CommandHelper'
 import { Cmoji, Source } from './Cubemoji'
+import imgEffects from '../res/imgEffects.json'
+import Fuse from 'fuse.js'
 // useful autocomplete commands for discord functions
 
 /**
@@ -44,11 +46,47 @@ export function emoteAutocomplete (interaction: AutocompleteInteraction) {
 
 /**
  * edit effects autocomplete resolver
- * TODO: implement
+ * first step is determining the list of effects the user has typed, if any
+ * then we determine suggestions based on their query
+ * and finally create a list of suggestions adding onto their current valid
+ * list
  */
-/* export function editAutocomplete (interaction: AutocompleteInteraction) {
+export function editAutocomplete (interaction: AutocompleteInteraction) {
   const query = interaction.options.getFocused(true).value
   if (typeof query === 'string') {
-    const res = imgEffects.sort((a, b) => {})
+    if (query === '') {
+      const opts = geometricReservoirSample(8, imgEffects)
+      // return a random option suggestion
+      // when nothing typed yet
+      interaction.respond(opts.map(result => {
+        return { name: result, value: result }
+      }))
+    } else {
+      // determine the effects the user has listed so far
+      const effects = query.split(' ')
+      const fuse = new Fuse(imgEffects)
+      // api limits responses to 100 chars so we have a conservative
+      // limit in place for suggestions
+      if (effects.length > 1 && effects.length < 11) {
+        // multiple effects listed already
+        const last = effects.pop()
+        if (last) {
+          // search based on the last element
+          const res = fuse.search(last, { limit: 8 })
+          interaction.respond(res.map(result => {
+            const suggestions = effects.slice()
+            suggestions.push(result.item)
+            return { name: suggestions.join(' '), value: suggestions.join(' ') }
+          })).catch(reason => console.error(reason))
+        }
+      } else {
+        // user is working on typing their first effect so we return some options
+        // that match
+        const res = fuse.search(query, { limit: 8 })
+        interaction.respond(res.map(result => {
+          return { name: result.item, value: result.item }
+        }))
+      }
+    }
   }
-} */
+}
