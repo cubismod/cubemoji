@@ -4,6 +4,8 @@ services:
     build: .
     container_name: "cubemoji_${VERSION}"
     restart: unless-stopped
+    volumes:
+      - /mnt/extdr/cubemoji/data/:/usr/src/cubemoji/data
     logging:
           driver: journald
           options:
