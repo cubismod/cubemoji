@@ -6,7 +6,7 @@ import { choice } from 'pandemonium'
 import { container } from 'tsyringe'
 import { adjectives, animals, colors, names, uniqueNamesGenerator } from 'unique-names-generator'
 import { getMessageImage, grabEmoteCache, isUrl } from '../util/CommandHelper'
-import { CubeMessageManager } from '../util/CubeMessageManager'
+import { CubeMessageManager } from '../util/MessageManager'
 import { editDiscord, rescaleDiscord } from '../util/ImgEffects'
 
 // event handling doesn't go through the usual executeInteraction flow in
@@ -88,7 +88,7 @@ export abstract class EventListeners {
                       'People often attribute this work of art to',
                       'Cubemoji thought up of this image because of',
                       'One of the great wonders of the world here was created by'])
-                  bestOfEmbed.setDescription(`${pretext} <@${msg.client.users.resolveId(reactor)}> in the server ${msg.guild.name}`)
+                  bestOfEmbed.setDescription(`${pretext} <@${msg.client.users.resolveId(reactor)}> in the server \`${msg.guild.name}\``)
                 } else {
                   bestOfEmbed.setDescription(`This image was created in the server, ${msg.guild.name}`)
                 }

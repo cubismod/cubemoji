@@ -4,7 +4,7 @@ import { Discord, Slash, SlashChoice, SlashOption } from 'discordx'
 import { container } from 'tsyringe'
 import { getUrl } from '../../util/CommandHelper'
 import { emoteAutocomplete } from '../../util/Autocomplete'
-import { CubeMessageManager } from '../../util/CubeMessageManager'
+import { CubeMessageManager } from '../../util/MessageManager'
 import { performAddFace } from '../../util/ImgEffects'
 import strings from '../../res/strings.json'
 
