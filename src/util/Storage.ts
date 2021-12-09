@@ -7,12 +7,12 @@ import pkg from '../../package.json'
 // database storage using https://github.com/zaaack/keyv-file
 @singleton()
 export class CubeStorage {
-  trashReacts: Keyv
+  trashReacts: Keyv<string>
   private location = 'data/'
 
   constructor () {
     // persist data for each for two weeks
-    this.trashReacts = new Keyv({
+    this.trashReacts = new Keyv<string>({
       store: new KeyvFile({
         filename: resolve(this.location, 'trashReacts.json'),
         writeDelay: 100

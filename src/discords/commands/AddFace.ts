@@ -4,7 +4,7 @@ import { Discord, Slash, SlashChoice, SlashOption } from 'discordx'
 import { container } from 'tsyringe'
 import { getUrl } from '../../util/CommandHelper'
 import { emoteAutocomplete } from '../../util/Autocomplete'
-import { CubeMessageManager } from '../../util/Cubemoji'
+import { CubeMessageManager } from '../../util/CubeMessageManager'
 import { performAddFace } from '../../util/ImgEffects'
 import strings from '../../res/strings.json'
 
@@ -45,7 +45,7 @@ export abstract class AddFace {
           if (!msg) {
             console.error('could not get a message during rescale, not proceeding with adding trash react')
           } else {
-            if (msg instanceof Message) cubeMessageManager.registerTrashReact(interaction, msg, interaction.user.id)
+            if (msg instanceof Message) await cubeMessageManager.registerTrashReact(interaction, msg, interaction.user.id)
           }
         })
       }

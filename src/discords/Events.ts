@@ -6,7 +6,7 @@ import { choice } from 'pandemonium'
 import { container } from 'tsyringe'
 import { adjectives, animals, colors, names, uniqueNamesGenerator } from 'unique-names-generator'
 import { getMessageImage, grabEmoteCache, isUrl } from '../util/CommandHelper'
-import { CubeMessageManager } from '../util/Cubemoji'
+import { CubeMessageManager } from '../util/CubeMessageManager'
 import { editDiscord, rescaleDiscord } from '../util/ImgEffects'
 
 // event handling doesn't go through the usual executeInteraction flow in
@@ -29,12 +29,12 @@ export abstract class EventListeners {
         case '🗑️': {
           // delete a message
           // ensure that only the author of that edit can actually delete their own message
-          const author = cubeMessageManager.retrieveUser(reaction.message.id)
+          const author = await cubeMessageManager.retrieveUser(reaction.message.id)
           if (author && reaction.users.cache.has(author) && author !== '792878401589477377') {
             // ensure cubemoji isn't deleting its own messages
             // perform the delete now
             await reaction.message.delete()
-            cubeMessageManager.unregisterMessage(reaction.message.id)
+            await cubeMessageManager.unregisterMessage(reaction.message.id)
           }
           break
         }
@@ -62,7 +62,7 @@ export abstract class EventListeners {
           if (reaction.count === 1) {
             const msg = await reaction.message.fetch()
             // author who reacted to the original image
-            const reactor = cubeMessageManager.retrieveUser(msg.id)
+            const reactor = await cubeMessageManager.retrieveUser(msg.id)
             if (msg.guild) {
               const bestOfChannel = await reaction.client.channels.fetch('901600718404862012')
               const imgSrc = getMessageImage(msg)

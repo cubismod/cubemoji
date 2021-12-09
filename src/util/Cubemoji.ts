@@ -2,11 +2,10 @@
 import { Storage } from '@google-cloud/storage'
 import dayjs from 'dayjs'
 import { Snowflake } from 'discord-api-types'
-import { CommandInteraction, ContextMenuInteraction, GuildEmoji, Message, MessageReaction, SnowflakeUtil } from 'discord.js'
+import { GuildEmoji, SnowflakeUtil } from 'discord.js'
 import { Discord } from 'discordx'
 import { unlink } from 'fs'
 import { injectable, singleton } from 'tsyringe'
-import { MsgContext } from './ImgEffects'
 
 // the emoji can come from a few places
 // Discord implies that this carries a GuildEmoji object
@@ -42,51 +41,6 @@ export class ImageQueue {
       }
     }
     this.images.push(image)
-  }
-}
-
-@singleton()
-// used to keep track of cubemoji sent messages
-export class CubeMessageManager {
-  // first option is the message ID, second option is the user ID who sent the message
-  private sentMessages: Map<Snowflake, Snowflake>
-  constructor () {
-    this.sentMessages = new Map()
-  }
-
-  // register a new trash react to save to our list of reacts
-  registerTrashReact (context: MsgContext, msg: Message, sender: Snowflake) {
-    if (context instanceof ContextMenuInteraction || context instanceof CommandInteraction) {
-      if (context.guild &&
-        context.guild.me &&
-        context.channel &&
-        context.guild.me.permissionsIn(context.channelId).has('MANAGE_MESSAGES') &&
-        context.guild.me.permissionsIn(context.channelId).has('ADD_REACTIONS') &&
-        context.member) {
-        // all these checks to ensure cubemoji can delete the message and can also add a react
-        msg.react('🗑️')
-        this.sentMessages.set(msg.id, sender)
-      }
-    }
-    if (context instanceof MessageReaction) {
-      if (context.message.guild &&
-        context.message.guild.me &&
-        context.message.author?.id &&
-        context.message.guild.me.permissionsIn(context.message.channelId).has('MANAGE_MESSAGES') &&
-        context.message.guild.me.permissionsIn(context.message.channelId).has('ADD_REACTIONS')) {
-        msg.react('🗑️')
-        this.sentMessages.set(msg.id, sender)
-      }
-    }
-  }
-
-  // retrieves the user ID in snowflake form or undefined if there is no message associated with that id
-  retrieveUser (messageID: Snowflake) {
-    return this.sentMessages.get(messageID)
-  }
-
-  unregisterMessage (msgID: Snowflake) {
-    this.sentMessages.delete(msgID)
   }
 }
 

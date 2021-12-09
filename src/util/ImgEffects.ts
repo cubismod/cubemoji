@@ -6,7 +6,8 @@ import { choice, random } from 'pandemonium'
 import { downloadImage, getUrl } from './CommandHelper'
 import gm from 'gm'
 import path from 'path'
-import { CubeMessageManager, ImageQueue } from './Cubemoji'
+import { ImageQueue } from './Cubemoji'
+import { CubeMessageManager } from './CubeMessageManager'
 import { randomUUID } from 'crypto'
 import { container } from 'tsyringe'
 import { CommandInteraction, ContextMenuInteraction, Message, MessageAttachment, MessageReaction, PartialUser, User } from 'discord.js'
@@ -175,7 +176,7 @@ export async function rescaleDiscord (context: MsgContext, source: string, user:
         if (!msg) {
           console.error('could not get a message during rescale, not proceeding with adding trash react')
         } else {
-          if (msg instanceof Message) cubeMessageManager.registerTrashReact(context, msg, user.id)
+          if (msg instanceof Message) await cubeMessageManager.registerTrashReact(context, msg, user.id)
         }
       })
     }
@@ -213,7 +214,7 @@ export async function editDiscord (context: MsgContext, effects: string, source:
         if (!msg) {
           console.error('could not get a message during edit, not proceeding with adding trash react')
         } else {
-          if (msg instanceof Message) cubeMessageManager.registerTrashReact(context, msg, user.id)
+          if (msg instanceof Message) await cubeMessageManager.registerTrashReact(context, msg, user.id)
         }
       })
     }
@@ -265,7 +266,7 @@ async function reactErr (context: MsgContext) {
     const reply = await context.editReply(`${secrets.cubemojiBroken} this operation failed!`)
     if (reply instanceof Message) {
       // allow user to delete the error message
-      cubeMessageManager.registerTrashReact(context, reply, context.user.id)
+      await cubeMessageManager.registerTrashReact(context, reply, context.user.id)
     }
   }
   if (context instanceof ContextMenuInteraction) {
