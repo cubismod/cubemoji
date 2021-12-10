@@ -1,4 +1,4 @@
-FROM node:latest
+FROM node:17.2-bullseye
 WORKDIR /usr/src/cubemoji
 
 # setup any requisite packages
