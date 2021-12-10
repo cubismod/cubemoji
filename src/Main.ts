@@ -88,7 +88,7 @@ export class Main {
       setInterval(setStatus, 300000, this._client)
     })
 
-    this._client.on('interaction', async (interaction) => {
+    this._client.on('interactionCreate', async (interaction) => {
       // we limit the test bot to only interacting in my own #bot-test channel
       // while prd can interact with any channel
       if (!interaction.channel ||
