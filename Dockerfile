@@ -18,6 +18,4 @@ RUN npm install --production
 RUN npm install -g typescript 
 RUN npm run build
 
-RUN mkdir download
-
 CMD node build/src/Main.js
