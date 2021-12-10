@@ -5,7 +5,7 @@ WORKDIR /usr/src/cubemoji
 COPY setup-image.sh .
 RUN ./setup-image.sh
 
-
+COPY package-lock.json .
 COPY package.json .
 COPY secrets.json .
 COPY tsconfig.json .

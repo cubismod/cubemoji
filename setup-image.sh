@@ -10,6 +10,9 @@ apt-get -y install apt-utils imagemagick graphicsmagick
 pushd /usr/src/cubemoji
 mkdir download
 mkdir data
+popd
 
 apt-get clean
 rm -rf /var/lib/apt/lists*
+
+npm install -g npm@8.3.0
