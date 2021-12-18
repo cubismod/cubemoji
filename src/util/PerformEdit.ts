@@ -2,9 +2,7 @@ import { fromFile } from 'file-type'
 import { random, randomFloat, randomIndex } from 'pandemonium'
 import { downloadImage } from './CommandHelper'
 import gm from 'gm'
-import path from 'path'
 import { ImageQueue } from './Cubemoji'
-import { randomUUID } from 'crypto'
 import { container } from 'tsyringe'
 import { stat } from 'fs/promises'
 import { compressImage } from './ImgEffects'
@@ -13,7 +11,6 @@ import { compressImage } from './ImgEffects'
 // returns the file path to the edited image
 // TODO: figure out why images occasionally return 0 byte files
 // TODO: retain spoilers
-
 export async function performEdit (baseUrl: string, effects: string[], outPath: string) {
   const localUrl = await downloadImage(baseUrl).catch(err => console.error(err))
   if (localUrl) {
@@ -21,7 +18,7 @@ export async function performEdit (baseUrl: string, effects: string[], outPath: 
     const imageQueue = container.resolve(ImageQueue)
 
     if (ft && imageQueue) {
-      const filename = path.resolve(`download/${randomUUID()}.${ft.ext}`)
+      const filename = outPath
       let img = gm(localUrl)
       // apply all the image effects one by one according to the string
       const fileInfo = await stat(localUrl)

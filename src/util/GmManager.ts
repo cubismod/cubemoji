@@ -91,7 +91,7 @@ export class GmManager {
       this.execJob()
     }
 
-    return this.newWatcher(filename)
+    return await this.newWatcher(filename)
   }
 
   /**
@@ -144,11 +144,14 @@ export class GmManager {
     return filename
   }
 
-  private newWatcher (filename: string) {
+  private async newWatcher (filename: string) {
     const watcher = watch(filename, { awaitWriteFinish: true })
     this.watchers.push(watcher)
     // keep a max of 50 fs watchers
-    if (this.watchers.length > 50) this.watchers.shift()
+    if (this.watchers.length > 50) {
+      const oldWatcher = this.watchers.shift()
+      if (oldWatcher) await oldWatcher.close()
+    }
     return watcher
   }
 }
