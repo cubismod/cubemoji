@@ -3,9 +3,8 @@ import { Storage } from '@google-cloud/storage'
 import dayjs from 'dayjs'
 import { Snowflake } from 'discord-api-types'
 import { GuildEmoji, SnowflakeUtil } from 'discord.js'
-import { Discord } from 'discordx'
 import { unlink } from 'fs'
-import { injectable, singleton } from 'tsyringe'
+import { singleton } from 'tsyringe'
 
 // the emoji can come from a few places
 // Discord implies that this carries a GuildEmoji object

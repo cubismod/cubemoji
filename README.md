@@ -26,6 +26,8 @@ The bot depends on the following secrets/auth files to function:
   // obviously, cubemoji must have access to this emoji
   // by being on the same guild the emoji is located on
   "cubemojiBroken": "<:cubemoji_broken:910351670188339212>", 
+  "dbPath": "/home/ryan/cubemoji-npr-db",
+  "concurrentJobs": 5
 }
 ```
 prd mode enables global application commands minus the test guild + test channel you specify  

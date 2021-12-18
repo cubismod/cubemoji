@@ -12,13 +12,27 @@
     "parserOptions": {
         "ecmaVersion": 12
     },
-    "plugins": ["jest"],
+    "plugins": ["jest", "unused-imports"],
     "ignorePatterns": ["build/", "jest.config.js"],
     "rules": {
         "jest/no-disabled-tests": "warn",
         "jest/no-focused-tests": "error",
         "jest/no-identical-title": "error",
         "jest/prefer-to-have-length": "warn",
-        "jest/valid-expect": "error"
-      }
+        "jest/valid-expect": "error",
+        "unused-imports/no-unused-imports": "error",
+        "unused-imports/no-unused-vars": [
+        "warn",
+        {
+            "vars": "all",
+            "varsIgnorePattern": "^_",
+            "args": "after-used",
+            "argsIgnorePattern": "^_"
+        }],
+        "sort-imports": [
+            "error",
+            {
+              "ignoreDeclarationSort": true
+            }]
+    }
 }

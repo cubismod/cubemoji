@@ -38,7 +38,7 @@ export function compressImage (img: gm.State, ft: FileTypeResult) {
  * @param externalUrl the url of the image we will download and rescale
  * @returns path to image file
  */
-export async function performRescale (externalUrl: string) {
+export async function performRescale (externalUrl: string, outPath: string) {
   const localUrl = await downloadImage(externalUrl, true).catch(
     err => {
       console.error(err)
@@ -81,23 +81,21 @@ export async function performRescale (externalUrl: string) {
         })
       await imageQueue.enqueue(localUrl)
       await imageQueue.enqueue(filePath)
-      return filePath
-    } else {
-      return undefined
+      return true
     }
   }
+  return false
 }
 
 // add an emoji (face) to any image
-// return the file path to the edited image
-export async function performAddFace (baseUrl: string, face: string) {
+export async function performAddFace (baseUrl: string, face: string, outPath: string) {
   const localUrl = await downloadImage(baseUrl).catch(err => console.error(err))
   const imageQueue = container.resolve(ImageQueue)
   if (localUrl && imageQueue) {
     // this also determines if the base image exists
     const ft = await fromFile(localUrl)
     if (ft !== undefined) {
-      const filePath = path.resolve(`download/${randomUUID()}.${ft.ext}`)
+      const filePath = outPath
       const faceUrl = `assets/${face}.png`
       // now need to determine width and height of background image
       gm(faceUrl).identify((err, info) => {
@@ -112,14 +110,12 @@ export async function performAddFace (baseUrl: string, face: string) {
             })
         }
       })
-
       imageQueue.enqueue(localUrl)
       imageQueue.enqueue(filePath)
-      return filePath
-    } else {
-      return undefined
+      return true
     }
   }
+  return false
 }
 
 // generate a set of up to 10 random edit options

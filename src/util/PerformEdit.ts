@@ -12,8 +12,9 @@ import { compressImage } from './ImgEffects'
 // edits an image
 // returns the file path to the edited image
 // TODO: figure out why images occasionally return 0 byte files
+// TODO: retain spoilers
 
-export async function performEdit (baseUrl: string, effects: string[]) {
+export async function performEdit (baseUrl: string, effects: string[], outPath: string) {
   const localUrl = await downloadImage(baseUrl).catch(err => console.error(err))
   if (localUrl) {
     const ft = await fromFile(localUrl)
@@ -135,9 +136,8 @@ export async function performEdit (baseUrl: string, effects: string[]) {
       })
       await imageQueue.enqueue(localUrl)
       await imageQueue.enqueue(filename)
-      return filename
-    } else {
-      return undefined
+      return true
     }
   }
+  return false
 }
