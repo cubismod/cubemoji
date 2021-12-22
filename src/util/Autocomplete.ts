@@ -62,6 +62,7 @@ export function editAutocomplete (interaction: AutocompleteInteraction) {
         return { name: result, value: result }
       }))
     } else {
+      // something has been typed in the query
       // determine the effects the user has listed so far
       const effects = query.split(' ')
       const fuse = new Fuse(imgEffects)

@@ -19,7 +19,7 @@
         {
             "label": "Delete downloaded files",
             "type": "shell",
-            "command": "rm download/*"
+            "command": "rm -f download/*"
         }
     ]
 }

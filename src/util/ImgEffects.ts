@@ -16,6 +16,7 @@ import { stat } from 'fs/promises'
 import secrets from '../../secrets.json'
 import imgEffects from '../res/imgEffects.json'
 import { performEdit } from './PerformEdit'
+import { CubeStorage } from './Storage'
 
 export type MsgContext = ContextMenuInteraction | CommandInteraction | MessageReaction
 
@@ -166,6 +167,7 @@ export async function rescaleDiscord (context: MsgContext, source: string, user:
       return
     }
     const cubeMessageManager = container.resolve(CubeMessageManager)
+    const storage = container.resolve(CubeStorage)
     if (filename) {
       const watcher = watch(filename, { awaitWriteFinish: true })
       watcher.on('add', async () => {
@@ -176,7 +178,14 @@ export async function rescaleDiscord (context: MsgContext, source: string, user:
         if (!msg) {
           console.error('could not get a message during rescale, not proceeding with adding trash react')
         } else {
-          if (msg instanceof Message) await cubeMessageManager.registerTrashReact(context, msg, user.id)
+          if (msg instanceof Message) {
+            await cubeMessageManager.registerTrashReact(context, msg, user.id)
+            await storage.imageJobs.set(msg.id, {
+              owner: user.id,
+              type: 'rescale',
+              source: source
+            })
+          }
         }
       })
     }
@@ -204,6 +213,7 @@ export async function editDiscord (context: MsgContext, effects: string, source:
       return
     }
     const cubeMessageManager = container.resolve(CubeMessageManager)
+    const storage = container.resolve(CubeStorage)
     if (filename) {
       const watcher = watch(filename, { awaitWriteFinish: true })
       watcher.on('add', async () => {
@@ -214,7 +224,15 @@ export async function editDiscord (context: MsgContext, effects: string, source:
         if (!msg) {
           console.error('could not get a message during edit, not proceeding with adding trash react')
         } else {
-          if (msg instanceof Message) await cubeMessageManager.registerTrashReact(context, msg, user.id)
+          if (msg instanceof Message) {
+            await cubeMessageManager.registerTrashReact(context, msg, user.id)
+            await storage.imageJobs.set(msg.id, {
+              owner: user.id,
+              type: 'edit',
+              effects: effects,
+              source: source
+            })
+          }
         }
       })
     }
