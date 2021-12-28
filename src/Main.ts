@@ -67,6 +67,7 @@ export class Main {
 
         console.log('creating CubeStorage')
         DIService.container.register(CubeStorage, { useValue: new CubeStorage() })
+        await container.resolve(CubeStorage).initHosts()
 
         console.log('creating CubeGCP')
         DIService.container.register(CubeGCP, { useValue: new CubeGCP() })

@@ -22,6 +22,7 @@ export enum Source {
 
 export interface Image {
   // url as saved in discord cdn
+  // or on the web
   url: string,
   // local filename
   localname: string,
@@ -124,5 +125,14 @@ export class Cmoji {
     this.guildEmoji = guildEmoji
     // auto generate an ID
     this.id = id
+  }
+}
+
+export const gotOptions = {
+  retry: {
+    limit: 2
+  },
+  timeout: {
+    request: 3000
   }
 }

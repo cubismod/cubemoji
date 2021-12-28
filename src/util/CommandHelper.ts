@@ -12,8 +12,10 @@ import { promisify } from 'util'
 import { pipeline } from 'stream'
 import { CommandInteraction, Message, MessageEmbed } from 'discord.js'
 import { choice } from 'pandemonium'
-import { Cmoji, CubeGCP, Source } from './Cubemoji'
+import { Cmoji, CubeGCP, gotOptions, ImageQueue, Source } from './Cubemoji'
 import { Pagination } from '@discordx/utilities'
+import { URL } from 'url'
+import { CubeStorage } from './Storage'
 
 // display  a random status message
 export function setStatus (client: Client) {
@@ -34,24 +36,37 @@ export function setStatus (client: Client) {
   }
 }
 
-// return true if this is a URL w/ a valid extension, false if it isn't
+/**
+ * checks whether a url is using a proper extension
+ * that cubemoji supports, is not on a hostname blocklist,
+ * and is using https
+ * @param url
+ * @returns
+ */
 export async function isUrl (url: string) {
-  const urlReg = /^https:\/\/.+/
-  if (url.match(urlReg)) {
-    // looks like an https url
-    // now check the filetype
-    try {
-      const stream = await got.stream(url)
-      const type = await FileType.fromStream(stream)
-      const validTypes = ['jpg', 'jpeg', 'gif', 'png']
+  try {
+    const whatwgUrl = new URL(url)
 
-      if (type !== undefined && validTypes.includes(type.ext)) return true
-      else return false
-    } catch (err) {
-      console.error(err)
-      return false
-    }
-  } else return false
+    // only want secure connections
+    if (whatwgUrl.protocol !== 'https:') return false
+
+    // check against blocked hosts
+    const storage = container.resolve(CubeStorage)
+    const res = await storage.badHosts.get(whatwgUrl.hostname)
+    // on the blocklist, then we don't continue
+    if (res !== undefined) return false
+
+    // now check the filetype
+    const stream = await got.stream(url)
+    const type = await FileType.fromStream(stream)
+    const validTypes = ['jpg', 'jpeg', 'gif', 'png']
+
+    if (type !== undefined && validTypes.includes(type.ext)) return true
+    else return false
+  } catch (e) {
+    console.error(e)
+    return false
+  }
 }
 
 // checks a string to see if there is an emote or URL there and then returns the URL
@@ -70,20 +85,17 @@ export async function getUrl (source: string) {
 
 /**
  * download an image file to the local FS under the download folder
+ * or use the cached version if that is saved
  * @param url - link to the img
- * @param compress - optionally compress the image if its above 0.5MB
- * @returns promise for a url or undefined
+ * @returns promise for local filename or undefined if can't be downloaded
  */
-export async function downloadImage (url: string, compress = false) {
+export async function downloadImage (url: string) {
+  // check cache
+  const queue = container.resolve(ImageQueue)
+  const res = await queue.search(url)
+  if (res) return res.url
+  // otherwise we download
   // add timeouts and limit retries with got
-  const gotOptions = {
-    retry: {
-      limit: 2
-    },
-    timeout: {
-      request: 3000
-    }
-  }
   // check first whether the file isn't too big
   const headers = await got.head(url, gotOptions)
     .catch(err => {

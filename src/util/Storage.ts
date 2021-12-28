@@ -1,7 +1,14 @@
+import dayjs from 'dayjs'
+import { createReadStream, createWriteStream } from 'fs'
+import got from 'got/dist/source'
 import Keyv from 'keyv'
 import KeyvFile from 'keyv-file'
 import { resolve } from 'path'
+import { createInterface } from 'readline'
+import { pipeline } from 'stream'
 import { singleton } from 'tsyringe'
+import { promisify } from 'util'
+import { gotOptions } from './Cubemoji'
 
 export interface ImageJob {
   // rescale or edit
@@ -20,6 +27,7 @@ export interface ImageJob {
 export class CubeStorage {
   trashReacts: Keyv<string>
   imageJobs: Keyv<ImageJob>
+  badHosts: Keyv<number>
   private location = 'data/'
 
   constructor () {
@@ -42,7 +50,7 @@ export class CubeStorage {
 
     /*
     Stores information about how to recreate a job.
-    We pertist
+    We persist
     - key: message snowflake ID
     - value: see ImageJob interface
     */
@@ -54,5 +62,45 @@ export class CubeStorage {
       // 8 hours in ms
       ttl: 2.88e+7
     })
+    /**
+     * Downloads a blocklist of bad hosts
+     * to avoid when performing downloads
+     */
+    this.badHosts = new Keyv<number>({
+      store: new KeyvFile({
+        filename: resolve(this.location, 'badHosts.json')
+      })
+    })
+  }
+
+  async initHosts () {
+    const refreshTime = await this.badHosts.get('refresh')
+    if (refreshTime && Date.now() > refreshTime) {
+      // time to perform a refresh
+      const fn = resolve('download/', 'hosts.txt')
+      const pl = promisify(pipeline)
+      // downloading this blocklist
+      // https://github.com/StevenBlack/hosts
+      await pl(
+        got.stream('http://sbc.io/hosts/alternates/porn/hosts', gotOptions),
+        createWriteStream(fn)
+      )
+
+      // once we have that file we gotta parse it
+      const fileStream = createReadStream(fn)
+      const rlInterface = createInterface({
+        input: fileStream,
+        crlfDelay: Infinity
+      })
+
+      for await (const line of rlInterface) {
+        const items = line.split(' ')
+        if (items.length === 2 && items[0] === '0.0.0.0') {
+          await this.badHosts.set(items[1], 1)
+        }
+      }
+      // set next refresh time
+      await this.badHosts.set('refresh', dayjs().add(1, 'week').unix())
+    }
   }
 }

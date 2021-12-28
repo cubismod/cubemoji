@@ -1,4 +1,5 @@
 import { isUrl } from '../src/util/CommandHelper'
+import { CubeStorage } from '../src/util/Storage'
 
 // command helper testing
 test('http url not valid', async () => {
@@ -19,4 +20,9 @@ test('yaml file ext not valid', async () => {
 
 test('svg file ext not valid', async () => {
   expect(await isUrl('https://gitlab.com/cubismod/cubemoji/-/raw/master/assets/cubemoji_broken.svg')).toBeFalsy()
+})
+
+test('init hosts', async () => {
+  const storage = new CubeStorage()
+  expect(async () => await storage.initHosts()).not.toThrow()
 })

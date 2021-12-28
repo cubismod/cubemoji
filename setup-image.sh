@@ -15,4 +15,5 @@ popd
 apt-get clean
 rm -rf /var/lib/apt/lists*
 
+# update to version of npm
 npm install -g npm@8.3.0
