@@ -1,6 +1,6 @@
 import { AutocompleteInteraction } from 'discord.js'
 import { choice, geometricReservoirSample } from 'pandemonium'
-import { grabEmoteCache } from './CommandHelper'
+import { grabEmoteCache } from './DiscordLogic'
 import { Cmoji, Source } from './Cubemoji'
 import imgEffects from '../res/imgEffects.json'
 import Fuse from 'fuse.js'

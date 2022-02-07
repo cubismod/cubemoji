@@ -8,7 +8,7 @@ import { container } from 'tsyringe'
 import { EmoteCache } from './util/EmoteCache'
 import { CubeGCP, ImageQueue } from './util/Cubemoji'
 import { CubeMessageManager } from './util/MessageManager'
-import { setStatus } from './util/CommandHelper'
+import { setStatus } from './util/DiscordLogic'
 import { importx } from '@discordx/importer'
 import { CubeStorage } from './util/Storage'
 export class Main {

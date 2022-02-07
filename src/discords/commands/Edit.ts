@@ -2,7 +2,7 @@ import { AutocompleteInteraction, CommandInteraction, GuildMember } from 'discor
 import { Discord, Slash, SlashOption } from 'discordx'
 import strings from '../../res/strings.json'
 import imgEffects from '../../res/imgEffects.json'
-import { editDiscord } from '../../util/ImgEffects'
+import { editDiscord } from '../../util/ImageLogic'
 import { editAutocomplete, emoteAutocomplete } from '../../util/Autocomplete'
 
 @Discord()

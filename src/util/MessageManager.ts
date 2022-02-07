@@ -1,7 +1,7 @@
 import { Snowflake } from 'discord-api-types'
 import { CommandInteraction, ContextMenuInteraction, Message, MessageReaction } from 'discord.js'
 import { container, singleton } from 'tsyringe'
-import { MsgContext } from './ImgEffects'
+import { MsgContext } from './ImageLogic'
 import { CubeStorage } from './Storage'
 
 @singleton()

@@ -1,7 +1,7 @@
 import { ContextMenuInteraction } from 'discord.js'
 import { ContextMenu, Discord } from 'discordx'
-import { getMessageImage } from '../util/CommandHelper'
-import { editDiscord, performAddFace, rescaleDiscord } from '../util/ImgEffects'
+import { getMessageImage } from '../util/DiscordLogic'
+import { editDiscord, performAddFace, rescaleDiscord } from '../util/ImageLogic'
 
 @Discord()
 export abstract class CubeMessageContext {

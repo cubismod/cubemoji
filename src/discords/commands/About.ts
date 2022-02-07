@@ -3,7 +3,7 @@ import { Discord, Slash } from 'discordx'
 import pkg from '../../../package.json'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
-import { grabEmoteCache } from '../../util/CommandHelper'
+import { grabEmoteCache } from '../../util/DiscordLogic'
 
 dayjs.extend(relativeTime)
 

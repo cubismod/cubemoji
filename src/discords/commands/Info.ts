@@ -1,7 +1,7 @@
 // https://github.com/oceanroleplay/discord.ts-example/blob/main/src/commands/slashes.ts
 import { CommandInteraction, MessageEmbed, GuildMember, AutocompleteInteraction } from 'discord.js'
 import { Discord, Slash, SlashOption } from 'discordx'
-import { grabEmoteCache } from '../../util/CommandHelper'
+import { grabEmoteCache } from '../../util/DiscordLogic'
 import { emoteAutocomplete } from '../../util/Autocomplete'
 import { Source } from '../../util/Cubemoji'
 import strings from '../../res/strings.json'
