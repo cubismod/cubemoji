@@ -1,4 +1,5 @@
 import { State } from 'gm'
+import { singleton } from 'tsyringe'
 /**
  * workers here aren't actually tracked in any meaningful way by the program
  * rather they are gm/im processes spawned by the gm module that we track internally
@@ -6,6 +7,7 @@ import { State } from 'gm'
  *
  * paths are actually used as index values for GM state objects
  */
+@singleton()
 export class WorkerPool {
   limit: number
   runningWorkers: Map<string, State>
@@ -41,6 +43,10 @@ export class WorkerPool {
         if (err) console.error(err)
       })
       this.runningWorkers.set(path, worker)
+
+      // free up that worker after 5 min if needed...although this doesn't actually
+      // stop the gm process
+      setTimeout(() => { this.runningWorkers.delete(path) }, 300000)
     } else {
       console.debug(`unable to run worker ${path}`)
     }

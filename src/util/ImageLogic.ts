@@ -3,10 +3,10 @@
 // from the fs once done
 import { randomUUID } from 'crypto'
 import { CommandInteraction, ContextMenuInteraction, MessageReaction } from 'discord.js'
-import { FileTypeResult, fromFile } from 'file-type'
+import { FileTypeResult, fileTypeFromFile } from 'file-type'
 import { createWriteStream } from 'fs'
 import { stat } from 'fs/promises'
-import gm from 'gm'
+import gm, { State } from 'gm'
 import got from 'got/dist/source'
 import { choice, random, randomFloat, randomIndex } from 'pandemonium'
 import path from 'path'
@@ -14,14 +14,149 @@ import { pipeline } from 'stream/promises'
 import { container } from 'tsyringe'
 import { promisify } from 'util'
 import imgEffects from '../res/imgEffects.json'
-import { gotOptions, ImageQueue } from './Cubemoji'
+import { gotOptions } from './Cubemoji'
+import { ImageQueue } from './ImageQueue'
+import { WorkerPool } from './WorkerPool'
 
 export type MsgContext = ContextMenuInteraction | CommandInteraction | MessageReaction
 
+interface outputtedFile {
+  outPath: string,
+  fileType: FileTypeResult
+}
 /**
 * logic for performing edits/rescales/addfaces
 * with imagemagick and their corresponding helper functions
 */
+
+/**
+ * Steps of an image operation
+ * 1. Download the image to the disk
+ * 2. Determine a path for the resulting file
+ * 3. Apply effects to the image using GraphicsMagick
+ * 4. Send task to a worker to perform, then our work here is done
+ */
+abstract class ImageOperation {
+  externalUrl: string
+  localPath = ''
+
+  constructor (externalUrl: string) {
+    this.externalUrl = externalUrl
+  }
+
+  /**
+   * downloads image from externalUrl
+   * to disk and saves path to this.localUrl
+   * @returns boolean status
+   */
+  async download () {
+    const localUrl = await downloadImage(this.externalUrl).catch(
+      err => {
+        console.error(err)
+      })
+    if (localUrl) {
+      this.localPath = localUrl
+      return true
+    }
+    return false
+  }
+
+  /**
+   * determines path for resulting file from this.localPath
+   * @returns object consisting of path of resulting file and filetype
+   * or '' if input file is invalid
+   */
+  async determine () {
+    const ft = await fileTypeFromFile(this.localPath)
+    if (ft === undefined) return ''
+    return {
+      outPath: path.resolve(`download/${randomUUID()}.${ft.ext}`),
+      fileType: ft
+    }
+  }
+
+  /**
+   * determines whether an image needs to be compressed and
+   * then returns a compressed version if needed, otherwise
+   * just returns the same state object
+   * compress at 0.5MB
+   */
+  async compress (ft: FileTypeResult, state: State) {
+    const fileInfo = await stat(this.localPath)
+    if (fileInfo.size > 500000) {
+      switch (ft.ext) {
+        case 'jpg':
+          return state.quality(20)
+            .geometry('60%')
+        case 'png':
+          return state.geometry('60%')
+        case 'gif':
+          return state.bitdepth(8)
+            .colors(50)
+      }
+    }
+    return state
+  }
+
+  /**
+   * compresses an image if necessary then applies
+   * an effect and returns a promise to the resulting gm.State
+   * @param output path & filetype of output
+   */
+  abstract apply (output: outputtedFile): Promise<State>
+
+  /**
+   * runs entire operation
+   * @returns path of resulting file or '' if failure ocurred
+   */
+  async run () {
+    const imageQueue = container.resolve(ImageQueue)
+    const workerPool = container.resolve(WorkerPool)
+
+    if (await this.download()) {
+      const output = await this.determine()
+      if (output !== '') {
+        const state = await this.apply(output)
+
+        // now send the operation to worker
+        workerPool.enqueue(output.outPath, state)
+        // save local image to queue in case we want to reuse it later
+        // in another operation
+        await imageQueue.enqueue({
+          localPath: this.localPath,
+          url: this.externalUrl
+        })
+        return output.outPath
+      }
+    }
+    return ''
+  }
+}
+
+class RescaleOperation extends ImageOperation {
+  apply (output: outputtedFile): State {
+    // now we need build our rescale parameters for graphicsmagick
+    let newSize = ''
+    switch (random(0, 2)) {
+      case 0:
+        // set a width
+        newSize = random(10, 1000).toString()
+        break
+      case 1:
+        // set a height
+        newSize = `x${random(10, 1000)}`
+        break
+      case 2:
+        // ignore aspect ratio
+        newSize = `${random(10, 1000)}x${random(10, 1000)}!`
+    }
+    // imagemagick only has liquid rescale, not graphicsmagick
+    const im = gm.subClass({ imageMagick: true })
+    const state = im(this.localPath)
+    return state.out('-liquid-rescale', newSize)
+  }
+}
+
 /**
   * perform a liquid rescale/ seam carving on an image
   * @param externalUrl the url of the image we will download and rescale
@@ -34,6 +169,7 @@ export async function rescale (externalUrl: string) {
     }
   )
   const imageQueue = container.resolve(ImageQueue)
+  const workerPool = container.resolve(WorkerPool)
   if (localUrl && imageQueue) {
     // now we need build our rescale parameters for graphicsmagick
     let newSize = ''
@@ -63,11 +199,9 @@ export async function rescale (externalUrl: string) {
         // on that file
         ourImg = compressImage(ourImg, ft)
       }
-      ourImg
-        .out('-liquid-rescale', newSize)
-        .write(filePath, (err) => {
-          if (err) throw (err)
-        })
+      // queue this to be processed
+      workerPool.enqueue(filePath, ourImg.out('-liquid-rescale', newSize))
+
       await imageQueue.enqueue(localUrl)
       await imageQueue.enqueue(filePath)
       return filePath

@@ -1,16 +1,18 @@
 /* eslint-disable node/no-path-concat */
 import 'reflect-metadata'
-import { Intents } from 'discord.js'
+import { Intents, Interaction } from 'discord.js'
 import { Client, DIService } from 'discordx'
 import secrets from '../secrets.json'
 import pkginfo from '../package.json'
 import { container } from 'tsyringe'
 import { EmoteCache } from './util/EmoteCache'
-import { CubeGCP, ImageQueue } from './util/Cubemoji'
+import { CubeGCP } from './util/Cubemoji'
+import { ImageQueue } from './util/ImageQueue'
 import { CubeMessageManager } from './util/MessageManager'
 import { setStatus } from './util/DiscordLogic'
 import { importx } from '@discordx/importer'
 import { CubeStorage } from './util/Storage'
+import { WorkerPool } from './util/WorkerPool'
 export class Main {
   private static _client: Client
 
@@ -33,7 +35,6 @@ export class Main {
           Intents.FLAGS.GUILD_MEMBERS,
           Intents.FLAGS.GUILD_PRESENCES
         ],
-        silent: true,
         partials: ['MESSAGE', 'CHANNEL', 'REACTION']
       })
     } else {
@@ -58,26 +59,33 @@ export class Main {
     await this._client.login(secrets.token)
 
     this._client.once('ready', async () => {
+      // dependency injection initialization
       if (DIService.container !== undefined) {
-        console.log('creating ImageQueue')
         DIService.container.register(ImageQueue, { useValue: new ImageQueue() })
+        console.log('registered ImageQueue')
 
-        console.log('creating CubeMessageManager')
         DIService.container.register(CubeMessageManager, { useValue: new CubeMessageManager() })
+        console.log('registered CubeMessageManager')
 
-        console.log('creating CubeStorage')
         DIService.container.register(CubeStorage, { useValue: new CubeStorage() })
+        console.log('registered CubeStorage')
         await container.resolve(CubeStorage).initHosts()
+        console.log('initialized hosts list')
 
-        console.log('creating CubeGCP')
         DIService.container.register(CubeGCP, { useValue: new CubeGCP() })
+        console.log('registered CubeGCP')
 
-        console.log('initializing emotes')
+        DIService.container.register(WorkerPool, { useValue: new WorkerPool(secrets.workers) })
+        console.log('registered WorkerPool')
+
         DIService.container.register(EmoteCache, { useValue: new EmoteCache(this._client) })
+        console.log('registered EmoteCache')
         // load up cubemoji emote cache
         const emoteCache = container.resolve(EmoteCache)
         await emoteCache.init()
-        console.log('emote cache started up')
+        console.log('initialized EmoteCache')
+      } else {
+        throw new Error('DIServer.container is undefined therefore cannot initialize dependency injection')
       }
 
       await this._client.initApplicationCommands()
@@ -89,7 +97,7 @@ export class Main {
       setInterval(setStatus, 300000, this._client)
     })
 
-    this._client.on('interactionCreate', async (interaction) => {
+    this._client.on('interactionCreate', async (interaction: Interaction) => {
       // we limit the test bot to only interacting in my own #bot-test channel
       // while prd can interact with any channel
       if (!interaction.channel ||
@@ -100,13 +108,13 @@ export class Main {
             return
           }
         }
-        await this._client.executeInteraction(interaction).catch(
-          err => {
-            console.error('INTERACTION FAILURE')
-            console.error(`Type: ${interaction.type}\nTimestamp: ${Date()}\nGuild: ${interaction.guild}\nUser: ${interaction.user.tag}\nChannel: ${interaction.channel}`)
-            console.error(err)
-          }
-        )
+        try {
+          await this._client.executeInteraction(interaction)
+        } catch (err: unknown) {
+          console.error('INTERACTION FAILURE')
+          console.error(`Type: ${interaction.type}\nTimestamp: ${Date()}\nGuild: ${interaction.guild}\nUser: ${interaction.user.tag}\nChannel: ${interaction.channel}`)
+          console.error(err)
+        }
       }
     })
   }
