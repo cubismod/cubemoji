@@ -8,11 +8,11 @@
             "type": "node",
             "request": "launch",
             "name": "Debug bot",
-            "program": "${workspaceFolder}/src/Main.ts",
+            "program": "${workspaceFolder}/build/src/Main.js",
             "preLaunchTask": "tsc: build - tsconfig.json",
             "sourceMaps": true,
             "postDebugTask": "Delete downloaded files",
-            "runtimeVersion": "16",
+            "runtimeVersion": "17.4",
             "outputCapture": "std",
             "args": ["--experimental-specifier-resolution=node"],
             "outFiles": [

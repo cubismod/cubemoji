@@ -9,7 +9,7 @@ export abstract class LeaveGuild {
 
   @Slash('leaveguild', { description: 'Leave a guild' })
   async leaveGuild (
-    @SlashOption('id', { description: 'id of the guild to leave' })
+    @SlashOption('id', { description: 'id of the guild to leave', required: false })
       id: string,
       interaction: CommandInteraction
   ) {

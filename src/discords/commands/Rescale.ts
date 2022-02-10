@@ -1,8 +1,8 @@
 import { AutocompleteInteraction, CommandInteraction, GuildMember } from 'discord.js'
 import { Discord, Slash, SlashOption } from 'discordx'
 import { emoteAutocomplete } from '../../util/Autocomplete'
-import { rescaleDiscord } from '../../util/ImageLogic'
 import strings from '../../res/strings.json'
+import { RescaleDiscord } from '../../util/DiscordLogic'
 
 @Discord()
 export abstract class Rescale {
@@ -11,10 +11,11 @@ export abstract class Rescale {
     @SlashOption('source', {
       description: strings.sourceSlash,
       autocomplete: (interaction: AutocompleteInteraction) => emoteAutocomplete(interaction),
-      type: 'STRING'
+      type: 'STRING',
+      required: false
     })
       emote: string,
-    @SlashOption('user', { description: 'a user' })
+    @SlashOption('user', { description: 'a user', required: false })
       user: GuildMember,
       interaction: CommandInteraction
   ) {
@@ -22,10 +23,12 @@ export abstract class Rescale {
       interaction.reply({ content: strings.noArgs, ephemeral: true })
     } else if (emote) {
       await interaction.deferReply()
-      await rescaleDiscord(interaction, emote, interaction.user)
+      const rsDiscord = new RescaleDiscord(interaction, emote, interaction.user)
+      await rsDiscord.run()
     } else if (user) {
       await interaction.deferReply()
-      await rescaleDiscord(interaction, user.displayAvatarURL({ format: 'png', dynamic: true, size: 256 }), interaction.user)
+      const rsDiscord = new RescaleDiscord(interaction, user.displayAvatarURL({ format: 'png', dynamic: true, size: 256 }), interaction.user)
+      await rsDiscord.run()
     }
   }
 }

@@ -2,8 +2,8 @@ import { AutocompleteInteraction, CommandInteraction, GuildMember } from 'discor
 import { Discord, Slash, SlashOption } from 'discordx'
 import strings from '../../res/strings.json'
 import imgEffects from '../../res/imgEffects.json'
-import { editDiscord } from '../../util/ImageLogic'
 import { editAutocomplete, emoteAutocomplete } from '../../util/Autocomplete'
+import { EditDiscord } from '../../util/DiscordLogic'
 
 @Discord()
 export abstract class Edit {
@@ -12,7 +12,8 @@ export abstract class Edit {
     @SlashOption('source', {
       description: strings.sourceSlash,
       autocomplete: (interaction: AutocompleteInteraction) => emoteAutocomplete(interaction),
-      type: 'STRING'
+      type: 'STRING',
+      required: false
     })
       emote: string,
     @SlashOption('user', { description: 'a user' })
@@ -20,10 +21,11 @@ export abstract class Edit {
     @SlashOption('effects', {
       description: 'list of effects (space separated, max 20). If not specified then random effects will be applied',
       autocomplete: (interaction: AutocompleteInteraction) => editAutocomplete(interaction),
-      type: 'STRING'
+      type: 'STRING',
+      required: false
     })
       effects: string,
-    @SlashOption('list', { description: 'get a list of the available effects' })
+    @SlashOption('list', { description: 'get a list of the available effects', required: false })
       list: boolean,
       interaction: CommandInteraction
   ) {
@@ -35,10 +37,12 @@ export abstract class Edit {
         interaction.reply({ content: strings.noArgs, ephemeral: true })
       } else if (emote) {
         await interaction.deferReply()
-        await editDiscord(interaction, effects, emote, interaction.user)
+        const edDiscord = new EditDiscord(interaction, effects, emote, interaction.user)
+        await edDiscord.run()
       } else if (user) {
         await interaction.deferReply()
-        await editDiscord(interaction, effects, user.displayAvatarURL({ format: 'png', dynamic: true, size: 256 }), interaction.user)
+        const edDiscord = new EditDiscord(interaction, effects, user.displayAvatarURL({ format: 'png', dynamic: true, size: 256 }), interaction.user)
+        await edDiscord.run()
       }
     }
   }

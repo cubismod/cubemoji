@@ -3,8 +3,10 @@ import { CommandInteraction } from 'discord.js'
 import { Discord, Slash, SlashChoice, SlashOption } from 'discordx'
 import { createWriteStream, writeFile } from 'fs'
 import path from 'path'
-import { grabEmoteCache, grabStorage, sendPagination } from '../../util/DiscordLogic'
-import { Source } from '../../util/Cubemoji'
+import { container } from 'tsyringe'
+import { CubeGCP, Source } from '../../util/Cubemoji'
+import { sendPagination } from '../../util/DiscordLogic'
+import { EmoteCache } from '../../util/EmoteCache'
 
 @Discord()
 export abstract class List {
@@ -16,10 +18,10 @@ export abstract class List {
     @SlashChoice('Mutant', 'mutant')
     @SlashChoice('All', 'all')
     @SlashChoice('Download', 'download')
-    @SlashOption('subset', { description: 'Which subset of emotes would you like to choose from?', required: true })
+    @SlashOption('subset', { description: 'Which subset of emotes would you like to choose from?' })
       subset: string,
       interaction: CommandInteraction) {
-    const emoteCache = grabEmoteCache()
+    const emoteCache = container.resolve(EmoteCache)
     if (emoteCache !== undefined) {
       if (subset === 'download') {
         const localPath = path.resolve('download/emoji-list.txt')
@@ -28,7 +30,7 @@ export abstract class List {
         // and store in GCP
         // if we don't already have one
         await interaction.deferReply()
-        const cubeStorage = grabStorage()
+        const cubeStorage = container.resolve(CubeGCP)
         if (cubeStorage) {
           if (dayjs().unix() > cubeStorage.refreshTime) {
             // now we create a new file

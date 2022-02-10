@@ -2,8 +2,7 @@
 import 'reflect-metadata'
 import { Intents, Interaction } from 'discord.js'
 import { Client, DIService } from 'discordx'
-import secrets from '../secrets.json'
-import pkginfo from '../package.json'
+import secrets from './secrets.json'
 import { container } from 'tsyringe'
 import { EmoteCache } from './util/EmoteCache'
 import { CubeGCP } from './util/Cubemoji'
@@ -91,7 +90,7 @@ export class Main {
       await this._client.initApplicationCommands()
       await this._client.initApplicationPermissions()
 
-      console.log(`cubemoji ${pkginfo.version} is now running...`)
+      console.log(`cubemoji ${secrets.version} is now running...`)
       // set a new status msg every 5 min
       setStatus(this._client)
       setInterval(setStatus, 300000, this._client)

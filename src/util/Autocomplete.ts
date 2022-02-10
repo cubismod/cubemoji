@@ -1,9 +1,10 @@
 import { AutocompleteInteraction } from 'discord.js'
 import { choice, geometricReservoirSample } from 'pandemonium'
-import { grabEmoteCache } from './DiscordLogic'
 import { Cmoji, Source } from './Cubemoji'
 import imgEffects from '../res/imgEffects.json'
 import Fuse from 'fuse.js'
+import { container } from 'tsyringe'
+import { EmoteCache } from './EmoteCache'
 // useful autocomplete commands for discord functions
 
 /**
@@ -12,7 +13,7 @@ import Fuse from 'fuse.js'
  * whatever they are typing
  */
 export function emoteAutocomplete (interaction: AutocompleteInteraction) {
-  const emoteCache = grabEmoteCache()
+  const emoteCache = container.resolve(EmoteCache)
   if (emoteCache) {
     const query = interaction.options.getFocused(true).value
     if (typeof query === 'string') {

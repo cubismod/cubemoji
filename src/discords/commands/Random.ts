@@ -1,8 +1,9 @@
 import { CommandInteraction } from 'discord.js'
 import { Discord, Slash, SlashOption } from 'discordx'
 import { choice, geometricReservoirSample } from 'pandemonium'
-import { grabEmoteCache } from '../../util/DiscordLogic'
+import { container } from 'tsyringe'
 import { Cmoji } from '../../util/Cubemoji'
+import { EmoteCache } from '../../util/EmoteCache'
 
 @Discord()
 export abstract class Random {
@@ -10,13 +11,13 @@ export abstract class Random {
     description: 'insert a random emote'
   })
   async random (
-    @SlashOption('copies', { description: 'how many emotes would you like in the chat, max 25' })
+    @SlashOption('copies', { description: 'how many emotes would you like in the chat, max 25', required: false })
       copies: number,
-    @SlashOption('flushed', { description: 'whether you want only flushed emotes' })
+    @SlashOption('flushed', { description: 'whether you want only flushed emotes', required: false })
       flushed: boolean,
       interaction: CommandInteraction
   ) {
-    const emoteCache = grabEmoteCache()
+    const emoteCache = container.resolve(EmoteCache)
     if (emoteCache !== undefined) {
       await interaction.deferReply()
       // depending on the user option, we will either grab all discord emojis to sample from or

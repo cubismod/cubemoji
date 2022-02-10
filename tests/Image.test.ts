@@ -1,9 +1,5 @@
 // test various image effects
-import gm from 'gm'
-import { fromFile } from 'file-type'
-import { compressImage, generateEditOptions, performAddFace, performRescale } from './../src/util/ImgEffects'
-import faces from './../src/res/faces.json'
-import { performEdit } from '../src/util/PerformEdit'
+import { RescaleOperation } from '../src/util/ImageLogic'
 import { choice } from 'pandemonium'
 
 // return a random image
@@ -31,54 +27,8 @@ function randomImage () {
   )
 }
 
-// initializes a file
-async function initFile (path: string) {
-  const file = gm(path)
-  const type = await fromFile(path)
-  return {
-    file: file,
-    type: type
-  }
-}
-
-test('Compress gif with GraphicsMagick', async () => {
-  const dat = await initFile('assets/cubeRoll.gif')
-  expect(dat.type).toBeDefined()
-  if (dat.type) expect(() => compressImage(dat.file, dat.type!)).not.toThrow()
+test('Raw rescale', async () => {
+  const rescale = new RescaleOperation(randomImage())
+  const retPath = await rescale.run()
+  expect(retPath).toEqual(expect.not.stringContaining(''))
 })
-
-test('Compress jpg with GraphicsMagick', async () => {
-  const dat = await initFile('assets/mimi.jpg')
-  expect(dat.type).toBeDefined()
-  if (dat.type) expect(() => compressImage(dat.file, dat.type!)).not.toThrow()
-})
-
-test('Compress png with GraphicsMagick', async () => {
-  const dat = await initFile('assets/icon.png')
-  expect(dat.type).toBeDefined()
-  if (dat.type) expect(() => compressImage(dat.file, dat.type!)).not.toThrow()
-})
-
-for (let i = 0; i < 3; ++i) {
-  test(`Rescale ${i + 1} out of 3`, async () => {
-    // rescales a random image from wikipedia
-    const path = await performRescale(randomImage())
-    expect(path).toBeDefined()
-  })
-}
-
-test('Perform add face on an image', async () => {
-  faces.forEach(async face => {
-    const path = await performAddFace(randomImage(), face)
-    expect(path).toBeDefined()
-  })
-})
-
-for (let i = 0; i < 3; ++i) {
-  test(`Random edit ${i + 1} out of 3`, async () => {
-  // try generating a few effects lists and then running
-  // edits
-    const path = await performEdit(randomImage(), generateEditOptions())
-    expect(path).toBeDefined()
-  })
-}

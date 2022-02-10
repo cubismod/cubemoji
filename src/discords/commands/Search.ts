@@ -1,7 +1,8 @@
 import { CommandInteraction, MessageEmbed } from 'discord.js'
 import { Discord, Slash, SlashOption } from 'discordx'
-import { grabEmoteCache } from '../../util/DiscordLogic'
+import { container } from 'tsyringe'
 import strings from '../../res/strings.json'
+import { EmoteCache } from '../../util/EmoteCache'
 
 @Discord()
 export abstract class Search {
@@ -9,13 +10,13 @@ export abstract class Search {
     description: 'Search the database for emotes'
   })
   async search (
-    @SlashOption('query', { description: 'you can search based on name or Discord ID (snowflake)', required: true })
+    @SlashOption('query', { description: 'you can search based on name or Discord ID (snowflake)' })
       query: string,
       interaction: CommandInteraction
   ) {
     await interaction.deferReply({ ephemeral: true }) // ephemeral to avoid spam
 
-    const emoteCache = grabEmoteCache()
+    const emoteCache = container.resolve(EmoteCache)
     if (emoteCache !== undefined) {
       const results = emoteCache.search(query)
       if (results.length > 0) {

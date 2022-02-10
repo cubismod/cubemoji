@@ -5,9 +5,9 @@ import { Client } from 'discordx'
 import { singleton } from 'tsyringe'
 import { Cmoji, Source } from './Cubemoji'
 import mutantNames from '../res/emojiNames.json'
-import got from 'got/dist/source'
 import Fuse from 'fuse.js'
 import { GuildEmoji } from 'discord.js'
+import got from 'got/dist/source'
 
 @singleton()
 // a class which can return an array version of emotes

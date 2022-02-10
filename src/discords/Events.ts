@@ -5,9 +5,9 @@ import { ArgsOf, Discord, On } from 'discordx'
 import { choice } from 'pandemonium'
 import { container } from 'tsyringe'
 import { adjectives, animals, colors, names, uniqueNamesGenerator } from 'unique-names-generator'
-import { getMessageImage, grabEmoteCache, isUrl } from '../util/DiscordLogic'
+import { EditDiscord, getMessageImage, isUrl, RescaleDiscord } from '../util/DiscordLogic'
+import { EmoteCache } from '../util/EmoteCache'
 import { CubeMessageManager } from '../util/MessageManager'
-import { editDiscord, rescaleDiscord } from '../util/ImageLogic'
 
 // event handling doesn't go through the usual executeInteraction flow in
 // Main.ts
@@ -42,7 +42,8 @@ export abstract class EventListeners {
           // perform an edit
           const source = getMessageImage(await reaction.message.fetch())
           if (reaction instanceof MessageReaction) {
-            await editDiscord(reaction, '', source, user)
+            const edDiscord = new EditDiscord(reaction, '', source, user)
+            await edDiscord.run()
           }
           break
         }
@@ -50,7 +51,8 @@ export abstract class EventListeners {
           // perform a rescale
           const source = getMessageImage(await reaction.message.fetch())
           if (reaction instanceof MessageReaction) {
-            await rescaleDiscord(reaction, source, user)
+            const rsDiscord = new RescaleDiscord(reaction, source, user)
+            await rsDiscord.run()
           }
           break
         }
@@ -119,7 +121,7 @@ export abstract class EventListeners {
   @On('emojiCreate')
   async emojiCreate (emojis: GuildEmoji[]) {
     if (emojis.length > 0) {
-      const emoteCache = grabEmoteCache()
+      const emoteCache = container.resolve(EmoteCache)
       if (emoteCache) emoteCache.addEmote(emojis[0])
     }
   }
@@ -127,7 +129,7 @@ export abstract class EventListeners {
   @On('emojiDelete')
   async emojiDelete (emojis: GuildEmoji[]) {
     if (emojis.length > 0) {
-      const emoteCache = grabEmoteCache()
+      const emoteCache = container.resolve(EmoteCache)
       if (emoteCache) emoteCache.removeEmote(emojis[0])
     }
   }
@@ -136,7 +138,7 @@ export abstract class EventListeners {
   async emojiUpdate (emojis: GuildEmoji[]) {
     if (emojis.length > 1) {
       // the event returns an array with the old emoji at pos 0, new emoji at pos 1
-      const emoteCache = grabEmoteCache()
+      const emoteCache = container.resolve(EmoteCache)
       if (emoteCache) emoteCache.editEmote(emojis[0], emojis[1])
     }
   }

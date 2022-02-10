@@ -1,9 +1,10 @@
 import { AutocompleteInteraction, CommandInteraction } from 'discord.js'
 import { Discord, Slash, SlashOption } from 'discordx'
-import { grabEmoteCache } from '../../util/DiscordLogic'
+import { container } from 'tsyringe'
+import strings from '../../res/strings.json'
 import { emoteAutocomplete } from '../../util/Autocomplete'
 import { Source } from '../../util/Cubemoji'
-import strings from '../../res/strings.json'
+import { EmoteCache } from '../../util/EmoteCache'
 
 @Discord()
 export abstract class Emote {
@@ -14,14 +15,13 @@ export abstract class Emote {
     @SlashOption('emote', {
       description: strings.emoteSlash,
       autocomplete: (interaction: AutocompleteInteraction) => emoteAutocomplete(interaction),
-      required: true,
       type: 'STRING'
     })
       emote: string,
       interaction: CommandInteraction
   ) {
     await interaction.deferReply()
-    const emoteCache = grabEmoteCache()
+    const emoteCache = container.resolve(EmoteCache)
     if (emoteCache !== undefined) {
       const retrievedEmoji = await emoteCache.retrieve(emote)
       if (retrievedEmoji !== undefined) {

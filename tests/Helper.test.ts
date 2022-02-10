@@ -1,4 +1,4 @@
-import { isUrl } from '../src/util/CommandHelper'
+/* import { isUrl } from '../src/util/CommandHelper'
 import { CubeStorage } from '../src/util/Storage'
 
 // command helper testing
@@ -26,3 +26,4 @@ test('init hosts', async () => {
   const storage = new CubeStorage()
   expect(async () => await storage.initHosts()).not.toThrow()
 })
+ */

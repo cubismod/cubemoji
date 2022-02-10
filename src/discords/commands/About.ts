@@ -1,9 +1,10 @@
-import { CommandInteraction, MessageEmbed } from 'discord.js'
-import { Discord, Slash } from 'discordx'
-import pkg from '../../../package.json'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
-import { grabEmoteCache } from '../../util/DiscordLogic'
+import { CommandInteraction, MessageEmbed } from 'discord.js'
+import { Discord, Slash } from 'discordx'
+import { container } from 'tsyringe'
+import secrets from './../../secrets.json'
+import { EmoteCache } from '../../util/EmoteCache'
 
 dayjs.extend(relativeTime)
 
@@ -13,13 +14,13 @@ export abstract class About {
     description: 'Provides information and stats about the bot.'
   })
   async about (interaction: CommandInteraction) {
-    const emoteCache = grabEmoteCache()
+    const emoteCache = container.resolve(EmoteCache)
     if (emoteCache !== undefined) {
       const embed = new MessageEmbed()
       embed.setTitle('Cubemoji')
       embed.setThumbnail('https://gitlab.com/cubismod/cubemoji/-/raw/master/assets/icon.png')
       embed.setColor(0x91d7f2)
-      embed.setAuthor('Created by cubis', 'https://cdn.discordapp.com/avatars/170358606590377984/5770bf2a10f9a5c3941d4e07b34c218d.png')
+      embed.author = { name: 'Created by cubis' }
       embed.setDescription('a simple emoji bot built to last ⌛')
 
       embed.addFields([
@@ -29,11 +30,11 @@ export abstract class About {
         },
         {
           name: 'Version',
-          value: `${pkg.version}`
+          value: `${secrets.version}`
         },
         {
           name: 'License',
-          value: `${pkg.license}`
+          value: 'MIT'
         },
         {
           name: 'Stats',

@@ -1,8 +1,9 @@
 import { AutocompleteInteraction, CommandInteraction, GuildMember } from 'discord.js'
 import { Discord, Slash, SlashOption } from 'discordx'
-import { grabEmoteCache } from '../../util/DiscordLogic'
-import { emoteAutocomplete } from '../../util/Autocomplete'
+import { container } from 'tsyringe'
 import strings from '../../res/strings.json'
+import { emoteAutocomplete } from '../../util/Autocomplete'
+import { EmoteCache } from '../../util/EmoteCache'
 
 @Discord()
 export abstract class Big {
@@ -13,14 +14,15 @@ export abstract class Big {
     @SlashOption('emote', {
       description: strings.emoteSlash,
       autocomplete: (interaction: AutocompleteInteraction) => emoteAutocomplete(interaction),
-      type: 'STRING'
+      type: 'STRING',
+      required: false
     })
       emote: string,
-    @SlashOption('member', { description: strings.memberSlash })
+    @SlashOption('member', { description: strings.memberSlash, required: false })
       member: GuildMember,
-      interaction: CommandInteraction
+      interaction: CommandInteraction,
   ) {
-    const emoteCache = grabEmoteCache()
+    const emoteCache = container.resolve(EmoteCache)
     if (emoteCache !== undefined) {
       if (emote !== undefined) {
         // emote parsing code

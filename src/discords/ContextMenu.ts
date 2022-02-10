@@ -1,7 +1,6 @@
 import { ContextMenuInteraction } from 'discord.js'
 import { ContextMenu, Discord } from 'discordx'
-import { getMessageImage } from '../util/DiscordLogic'
-import { editDiscord, performAddFace, rescaleDiscord } from '../util/ImageLogic'
+import { EditDiscord, FaceDiscord, getMessageImage, RescaleDiscord } from '../util/DiscordLogic'
 
 @Discord()
 export abstract class CubeMessageContext {
@@ -11,7 +10,8 @@ export abstract class CubeMessageContext {
       // fetch the message from the API
       await interaction.deferReply()
       const source = getMessageImage(await interaction.channel.messages.fetch(interaction.targetId))
-      await editDiscord(interaction, '', source, interaction.user)
+      const edDiscord = new EditDiscord(interaction, '', source, interaction.user)
+      await edDiscord.run()
     }
   }
 
@@ -20,7 +20,8 @@ export abstract class CubeMessageContext {
     if (interaction.channel) {
       await interaction.deferReply()
       const source = getMessageImage(await interaction.channel.messages.fetch(interaction.targetId))
-      await rescaleDiscord(interaction, source, interaction.user)
+      const rsDiscord = new RescaleDiscord(interaction, source, interaction.user)
+      await rsDiscord.run()
     }
   }
 
@@ -44,7 +45,8 @@ export abstract class CubeMessageContext {
     if (interaction.channel) {
       await interaction.deferReply()
       const source = getMessageImage(await interaction.channel.messages.fetch(interaction.targetId))
-      await performAddFace(source, faceName)
+      const faceDiscord = new FaceDiscord(interaction, faceName, source, interaction.user)
+      await faceDiscord.run()
     }
   }
 }

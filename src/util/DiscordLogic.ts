@@ -9,7 +9,7 @@ import got from 'got/dist/source'
 import { choice } from 'pandemonium'
 import { container } from 'tsyringe'
 import { URL } from 'url'
-import secrets from '../../secrets.json'
+import secrets from '../secrets.json'
 import { Cmoji, Source } from './Cubemoji'
 import { EmoteCache } from './EmoteCache'
 import { MsgContext, EditOperation, RescaleOperation, splitEffects, FaceOperation } from './ImageLogic'
@@ -109,7 +109,7 @@ export class EditDiscord extends RescaleDiscord {
   }
 }
 
-export class AddFace extends RescaleDiscord {
+export class FaceDiscord extends RescaleDiscord {
   face: string
 
   constructor (context: MsgContext, face: string, source: string, user: User | PartialUser) {
