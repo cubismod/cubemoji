@@ -52,6 +52,10 @@ export class RescaleDiscord {
     if (this.source === null) return
     const url = await getUrl(this.source)
     if (url) {
+      // overwrite the source variable from whatever the user inputted
+      // to the actual URL we acquired
+      this.source = url
+
       startTyping(this.context)
       const filename = await this.performOp()
       if (filename === undefined) {
@@ -171,7 +175,6 @@ export async function isUrl (url: string) {
     if (type !== undefined && validTypes.includes(type.ext)) return true
     else return false
   } catch (e) {
-    console.error(e)
     return false
   }
 }

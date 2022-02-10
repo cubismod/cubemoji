@@ -338,7 +338,7 @@ export async function downloadImage (url: string) {
   // check cache
   const queue = container.resolve(ImageQueue)
   const res = await queue.search(url)
-  if (res) return res.url
+  if (res) return res.localPath
   // otherwise we download
   // add timeouts and limit retries with got
   // check first whether the file isn't too big

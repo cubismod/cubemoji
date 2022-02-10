@@ -39,7 +39,7 @@ export class WorkerPool {
     const worker = this.waitingWorkers.get(path)
     if (worker && (this.runningWorkers.size <= this.limit)) {
       this.waitingWorkers.delete(path)
-      console.log(`Job "${path}" now running. \n ${worker}`)
+      console.log(`Job "${path}" now running.`)
       worker.write(path, (err) => {
         if (err) console.error(err)
       })

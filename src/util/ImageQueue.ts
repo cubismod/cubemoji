@@ -1,6 +1,7 @@
 import { unlink } from 'fs'
 import { singleton } from 'tsyringe'
 import Fuse from 'fuse.js'
+import { readdir } from 'fs/promises'
 
 export interface Image {
   // url as saved in discord cdn
@@ -59,11 +60,12 @@ export class ImageQueue {
   async search (url: string) {
     const options = {
       keys: ['url'],
-      minMatchCharLength: 3
+      minMatchCharLength: 3,
+      threshold: 0.0
     }
     const search = new Fuse(this.images, options)
     const res = search.search(url)
-    if (res.length > 0) {
+    if (res.length > 0 && res[0].item.url === url) {
       // promote this item to the front of the queue
       // so it stays around for longer and doesnt get deleted
       const i = res[0].refIndex
@@ -72,5 +74,18 @@ export class ImageQueue {
       // return the first item
       return res[0].item
     } else { return undefined }
+  }
+
+  // clear downloads folder
+  async clear () {
+    await readdir('download/').then(
+      async (dir) => {
+        dir.map(file => unlink(`download/${file}`, (err) => {
+          if (err) {
+            console.error(err)
+          }
+        }))
+      }
+    )
   }
 }

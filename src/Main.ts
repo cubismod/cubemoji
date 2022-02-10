@@ -63,6 +63,10 @@ export class Main {
         DIService.container.register(ImageQueue, { useValue: new ImageQueue() })
         console.log('registered ImageQueue')
 
+        const imageQueue = container.resolve(ImageQueue)
+        await imageQueue.clear()
+        console.log('cleared download directory')
+
         DIService.container.register(CubeMessageManager, { useValue: new CubeMessageManager() })
         console.log('registered CubeMessageManager')
 
