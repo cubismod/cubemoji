@@ -16,7 +16,7 @@ export class ImageQueue {
   /**
   * Used to keep track of images saved on disk
   * basically we just add another image to the queue
-  * and when we hit 30 images, we delete the last one so that we aren't
+  * and when we hit 40 images, we delete the last one so that we aren't
   * filling the disk.
   * Also used as a caching layer so that we're not consistently downloading
   * the same files over and over again.

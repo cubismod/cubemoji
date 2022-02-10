@@ -49,7 +49,7 @@ abstract class ImageOperation {
    * to disk and saves path to this.localUrl
    * @returns boolean status
    */
-  async download () {
+  protected async download () {
     const localUrl = await downloadImage(this.externalUrl).catch(
       err => {
         console.error(err)
@@ -66,7 +66,7 @@ abstract class ImageOperation {
    * @returns object consisting of path of resulting file and filetype
    * or '' if input file is invalid
    */
-  async determine () {
+  protected async determine () {
     const ft = await fileTypeFromFile(this.localPath)
     if (ft === undefined) return ''
     return {
@@ -81,7 +81,7 @@ abstract class ImageOperation {
    * just returns the same state object
    * compress at 0.5MB
    */
-  async compress (ft: FileTypeResult, state: State) {
+  protected async compress (ft: FileTypeResult, state: State) {
     const fileInfo = await stat(this.localPath)
     if (fileInfo.size > 500000) {
       switch (ft.ext) {
@@ -118,7 +118,7 @@ abstract class ImageOperation {
       if (output !== '') {
         const state = await this.apply(output)
         // now send the operation to worker
-        workerPool.enqueue(output.outPath, state)
+        workerPool.add(output.outPath, state)
         // save local image to queue in case we want to reuse it later
         // in another operation
         await imageQueue.enqueue({
@@ -132,7 +132,7 @@ abstract class ImageOperation {
   }
 }
 
-class RescaleOperation extends ImageOperation {
+export class RescaleOperation extends ImageOperation {
   async apply (output: outputtedFile) {
     // now we need build our rescale parameters for graphicsmagick
     let newSize = ''
@@ -156,7 +156,7 @@ class RescaleOperation extends ImageOperation {
   }
 }
 
-class EditOperation extends ImageOperation {
+export class EditOperation extends ImageOperation {
   effects: string[]
 
   constructor (externalUrl: string, effects: string[]) {
@@ -275,7 +275,7 @@ class EditOperation extends ImageOperation {
   }
 }
 
-class FaceOperation extends ImageOperation {
+export class FaceOperation extends ImageOperation {
   face: string
 
   constructor (externalUrl: string, face: string) {

@@ -10,23 +10,10 @@ import { singleton } from 'tsyringe'
 import { promisify } from 'util'
 import { gotOptions } from './Cubemoji'
 
-export interface ImageJob {
-  // rescale or edit
-  type: string,
-  // a url
-  source: string,
-  // who invoked the job originally
-  // by reacting or triggering the
-  // job in another manner
-  owner: string,
-  effects?: string,
-}
-
 // database storage using https://github.com/zaaack/keyv-file
 @singleton()
 export class CubeStorage {
   trashReacts: Keyv<string>
-  imageJobs: Keyv<ImageJob>
   badHosts: Keyv<number>
   private location = 'data/'
 
@@ -48,20 +35,6 @@ export class CubeStorage {
       ttl: 6.048e+8
     })
 
-    /*
-    Stores information about how to recreate a job.
-    We persist
-    - key: message snowflake ID
-    - value: see ImageJob interface
-    */
-    this.imageJobs = new Keyv<ImageJob>({
-      store: new KeyvFile({
-        filename: resolve(this.location, 'imageJobs.json'),
-        writeDelay: 100
-      }),
-      // 8 hours in ms
-      ttl: 2.88e+7
-    })
     /**
      * Downloads a blocklist of bad hosts
      * to avoid when performing downloads

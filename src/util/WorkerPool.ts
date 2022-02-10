@@ -21,10 +21,10 @@ export class WorkerPool {
 
   /**
    * add another task to the queue and run if a worker is available
-   * @param path output path of image
+   * @param path output path of image - should be passing a unique GUID in here
    * @param state graphics magick object containing state of edits to perofm
    */
-  enqueue (path: string, state: State) {
+  add (path: string, state: State) {
     this.waitingWorkers.set(path, state)
     this.run(path)
     // or else we wait til next worker finished
@@ -39,6 +39,7 @@ export class WorkerPool {
     const worker = this.waitingWorkers.get(path)
     if (worker && (this.runningWorkers.size <= this.limit)) {
       this.waitingWorkers.delete(path)
+      console.log(`Job "${path}" now running. \n ${worker}`)
       worker.write(path, (err) => {
         if (err) console.error(err)
       })
@@ -60,6 +61,7 @@ export class WorkerPool {
    * @param path output path of image
    */
   done (path: string) {
+    console.log(`Job "${path}" has completed`)
     const worker = this.runningWorkers.get(path)
     if (worker) {
       this.runningWorkers.delete(path)

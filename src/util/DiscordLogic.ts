@@ -12,9 +12,117 @@ import { URL } from 'url'
 import secrets from '../../secrets.json'
 import { Cmoji, Source } from './Cubemoji'
 import { EmoteCache } from './EmoteCache'
-import { edit, MsgContext, rescale, splitEffects } from './ImageLogic'
+import { MsgContext, EditOperation, RescaleOperation, splitEffects, FaceOperation } from './ImageLogic'
+import { ImageQueue } from './ImageQueue'
 import { CubeMessageManager } from './MessageManager'
 import { CubeStorage } from './Storage'
+import { WorkerPool } from './WorkerPool'
+
+/**
+ * Discord logic for performing an image operation
+ * Steps:
+ * 1. Check if source image/url/emote is valid
+ * 2. Indicate to user that we are working with a typing indicator if necessary
+ * 3. Queue operation to perform
+ * 4. Set a file handler watcher to watch when file is created
+ * 5. Send resulting message
+ *
+ * Rescale is the parent class and edit just extends that class to add parameters
+ * for the effects.
+ */
+export class RescaleDiscord {
+  context: MsgContext
+  source: string
+  user: User | PartialUser
+
+  constructor (context: MsgContext, source: string, user: User | PartialUser) {
+    this.context = context
+    this.source = source
+    this.user = user
+  }
+
+  // perform rescale
+  protected async performOp () {
+    const rescaleOperation = new RescaleOperation(this.source)
+    const outputPath = await rescaleOperation.run()
+    return outputPath
+  }
+
+  async run () {
+    if (this.source === null) return
+    const url = await getUrl(this.source)
+    if (url) {
+      startTyping(this.context)
+      const filename = await this.performOp()
+      if (filename === undefined) {
+        // error in performing the command, react with emote
+        reactErr(this.context)
+      } else {
+        // setup file watcher for resulting output
+        const watcher = watch(filename, { awaitWriteFinish: true })
+        watcher.on('add', async () => {
+          const cubeMessageManager = container.resolve(CubeMessageManager)
+          const imageQueue = container.resolve(ImageQueue)
+          const workerPool = container.resolve(WorkerPool)
+
+          // now we send out the rescaled message
+          const msg = await reply(this.context, new MessageAttachment(filename))
+          await watcher.close()
+          // add trash can reaction
+          if (!msg) {
+            console.error('could not get a message during image operation, not proceeding with adding trash react')
+          } else {
+            if (msg instanceof Message) {
+              await cubeMessageManager.registerTrashReact(this.context, msg, this.user.id)
+              // job is finished so send status to trigger next jobs
+              workerPool.done(filename)
+
+              // queue up attachment for later
+              const attach = msg.attachments.at(0)
+
+              if (attach !== undefined) {
+                imageQueue.enqueue({
+                  localPath: filename,
+                  url: attach.url
+                })
+              }
+            }
+          }
+        })
+      }
+    }
+  }
+}
+
+export class EditDiscord extends RescaleDiscord {
+  effects: string[]
+
+  constructor (context: MsgContext, effects: string, source: string, user: User | PartialUser) {
+    super(context, source, user)
+    this.effects = splitEffects(effects)
+  }
+
+  protected async performOp () {
+    const editOperation = new EditOperation(this.source, this.effects)
+    const outputPath = await editOperation.run()
+    return outputPath
+  }
+}
+
+export class AddFace extends RescaleDiscord {
+  face: string
+
+  constructor (context: MsgContext, face: string, source: string, user: User | PartialUser) {
+    super(context, source, user)
+    this.face = face
+  }
+
+  protected async performOp () {
+    const faceOp = new FaceOperation(this.source, this.face)
+    const outputPath = await faceOp.run()
+    return outputPath
+  }
+}
 
 // display a random status message for the bot
 export function setStatus (client: Client) {
@@ -40,7 +148,7 @@ export function setStatus (client: Client) {
 * that cubemoji supports, is not on a hostname blocklist,
 * and is using https
 * @param url
-* @returns
+* @returns boolean indicating valid
 */
 export async function isUrl (url: string) {
   try {
@@ -81,23 +189,6 @@ export async function getUrl (source: string) {
     else return res.url
   } else return ''
 }
-
-// /**
-//   * grab an emote cache TSyringe container or return
-//   * undefined if there is no container
-//   */
-// export function grabEmoteCache () {
-//   if (DIService.container) return container.resolve(EmoteCache)
-//   else return undefined
-// }
-
-// /**
-//   * grabs gcp storage from tsyringe container
-//   */
-// export function grabStorage () {
-//   if (DIService.container) return container.resolve(CubeGCP)
-//   else return undefined
-// }
 
 /**
   * gets either a message attachment or content of a message
@@ -210,95 +301,6 @@ function newPage (embed: MessageEmbed, type: Source) {
   }
   embed.setColor('RANDOM')
   return embed
-}
-
-// discord logic for doing a rescale
-export async function discRescale (context: MsgContext, source: string, user: User | PartialUser) {
-  if (source === null) return
-  const url = await getUrl(source)
-  if (url) {
-    startTyping(context)
-    // do the rescale
-    const filename = await rescale(url)
-    if (filename === undefined) {
-      // error in performing the command, react with emote
-      reactErr(context)
-      return
-    }
-    const cubeMessageManager = container.resolve(CubeMessageManager)
-    const storage = container.resolve(CubeStorage)
-    if (filename) {
-      const watcher = watch(filename, { awaitWriteFinish: true })
-      watcher.on('add', async () => {
-        // now we send out the rescaled message
-        const msg = await reply(context, new MessageAttachment(filename))
-        await watcher.close()
-        // add trash can reaction
-        if (!msg) {
-          console.error('could not get a message during rescale, not proceeding with adding trash react')
-        } else {
-          if (msg instanceof Message) {
-            await cubeMessageManager.registerTrashReact(context, msg, user.id)
-            await storage.imageJobs.set(msg.id, {
-              owner: user.id,
-              type: 'rescale',
-              source: source
-            })
-          }
-        }
-      })
-    }
-  } else {
-    // image error of some sort
-    console.error(`Rescale failed for ${user.id} (user id) on ${source} (source)`)
-    await reactErr(context)
-  }
-}
-
-// the actual discord logic for doing an edit
-// source is an emote or other parsable
-export async function discEdit (context: MsgContext, effects: string, source: string | null, user: User | PartialUser) {
-  if (source === null) return
-  const parsedEffects = splitEffects(effects)
-  // done parsing the effects, now let's try and parse what we're trying to edit
-  const url = await getUrl(source)
-  if (url) {
-    startTyping(context)
-    // now perform the edit
-    const filename = await edit(url, parsedEffects)
-    if (filename === undefined) {
-      // error in performing the command, react with emote
-      reactErr(context)
-      return
-    }
-    const cubeMessageManager = container.resolve(CubeMessageManager)
-    const storage = container.resolve(CubeStorage)
-    if (filename) {
-      const watcher = watch(filename, { awaitWriteFinish: true })
-      watcher.on('add', async () => {
-        // file has finished processing from gm
-        const msg = await reply(context, new MessageAttachment(filename))
-        await watcher.close()
-        // now add a trash can reaction
-        if (!msg) {
-          console.error('could not get a message during edit, not proceeding with adding trash react')
-        } else {
-          if (msg instanceof Message) {
-            await cubeMessageManager.registerTrashReact(context, msg, user.id)
-            await storage.imageJobs.set(msg.id, {
-              owner: user.id,
-              type: 'edit',
-              effects: effects,
-              source: source
-            })
-          }
-        }
-      })
-    }
-  } else {
-    console.error(`Edit failed for ${user.id} (user id) on ${source} (source url)`)
-    await reactErr(context)
-  }
 }
 
 // do a different reply depending on the context we have
