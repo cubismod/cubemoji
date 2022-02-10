@@ -1,8 +1,9 @@
 {
   "compilerOptions": {
-    "module": "CommonJS",
-    "target": "ES2021",
+    "module": "ESNext",
+    "target": "ESNext",
     "outDir": "./build",
+    "rootDir": "./src",
     "sourceMap": true,
 
     "strict": true,
@@ -27,7 +28,7 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "importHelpers": true,
-    "moduleResolution": "node"
+    "moduleResolution": "Node"
   },
   "ts-node": {
     "transpileOnly": true

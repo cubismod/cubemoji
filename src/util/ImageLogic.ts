@@ -7,7 +7,6 @@ import { fileTypeFromFile, FileTypeResult } from 'file-type'
 import { createReadStream, createWriteStream } from 'fs'
 import { stat } from 'fs/promises'
 import gm, { State } from 'gm'
-import got from 'got/dist/source'
 import { choice, random, randomFloat, randomIndex } from 'pandemonium'
 import path from 'path'
 import probe from 'probe-image-size'
@@ -17,6 +16,7 @@ import imgEffects from '../res/imgEffects.json'
 import { gotOptions } from './Cubemoji'
 import { ImageQueue } from './ImageQueue'
 import { WorkerPool } from './WorkerPool'
+const { got } = await import('got')
 
 export type MsgContext = ContextMenuInteraction | CommandInteraction | MessageReaction
 

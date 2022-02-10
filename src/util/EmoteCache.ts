@@ -7,7 +7,7 @@ import { Cmoji, Source } from './Cubemoji'
 import mutantNames from '../res/emojiNames.json'
 import Fuse from 'fuse.js'
 import { GuildEmoji } from 'discord.js'
-import got from 'got/dist/source'
+const { got } = await import('got')
 
 @singleton()
 // a class which can return an array version of emotes

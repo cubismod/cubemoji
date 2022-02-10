@@ -5,7 +5,6 @@ import { watch } from 'chokidar'
 import { CommandInteraction, ContextMenuInteraction, Message, MessageAttachment, MessageEmbed, MessageReaction, PartialUser, User } from 'discord.js'
 import { Client } from 'discordx'
 import { fileTypeFromStream } from 'file-type'
-import got from 'got/dist/source'
 import { choice } from 'pandemonium'
 import { container } from 'tsyringe'
 import { URL } from 'url'
@@ -17,6 +16,7 @@ import { ImageQueue } from './ImageQueue'
 import { CubeMessageManager } from './MessageManager'
 import { CubeStorage } from './Storage'
 import { WorkerPool } from './WorkerPool'
+const { got } = await import('got')
 
 /**
  * Discord logic for performing an image operation

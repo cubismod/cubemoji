@@ -9,7 +9,7 @@ import { CubeGCP } from './util/Cubemoji'
 import { ImageQueue } from './util/ImageQueue'
 import { CubeMessageManager } from './util/MessageManager'
 import { setStatus } from './util/DiscordLogic'
-import { importx } from '@discordx/importer'
+import { importx, dirname } from '@discordx/importer'
 import { CubeStorage } from './util/Storage'
 import { WorkerPool } from './util/WorkerPool'
 export class Main {
@@ -20,6 +20,7 @@ export class Main {
   }
 
   static async start () {
+    await importx(dirname(import.meta.url) + '/**/*.{ts,js}')
     console.log('🅲🆄🅱🅴🅼🅾🅹🅸')
     DIService.container = container
     if (secrets.environment === 'prd') {
@@ -53,7 +54,6 @@ export class Main {
         silent: false
       })
     }
-    await importx(__dirname + '/**/*.{ts,js}')
     console.log()
     await this._client.login(secrets.token)
 

@@ -1,14 +1,14 @@
 import dayjs from 'dayjs'
 import { createReadStream, createWriteStream } from 'fs'
-import got from 'got/dist/source'
 import Keyv from 'keyv'
-import KeyvFile from 'keyv-file'
+import { KeyvFile } from 'keyv-file'
 import { resolve } from 'path'
 import { createInterface } from 'readline'
 import { pipeline } from 'stream'
 import { singleton } from 'tsyringe'
 import { promisify } from 'util'
 import { gotOptions } from './Cubemoji'
+const { got } = await import('got')
 
 // database storage using https://github.com/zaaack/keyv-file
 @singleton()

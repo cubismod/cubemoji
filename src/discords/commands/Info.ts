@@ -20,7 +20,7 @@ export abstract class Info {
       required: false
     })
       emote: string,
-    @SlashOption('member', { description: strings.memberSlash })
+    @SlashOption('member', { description: strings.memberSlash, required: false })
       member: GuildMember,
       interaction: CommandInteraction
   ) {

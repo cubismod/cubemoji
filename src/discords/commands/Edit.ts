@@ -16,7 +16,7 @@ export abstract class Edit {
       required: false
     })
       emote: string,
-    @SlashOption('user', { description: 'a user' })
+    @SlashOption('user', { description: 'a user', required: false })
       user: GuildMember,
     @SlashOption('effects', {
       description: 'list of effects (space separated, max 20). If not specified then random effects will be applied',

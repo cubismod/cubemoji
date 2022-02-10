@@ -14,7 +14,7 @@
             "postDebugTask": "Delete downloaded files",
             "runtimeVersion": "17.4",
             "outputCapture": "std",
-            "args": ["--experimental-specifier-resolution=node"],
+            "args": ["--es-module-specifier-resolution=node"],
             "outFiles": [
                 "${workspaceFolder}/**/*.js",
                 "!**/node_modules/**"

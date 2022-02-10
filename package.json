@@ -4,7 +4,7 @@
   "description": "A Discord emoji bot",
   "main": "Main.ts",
   "license": "MIT",
-  "type": "commonjs",
+  "type": "module",
   "scripts": {
     "build": "tsc",
     "start": "node build/src/Main.js",
