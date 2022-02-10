@@ -47,8 +47,11 @@ export class CubeStorage {
   }
 
   async initHosts () {
+    await this.badHosts.set('test', 3)
     const refreshTime = await this.badHosts.get('refresh')
-    if (refreshTime && Date.now() > refreshTime) {
+    if (refreshTime === undefined || (refreshTime && Date.now() > refreshTime)) {
+      // set next refresh time
+      await this.badHosts.set('refresh', dayjs().add(1, 'month').unix())
       // time to perform a refresh
       const fn = resolve('download/', 'hosts.txt')
       const pl = promisify(pipeline)
@@ -66,14 +69,20 @@ export class CubeStorage {
         crlfDelay: Infinity
       })
 
+      console.log('initializing bad hosts list which will take a while...')
+      let i = 0
+
       for await (const line of rlInterface) {
         const items = line.split(' ')
         if (items.length === 2 && items[0] === '0.0.0.0') {
           await this.badHosts.set(items[1], 1)
+          i++
+
+          if (i % 1000 === 0) {
+            console.log(`${i} records processed of ~141k`)
+          }
         }
       }
-      // set next refresh time
-      await this.badHosts.set('refresh', dayjs().add(1, 'week').unix())
     }
   }
 }
