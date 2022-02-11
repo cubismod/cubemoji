@@ -12,6 +12,7 @@ import { setStatus } from './util/DiscordLogic'
 import { importx, dirname } from '@discordx/importer'
 import { CubeStorage } from './util/Storage'
 import { WorkerPool } from './util/WorkerPool'
+import { TestServer } from './discords/Guards'
 export class Main {
   private static _client: Client
 
@@ -35,7 +36,8 @@ export class Main {
           Intents.FLAGS.GUILD_MEMBERS,
           Intents.FLAGS.GUILD_PRESENCES
         ],
-        partials: ['MESSAGE', 'CHANNEL', 'REACTION']
+        partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
+        guards: [TestServer]
       })
     } else {
       console.log('Running in NPR')
@@ -51,7 +53,8 @@ export class Main {
         ],
         partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
         // for testing purposes in cubemoji server
-        silent: false
+        silent: false,
+        guards: [TestServer]
       })
     }
     console.log()
@@ -73,7 +76,6 @@ export class Main {
         DIService.container.register(CubeStorage, { useValue: new CubeStorage() })
         console.log('registered CubeStorage')
         await container.resolve(CubeStorage).initHosts()
-        console.log('initialized hosts list')
 
         DIService.container.register(CubeGCP, { useValue: new CubeGCP() })
         console.log('registered CubeGCP')
@@ -103,21 +105,17 @@ export class Main {
     this._client.on('interactionCreate', async (interaction: Interaction) => {
       // we limit the test bot to only interacting in my own #bot-test channel
       // while prd can interact with any channel
-      if (!interaction.channel ||
-        (secrets.environment === 'prd' && interaction.channel.id !== secrets.testChannel) ||
-        (secrets.environment === 'npr' && interaction.channel.id === secrets.testChannel)) {
-        if (interaction.isButton() || interaction.isSelectMenu()) {
-          if (interaction.customId.startsWith('discordx@pagination@')) {
-            return
-          }
+      if (interaction.isButton() || interaction.isSelectMenu()) {
+        if (interaction.customId.startsWith('discordx@pagination@')) {
+          return
         }
-        try {
-          await this._client.executeInteraction(interaction)
-        } catch (err: unknown) {
-          console.error('INTERACTION FAILURE')
-          console.error(`Type: ${interaction.type}\nTimestamp: ${Date()}\nGuild: ${interaction.guild}\nUser: ${interaction.user.tag}\nChannel: ${interaction.channel}`)
-          console.error(err)
-        }
+      }
+      try {
+        await this._client.executeInteraction(interaction)
+      } catch (err: unknown) {
+        console.error('INTERACTION FAILURE')
+        console.error(`Type: ${interaction.type}\nTimestamp: ${Date()}\nGuild: ${interaction.guild}\nUser: ${interaction.user.tag}\nChannel: ${interaction.channel}`)
+        console.error(err)
       }
     })
   }

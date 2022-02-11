@@ -51,7 +51,7 @@ export class CubeStorage {
     const refreshTime = await this.badHosts.get('refresh')
     if (refreshTime === undefined || (refreshTime && Date.now() > refreshTime)) {
       // set next refresh time
-      await this.badHosts.set('refresh', dayjs().add(1, 'month').unix())
+      await this.badHosts.set('refresh', dayjs().add(1, 'week').valueOf())
       // time to perform a refresh
       const fn = resolve('download/', 'hosts.txt')
       const pl = promisify(pipeline)

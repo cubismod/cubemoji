@@ -1,10 +1,12 @@
-import { AutocompleteInteraction, CommandInteraction } from 'discord.js'
+import { AutocompleteInteraction, CommandInteraction, Message } from 'discord.js'
 import { Discord, Slash, SlashOption } from 'discordx'
 import { container } from 'tsyringe'
 import strings from '../../res/strings.json'
 import { emoteAutocomplete } from '../../util/Autocomplete'
 import { Source } from '../../util/Cubemoji'
+import { autoDeleteMsg, reply } from '../../util/DiscordLogic'
 import { EmoteCache } from '../../util/EmoteCache'
+import { CubeMessageManager } from '../../util/MessageManager'
 
 @Discord()
 export abstract class Emote {
@@ -21,6 +23,7 @@ export abstract class Emote {
       interaction: CommandInteraction
   ) {
     await interaction.deferReply()
+    let rep: Message|undefined
     const emoteCache = container.resolve(EmoteCache)
     if (emoteCache !== undefined) {
       const retrievedEmoji = await emoteCache.retrieve(emote)
@@ -36,10 +39,13 @@ export abstract class Emote {
           case Source.URL:
             msg = retrievedEmoji.url
         }
-        await interaction.editReply(msg)
+        rep = await reply(interaction, msg)
       } else {
-        await interaction.editReply({ content: strings.noEmoteFound })
+        rep = await reply(interaction, strings.noEmoteFound)
+        autoDeleteMsg(rep)
       }
+      const cubeMessageManager = container.resolve(CubeMessageManager)
+      if (rep) cubeMessageManager.registerTrashReact(interaction, rep, interaction.user.id)
     }
   }
 }

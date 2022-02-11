@@ -1,9 +1,10 @@
-import { AutocompleteInteraction, CommandInteraction, GuildMember } from 'discord.js'
+import { AutocompleteInteraction, CommandInteraction, GuildMember, Message } from 'discord.js'
 import { Discord, Slash, SlashOption } from 'discordx'
 import { container } from 'tsyringe'
 import strings from '../../res/strings.json'
 import { emoteAutocomplete } from '../../util/Autocomplete'
-import { EmoteCache } from '../../util/EmoteCache'
+import { autoDeleteMsg, parseForEmote, reply } from '../../util/DiscordLogic'
+import { CubeMessageManager } from '../../util/MessageManager'
 
 @Discord()
 export abstract class Big {
@@ -20,27 +21,28 @@ export abstract class Big {
       emote: string,
     @SlashOption('member', { description: strings.memberSlash, required: false })
       member: GuildMember,
-      interaction: CommandInteraction,
+      interaction: CommandInteraction
   ) {
-    const emoteCache = container.resolve(EmoteCache)
-    if (emoteCache !== undefined) {
-      if (emote !== undefined) {
-        // emote parsing code
-        await interaction.deferReply()
-        const retrievedEmoji = await emoteCache.retrieve(emote)
-        if (retrievedEmoji !== undefined) {
-          await interaction.editReply(retrievedEmoji.url)
-        } else {
-          await interaction.editReply(strings.noEmoteFound)
-        }
-      } else if (member !== undefined) {
-        // user code
-        // no need to defer a reply since we don't have to search through the emote cache
-        await interaction.reply(member.user.displayAvatarURL({ format: 'png', dynamic: true, size: 256 }))
+    let msg: Message|undefined
+    if (emote !== undefined) {
+      await interaction.deferReply()
+      const res = await parseForEmote(interaction, emote)
+      if (res) {
+        msg = await reply(interaction, res)
+      } else {
+        msg = await reply(interaction, strings.noEmoteFound)
+        autoDeleteMsg(msg)
       }
-      if ((member === undefined) && (emote === undefined)) {
-        await interaction.reply({ content: strings.noArgs, ephemeral: true })
-      }
+    } else if (member !== undefined) {
+      // user code
+      // no need to defer a reply since we don't have to search through the emote cache
+      msg = await reply(interaction, member.user.displayAvatarURL({ format: 'png', dynamic: true, size: 256 }))
     }
+    if ((member === undefined) && (emote === undefined)) {
+      msg = await reply(interaction, strings.noArgs)
+      autoDeleteMsg(msg)
+    }
+    const cubeMessageManager = container.resolve(CubeMessageManager)
+    if (msg) cubeMessageManager.registerTrashReact(interaction, msg, interaction.user.id)
   }
 }

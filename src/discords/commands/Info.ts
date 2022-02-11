@@ -32,19 +32,14 @@ export abstract class Info {
         const emoteName = emote.toLowerCase()
         const res = await emoteCache.retrieve(emoteName)
         if (res !== undefined) {
-          try {
-            await interaction.deferReply()
-          } catch (err) {
-            console.error(err)
-            return
-          }
+          await interaction.deferReply()
+
           const embed = new MessageEmbed()
           embed.setColor('RANDOM')
           embed.setImage(res.url)
           embed.setTitle(res.name)
           switch (res.source) {
             case Source.Discord: {
-              console.log(res.guildEmoji?.createdAt.getTime())
               if (res.guildEmoji?.createdAt) embed.addField('Creation Date', `<t:${Math.round(res.guildEmoji.createdAt.getTime() / 1000)}>`)
               if (res.guildEmoji?.id) embed.addField('ID', res.guildEmoji.id)
               embed.addField('URL', res.url)
@@ -70,19 +65,11 @@ export abstract class Info {
             }
             default: {
               embed.setFooter('Note that this emote may actually be animated but the Discord embed is not, click and open in your browser to check.')
-              try {
-                await interaction.editReply({ embeds: [embed] })
-              } catch (err) {
-                console.error(err)
-              }
+              await interaction.editReply({ embeds: [embed] })
             }
           }
         } else {
-          try {
-            await interaction.reply({ content: strings.noEmoteFound, ephemeral: true })
-          } catch (err) {
-            console.error(err)
-          }
+          await interaction.reply({ content: strings.noEmoteFound, ephemeral: true })
         }
       } else if (member !== undefined) {
         // user code
@@ -102,11 +89,7 @@ export abstract class Info {
         }
       }
       if ((member === undefined) && (emote === undefined)) {
-        try {
-          await interaction.reply({ content: strings.noArgs, ephemeral: true })
-        } catch (err) {
-          console.error(err)
-        }
+        await interaction.reply({ content: strings.noArgs, ephemeral: true })
       }
     }
   }

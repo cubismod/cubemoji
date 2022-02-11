@@ -1,10 +1,11 @@
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
-import { CommandInteraction, MessageEmbed } from 'discord.js'
+import { CommandInteraction, Message, MessageEmbed } from 'discord.js'
 import { Discord, Slash } from 'discordx'
 import { container } from 'tsyringe'
 import secrets from './../../secrets.json'
 import { EmoteCache } from '../../util/EmoteCache'
+import { CubeMessageManager } from '../../util/MessageManager'
 
 dayjs.extend(relativeTime)
 
@@ -50,7 +51,9 @@ export abstract class About {
         }
       ])
 
-      await interaction.reply({ embeds: [embed] })
+      const msg = await interaction.reply({ embeds: [embed], fetchReply: true })
+      const cubeMessageManager = container.resolve(CubeMessageManager)
+      if (msg instanceof Message) cubeMessageManager.registerTrashReact(interaction, msg, interaction.user.id)
     }
   }
 }

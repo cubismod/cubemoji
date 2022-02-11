@@ -11,7 +11,7 @@ import { URL } from 'url'
 import secrets from '../secrets.json'
 import { Cmoji, Source } from './Cubemoji'
 import { EmoteCache } from './EmoteCache'
-import { MsgContext, EditOperation, RescaleOperation, splitEffects, FaceOperation } from './ImageLogic'
+import { EditOperation, FaceOperation, MsgContext, RescaleOperation, splitEffects } from './ImageLogic'
 import { ImageQueue } from './ImageQueue'
 import { CubeMessageManager } from './MessageManager'
 import { CubeStorage } from './Storage'
@@ -285,6 +285,17 @@ export function sendPagination (interaction: CommandInteraction, type: Source, e
   }
 }
 
+export async function parseForEmote (interaction: CommandInteraction, emote: string) {
+  const emoteCache = container.resolve(EmoteCache)
+  // emote parsing code
+  const retrievedEmoji = await emoteCache.retrieve(emote)
+  if (retrievedEmoji !== undefined) {
+    return retrievedEmoji.url
+  } else {
+    return false
+  }
+}
+
 /**
   * Initializes a new page
   */
@@ -307,7 +318,7 @@ function newPage (embed: MessageEmbed, type: Source) {
 }
 
 // do a different reply depending on the context we have
-async function reply (context: MsgContext, content: MessageAttachment | string) {
+export async function reply (context: MsgContext, content: MessageAttachment | string) {
   let msg: Message | undefined
   if (content instanceof MessageAttachment) {
     // different logic depending on which context we are passing in
@@ -320,7 +331,6 @@ async function reply (context: MsgContext, content: MessageAttachment | string) 
       if (repMsg instanceof Message) msg = repMsg
     }
     if (context instanceof MessageReaction) msg = await context.message.reply({ files: [content], allowedMentions: { repliedUser: false } })
-    return msg
   } else {
     if (context instanceof CommandInteraction) {
       const repMsg = await context.editReply(content)
@@ -332,6 +342,7 @@ async function reply (context: MsgContext, content: MessageAttachment | string) 
     }
     if (context instanceof MessageReaction) msg = await context.message.reply({ content: content, allowedMentions: { repliedUser: false } })
   }
+  return msg
 }
 
 /**
@@ -369,5 +380,14 @@ async function reactErr (context: MsgContext) {
 async function startTyping (context: MsgContext) {
   if (context instanceof MessageReaction) {
     context.message.channel.sendTyping()
+  }
+}
+
+// sets a timeout to auto delete a message after 30 seconds
+export function autoDeleteMsg (msg: Message|undefined) {
+  if (msg) {
+    setTimeout(async () => {
+      await msg.delete()
+    }, 30000)
   }
 }

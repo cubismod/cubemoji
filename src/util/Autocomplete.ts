@@ -35,8 +35,12 @@ export function emoteAutocomplete (interaction: AutocompleteInteraction) {
           // we choose a random emote to send as the first one
           firstResult = choice(emoteCache.emojis).name
         }
-        const queryItem = [new Cmoji(firstResult, firstResult, Source.URL)]
-        const res = queryItem.concat(geometricReservoirSample(8, emoteCache.emojis))
+        let queryItem: Cmoji[] = []
+        if (firstResult.length < 100) {
+          queryItem = [new Cmoji(firstResult, firstResult, Source.URL)]
+        }
+        const randomEmojis = geometricReservoirSample(10, emoteCache.emojis)
+        const res = queryItem.concat(randomEmojis)
         interaction.respond(res.map(result => {
           return { name: result.name, value: result.name }
         }))
