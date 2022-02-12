@@ -7,12 +7,10 @@ RUN ./setup-image.sh
 
 COPY package-lock.json .
 COPY package.json .
-COPY secrets.json .
 COPY tsconfig.json .
 COPY assets/ ./assets/
 COPY src/ ./src/
 COPY .env .
-COPY serviceKey.json .
 
 RUN npm install --production
 RUN npm install -g typescript 

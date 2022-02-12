@@ -1,6 +1,6 @@
 import { CommandInteraction, ContextMenuInteraction } from 'discord.js'
 import { ArgsOf, GuardFunction } from 'discordx'
-import secrets from '../secrets.json'
+import secrets from '../res/secrets.json'
 
 export const TestServer: GuardFunction<
   | ArgsOf<'messageReactionAdd'>

@@ -3,7 +3,7 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 import { CommandInteraction, Message, MessageEmbed } from 'discord.js'
 import { Discord, Slash } from 'discordx'
 import { container } from 'tsyringe'
-import secrets from './../../secrets.json'
+import secrets from '../../res/secrets.json'
 import { EmoteCache } from '../../util/EmoteCache'
 import { CubeMessageManager } from '../../util/MessageManager'
 

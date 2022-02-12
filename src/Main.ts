@@ -1,18 +1,18 @@
 /* eslint-disable node/no-path-concat */
-import 'reflect-metadata'
+import { dirname, importx } from '@discordx/importer'
 import { Intents, Interaction } from 'discord.js'
 import { Client, DIService } from 'discordx'
-import secrets from './secrets.json'
+import 'reflect-metadata'
 import { container } from 'tsyringe'
-import { EmoteCache } from './util/EmoteCache'
+import { TestServer } from './discords/Guards'
+import secrets from './res/secrets.json'
 import { CubeGCP } from './util/Cubemoji'
+import { setStatus } from './util/DiscordLogic'
+import { EmoteCache } from './util/EmoteCache'
 import { ImageQueue } from './util/ImageQueue'
 import { CubeMessageManager } from './util/MessageManager'
-import { setStatus } from './util/DiscordLogic'
-import { importx, dirname } from '@discordx/importer'
 import { CubeStorage } from './util/Storage'
 import { WorkerPool } from './util/WorkerPool'
-import { TestServer } from './discords/Guards'
 export class Main {
   private static _client: Client
 

@@ -27,7 +27,7 @@ export class CubeGCP {
   refreshTime: number // unix timestamp to keep track of the next time we should refresh the storage list
 
   constructor () {
-    this.storage = new Storage({ keyFilename: 'serviceKey.json' })
+    this.storage = new Storage({ keyFilename: 'res/serviceKey.json' })
     this.refreshTime = dayjs().unix()
   }
 }
