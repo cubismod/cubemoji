@@ -39,7 +39,7 @@ export class WorkerPool {
     const worker = this.waitingWorkers.get(path)
     if (worker && (this.runningWorkers.size <= this.limit)) {
       this.waitingWorkers.delete(path)
-      console.log(`Job "${path}" now running.`)
+      console.log(`job running: "${path.slice(-8)}"`)
       worker.write(path, (err) => {
         if (err) console.error(err)
       })
@@ -49,7 +49,7 @@ export class WorkerPool {
       // stop the gm process
       setTimeout(() => { this.runningWorkers.delete(path) }, 300000)
     } else {
-      console.debug(`unable to run worker ${path}`)
+      console.log(`job queued: "${path.slice(-8)}"`)
     }
   }
 
@@ -61,7 +61,7 @@ export class WorkerPool {
    * @param path output path of image
    */
   done (path: string) {
-    console.log(`Job "${path}" has completed`)
+    console.log(`job finished: "${path.slice(-8)}"`)
     const worker = this.runningWorkers.get(path)
     if (worker) {
       this.runningWorkers.delete(path)

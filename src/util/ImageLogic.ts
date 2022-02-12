@@ -267,7 +267,7 @@ export class EditOperation extends ImageOperation {
           img.modulate(100, 150)
           break
         case 'shear':
-          img.shear(random(0, 360), random(0, 360))
+          img.shear(random(100, 360), random(100, 360))
           break
       }
     })

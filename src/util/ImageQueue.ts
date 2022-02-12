@@ -40,9 +40,7 @@ export class ImageQueue {
       // delete first item
       const first = this.images.shift()
       if (first) {
-        await unlink(first.localPath, (err) => {
-          if (err) { console.error(err) }
-        })
+        await unlink(first.localPath, (_) => {})
       }
     }
     this.images.push(image)
@@ -66,7 +64,7 @@ export class ImageQueue {
     const search = new Fuse(this.images, options)
     const res = search.search(url)
     if (res.length > 0 && res[0].item.url === url) {
-      // promote this item to the front of the queue
+      // promote this item to the end of the queue
       // so it stays around for longer and doesnt get deleted
       const i = res[0].refIndex
       this.images.splice(i, 1)
