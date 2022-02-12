@@ -20,7 +20,7 @@ Secrets
 -------
 The bot depends on the following secrets/auth files to function:
 
-### res/secrets.json
+### src/res/secrets.json
 ```json
 {
   "token": "your_discord_bot_token",
@@ -45,7 +45,7 @@ prd mode enables global application commands minus the test guild + test channel
 npr mode limits listening to application commands only in the test guild & test channel you specify  
 ids refer to the discord ids of these objects
 
-### res/serviceKey.json  
+### src/res/serviceKey.json  
 this is used for gcp storage  
 https://cloud.google.com/iam/docs/creating-managing-service-account-keys
 
