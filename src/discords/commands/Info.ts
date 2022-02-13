@@ -6,6 +6,7 @@ import strings from '../../res/strings.json'
 import { emoteAutocomplete } from '../../util/Autocomplete'
 import { Source } from '../../util/Cubemoji'
 import { EmoteCache } from '../../util/EmoteCache'
+import { logManager } from '../../util/LogManager'
 
 @Discord()
 export abstract class Info {
@@ -24,6 +25,8 @@ export abstract class Info {
       member: GuildMember,
       interaction: CommandInteraction
   ) {
+    const logger = logManager().getLogger('Info')
+
     const emoteCache = container.resolve(EmoteCache)
     if (emoteCache !== undefined) {
       // check our args
@@ -50,7 +53,7 @@ export abstract class Info {
               try {
                 await interaction.editReply({ embeds: [embed] })
               } catch (err) {
-                console.error(err)
+                logger.error(err)
               }
               break
             }
@@ -59,7 +62,7 @@ export abstract class Info {
               try {
                 await interaction.editReply({ embeds: [embed] })
               } catch (err) {
-                console.error(err)
+                logger.error(err)
               }
               break
             }
@@ -85,7 +88,7 @@ export abstract class Info {
         try {
           await interaction.reply({ embeds: [embed] })
         } catch (err) {
-          console.error(err)
+          logger.error(err)
         }
       }
       if ((member === undefined) && (emote === undefined)) {

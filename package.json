@@ -42,6 +42,7 @@
     "image-downloader": "^4.0.3",
     "keyv": "^4.1.1",
     "keyv-file": "^0.2.0",
+    "log4js": "^6.4.1",
     "node-emoji": "^1.11.0",
     "pandemonium": "^2.3.0",
     "probe-image-size": "^7.2.3",

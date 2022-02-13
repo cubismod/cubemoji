@@ -2,12 +2,14 @@ import dayjs from 'dayjs'
 import { createReadStream, createWriteStream } from 'fs'
 import Keyv from 'keyv'
 import { KeyvFile } from 'keyv-file'
+import { Logger } from 'log4js'
 import { resolve } from 'path'
 import { createInterface } from 'readline'
 import { pipeline } from 'stream'
 import { singleton } from 'tsyringe'
 import { promisify } from 'util'
 import { gotOptions } from './Cubemoji'
+import { logManager } from './LogManager'
 const { got } = await import('got')
 
 // database storage using https://github.com/zaaack/keyv-file
@@ -16,6 +18,7 @@ export class CubeStorage {
   trashReacts: Keyv<string>
   badHosts: Keyv<number>
   private location = 'data/'
+  private logger: Logger
 
   constructor () {
     /*
@@ -44,6 +47,8 @@ export class CubeStorage {
         filename: resolve(this.location, 'badHosts.json')
       })
     })
+
+    this.logger = logManager().getLogger('Storage')
   }
 
   async initHosts () {
@@ -69,7 +74,7 @@ export class CubeStorage {
         crlfDelay: Infinity
       })
 
-      console.log('initializing bad hosts list which will take a while...')
+      this.logger.info('initializing bad hosts list which will take a while...')
       let i = 0
 
       for await (const line of rlInterface) {
@@ -79,7 +84,7 @@ export class CubeStorage {
           i++
 
           if (i % 1000 === 0) {
-            console.log(`${i} records processed of ~141k`)
+            this.logger.info(`${i} records processed of ~141k`)
           }
         }
       }

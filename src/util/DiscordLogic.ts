@@ -5,6 +5,7 @@ import { watch } from 'chokidar'
 import { CommandInteraction, ContextMenuInteraction, Message, MessageAttachment, MessageEmbed, MessageReaction, PartialUser, User } from 'discord.js'
 import { Client } from 'discordx'
 import { fileTypeFromStream } from 'file-type'
+import { Logger } from 'log4js'
 import { choice } from 'pandemonium'
 import { container } from 'tsyringe'
 import { URL } from 'url'
@@ -13,6 +14,7 @@ import { Cmoji, Source } from './Cubemoji'
 import { EmoteCache } from './EmoteCache'
 import { EditOperation, FaceOperation, MsgContext, RescaleOperation, splitEffects } from './ImageLogic'
 import { ImageQueue } from './ImageQueue'
+import { logManager } from './LogManager'
 import { CubeMessageManager } from './MessageManager'
 import { CubeStorage } from './Storage'
 import { WorkerPool } from './WorkerPool'
@@ -34,11 +36,14 @@ export class RescaleDiscord {
   context: MsgContext
   source: string
   user: User | PartialUser
+  private logger: Logger
 
   constructor (context: MsgContext, source: string, user: User | PartialUser) {
     this.context = context
     this.source = source
     this.user = user
+
+    this.logger = logManager().getLogger('DiscordLogic')
   }
 
   // perform rescale
@@ -74,7 +79,7 @@ export class RescaleDiscord {
           await watcher.close()
           // add trash can reaction
           if (!msg) {
-            console.error('could not get a message during image operation, not proceeding with adding trash react')
+            this.logger.error('could not get a message during image operation, not proceeding with adding trash react')
           } else {
             if (msg instanceof Message) {
               await cubeMessageManager.registerTrashReact(this.context, msg, this.user.id)
@@ -352,10 +357,12 @@ export async function reply (context: MsgContext, content: MessageAttachment | s
   * @param context either a message or interaction
   */
 async function reactErr (context: MsgContext) {
+  const logger = logManager().getLogger('LogManager')
+
   // TODO: add ephermal followup explaining error details
   const cubeMessageManager = container.resolve(CubeMessageManager)
   if (context instanceof CommandInteraction) {
-    console.error(`Command interaction failure on channel id: ${context.channelId}, guild id: ${context.guildId}`)
+    logger.error(`Command interaction failure on channel id: ${context.channelId}, guild id: ${context.guildId}`)
     const reply = await context.editReply(`${secrets.cubemojiBroken} this operation failed!`)
     if (reply instanceof Message) {
       // allow user to delete the error message
@@ -363,7 +370,7 @@ async function reactErr (context: MsgContext) {
     }
   }
   if (context instanceof ContextMenuInteraction) {
-    console.error(`Context menu failure on channel id: ${context.channelId}, guild id: ${context.guildId}`)
+    logger.error(`Context menu failure on channel id: ${context.channelId}, guild id: ${context.guildId}`)
     const msg = await context.channel?.messages.fetch(context.targetId)
     if (msg) {
       msg.react(secrets.cubemojiBroken)
@@ -371,7 +378,7 @@ async function reactErr (context: MsgContext) {
     await context.deleteReply()
   }
   if (context instanceof MessageReaction) {
-    console.error(`Message reaction failure on channel id ${context.message.channelId}, guild id: ${context.message.guildId}, message id: ${context.message.id}`)
+    logger.error(`Message reaction failure on channel id ${context.message.channelId}, guild id: ${context.message.guildId}, message id: ${context.message.id}`)
     await (await context.fetch()).message.react(secrets.cubemojiBroken)
   }
 }

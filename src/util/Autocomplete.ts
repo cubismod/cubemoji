@@ -5,6 +5,10 @@ import { container } from 'tsyringe'
 import imgEffects from '../res/imgEffects.json'
 import { Cmoji, Source } from './Cubemoji'
 import { EmoteCache } from './EmoteCache'
+import { logManager } from './LogManager'
+
+const logger = logManager().getLogger('Autocomplete')
+
 // useful autocomplete commands for discord functions
 
 /**
@@ -49,8 +53,8 @@ export function emoteAutocomplete (interaction: AutocompleteInteraction) {
       }
     }
   } catch (err: unknown) {
-    console.error('Likely Discord API error in Emote Autocomplete')
-    console.error(err)
+    logger.error('Likely Discord API error in Emote Autocomplete')
+    logger.error(err)
   }
 }
 
@@ -94,7 +98,7 @@ export function editAutocomplete (interaction: AutocompleteInteraction) {
               const suggestions = queryArr.slice()
               suggestions.push(result)
               return { name: suggestions.join(' '), value: suggestions.join(' ') }
-            })).catch(reason => console.error(reason))
+            })).catch(reason => logger.error(reason))
           }
         } else {
           // user is working on typing their first effect so we return some options
@@ -106,8 +110,8 @@ export function editAutocomplete (interaction: AutocompleteInteraction) {
         }
       }
     } catch (err: unknown) {
-      console.error('Discord API error likely ocurred on Edit Autocomplete')
-      console.error(err)
+      logger.error('Discord API error likely ocurred on Edit Autocomplete')
+      logger.error(err)
     }
   }
 }

@@ -7,6 +7,7 @@ import { container } from 'tsyringe'
 import { CubeGCP, Source } from '../../util/Cubemoji'
 import { sendPagination } from '../../util/DiscordLogic'
 import { EmoteCache } from '../../util/EmoteCache'
+import { logManager } from '../../util/LogManager'
 
 @Discord()
 export abstract class List {
@@ -22,6 +23,9 @@ export abstract class List {
       subset: string,
       interaction: CommandInteraction) {
     const emoteCache = container.resolve(EmoteCache)
+
+    const logger = logManager().getLogger('Info')
+
     if (emoteCache !== undefined) {
       if (subset === 'download') {
         const localPath = path.resolve('download/emoji-list.txt')
@@ -35,7 +39,7 @@ export abstract class List {
           if (dayjs().unix() > cubeStorage.refreshTime) {
             // now we create a new file
             cubeStorage.refreshTime = dayjs().add(30, 'min').unix()
-            console.log('writing new emoji list')
+            logger.info('writing new emoji list')
             writeFile(localPath, 'Cubemoji emote list\n(M) indicates a Mutant emoji while (D) indicates a Discord emoji\n\n', err => {
               if (err) throw (err)
             })
@@ -60,11 +64,11 @@ export abstract class List {
           interaction.editReply({ content: 'https://storage.googleapis.com/cubemoji.appspot.com/txt/emoji-list.txt' })
           /* try {
             await access(path.resolve(listPath))
-            console.log('reusing existing emoji list')
+            log.info('reusing existing emoji list')
             // the file does exist!
           } catch {
             emoteCache.nextListDelete = dayjs().add(30, 'min').unix()
-            console.log('writing new emoji list')
+            log.info('writing new emoji list')
             // the file does not exist so let's create one now
 
           }
@@ -73,7 +77,7 @@ export abstract class List {
           // delete the file after 30 minutes to generate a new file next time
           if (dayjs().unix() > emoteCache.nextListDelete) {
             await unlink(listPath, (err) => {
-              if (err) console.error(err)
+              if (err) log.error(err)
             })
           } */
         }

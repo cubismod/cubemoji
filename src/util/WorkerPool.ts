@@ -1,5 +1,8 @@
 import { State } from 'gm'
+import { Logger } from 'log4js'
 import { singleton } from 'tsyringe'
+import { logManager } from './LogManager'
+
 /**
  * workers here aren't actually tracked in any meaningful way by the program
  * rather they are gm/im processes spawned by the gm module that we track internally
@@ -12,11 +15,14 @@ export class WorkerPool {
   limit: number
   runningWorkers: Map<string, State>
   waitingWorkers: Map<string, State>
+  private logger: Logger
 
   constructor (limit: number) {
     this.runningWorkers = new Map<string, State>()
     this.waitingWorkers = new Map<string, State>()
     this.limit = limit
+
+    this.logger = logManager().getLogger('WorkerPool')
   }
 
   /**
@@ -39,9 +45,9 @@ export class WorkerPool {
     const worker = this.waitingWorkers.get(path)
     if (worker && (this.runningWorkers.size <= this.limit)) {
       this.waitingWorkers.delete(path)
-      console.log(`job running: "${path.slice(-8)}"`)
+      this.logger.info(`job running: "${path.slice(-8)}"`)
       worker.write(path, (err) => {
-        if (err) console.error(err)
+        if (err) this.logger.error(err)
       })
       this.runningWorkers.set(path, worker)
 
@@ -49,7 +55,7 @@ export class WorkerPool {
       // stop the gm process
       setTimeout(() => { this.runningWorkers.delete(path) }, 300000)
     } else {
-      console.log(`job queued: "${path.slice(-8)}"`)
+      this.logger.info(`job queued: "${path.slice(-8)}"`)
     }
   }
 
@@ -61,7 +67,7 @@ export class WorkerPool {
    * @param path output path of image
    */
   done (path: string) {
-    console.log(`job finished: "${path.slice(-8)}"`)
+    this.logger.info(`job finished: "${path.slice(-8)}"`)
     const worker = this.runningWorkers.get(path)
     if (worker) {
       this.runningWorkers.delete(path)

@@ -1,12 +1,14 @@
 /* eslint-disable new-cap */
 // emote cache and some helper functions
-import { parse } from 'twemoji-parser'
-import { Client } from 'discordx'
-import { singleton } from 'tsyringe'
-import { Cmoji, Source } from './Cubemoji'
-import mutantNames from '../res/emojiNames.json'
-import Fuse from 'fuse.js'
 import { GuildEmoji } from 'discord.js'
+import { Client } from 'discordx'
+import Fuse from 'fuse.js'
+import { Logger } from 'log4js'
+import { singleton } from 'tsyringe'
+import { parse } from 'twemoji-parser'
+import mutantNames from '../res/emojiNames.json'
+import { Cmoji, Source } from './Cubemoji'
+import { logManager } from './LogManager'
 const { got } = await import('got')
 
 @singleton()
@@ -18,6 +20,7 @@ export class EmoteCache {
   sortedArray: string[] // sorted list of emoji names
   discEmojis: Cmoji[] // save references to discord emojis for functions that wouldn't work well w/ images
   mutantEmojis: Cmoji[] // references to mutant emojis
+  private logger: Logger
 
   constructor (client: Client) {
     this.client = client
@@ -25,6 +28,8 @@ export class EmoteCache {
     this.sortedArray = [] // sorted list of emoji names
     this.discEmojis = []
     this.mutantEmojis = []
+
+    this.logger = logManager().getLogger('EmoteCache')
   }
 
   /**
@@ -68,7 +73,7 @@ export class EmoteCache {
  * @param emote the emote to add
  */
   async addEmote (emote: GuildEmoji) {
-    console.log(`new emoji registered: ${emote.name}`)
+    this.logger.info(`new emoji registered: ${emote.name}`)
     this.emojis.push(new Cmoji(emote.name, emote.url, Source.Discord, emote, emote.id))
   }
 
@@ -81,7 +86,7 @@ export class EmoteCache {
     const res = this.search(emote.id)
     if (res.length > 0 && res[0].item.id === emote.id) {
       this.emojis.splice(res[0].refIndex, 1)
-      console.log(`emoij removed: ${emote.name}`)
+      this.logger.info(`emoij removed: ${emote.name}`)
     }
   }
 

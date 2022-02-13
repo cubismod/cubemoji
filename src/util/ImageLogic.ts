@@ -15,10 +15,13 @@ import { container } from 'tsyringe'
 import imgEffects from '../res/imgEffects.json'
 import { gotOptions } from './Cubemoji'
 import { ImageQueue } from './ImageQueue'
+import { logManager } from './LogManager'
 import { WorkerPool } from './WorkerPool'
 const { got } = await import('got')
 
 export type MsgContext = ContextMenuInteraction | CommandInteraction | MessageReaction
+
+const logger = logManager().getLogger('ImageLogic')
 
 interface outputtedFile {
   outPath: string,
@@ -52,7 +55,7 @@ abstract class ImageOperation {
   protected async download () {
     const localUrl = await downloadImage(this.externalUrl).catch(
       err => {
-        console.error(err)
+        logger.error(err)
       })
     if (localUrl) {
       this.localPath = localUrl
@@ -344,7 +347,7 @@ export async function downloadImage (url: string) {
   // check first whether the file isn't too big
   const headers = await got.head(url, gotOptions)
     .catch(err => {
-      console.error(err)
+      logger.error(err)
       return undefined
     })
   if (headers && headers.headers['content-length'] && parseInt(headers.headers['content-length']) < 2e+7) {
@@ -353,7 +356,7 @@ export async function downloadImage (url: string) {
     await pipeline(
       got.stream(url, gotOptions)
         .on('error', (error: Error) => {
-          console.error(error.message)
+          logger.error(error.message)
         }),
       createWriteStream(fn)
     )
