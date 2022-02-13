@@ -35,7 +35,8 @@ export function logManager () {
       ImageQueue: categoryConfig,
       Storage: categoryConfig,
       WorkerPool: categoryConfig,
-      ImageLogic: categoryConfig
+      ImageLogic: categoryConfig,
+      MessageManager: categoryConfig
     }
   })
 }
