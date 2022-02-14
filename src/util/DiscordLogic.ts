@@ -373,7 +373,11 @@ async function reactErr (context: MsgContext) {
     logger.error(`Context menu failure on channel id: ${context.channelId}, guild id: ${context.guildId}`)
     const msg = await context.channel?.messages.fetch(context.targetId)
     if (msg) {
-      msg.react(secrets.cubemojiBroken)
+      try {
+        msg.react(secrets.cubemojiBroken)
+      } catch (err) {
+        logger.error(err)
+      }
     }
     await context.deleteReply()
   }

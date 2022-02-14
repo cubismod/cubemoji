@@ -38,7 +38,9 @@ The bot depends on the following secrets/auth files to function:
   // concurrent GM/IM processes to run for image editing tasks
   "workers": 6,
   // version number
-  "version": "3.2.0"
+  "version": "3.2.0",
+  // guild ID of bot owner who gets extra perms
+  "botOwner": "id"
 }
 ```
 prd mode enables global application commands minus the test guild + test channel you specify  

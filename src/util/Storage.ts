@@ -1,4 +1,5 @@
 import dayjs from 'dayjs'
+import { Client } from 'discordx'
 import { createReadStream, createWriteStream } from 'fs'
 import Keyv from 'keyv'
 import { KeyvFile } from 'keyv-file'
@@ -12,16 +13,17 @@ import { gotOptions } from './Cubemoji'
 import { logManager } from './LogManager'
 const { got } = await import('got')
 
+export interface GuildOwner {
+  id: string,
+  name: string
+}
+
 // database storage using https://github.com/zaaack/keyv-file
+// we utilize a plain JSON file for blocked hosts list because it loads so quickly
+// and SQLite for the other storage as its consistent
 @singleton()
 export class CubeStorage {
-  trashReacts: Keyv<string>
-  badHosts: Keyv<number>
-  private location = 'data/'
-  private logger: Logger
-
-  constructor () {
-    /*
+  /*
     Database that is persisting the info for little trash icons you see
     under images edited by cubemoji
     - key: message snowflake ID from Discord
@@ -29,26 +31,53 @@ export class CubeStorage {
     Author is the user who reacted to the image not whoever
     posted the image
     */
-    this.trashReacts = new Keyv<string>({
-      store: new KeyvFile({
-        filename: resolve(this.location, 'trashReacts.json'),
-        writeDelay: 100
-      }),
-      // 1 week in ms
-      ttl: 6.048e+8
-    })
+  trashReacts: Keyv<string>
 
-    /**
-     * Downloads a blocklist of bad hosts
-     * to avoid when performing downloads
-     */
+  /**
+   * Downloads a blocklist of bad hosts
+   * to avoid when performing downloads
+   */
+  badHosts: Keyv<number>
+
+  /**
+   * server owners with key of their id
+   * value is a list of servers they own
+   */
+  serverOwners: Keyv<GuildOwner[]>
+
+  /**
+   * enrolled servers stored w/ key of server unique id
+   * and just a blank value
+   */
+  enrollment: Keyv<string>
+
+  /**
+   * plain emoji like "plead" for example
+   * that should be blocked for servers in big server mod
+   */
+  emojiBlocked: Keyv<string>
+
+  private location = 'data/'
+  private logger: Logger
+  constructor () {
+    this.trashReacts = new Keyv<string>(
+      'sqlite://data/trashReacts.sqlite',
+      {
+        ttl: 6.048e+8 // 1 week in ms
+      }
+    )
+
     this.badHosts = new Keyv<number>({
       store: new KeyvFile({
         filename: resolve(this.location, 'badHosts.json')
       })
     })
 
+    this.enrollment = new Keyv<string>('sqlite://data/serverInfo.sqlite', { namespace: 'servers' })
+    this.emojiBlocked = new Keyv<string>('sqlite://data/serverInfo.sqlite', { namespace: 'emoji' })
+
     this.logger = logManager().getLogger('Storage')
+    this.serverOwners = new Keyv<GuildOwner[]>('sqlite://data/serverInfo.sqlite', { namespace: 'owners' })
   }
 
   async initHosts () {
@@ -89,5 +118,38 @@ export class CubeStorage {
         }
       }
     }
+  }
+
+  /**
+   * load server owners into database for quick access
+   * @param client Discordx client
+   */
+  async loadServerOwners (client: Client) {
+    // reset each time
+    await this.serverOwners.clear()
+
+    client.guilds.cache.forEach(async (guild) => {
+      const resolved = await guild.fetch()
+      const owner = resolved.ownerId
+
+      const guildsOwned = await this.serverOwners.get(owner)
+      if (guildsOwned) {
+        // server owner has changed
+        guildsOwned.push({
+          name: resolved.name,
+          id: resolved.id
+        })
+        await this.serverOwners.set(owner, guildsOwned)
+      } else {
+        const newArr: GuildOwner[] = [
+          {
+            name: resolved.name,
+            id: resolved.id
+          }
+        ]
+        await this.serverOwners.set(owner, newArr)
+      }
+    })
+    this.logger.info('Successfully refreshed guild owners')
   }
 }

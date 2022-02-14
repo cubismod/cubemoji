@@ -79,6 +79,20 @@ export class Main {
         DIService.container.register(CubeStorage, { useValue: new CubeStorage() })
         logger.info('registered CubeStorage')
         await container.resolve(CubeStorage).initHosts()
+        setInterval(
+          async () => {
+            await container.resolve(CubeStorage).initHosts()
+          },
+          6.048e+8 // 1 week interval
+        )
+
+        await container.resolve(CubeStorage).loadServerOwners(Main._client)
+        setInterval(
+          async () => {
+            await container.resolve(CubeStorage).loadServerOwners(Main._client)
+          },
+          3.6e+6 // 1 hour
+        )
 
         DIService.container.register(CubeGCP, { useValue: new CubeGCP() })
         logger.info('registered CubeGCP')

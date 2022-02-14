@@ -1,7 +1,13 @@
 import { CommandInteraction, ContextMenuInteraction } from 'discord.js'
 import { ArgsOf, GuardFunction } from 'discordx'
+import { container } from 'tsyringe'
 import secrets from '../res/secrets.json'
+import { CubeStorage } from '../util/Storage'
 
+/**
+ * limits npr mode to run in test channel
+ * while in prd listens in every guild and channel besides test one defined in secrets
+ */
 export const TestServer: GuardFunction<
   | ArgsOf<'messageReactionAdd'>
   | CommandInteraction
@@ -24,5 +30,22 @@ export const TestServer: GuardFunction<
     if (secrets.environment === 'npr' && arg[0].message.channelId === secrets.testChannel) {
       await next()
     }
+  }
+}
+
+/**
+ * validates that user using this command actually
+ * owns a guild
+ */
+export const OwnerCheck: GuardFunction<CommandInteraction> =
+async (arg, _client, next) => {
+  const storage = container.resolve(CubeStorage)
+  const userGuilds = await storage.serverOwners.get(arg.user.id)
+
+  if (arg.user.id === secrets.botOwner) {
+    await next()
+  }
+  if (userGuilds) {
+    await next()
   }
 }

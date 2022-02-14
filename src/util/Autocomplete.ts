@@ -1,4 +1,4 @@
-import { AutocompleteInteraction } from 'discord.js'
+import { ApplicationCommandOptionChoice, AutocompleteInteraction } from 'discord.js'
 import Fuse from 'fuse.js'
 import { choice, geometricReservoirSample } from 'pandemonium'
 import { container } from 'tsyringe'
@@ -6,6 +6,7 @@ import imgEffects from '../res/imgEffects.json'
 import { Cmoji, Source } from './Cubemoji'
 import { EmoteCache } from './EmoteCache'
 import { logManager } from './LogManager'
+import { CubeStorage } from './Storage'
 
 const logger = logManager().getLogger('Autocomplete')
 
@@ -53,7 +54,6 @@ export function emoteAutocomplete (interaction: AutocompleteInteraction) {
       }
     }
   } catch (err: unknown) {
-    logger.error('Likely Discord API error in Emote Autocomplete')
     logger.error(err)
   }
 }
@@ -109,8 +109,46 @@ export function editAutocomplete (interaction: AutocompleteInteraction) {
           }))
         }
       }
-    } catch (err: unknown) {
-      logger.error('Discord API error likely ocurred on Edit Autocomplete')
+    } catch (err) {
+      logger.error(err)
+    }
+  }
+}
+
+/**
+ * performs autocomplete of server names
+ * @param interaction
+ */
+export async function serverAutocomplete (interaction: AutocompleteInteraction) {
+  const query = interaction.options.getFocused(true).value
+  if (typeof query === 'string') {
+    try {
+      const storage = container.resolve(CubeStorage)
+      const guilds = await storage.serverOwners.get(interaction.user.id)
+      const responses: ApplicationCommandOptionChoice[] = []
+      if (query === '' && guilds) {
+        guilds.forEach(guild => {
+          // try not to go over autocomplete limits
+          if (responses.length < 10) {
+            responses.push({
+              name: guild.name,
+              value: guild.name
+            })
+          }
+        })
+        await interaction.respond(responses)
+      } else if (guilds) {
+        // search across the list
+        const fuse = new Fuse(guilds)
+        const searchRes = fuse.search(query, { limit: 10 })
+        interaction.respond(searchRes.map(result => {
+          return {
+            name: result.item.name,
+            value: result.item.name
+          }
+        }))
+      }
+    } catch (err) {
       logger.error(err)
     }
   }
