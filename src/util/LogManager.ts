@@ -37,7 +37,8 @@ export function logManager () {
       WorkerPool: categoryConfig,
       ImageLogic: categoryConfig,
       MessageManager: categoryConfig,
-      Events: categoryConfig
+      Events: categoryConfig,
+      ServerConfig: categoryConfig
     }
   })
 }
