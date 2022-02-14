@@ -44,8 +44,7 @@ async (arg, _client, next) => {
 
   if (arg.user.id === secrets.botOwner) {
     await next()
-  }
-  if (userGuilds) {
+  } else if (userGuilds) {
     await next()
   }
 }

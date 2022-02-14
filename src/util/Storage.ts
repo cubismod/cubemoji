@@ -1,3 +1,4 @@
+import Database from 'better-sqlite3'
 import dayjs from 'dayjs'
 import { Client } from 'discordx'
 import { createReadStream, createWriteStream } from 'fs'
@@ -16,6 +17,11 @@ const { got } = await import('got')
 export interface GuildOwner {
   id: string,
   name: string
+}
+
+export interface KeyVRaw {
+  key: string,
+  value: string
 }
 
 // database storage using https://github.com/zaaack/keyv-file
@@ -47,7 +53,7 @@ export class CubeStorage {
 
   /**
    * enrolled servers stored w/ key of server unique id
-   * and just a blank value
+   * and just user tag as value
    */
   enrollment: Keyv<string>
 
@@ -59,6 +65,7 @@ export class CubeStorage {
 
   private location = 'data/'
   private logger: Logger
+  private serverInfoPath = 'data/serverInfo.sqlite'
   constructor () {
     this.trashReacts = new Keyv<string>(
       'sqlite://data/trashReacts.sqlite',
@@ -73,11 +80,11 @@ export class CubeStorage {
       })
     })
 
-    this.enrollment = new Keyv<string>('sqlite://data/serverInfo.sqlite', { namespace: 'servers' })
-    this.emojiBlocked = new Keyv<string>('sqlite://data/serverInfo.sqlite', { namespace: 'emoji' })
+    this.enrollment = new Keyv<string>('sqlite://' + this.serverInfoPath, { namespace: 'servers' })
+    this.emojiBlocked = new Keyv<string>('sqlite://' + this.serverInfoPath, { namespace: 'emoji' })
 
     this.logger = logManager().getLogger('Storage')
-    this.serverOwners = new Keyv<GuildOwner[]>('sqlite://data/serverInfo.sqlite', { namespace: 'owners' })
+    this.serverOwners = new Keyv<GuildOwner[]>('sqlite://' + this.serverInfoPath, { namespace: 'owners' })
   }
 
   async initHosts () {
@@ -151,5 +158,33 @@ export class CubeStorage {
       }
     })
     this.logger.info('Successfully refreshed guild owners')
+  }
+
+  /**
+   * KeyV does not currently support iteration of all keys although this
+   * feature is being worked on. So instead, we use some SQLite to actually
+   * grab all the values of a particular namespace and return the results
+   * We leave it to the caller to parse the resulting JSON value
+   *
+   * Eventually, this will be removed once actual iterator functionality is added
+   * to the NPM package for keyv
+   * @param ns namespace such as emojis, serverOwners
+   */
+  getNamespace (ns: string) {
+    const db = new Database(this.serverInfoPath, { readonly: true })
+    const statement = db.prepare('SELECT * FROM keyv WHERE key LIKE ?')
+    const res = statement.all(ns + '%')
+    try {
+      // convert type to just key and value
+      const converted = res.map(value => {
+        const parsed = (value as KeyVRaw)
+        return parsed
+      })
+      db.close()
+      return converted
+    } catch (err) {
+      this.logger.error(err)
+    }
+    db.close()
   }
 }

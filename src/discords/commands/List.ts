@@ -15,9 +15,9 @@ export abstract class List {
     description: 'Get a full list of emojis'
   })
   async list (
+    @SlashChoice('All', 'all')
     @SlashChoice('Discord', 'discord')
     @SlashChoice('Mutant', 'mutant')
-    @SlashChoice('All', 'all')
     @SlashChoice('Download', 'download')
     @SlashOption('subset', { description: 'Which subset of emotes would you like to choose from?' })
       subset: string,

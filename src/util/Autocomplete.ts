@@ -126,7 +126,7 @@ export async function serverAutocomplete (interaction: AutocompleteInteraction) 
       const storage = container.resolve(CubeStorage)
       const guilds = await storage.serverOwners.get(interaction.user.id)
       const responses: ApplicationCommandOptionChoice[] = []
-      if (query === '' && guilds) {
+      if (guilds) {
         guilds.forEach(guild => {
           // try not to go over autocomplete limits
           if (responses.length < 10) {
@@ -137,16 +137,6 @@ export async function serverAutocomplete (interaction: AutocompleteInteraction) 
           }
         })
         await interaction.respond(responses)
-      } else if (guilds) {
-        // search across the list
-        const fuse = new Fuse(guilds)
-        const searchRes = fuse.search(query, { limit: 10 })
-        interaction.respond(searchRes.map(result => {
-          return {
-            name: result.item.name,
-            value: result.item.name
-          }
-        }))
       }
     } catch (err) {
       logger.error(err)
