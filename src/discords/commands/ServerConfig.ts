@@ -142,4 +142,39 @@ export abstract class Blacklist {
       await reply(interaction, guildInfo[1], false, `modify "${emoji} in`)
     }
   }
+
+  @Guard(OwnerCheck)
+  @Slash('list', { description: 'list blocked emoji' })
+  @SlashGroup({ name: 'blacklist' })
+  async list (
+    @SlashOption('server', {
+      description: 'name of server you want to block emoji on',
+      autocomplete: (interaction: AutocompleteInteraction) => serverAutocomplete(interaction),
+      type: 'STRING'
+    }) server: string,
+      interaction: CommandInteraction
+  ) {
+    await interaction.deferReply({ ephemeral: true })
+    const guildInfo = await validateServerOwner(interaction.user.id, server, interaction.client)
+    if (guildInfo) {
+      // valid owner so let's see what emoji are blocked on that server
+      const blockedEmoji = this.emoteCache.blockedEmoji.get(guildInfo[0])
+      if (blockedEmoji) {
+        const paginatedList : string[] = [
+          `**Blacklisted emoji on ${guildInfo[1]}**\n`
+        ]
+        let i = 1
+        blockedEmoji.forEach((emoji) => {
+          if (i % 20 === 0) {
+            paginatedList.push(`${emoji}\n`)
+          } else {
+            const last = paginatedList.splice(-1)
+            paginatedList.push(last + `${emoji}\n`)
+          }
+          i++
+        })
+        new Pagination(interaction, paginatedList).send()
+      }
+    }
+  }
 }

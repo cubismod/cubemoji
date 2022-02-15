@@ -24,7 +24,7 @@ export class EmoteCache {
    * we maintain blocked emojis both in the database for persistent use as well as in
    * memory for quick access
    */
-  private blockedEmojis: Map<string, Set<string>> // keys are server IDs, values is a list of emojis
+  blockedEmoji: Map<string, Set<string>> // keys are server IDs, values is a list of emojis
   private logger: Logger
 
   constructor () {
@@ -34,7 +34,7 @@ export class EmoteCache {
     this.mutantEmojis = []
 
     this.logger = logManager().getLogger('EmoteCache')
-    this.blockedEmojis = new Map<string, Set<string>>()
+    this.blockedEmoji = new Map<string, Set<string>>()
   }
 
   /**
@@ -249,12 +249,12 @@ export class EmoteCache {
    * @param block true for blocking, false for unblocking
    */
   modifyBlockedEmoji (name: string, serverId: string, block = true) {
-    const vals = this.blockedEmojis.get(serverId)
+    const vals = this.blockedEmoji.get(serverId)
     if (vals) {
-      if (block) this.blockedEmojis.set(serverId, vals.add(name))
-      else this.blockedEmojis.delete(serverId)
+      if (block) this.blockedEmoji.set(serverId, vals.add(name))
+      else this.blockedEmoji.delete(serverId)
     } else {
-      if (block) this.blockedEmojis.set(serverId, new Set<string>().add(name))
+      if (block) this.blockedEmoji.set(serverId, new Set<string>().add(name))
       // nothing to do otherwise as no key existed in the first place
     }
   }
