@@ -100,11 +100,12 @@ export class Main {
         DIService.container.register(WorkerPool, { useValue: new WorkerPool(secrets.workers) })
         logger.info('registered WorkerPool')
 
-        DIService.container.register(EmoteCache, { useValue: new EmoteCache(this._client) })
+        DIService.container.register(EmoteCache, { useValue: new EmoteCache() })
         logger.info('registered EmoteCache')
         // load up cubemoji emote cache
         const emoteCache = container.resolve(EmoteCache)
-        await emoteCache.init()
+        await emoteCache.init(this._client)
+        emoteCache.loadBlockedEmojis()
         logger.info('initialized EmoteCache')
       } else {
         throw new Error('DIServer.container is undefined therefore cannot initialize dependency injection')

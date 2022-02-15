@@ -2,10 +2,11 @@
 
 import { Pagination } from '@discordx/pagination'
 import { AutocompleteInteraction, CommandInteraction } from 'discord.js'
-import { Discord, Guard, Slash, SlashGroup, SlashOption } from 'discordx'
+import { Discord, Guard, Slash, SlashChoice, SlashGroup, SlashOption } from 'discordx'
 import { container } from 'tsyringe'
 import { serverAutocomplete } from '../../util/Autocomplete'
 import { validateServerOwner } from '../../util/DiscordLogic'
+import { EmoteCache } from '../../util/EmoteCache'
 import { logManager } from '../../util/LogManager'
 import { CubeStorage } from '../../util/Storage'
 import { OwnerCheck } from '../Guards'
@@ -16,58 +17,44 @@ interface enrolledServer {
 }
 
 async function reply (interaction: CommandInteraction, serverName = '', success: boolean, action: string) {
-  if (success) await interaction.editReply(`✅ Successfully **${action}ed** "${serverName}" in big server mode.`)
-  else await interaction.editReply(`❌ Could not **${action}** server in big server mode. You may be not be the owner or identifier was invalid.`)
+  if (success) await interaction.editReply(`✅ Successfully **${action}** "${serverName}"`)
+  else await interaction.editReply(`❌ Could not **${action}** "${serverName}". You may be not be the owner or identifier was invalid.`)
 }
 
 @Discord()
 @SlashGroup({ description: 'allows bot and server owners to modify big server mode', name: 'enrollment' })
 export abstract class Enrollment {
   logger = logManager().getLogger('ServerConfig')
-  @Guard(OwnerCheck)
-  @Slash('enroll', { description: 'enroll a new server into big server mode' })
-  @SlashGroup({ name: 'enrollment' })
-  async enroll (
-      @SlashOption('server', {
-        description: 'name of server you want to enroll',
-        autocomplete: (interaction: AutocompleteInteraction) => serverAutocomplete(interaction),
-        type: 'STRING'
-      }) server: string,
-        interaction: CommandInteraction
-  ) {
-    await interaction.deferReply({ ephemeral: true })
-    const guildInfo = await validateServerOwner(interaction.user.id, server, interaction.client)
-    if (guildInfo) {
-      const enrollment = container.resolve(CubeStorage).enrollment
-      await enrollment.set(guildInfo[0], interaction.user.tag)
-      this.logger.info(`${interaction.user.tag} enrolled [${guildInfo}] in big server mode.`)
-      await reply(interaction, guildInfo[1], true, 'enroll')
-    } else {
-      await reply(interaction, undefined, false, 'enroll')
-    }
-  }
 
   @Guard(OwnerCheck)
-  @Slash('unenroll', { description: 'unenroll a new server from big server mode' })
+  @Slash('modify', { description: 'enroll/unenroll a new server into big server mode' })
   @SlashGroup({ name: 'enrollment' })
-  async unenroll (
+  async modify (
+      @SlashChoice('enroll', 'enroll')
+      @SlashChoice('unenroll', 'unenroll')
+      @SlashOption('action') action: string,
       @SlashOption('server', {
-        description: 'name of server you want to enroll',
+        description: 'name of server you want to enroll/unenroll',
         autocomplete: (interaction: AutocompleteInteraction) => serverAutocomplete(interaction),
         type: 'STRING'
       }) server: string,
         interaction: CommandInteraction
   ) {
-    this.logger.info(interaction.deferred)
     await interaction.deferReply({ ephemeral: true })
     const guildInfo = await validateServerOwner(interaction.user.id, server, interaction.client)
     if (guildInfo) {
       const enrollment = container.resolve(CubeStorage).enrollment
-      await enrollment.delete(guildInfo[0])
-      this.logger.info(`${interaction.user.tag} unenrolled [${guildInfo}] from big server mode.`)
-      await reply(interaction, guildInfo[1], true, 'unenroll')
+      if (action === 'enroll') {
+        await enrollment.set(guildInfo[0], interaction.user.tag)
+        this.logger.info(`${interaction.user.tag} enrolled [${guildInfo}] in big server mode.`)
+        await reply(interaction, guildInfo[1], true, 'enrolled')
+      } else {
+        await enrollment.delete(guildInfo[0])
+        await reply(interaction, guildInfo[1], true, 'unenrolled')
+        this.logger.info(`${interaction.user.tag} unenrolled [${guildInfo}] from big server mode.`)
+      }
     } else {
-      await reply(interaction, undefined, false, 'unenroll')
+      await reply(interaction, undefined, false, 'modify enrollment for')
     }
   }
 
@@ -110,6 +97,49 @@ export abstract class Enrollment {
       // is a page and we have 10 servers per page
 
       new Pagination(interaction, paginatedList).send()
+    }
+  }
+}
+
+@Discord()
+@SlashGroup({ description: 'blacklist emojis for big server mode', name: 'blacklist' })
+export abstract class Blacklist {
+  logger = logManager().getLogger('ServerConfig')
+  emoteCache = container.resolve(EmoteCache)
+  storage = container.resolve(CubeStorage)
+
+  @Guard(OwnerCheck)
+  @Slash('modify', { description: 'block/unblock an emoji on a specified server that you own' })
+  @SlashGroup({ name: 'blacklist' })
+  async modify (
+    @SlashChoice('block', 'block')
+    @SlashChoice('unblock', 'unblock')
+    @SlashOption('action') action: string,
+    @SlashOption('server', {
+      description: 'name of server you want to block emoji on',
+      autocomplete: (interaction: AutocompleteInteraction) => serverAutocomplete(interaction),
+      type: 'STRING'
+    }) server: string,
+    @SlashOption('emoji', {
+      description: 'emojis including this string in it won\'t work on your server',
+      type: 'STRING'
+    }) emoji: string,
+      interaction: CommandInteraction
+  ) {
+    await interaction.deferReply({ ephemeral: true })
+    const guildInfo = await validateServerOwner(interaction.user.id, server, interaction.client)
+    if (guildInfo && interaction.guildId && interaction.guild && emoji.length < 25) {
+      const key = guildInfo[0] + '_' + emoji.toLowerCase()
+      if (action === 'block') {
+        this.emoteCache.modifyBlockedEmoji(emoji.toLowerCase(), guildInfo[0], true)
+        await this.storage.emojiBlocked.set(key, '')
+        await reply(interaction, guildInfo[1], true, `blocked "${emoji}" in`)
+      } else {
+        this.emoteCache.modifyBlockedEmoji(emoji.toLowerCase(), guildInfo[0], false)
+        await this.storage.emojiBlocked.delete(key)
+      }
+    } else if (guildInfo) {
+      await reply(interaction, guildInfo[1], false, `modify "${emoji} in`)
     }
   }
 }

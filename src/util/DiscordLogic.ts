@@ -410,6 +410,7 @@ export function autoDeleteMsg (msg: Message|undefined) {
  * @param userId id of user we are checking
  * @param identifier name or id
  * @param client Discord client
+ * @returns [guild ID, guild name] or undefined
  */
 export async function validateServerOwner (userId: string, identifier: string, client: DiscordClient) {
   const serverOwners = container.resolve(CubeStorage).serverOwners

@@ -4,32 +4,37 @@ import { GuildEmoji } from 'discord.js'
 import { Client } from 'discordx'
 import Fuse from 'fuse.js'
 import { Logger } from 'log4js'
-import { singleton } from 'tsyringe'
+import { container, singleton } from 'tsyringe'
 import { parse } from 'twemoji-parser'
 import mutantNames from '../res/emojiNames.json'
 import { Cmoji, Source } from './Cubemoji'
 import { logManager } from './LogManager'
+import { CubeStorage } from './Storage'
 const { got } = await import('got')
 
 @singleton()
 // a class which can return an array version of emotes
 // and also only refreshes when necessary
 export class EmoteCache {
-  client: Client
   emojis: Cmoji[]
   sortedArray: string[] // sorted list of emoji names
   discEmojis: Cmoji[] // save references to discord emojis for functions that wouldn't work well w/ images
   mutantEmojis: Cmoji[] // references to mutant emojis
+  /**
+   * we maintain blocked emojis both in the database for persistent use as well as in
+   * memory for quick access
+   */
+  private blockedEmojis: Map<string, Set<string>> // keys are server IDs, values is a list of emojis
   private logger: Logger
 
-  constructor (client: Client) {
-    this.client = client
+  constructor () {
     this.emojis = []
     this.sortedArray = [] // sorted list of emoji names
     this.discEmojis = []
     this.mutantEmojis = []
 
     this.logger = logManager().getLogger('EmoteCache')
+    this.blockedEmojis = new Map<string, Set<string>>()
   }
 
   /**
@@ -37,9 +42,9 @@ export class EmoteCache {
    * performing de-duplication of emote names, extracting
    * emojis into separate list, and sorting the main list
    */
-  async init () {
+  async init (client: Client) {
     // setup emoji cache and fix duplicate names
-    this.emojis = await this.grabEmotes()
+    this.emojis = await this.grabEmotes(client)
     this.deduper()
     this.extractEmojis()
     this.sortArray()
@@ -49,11 +54,11 @@ export class EmoteCache {
    * copies discord client emojis as well as adds Mutant emojis
    * @returns list of all emojis
    */
-  private async grabEmotes () {
+  private async grabEmotes (client: Client) {
     const emojis: Cmoji[] = []
-    await this.client.guilds.fetch()
+    await client.guilds.fetch()
     // add discord emojis
-    this.client.guilds.cache.forEach(guild => {
+    client.guilds.cache.forEach(guild => {
       for (const emoji of guild.emojis.cache.values()) {
         emojis.push(new Cmoji(emoji.name, emoji.url, Source.Discord, emoji, emoji.id))
       }
@@ -235,5 +240,46 @@ export class EmoteCache {
    */
   sortArray () {
     this.emojis = this.emojis.sort((a, b) => a.name.localeCompare(b.name))
+  }
+
+  /**
+   * block or unblock an emoji
+   * @param name emoji to block
+   * @param serverId id of server this emoji shouldn't show up on
+   * @param block true for blocking, false for unblocking
+   */
+  modifyBlockedEmoji (name: string, serverId: string, block = true) {
+    const vals = this.blockedEmojis.get(serverId)
+    if (vals) {
+      if (block) this.blockedEmojis.set(serverId, vals.add(name))
+      else this.blockedEmojis.delete(serverId)
+    } else {
+      if (block) this.blockedEmojis.set(serverId, new Set<string>().add(name))
+      // nothing to do otherwise as no key existed in the first place
+    }
+  }
+
+  /**
+   * load blocked emojis from database
+   */
+  loadBlockedEmojis () {
+    const storage = container.resolve(CubeStorage)
+    const dbEmoji = storage.getNamespace('emoji')
+    if (dbEmoji) {
+      dbEmoji.forEach((emoji) => {
+        // parse the key
+        // which is in the format emoji:serverid_emojiname
+        const split = emoji.key.split(':')
+        if (split.length > 1) {
+          const idAndName = split[1].split('_')
+          if (idAndName.length > 1) {
+            // idAndName[0] = id
+            // idAndName[1] = name
+            this.modifyBlockedEmoji(idAndName[1], idAndName[0], true)
+          }
+        }
+      })
+    }
+    this.logger.info('loaded blocked emojis from database to memory')
   }
 }

@@ -58,8 +58,8 @@ export class CubeStorage {
   enrollment: Keyv<string>
 
   /**
-   * plain emoji like "plead" for example
-   * that should be blocked for servers in big server mod
+   * key is server ID_emoji block string
+   * value is empty
    */
   emojiBlocked: Keyv<string>
 
@@ -169,6 +169,7 @@ export class CubeStorage {
    * Eventually, this will be removed once actual iterator functionality is added
    * to the NPM package for keyv
    * @param ns namespace such as emojis, serverOwners
+   * @returns key value pairs or undefined if no results found
    */
   getNamespace (ns: string) {
     const db = new Database(this.serverInfoPath, { readonly: true })
