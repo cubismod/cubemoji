@@ -38,7 +38,8 @@ export function logManager () {
       ImageLogic: categoryConfig,
       MessageManager: categoryConfig,
       Events: categoryConfig,
-      ServerConfig: categoryConfig
+      ServerConfig: categoryConfig,
+      DatabaseMgmt: categoryConfig
     }
   })
 }

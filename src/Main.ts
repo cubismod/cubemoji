@@ -7,6 +7,7 @@ import { container } from 'tsyringe'
 import { TestServer } from './discords/Guards'
 import secrets from './res/secrets.json'
 import { CubeGCP } from './util/Cubemoji'
+import { scheduleBackup } from './util/DatabaseMgmt'
 import { setStatus } from './util/DiscordLogic'
 import { EmoteCache } from './util/EmoteCache'
 import { ImageQueue } from './util/ImageQueue'
@@ -46,7 +47,7 @@ export class Main {
     } else {
       logger.info('Running in NPR')
       Main._client = new Client({
-        botGuilds: [secrets.testGuild],
+        botGuilds: secrets.testGuilds,
         intents: [
           Intents.FLAGS.GUILDS,
           Intents.FLAGS.GUILD_EMOJIS_AND_STICKERS,
@@ -93,6 +94,9 @@ export class Main {
           },
           3.6e+6 // 1 hour
         )
+
+        // schedule a backup for 3am EST
+        scheduleBackup()
 
         DIService.container.register(CubeGCP, { useValue: new CubeGCP() })
         logger.info('registered CubeGCP')

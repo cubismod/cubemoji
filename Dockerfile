@@ -1,6 +1,8 @@
 FROM node:17.4-bullseye
 WORKDIR /usr/src/cubemoji
 
+ENV TZ=America/New_York
+
 # setup any requisite packages
 COPY setup-image.sh .
 RUN ./setup-image.sh

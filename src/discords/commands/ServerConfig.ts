@@ -22,13 +22,14 @@ async function reply (interaction: CommandInteraction, serverName = '', success:
 }
 
 @Discord()
-@SlashGroup({ description: 'allows bot and server owners to modify big server mode', name: 'enrollment' })
+@SlashGroup({ name: 'moderation', description: 'setup a less spammy version of the bot for specific servers' })
+@SlashGroup({ description: 'allows bot and server owners to modify big server mode', name: 'enrollment', root: 'moderation' })
 export abstract class Enrollment {
   logger = logManager().getLogger('ServerConfig')
 
   @Guard(OwnerCheck)
   @Slash('modify', { description: 'enroll/unenroll a new server into big server mode' })
-  @SlashGroup({ name: 'enrollment' })
+  @SlashGroup({ name: 'enrollment', root: 'moderation' })
   async modify (
       @SlashChoice('enroll', 'enroll')
       @SlashChoice('unenroll', 'unenroll')
@@ -60,7 +61,7 @@ export abstract class Enrollment {
 
   @Guard(OwnerCheck)
   @Slash('list', { description: 'list servers currently enrolled in big server mode' })
-  @SlashGroup({ name: 'enrollment' })
+  @SlashGroup({ name: 'enrollment', root: 'moderation' })
   async list (
     interaction: CommandInteraction
   ) {
@@ -102,7 +103,7 @@ export abstract class Enrollment {
 }
 
 @Discord()
-@SlashGroup({ description: 'blacklist emojis for big server mode', name: 'blacklist' })
+@SlashGroup({ description: 'blacklist emojis for big server mode', name: 'blacklist', root: 'moderation' })
 export abstract class Blacklist {
   logger = logManager().getLogger('ServerConfig')
   emoteCache = container.resolve(EmoteCache)
@@ -110,7 +111,7 @@ export abstract class Blacklist {
 
   @Guard(OwnerCheck)
   @Slash('modify', { description: 'block/unblock an emoji on a specified server that you own' })
-  @SlashGroup({ name: 'blacklist' })
+  @SlashGroup({ name: 'blacklist', root: 'moderation' })
   async modify (
     @SlashChoice('block', 'block')
     @SlashChoice('unblock', 'unblock')
@@ -145,7 +146,7 @@ export abstract class Blacklist {
 
   @Guard(OwnerCheck)
   @Slash('list', { description: 'list blocked emoji' })
-  @SlashGroup({ name: 'blacklist' })
+  @SlashGroup({ name: 'blacklist', root: 'moderation' })
   async list (
     @SlashOption('server', {
       description: 'name of server you want to block emoji on',
@@ -174,7 +175,9 @@ export abstract class Blacklist {
           i++
         })
         new Pagination(interaction, paginatedList).send()
+        return
       }
     }
+    await interaction.editReply('No blocked emoji on this server.')
   }
 }
