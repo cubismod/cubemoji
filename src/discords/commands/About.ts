@@ -1,20 +1,22 @@
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { CommandInteraction, Message, MessageEmbed } from 'discord.js'
-import { Discord, Slash } from 'discordx'
+import { Discord, Guard, Slash } from 'discordx'
 import { container } from 'tsyringe'
 import secrets from '../../res/secrets.json'
 import { EmoteCache } from '../../util/EmoteCache'
 import { CubeMessageManager } from '../../util/MessageManager'
+import { bigServerDetect } from '../Guards'
 
 dayjs.extend(relativeTime)
 
 @Discord()
 export abstract class About {
+  @Guard(bigServerDetect)
   @Slash('about', {
     description: 'Provides information and stats about the bot.'
   })
-  async about (interaction: CommandInteraction) {
+  async about (interaction: CommandInteraction, data: {enrolled: boolean}) {
     const emoteCache = container.resolve(EmoteCache)
     if (emoteCache !== undefined) {
       const embed = new MessageEmbed()
@@ -50,8 +52,7 @@ export abstract class About {
           value: 'https://gitlab.com/cubismod/cubemoji/-/issues'
         }
       ])
-
-      const msg = await interaction.reply({ embeds: [embed], fetchReply: true })
+      const msg = await interaction.reply({ embeds: [embed], fetchReply: true, ephemeral: data.enrolled })
       const cubeMessageManager = container.resolve(CubeMessageManager)
       if (msg instanceof Message) cubeMessageManager.registerTrashReact(interaction, msg, interaction.user.id)
     }

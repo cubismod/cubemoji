@@ -110,9 +110,9 @@ export abstract class Blacklist {
   storage = container.resolve(CubeStorage)
 
   @Guard(OwnerCheck)
-  @Slash('modify', { description: 'block/unblock an emoji on a specified server that you own' })
+  @Slash('update', { description: 'block/unblock an emoji on a specified server that you own' })
   @SlashGroup({ name: 'blacklist', root: 'moderation' })
-  async modify (
+  async update (
     @SlashChoice('block', 'block')
     @SlashChoice('unblock', 'unblock')
     @SlashOption('action') action: string,
@@ -145,9 +145,9 @@ export abstract class Blacklist {
   }
 
   @Guard(OwnerCheck)
-  @Slash('list', { description: 'list blocked emoji' })
+  @Slash('show', { description: 'list blocked emoji' })
   @SlashGroup({ name: 'blacklist', root: 'moderation' })
-  async list (
+  async show (
     @SlashOption('server', {
       description: 'name of server you want to block emoji on',
       autocomplete: (interaction: AutocompleteInteraction) => serverAutocomplete(interaction),

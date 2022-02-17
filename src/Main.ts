@@ -26,7 +26,7 @@ export class Main {
   }
 
   static async start () {
-    await importx(dirname(import.meta.url) + '/**/*.{ts,js}')
+    await importx(dirname(import.meta.url) + '/**/*.{js}')
     logger.info('🅲🆄🅱🅴🅼🅾🅹🅸')
     DIService.container = container
     if (secrets.environment === 'prd') {
@@ -116,7 +116,7 @@ export class Main {
       }
 
       await Main._client.initApplicationCommands()
-      await Main._client.initApplicationPermissions()
+      await Main._client.initApplicationPermissions(true)
 
       logger.info(`cubemoji ${secrets.version} is now running...`)
       // set a new status msg every 5 min

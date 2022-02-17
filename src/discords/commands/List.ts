@@ -33,7 +33,7 @@ export abstract class List {
         // create a downloadable list
         // and store in GCP
         // if we don't already have one
-        await interaction.deferReply()
+        await interaction.deferReply({ ephemeral: true })
         const cubeStorage = container.resolve(CubeGCP)
         if (cubeStorage) {
           if (dayjs().unix() > cubeStorage.refreshTime) {
@@ -62,24 +62,6 @@ export abstract class List {
           }
           // now we send out the message
           interaction.editReply({ content: 'https://storage.googleapis.com/cubemoji.appspot.com/txt/emoji-list.txt' })
-          /* try {
-            await access(path.resolve(listPath))
-            log.info('reusing existing emoji list')
-            // the file does exist!
-          } catch {
-            emoteCache.nextListDelete = dayjs().add(30, 'min').unix()
-            log.info('writing new emoji list')
-            // the file does not exist so let's create one now
-
-          }
-          // now we send that file
-          interaction.editReply({ files: [new MessageAttachment(listPath)] })
-          // delete the file after 30 minutes to generate a new file next time
-          if (dayjs().unix() > emoteCache.nextListDelete) {
-            await unlink(listPath, (err) => {
-              if (err) log.error(err)
-            })
-          } */
         }
       } else {
         // the code for paginating is encapsulated in this other function
