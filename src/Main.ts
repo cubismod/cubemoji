@@ -1,15 +1,16 @@
 /* eslint-disable node/no-path-concat */
-import 'reflect-metadata'
+import { importx } from '@discordx/importer'
 import { Intents } from 'discord.js'
 import { Client, DIService } from 'discordx'
-import secrets from '../secrets.json'
-import pkginfo from '../package.json'
+import 'reflect-metadata'
 import { container } from 'tsyringe'
-import { EmoteCache } from './util/EmoteCache'
-import { CubeGCP, ImageQueue } from './util/Cubemoji'
-import { CubeMessageManager } from './util/MessageManager'
+import pkginfo from '../package.json'
+import secrets from '../secrets.json'
 import { setStatus } from './util/CommandHelper'
-import { importx } from '@discordx/importer'
+import { CubeGCP, ImageQueue } from './util/Cubemoji'
+import { EmoteCache } from './util/EmoteCache'
+import { setupHTTP } from './util/Healthcheck'
+import { CubeMessageManager } from './util/MessageManager'
 import { CubeStorage } from './util/Storage'
 export class Main {
   private static _client: Client
@@ -81,6 +82,8 @@ export class Main {
 
       await this._client.initApplicationCommands()
       await this._client.initApplicationPermissions()
+
+      setupHTTP()
 
       console.log(`cubemoji ${pkginfo.version} is now running...`)
       // set a new status msg every 5 min
