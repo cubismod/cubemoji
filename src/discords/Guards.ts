@@ -32,36 +32,6 @@ export const bigServerDetect: GuardFunction<
 }
 
 /**
- * limits npr mode to run in test channel
- * while in prd listens in every guild and channel besides test one defined in secrets
- */
-export const TestServer: GuardFunction<
-  | ArgsOf<'messageReactionAdd'>
-  | CommandInteraction
-  | ContextMenuInteraction
-> = async (arg, _client, next) => {
-  if (arg instanceof CommandInteraction || arg instanceof ContextMenuInteraction) {
-    // in production state, only interact with events NOT in the test channel
-    // defined in secrets file
-    if (secrets.environment === 'prd' && !secrets.testChannels.includes(arg.channelId)) {
-      await next()
-    }
-    // in non-prod state, do the opposite, only interact with events in test channel
-    if (secrets.environment === 'npr' && secrets.testChannels.includes(arg.channelId)) {
-      await next()
-    }
-  } else {
-    if (secrets.environment === 'prd' && !secrets.testChannels.includes(arg[0].message.channelId)) {
-      await next()
-    }
-    if (secrets.environment === 'npr' && secrets.testChannels.includes(arg[0].message.channelId)) {
-      await next()
-    }
-  }
-  console.log('hi')
-}
-
-/**
  * validates that user using this command actually
  * owns a guild
  */

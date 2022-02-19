@@ -4,7 +4,6 @@ import { Intents, Interaction } from 'discord.js'
 import { Client, DIService } from 'discordx'
 import 'reflect-metadata'
 import { container } from 'tsyringe'
-import { TestServer } from './discords/Guards'
 import secrets from './res/secrets.json'
 import { CubeGCP } from './util/Cubemoji'
 import { scheduleBackup } from './util/DatabaseMgmt'
@@ -29,42 +28,32 @@ export class Main {
     await importx(dirname(import.meta.url) + '/**/*.{js}')
     logger.info('🅲🆄🅱🅴🅼🅾🅹🅸')
     DIService.container = container
+    let silent: false|undefined
     if (secrets.environment === 'prd') {
       logger.info('running in PRD')
-      Main._client = new Client({
-        botGuilds: [(client) => client.guilds.cache.map((guild) => guild.id)],
-        intents: [
-          Intents.FLAGS.GUILDS,
-          Intents.FLAGS.GUILD_EMOJIS_AND_STICKERS,
-          Intents.FLAGS.GUILD_MESSAGES,
-          Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
-          Intents.FLAGS.GUILD_MEMBERS,
-          Intents.FLAGS.GUILD_PRESENCES
-        ],
-        partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
-        guards: [TestServer]
-      })
     } else {
       logger.info('Running in NPR')
-      Main._client = new Client({
-        botGuilds: secrets.testGuilds,
-        intents: [
-          Intents.FLAGS.GUILDS,
-          Intents.FLAGS.GUILD_EMOJIS_AND_STICKERS,
-          Intents.FLAGS.GUILD_MESSAGES,
-          Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
-          Intents.FLAGS.GUILD_MEMBERS,
-          Intents.FLAGS.GUILD_PRESENCES
-        ],
-        partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
-        // for testing purposes in cubemoji server
-        silent: false,
-        guards: [TestServer]
-      })
+      silent = false
     }
+
+    this._client = new Client({
+      botGuilds: [(client) => client.guilds.cache.map((guild) => guild.id)],
+      intents: [
+        Intents.FLAGS.GUILDS,
+        Intents.FLAGS.GUILD_EMOJIS_AND_STICKERS,
+        Intents.FLAGS.GUILD_MESSAGES,
+        Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
+        Intents.FLAGS.GUILD_MEMBERS,
+        Intents.FLAGS.GUILD_PRESENCES
+      ],
+      partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
+      // for testing purposes in cubemoji server
+      silent: silent
+    })
     await Main._client.login(secrets.token)
 
-    Main._client.once('ready', async () => {
+    this._client.once('ready', async () => {
+      await this._client.guilds.fetch()
       // dependency injection initialization
       if (DIService.container !== undefined) {
         DIService.container.register(ImageQueue, { useValue: new ImageQueue() })
@@ -87,10 +76,10 @@ export class Main {
           6.048e+8 // 1 week interval
         )
 
-        await container.resolve(CubeStorage).loadServerOwners(Main._client)
+        await container.resolve(CubeStorage).loadServerOwners(this._client)
         setInterval(
           async () => {
-            await container.resolve(CubeStorage).loadServerOwners(Main._client)
+            await container.resolve(CubeStorage).loadServerOwners(this._client)
           },
           3.6e+6 // 1 hour
         )
@@ -115,16 +104,19 @@ export class Main {
         throw new Error('DIServer.container is undefined therefore cannot initialize dependency injection')
       }
 
-      await Main._client.initApplicationCommands()
-      await Main._client.initApplicationPermissions(true)
+      await this._client.initApplicationCommands({
+        global: { log: true },
+        guild: { log: true }
+      })
+      await this._client.initApplicationPermissions()
 
       logger.info(`cubemoji ${secrets.version} is now running...`)
       // set a new status msg every 5 min
-      setStatus(Main._client)
-      setInterval(setStatus, 300000, Main._client)
+      setStatus(this._client)
+      setInterval(setStatus, 300000, this._client)
     })
 
-    Main._client.on('interactionCreate', async (interaction: Interaction) => {
+    this._client.on('interactionCreate', async (interaction: Interaction) => {
       // we limit the test bot to only interacting in my own #bot-test channel
       // while prd can interact with any channel
       if (interaction.isButton() || interaction.isSelectMenu()) {
@@ -133,7 +125,7 @@ export class Main {
         }
       }
       try {
-        await Main._client.executeInteraction(interaction)
+        await this._client.executeInteraction(interaction)
       } catch (err: unknown) {
         logger.error('INTERACTION FAILURE')
         logger.error(`Type: ${interaction.type}\nTimestamp: ${Date()}\nGuild: ${interaction.guild}\nUser: ${interaction.user.tag}\nChannel: ${interaction.channel}`)
@@ -143,4 +135,4 @@ export class Main {
   }
 }
 
-Main.start()
+await Main.start()
