@@ -23,6 +23,8 @@ async function reply (interaction: CommandInteraction, serverName = '', success:
 }
 
 @Discord()
+@Permission(false)
+@Permission(await OwnerCheck)
 @SlashGroup({ name: 'moderation', description: 'moderation functionality for the bot' })
 @SlashGroup('moderation')
 export abstract class Moderation {
@@ -50,13 +52,13 @@ export abstract class Moderation {
 }
 
 @Discord()
+@Permission(false)
+@Permission(await OwnerCheck)
 @SlashGroup({ name: 'enrollment', root: 'moderation' })
 @SlashGroup('enrollment', 'moderation')
 export abstract class Enrollment {
   logger = logManager().getLogger('ServerConfig')
 
-  @Permission(false)
-  @Permission(OwnerCheck)
   @Slash('modify', { description: 'enroll/unenroll a new server into big server mode' })
   async modify (
       @SlashChoice('enroll', 'enroll')
@@ -87,8 +89,6 @@ export abstract class Enrollment {
     }
   }
 
-  @Permission(false)
-  @Permission(OwnerCheck)
   @Slash('list', { description: 'list servers currently enrolled in big server mode' })
   async list (
     interaction: CommandInteraction
@@ -131,6 +131,8 @@ export abstract class Enrollment {
 }
 
 @Discord()
+@Permission(false)
+@Permission(await OwnerCheck)
 @SlashGroup({ name: 'blacklist', root: 'moderation' })
 @SlashGroup('blacklist', 'moderation')
 export abstract class Blacklist {
@@ -138,8 +140,6 @@ export abstract class Blacklist {
   emoteCache = container.resolve(EmoteCache)
   storage = container.resolve(CubeStorage)
 
-  @Permission(false)
-  @Permission(OwnerCheck)
   @Slash('emojimod', { description: 'block/unblock an emoji on a specified server that you own' })
   async emojiMod (
     @SlashChoice('block', 'block')
@@ -173,8 +173,6 @@ export abstract class Blacklist {
     }
   }
 
-  @Permission(false)
-  @Permission(OwnerCheck)
   @Slash('list', { description: 'list blocked emoji' })
   async list (
     @SlashOption('server', {

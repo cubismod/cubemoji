@@ -1,25 +1,19 @@
-// responses to Discord events
+// responses to message reacts
 
-import { GuildEmoji, MessageEmbed, MessageReaction, TextChannel } from 'discord.js'
+import { MessageEmbed, MessageReaction, TextChannel } from 'discord.js'
 import { ArgsOf, Discord, On } from 'discordx'
 import { choice } from 'pandemonium'
 import { container } from 'tsyringe'
 import { adjectives, animals, colors, names, uniqueNamesGenerator } from 'unique-names-generator'
-import { EditDiscord, getMessageImage, isUrl, RescaleDiscord } from '../util/DiscordLogic'
-import { EmoteCache } from '../util/EmoteCache'
-import { logManager } from '../util/LogManager'
-import { CubeMessageManager } from '../util/MessageManager'
-import { CubeStorage } from '../util/Storage'
-
-const logger = logManager().getLogger('Events')
-
-// event handling doesn't go through the usual executeInteraction flow in
-// Main.ts
+import { EditDiscord, getMessageImage, isUrl, RescaleDiscord } from '../../util/DiscordLogic'
+import { logManager } from '../../util/LogManager'
+import { CubeMessageManager } from '../../util/MessageManager'
+import { CubeStorage } from '../../util/Storage'
 
 @Discord()
-export abstract class EventListeners {
-  // messageReactionAdd
-  // for when we get a rescale, trash, or trash icon
+export abstract class ReactEvents {
+  private logger = logManager().getLogger('Events')
+
   @On('messageReactionAdd')
   async onMessageReactionAdd (
     [reaction]: ArgsOf<'messageReactionAdd'>
@@ -46,7 +40,7 @@ export abstract class EventListeners {
               try {
                 await reaction.message.delete()
               } catch (err) {
-                logger.error(err)
+                this.logger.error(err)
               }
               await cubeMessageManager.unregisterMessage(reaction.message.id)
             }
@@ -133,37 +127,12 @@ export abstract class EventListeners {
                   }
                 }
               } catch (err) {
-                logger.error(err)
+                this.logger.error(err)
               }
             }
           }
         }
       }
-    }
-  }
-
-  @On('emojiCreate')
-  async emojiCreate (emojis: GuildEmoji[]) {
-    if (emojis.length > 0) {
-      const emoteCache = container.resolve(EmoteCache)
-      if (emoteCache) emoteCache.addEmote(emojis[0])
-    }
-  }
-
-  @On('emojiDelete')
-  async emojiDelete (emojis: GuildEmoji[]) {
-    if (emojis.length > 0) {
-      const emoteCache = container.resolve(EmoteCache)
-      if (emoteCache) emoteCache.removeEmote(emojis[0])
-    }
-  }
-
-  @On('emojiUpdate')
-  async emojiUpdate (emojis: GuildEmoji[]) {
-    if (emojis.length > 1) {
-      // the event returns an array with the old emoji at pos 0, new emoji at pos 1
-      const emoteCache = container.resolve(EmoteCache)
-      if (emoteCache) emoteCache.editEmote(emojis[0], emojis[1])
     }
   }
 }

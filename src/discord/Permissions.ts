@@ -11,7 +11,7 @@ export async function OwnerCheck (): Promise<ApplicationCommandPermissions[]> {
   const owners = storage.getNamespace('owners')
   if (owners) {
     return owners.map(owner => {
-      return { id: owner.key, permission: true, type: 'USER' }
+      return { id: owner.key.replace('owners:', ''), permission: true, type: 'USER' }
     })
   } else {
     return [{ id: '', permission: false, type: 'USER' }]
