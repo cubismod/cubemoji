@@ -1,7 +1,6 @@
 import { CommandInteraction, ContextMenuInteraction } from 'discord.js'
 import { ArgsOf, GuardFunction } from 'discordx'
 import { container } from 'tsyringe'
-import secrets from '../res/secrets.json'
 import { CubeStorage } from '../util/Storage'
 
 /**
@@ -40,7 +39,7 @@ async (arg, _client, next) => {
   const storage = container.resolve(CubeStorage)
   const userGuilds = await storage.serverOwners.get(arg.user.id)
 
-  if (arg.user.id === secrets.botOwner) {
+  if (arg.user.id === process.env.CM_BOTOWNER) {
     await next()
   } else if (userGuilds) {
     await next()

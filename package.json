@@ -9,7 +9,8 @@
     "build": "tsc",
     "start": "node --es-module-specifier-resolution=node build/Main.js",
     "test": "jest --detectOpenHandles && rm download/*",
-    "dev": "tsc-watch --noClear -p ./tsconfig.json --onSuccess \"node --inspect --es-module-specifier-resolution=node build/Main.js\""
+    "dev": "tsc-watch --noClear -p ./tsconfig.json --onSuccess \"node --inspect --es-module-specifier-resolution=node build/Main.js\"",
+    "clean": "rm -rf build/"
   },
   "repository": {
     "type": "git",
@@ -29,7 +30,6 @@
     "@discordx/importer": "^1.1.2",
     "@discordx/pagination": "^1.2.0",
     "@discordx/utilities": "3.4.2",
-    "@google-cloud/storage": "^5.18.2",
     "@keyv/sqlite": "^3.0.0",
     "@types/jest": "^27.4.0",
     "better-sqlite3": "^7.5.0",
@@ -37,6 +37,7 @@
     "dayjs": "^1.10.7",
     "discord.js": "^13.6.0",
     "discordx": "9.3.1",
+    "dotenv": "^16.0.0",
     "file-type": "^17.1.1",
     "fuse.js": "^6.5.3",
     "gm": "^1.23.1",

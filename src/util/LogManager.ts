@@ -9,7 +9,12 @@ const { configure } = pkg
  * categories are set for various classes and files that log
  */
 export function logManager () {
-  const categoryConfig = { appenders: ['console', 'file'], level: 'info', enableCallStack: true }
+  let level = 'info'
+  if (process.env.CM_ENVIRONMENT === 'npr') {
+    level = 'debug'
+  }
+
+  const categoryConfig = { appenders: ['console', 'file'], level: level, enableCallStack: true }
 
   return configure({
     appenders: {

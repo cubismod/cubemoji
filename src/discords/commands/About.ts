@@ -3,7 +3,6 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 import { CommandInteraction, Message, MessageEmbed } from 'discord.js'
 import { Discord, Guard, Slash } from 'discordx'
 import { container } from 'tsyringe'
-import secrets from '../../res/secrets.json'
 import { EmoteCache } from '../../util/EmoteCache'
 import { CubeMessageManager } from '../../util/MessageManager'
 import { bigServerDetect } from '../Guards'
@@ -33,7 +32,7 @@ export abstract class About {
         },
         {
           name: 'Version',
-          value: `${secrets.version}`
+          value: `${process.env.CM_VERSION}`
         },
         {
           name: 'License',

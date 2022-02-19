@@ -1,10 +1,7 @@
 /* eslint-disable no-unused-vars */
 // various other classes used by cubemoji
-import { Storage } from '@google-cloud/storage'
-import dayjs from 'dayjs'
 import { Snowflake } from 'discord-api-types'
 import { GuildEmoji, SnowflakeUtil } from 'discord.js'
-import { singleton } from 'tsyringe'
 
 // the emoji can come from a few places
 // Discord implies that this carries a GuildEmoji object
@@ -16,20 +13,6 @@ export enum Source {
   Mutant,
   URL,
   Any
-}
-
-@singleton()
-/**
- * gcp storage
- */
-export class CubeGCP {
-  storage: Storage
-  refreshTime: number // unix timestamp to keep track of the next time we should refresh the storage list
-
-  constructor () {
-    this.storage = new Storage({ keyFilename: 'src/res/serviceKey.json' })
-    this.refreshTime = dayjs().unix()
-  }
 }
 
 // an individual emote

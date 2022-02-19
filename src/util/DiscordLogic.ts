@@ -9,7 +9,6 @@ import { Logger } from 'log4js'
 import { choice } from 'pandemonium'
 import { container } from 'tsyringe'
 import { URL } from 'url'
-import secrets from '../res/secrets.json'
 import { Cmoji, Source } from './Cubemoji'
 import { EmoteCache } from './EmoteCache'
 import { EditOperation, FaceOperation, MsgContext, RescaleOperation, splitEffects } from './ImageLogic'
@@ -361,9 +360,11 @@ async function reactErr (context: MsgContext) {
 
   // TODO: add ephermal followup explaining error details
   const cubeMessageManager = container.resolve(CubeMessageManager)
+  let errEmote = '😰'
+  if (process.env.CM_BROKEN) errEmote = process.env.CM_BROKEN
   if (context instanceof CommandInteraction) {
     logger.error(`Command interaction failure on channel id: ${context.channelId}, guild id: ${context.guildId}`)
-    const reply = await context.editReply(`${secrets.cubemojiBroken} this operation failed!`)
+    const reply = await context.editReply(`${errEmote} this operation failed!`)
     if (reply instanceof Message) {
       // allow user to delete the error message
       await cubeMessageManager.registerTrashReact(context, reply, context.user.id)
@@ -374,7 +375,7 @@ async function reactErr (context: MsgContext) {
     const msg = await context.channel?.messages.fetch(context.targetId)
     if (msg) {
       try {
-        msg.react(secrets.cubemojiBroken)
+        msg.react(errEmote)
       } catch (err) {
         logger.error(err)
       }
@@ -383,7 +384,7 @@ async function reactErr (context: MsgContext) {
   }
   if (context instanceof MessageReaction) {
     logger.error(`Message reaction failure on channel id ${context.message.channelId}, guild id: ${context.message.guildId}, message id: ${context.message.id}`)
-    await (await context.fetch()).message.react(secrets.cubemojiBroken)
+    await (await context.fetch()).message.react(errEmote)
   }
 }
 

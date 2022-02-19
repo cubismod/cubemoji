@@ -50,6 +50,7 @@ export abstract class Moderation {
 }
 
 @Discord()
+@SlashGroup({ name: 'enrollment', root: 'moderation' })
 @SlashGroup('enrollment', 'moderation')
 export abstract class Enrollment {
   logger = logManager().getLogger('ServerConfig')

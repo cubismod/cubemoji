@@ -1,11 +1,10 @@
 /* eslint-disable node/no-path-concat */
 import { dirname, importx } from '@discordx/importer'
-import { Intents, Interaction } from 'discord.js'
+import { Intents, Interaction, RateLimitData } from 'discord.js'
 import { Client, DIService } from 'discordx'
+import { config } from 'dotenv'
 import 'reflect-metadata'
 import { container } from 'tsyringe'
-import secrets from './res/secrets.json'
-import { CubeGCP } from './util/Cubemoji'
 import { scheduleBackup } from './util/DatabaseMgmt'
 import { setStatus } from './util/DiscordLogic'
 import { EmoteCache } from './util/EmoteCache'
@@ -27,10 +26,11 @@ export class Main {
 
   static async start () {
     await importx(dirname(import.meta.url) + '/discords/**/*.js')
+    config()
     logger.info('🅲🆄🅱🅴🅼🅾🅹🅸')
     DIService.container = container
     let silent: false|undefined
-    if (secrets.environment === 'prd') {
+    if (process.env.CM_ENVIRONMENT === 'prd') {
       logger.info('running in PRD')
     } else {
       logger.info('Running in NPR')
@@ -51,7 +51,17 @@ export class Main {
       // for testing purposes in cubemoji server
       silent: silent
     })
-    await Main._client.login(secrets.token)
+    if (process.env.CM_TOKEN) await this._client.login(process.env.CM_TOKEN, true)
+    else throw new Error('No token specified with environment variable $CM_TOKEN')
+
+    this._client.on('rateLimit', async (data: RateLimitData) => {
+      logger.error('Rate Limit Error!')
+      logger.error(data)
+    })
+
+    this._client.on('debug', async (message: string) => {
+      logger.debug(message)
+    })
 
     this._client.once('ready', async () => {
       await this._client.guilds.fetch()
@@ -85,13 +95,12 @@ export class Main {
           3.6e+6 // 1 hour
         )
 
-        // schedule a backup for 3am EST
+        // schedule a backup for 2am EST
         scheduleBackup()
 
-        DIService.container.register(CubeGCP, { useValue: new CubeGCP() })
-        logger.info('registered CubeGCP')
-
-        DIService.container.register(WorkerPool, { useValue: new WorkerPool(secrets.workers) })
+        let workers = 4
+        if (process.env.CM_WORKERS) workers = parseInt(process.env.CM_WORKERS)
+        DIService.container.register(WorkerPool, { useValue: new WorkerPool(workers) })
         logger.info('registered WorkerPool')
 
         DIService.container.register(EmoteCache, { useValue: new EmoteCache() })
@@ -117,7 +126,7 @@ export class Main {
         throw new Error('exiting application as commands can\'t init properly')
       }
 
-      logger.info(`cubemoji ${secrets.version} is now running...`)
+      logger.info(`cubemoji ${process.env.CM_VERSION} is now running...`)
       // set a new status msg every 5 min
       setStatus(this._client)
       setInterval(setStatus, 300000, this._client)

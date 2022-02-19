@@ -1,10 +1,13 @@
 import { ButtonInteraction, CommandInteraction, Guild, MessageActionRow, MessageButton } from 'discord.js'
 import { ButtonComponent, Discord, Permission, Slash, SlashOption } from 'discordx'
-import secrets from '../../res/secrets.json'
+
+let botOwner = '0'
+
+if (process.env.CM_BOTOWNER) botOwner = process.env.CM_BOTOWNER
 
 @Discord()
 @Permission(false)
-@Permission({ id: secrets.botOwner, type: 'USER', permission: true })
+@Permission({ id: botOwner, type: 'USER', permission: true })
 export abstract class LeaveGuild {
   resolved: Guild | null = null
 
