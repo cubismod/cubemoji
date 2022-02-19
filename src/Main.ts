@@ -53,12 +53,16 @@ export class Main {
       // for testing purposes in cubemoji server
       silent: silent
     })
-    if (process.env.CM_TOKEN) await this._client.login(process.env.CM_TOKEN, true)
+    if (process.env.CM_TOKEN) await this._client.login(process.env.CM_TOKEN)
     else throw new Error('No token specified with environment variable $CM_TOKEN')
 
     this._client.on('rateLimit', async (data: RateLimitData) => {
-      logger.error('Rate Limit Error!')
-      logger.error(data)
+      logger.debug('Rate Limit Error!')
+      logger.debug(data)
+    })
+
+    this._client.on('warn', async (msg: string) => {
+      logger.warn(msg)
     })
 
     this._client.on('debug', async (message: string) => {
@@ -66,7 +70,6 @@ export class Main {
     })
 
     this._client.once('ready', async () => {
-      await this._client.guilds.fetch()
       // dependency injection initialization
       if (DIService.container !== undefined) {
         DIService.container.register(ImageQueue, { useValue: new ImageQueue() })

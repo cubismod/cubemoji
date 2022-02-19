@@ -34,7 +34,7 @@ export const bigServerDetect: GuardFunction<
  * validates that user using this command actually
  * owns a guild
  */
-export const OwnerCheck: GuardFunction<CommandInteraction> =
+/* export const OwnerCheck: GuardFunction<CommandInteraction> =
 async (arg, _client, next) => {
   const storage = container.resolve(CubeStorage)
   const userGuilds = await storage.serverOwners.get(arg.user.id)
@@ -44,4 +44,4 @@ async (arg, _client, next) => {
   } else if (userGuilds) {
     await next()
   }
-}
+} */

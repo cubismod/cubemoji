@@ -2,7 +2,7 @@
 
 import { Pagination } from '@discordx/pagination'
 import { AutocompleteInteraction, CommandInteraction, MessageEmbed } from 'discord.js'
-import { Discord, Guard, Slash, SlashChoice, SlashGroup, SlashOption } from 'discordx'
+import { Discord, Permission, Slash, SlashChoice, SlashGroup, SlashOption } from 'discordx'
 import { container } from 'tsyringe'
 import strings from '../../res/strings.json'
 import { serverAutocomplete } from '../../util/Autocomplete'
@@ -10,7 +10,7 @@ import { validateServerOwner } from '../../util/DiscordLogic'
 import { EmoteCache } from '../../util/EmoteCache'
 import { logManager } from '../../util/LogManager'
 import { CubeStorage } from '../../util/Storage'
-import { OwnerCheck } from '../Guards'
+import { OwnerCheck } from '../Permissions'
 
 interface enrolledServer {
   value: string, // user tag
@@ -55,7 +55,8 @@ export abstract class Moderation {
 export abstract class Enrollment {
   logger = logManager().getLogger('ServerConfig')
 
-  @Guard(OwnerCheck)
+  @Permission(false)
+  @Permission(OwnerCheck)
   @Slash('modify', { description: 'enroll/unenroll a new server into big server mode' })
   async modify (
       @SlashChoice('enroll', 'enroll')
@@ -86,7 +87,8 @@ export abstract class Enrollment {
     }
   }
 
-  @Guard(OwnerCheck)
+  @Permission(false)
+  @Permission(OwnerCheck)
   @Slash('list', { description: 'list servers currently enrolled in big server mode' })
   async list (
     interaction: CommandInteraction
@@ -136,7 +138,8 @@ export abstract class Blacklist {
   emoteCache = container.resolve(EmoteCache)
   storage = container.resolve(CubeStorage)
 
-  @Guard(OwnerCheck)
+  @Permission(false)
+  @Permission(OwnerCheck)
   @Slash('emojimod', { description: 'block/unblock an emoji on a specified server that you own' })
   async emojiMod (
     @SlashChoice('block', 'block')
@@ -170,7 +173,8 @@ export abstract class Blacklist {
     }
   }
 
-  @Guard(OwnerCheck)
+  @Permission(false)
+  @Permission(OwnerCheck)
   @Slash('list', { description: 'list blocked emoji' })
   async list (
     @SlashOption('server', {

@@ -14,7 +14,7 @@ import { gotOptions } from './Cubemoji'
 import { logManager } from './LogManager'
 const { got } = await import('got')
 
-export interface GuildOwner {
+export interface ServerOwner {
   id: string,
   name: string
 }
@@ -48,8 +48,9 @@ export class CubeStorage {
   /**
    * server owners with key of their id
    * value is a list of servers they own
+   * namespace: owners
    */
-  serverOwners: Keyv<GuildOwner[]>
+  serverOwners: Keyv<ServerOwner[]>
 
   /**
    * enrolled servers stored w/ key of server unique id
@@ -84,7 +85,7 @@ export class CubeStorage {
     this.emojiBlocked = new Keyv<string>('sqlite://' + this.serverInfoPath, { namespace: 'emoji' })
 
     this.logger = logManager().getLogger('Storage')
-    this.serverOwners = new Keyv<GuildOwner[]>('sqlite://' + this.serverInfoPath, { namespace: 'owners' })
+    this.serverOwners = new Keyv<ServerOwner[]>('sqlite://' + this.serverInfoPath, { namespace: 'owners' })
   }
 
   async initHosts () {
@@ -148,7 +149,7 @@ export class CubeStorage {
         })
         await this.serverOwners.set(owner, guildsOwned)
       } else {
-        const newArr: GuildOwner[] = [
+        const newArr: ServerOwner[] = [
           {
             name: resolved.name,
             id: resolved.id
