@@ -14,6 +14,9 @@ import { CubeMessageManager } from './util/MessageManager'
 import { CubeStorage } from './util/Storage'
 import { WorkerPool } from './util/WorkerPool'
 
+// load dotenv file if exists
+config()
+
 const logger = logManager().getLogger('Main')
 const clientLogger = logManager().getLogger('Client')
 
@@ -25,8 +28,7 @@ export class Main {
   }
 
   static async start () {
-    await importx(dirname(import.meta.url) + '/discords/**/*.js')
-    config()
+    await importx(dirname(import.meta.url) + '/discord/**/*.js')
     logger.info('🅲🆄🅱🅴🅼🅾🅹🅸')
     DIService.container = container
     let silent: false|undefined
