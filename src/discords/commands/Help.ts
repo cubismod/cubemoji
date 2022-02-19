@@ -5,9 +5,9 @@ import strings from '../../res/strings.json'
 @Discord()
 export abstract class Help {
   @Slash('help', { description: 'A guide on how to use cubemoji' })
-  help (interaction: CommandInteraction) {
+  async help (interaction: CommandInteraction) {
     const helpEmbed = new MessageEmbed()
-      .setTitle('cubemoji help')
+      .setTitle('cubemoji Help')
       .setThumbnail('https://storage.googleapis.com/cubemoji.appspot.com/icon.png')
       .setDescription(strings.helpDescription)
       .addField('Slashes', strings.helpSlashes)
@@ -17,6 +17,6 @@ export abstract class Help {
       .addField('Utilities', strings.helpUtilities)
       .addField('Feedback', strings.helpFeedback)
       .setColor('#c5e0e9')
-    interaction.reply({ embeds: [helpEmbed], ephemeral: true })
+    await interaction.reply({ embeds: [helpEmbed], ephemeral: true })
   }
 }

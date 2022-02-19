@@ -1,9 +1,10 @@
 // Various server configuration commands
 
 import { Pagination } from '@discordx/pagination'
-import { AutocompleteInteraction, CommandInteraction } from 'discord.js'
+import { AutocompleteInteraction, CommandInteraction, MessageEmbed } from 'discord.js'
 import { Discord, Guard, Slash, SlashChoice, SlashGroup, SlashOption } from 'discordx'
 import { container } from 'tsyringe'
+import strings from '../../res/strings.json'
 import { serverAutocomplete } from '../../util/Autocomplete'
 import { validateServerOwner } from '../../util/DiscordLogic'
 import { EmoteCache } from '../../util/EmoteCache'
@@ -22,8 +23,33 @@ async function reply (interaction: CommandInteraction, serverName = '', success:
 }
 
 @Discord()
-@SlashGroup({ name: 'moderation', description: 'setup a less spammy version of the bot for specific servers' })
-@SlashGroup({ name: 'enrollment', description: 'allows bot and server owners to modify big server mode', root: 'moderation' })
+@SlashGroup({ name: 'moderation', description: 'moderation functionality for the bot' })
+@SlashGroup('moderation')
+export abstract class Moderation {
+  @Slash('help')
+  async help (
+    interaction: CommandInteraction
+  ) {
+    const helpEmbed = new MessageEmbed()
+      .setTitle('Moderation Help')
+      .setDescription(strings.modIntro)
+      .addField('Enrollment', strings.modEnrollment)
+      .addField('Blacklist', strings.modBlacklist)
+      .addField('Commands', `
+      - Enrollment
+      -- modify
+      -- list
+      - Blacklist
+      -- emojimod
+      -- channelmod
+      -- list
+      `)
+      .setColor('#c5e0e9')
+    await interaction.reply({ embeds: [helpEmbed], ephemeral: true })
+  }
+}
+
+@Discord()
 @SlashGroup('enrollment', 'moderation')
 export abstract class Enrollment {
   logger = logManager().getLogger('ServerConfig')
@@ -102,7 +128,7 @@ export abstract class Enrollment {
 }
 
 @Discord()
-@SlashGroup({ name: 'blacklist', description: 'blacklist emojis for big server mode', root: 'moderation' })
+@SlashGroup({ name: 'blacklist', root: 'moderation' })
 @SlashGroup('blacklist', 'moderation')
 export abstract class Blacklist {
   logger = logManager().getLogger('ServerConfig')
@@ -110,8 +136,8 @@ export abstract class Blacklist {
   storage = container.resolve(CubeStorage)
 
   @Guard(OwnerCheck)
-  @Slash('update', { description: 'block/unblock an emoji on a specified server that you own' })
-  async update (
+  @Slash('emojimod', { description: 'block/unblock an emoji on a specified server that you own' })
+  async emojiMod (
     @SlashChoice('block', 'block')
     @SlashChoice('unblock', 'unblock')
     @SlashOption('action') action: string,
@@ -144,8 +170,8 @@ export abstract class Blacklist {
   }
 
   @Guard(OwnerCheck)
-  @Slash('show', { description: 'list blocked emoji' })
-  async show (
+  @Slash('list', { description: 'list blocked emoji' })
+  async list (
     @SlashOption('server', {
       description: 'name of server you want to block emoji on',
       autocomplete: (interaction: AutocompleteInteraction) => serverAutocomplete(interaction),

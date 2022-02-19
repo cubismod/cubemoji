@@ -16,6 +16,7 @@ import { CubeStorage } from './util/Storage'
 import { WorkerPool } from './util/WorkerPool'
 
 const logger = logManager().getLogger('Main')
+const clientLogger = logManager().getLogger('Client')
 
 export class Main {
   private static _client: Client
@@ -25,7 +26,7 @@ export class Main {
   }
 
   static async start () {
-    await importx(dirname(import.meta.url) + '/**/*.{js}')
+    await importx(dirname(import.meta.url) + '/discords/**/*.js')
     logger.info('🅲🆄🅱🅴🅼🅾🅹🅸')
     DIService.container = container
     let silent: false|undefined
@@ -104,11 +105,17 @@ export class Main {
         throw new Error('DIServer.container is undefined therefore cannot initialize dependency injection')
       }
 
-      await this._client.initApplicationCommands({
-        global: { log: true },
-        guild: { log: true }
-      })
-      await this._client.initApplicationPermissions()
+      try {
+        await this._client.initApplicationCommands({
+          global: { log: true },
+          guild: { log: true }
+        })
+        await this._client.initApplicationPermissions()
+      } catch (err) {
+        clientLogger.error('Error initializing application commands and permissions!!!')
+        clientLogger.error(err)
+        throw new Error('exiting application as commands can\'t init properly')
+      }
 
       logger.info(`cubemoji ${secrets.version} is now running...`)
       // set a new status msg every 5 min
