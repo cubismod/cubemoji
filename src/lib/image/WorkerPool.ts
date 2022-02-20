@@ -1,7 +1,7 @@
 import { State } from 'gm'
 import { Logger } from 'log4js'
 import { singleton } from 'tsyringe'
-import { logManager } from './LogManager'
+import { logManager } from '../LogManager'
 
 /**
  * workers here aren't actually tracked in any meaningful way by the program

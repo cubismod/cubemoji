@@ -24,9 +24,7 @@ export function logManager () {
       file: {
         type: 'file',
         filename: 'data/logs/cubemoji.log',
-        maxLogSize: 500000, // 500Kb
-        backups: 8,
-        compress: true
+        maxLogSize: 1e+7 // 10MB
       }
     },
     categories: {

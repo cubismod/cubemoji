@@ -1,10 +1,10 @@
 import { AutocompleteInteraction, CommandInteraction, GuildMember, Message } from 'discord.js'
 import { Discord, Slash, SlashOption } from 'discordx'
 import { container } from 'tsyringe'
+import { emoteAutocomplete } from '../../lib/cmd/Autocomplete'
+import { CubeMessageManager } from '../../lib/cmd/MessageManager'
+import { autoDeleteMsg, parseForEmote, reply } from '../../lib/image/DiscordLogic'
 import strings from '../../res/strings.json'
-import { emoteAutocomplete } from '../../util/Autocomplete'
-import { autoDeleteMsg, parseForEmote, reply } from '../../util/DiscordLogic'
-import { CubeMessageManager } from '../../util/MessageManager'
 
 @Discord()
 export abstract class Big {

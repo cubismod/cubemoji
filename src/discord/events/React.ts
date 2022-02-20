@@ -5,10 +5,10 @@ import { ArgsOf, Discord, On } from 'discordx'
 import { choice } from 'pandemonium'
 import { container } from 'tsyringe'
 import { adjectives, animals, colors, names, uniqueNamesGenerator } from 'unique-names-generator'
-import { EditDiscord, getMessageImage, isUrl, RescaleDiscord } from '../../util/DiscordLogic'
-import { logManager } from '../../util/LogManager'
-import { CubeMessageManager } from '../../util/MessageManager'
-import { CubeStorage } from '../../util/Storage'
+import { CubeMessageManager } from '../../lib/cmd/MessageManager'
+import { CubeStorage } from '../../lib/db/Storage'
+import { EditDiscord, getMessageImage, isUrl, RescaleDiscord } from '../../lib/image/DiscordLogic'
+import { logManager } from '../../lib/LogManager'
 
 @Discord()
 export abstract class ReactEvents {

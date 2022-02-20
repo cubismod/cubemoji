@@ -1,8 +1,8 @@
 import { AutocompleteInteraction, CommandInteraction, GuildMember } from 'discord.js'
 import { Discord, Slash, SlashOption } from 'discordx'
+import { emoteAutocomplete } from '../../lib/cmd/Autocomplete'
+import { EditDiscord, parseForEmote } from '../../lib/image/DiscordLogic'
 import strings from '../../res/strings.json'
-import { emoteAutocomplete } from '../../util/Autocomplete'
-import { EditDiscord, parseForEmote } from '../../util/DiscordLogic'
 
 @Discord()
 export abstract class Jumbo {

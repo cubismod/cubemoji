@@ -2,14 +2,14 @@
 
 import { ArgsOf, Client, Discord, DIService, On, Once } from 'discordx'
 import { container } from 'tsyringe'
-import { scheduleBackup } from '../../util/DatabaseMgmt'
-import { setStatus } from '../../util/DiscordLogic'
-import { EmoteCache } from '../../util/EmoteCache'
-import { ImageQueue } from '../../util/ImageQueue'
-import { logManager } from '../../util/LogManager'
-import { CubeMessageManager } from '../../util/MessageManager'
-import { CubeStorage } from '../../util/Storage'
-import { WorkerPool } from '../../util/WorkerPool'
+import { CubeMessageManager } from '../../lib/cmd/MessageManager'
+import { scheduleBackup } from '../../lib/db/DatabaseMgmt'
+import { CubeStorage } from '../../lib/db/Storage'
+import { EmoteCache } from '../../lib/emote/EmoteCache'
+import { setStatus } from '../../lib/image/DiscordLogic'
+import { ImageQueue } from '../../lib/image/ImageQueue'
+import { WorkerPool } from '../../lib/image/WorkerPool'
+import { logManager } from '../../lib/LogManager'
 
 const logger = logManager().getLogger('Client')
 
@@ -50,9 +50,12 @@ export abstract class ClientEvents {
         )
 
         await container.resolve(CubeStorage).loadServerOwners(client)
+        // once an hour refresh our cache of who the server owners are
+        // and re-init permissions on Moderation commands
         setInterval(
           async () => {
             await container.resolve(CubeStorage).loadServerOwners(client)
+            await client.initApplicationPermissions()
           },
           3.6e+6 // 1 hour
         )
@@ -89,6 +92,7 @@ export abstract class ClientEvents {
       }
 
       logger.info(`cubemoji ${process.env.CM_VERSION} is now running...`)
+      logger.info(`It took ${process.uptime()}s to startup this time`)
       // set a new status msg every 5 min
       setStatus(client)
       setInterval(setStatus, 300000, client)

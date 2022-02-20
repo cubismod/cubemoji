@@ -12,10 +12,10 @@ import path from 'path'
 import probe from 'probe-image-size'
 import { pipeline } from 'stream/promises'
 import { container } from 'tsyringe'
-import imgEffects from '../res/imgEffects.json'
-import { gotOptions } from './Cubemoji'
+import imgEffects from '../../res/imgEffects.json'
+import { gotOptions } from '../emote/Cmoji'
+import { logManager } from '../LogManager'
 import { ImageQueue } from './ImageQueue'
-import { logManager } from './LogManager'
 import { WorkerPool } from './WorkerPool'
 const { got } = await import('got')
 

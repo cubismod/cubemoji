@@ -1,8 +1,8 @@
 import { AutocompleteInteraction, CommandInteraction, GuildMember } from 'discord.js'
 import { Discord, Slash, SlashOption } from 'discordx'
-import { emoteAutocomplete } from '../../util/Autocomplete'
+import { emoteAutocomplete } from '../../lib/cmd/Autocomplete'
+import { RescaleDiscord } from '../../lib/image/DiscordLogic'
 import strings from '../../res/strings.json'
-import { RescaleDiscord } from '../../util/DiscordLogic'
 
 @Discord()
 export abstract class Rescale {

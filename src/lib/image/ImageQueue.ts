@@ -3,7 +3,7 @@ import { readdir } from 'fs/promises'
 import Fuse from 'fuse.js'
 import { Logger } from 'log4js'
 import { singleton } from 'tsyringe'
-import { logManager } from './LogManager'
+import { logManager } from '../LogManager'
 
 export interface Image {
   // url as saved in discord cdn

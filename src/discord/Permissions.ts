@@ -1,6 +1,6 @@
 import { ApplicationCommandPermissions } from 'discord.js'
 import { container } from 'tsyringe'
-import { CubeStorage } from '../util/Storage'
+import { CubeStorage } from '../lib/db/Storage'
 
 /**
  * returns an array of user IDs where each user owns

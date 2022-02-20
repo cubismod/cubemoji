@@ -4,7 +4,7 @@ import { Intents } from 'discord.js'
 import { Client } from 'discordx'
 import { config } from 'dotenv'
 import 'reflect-metadata'
-import { logManager } from './util/LogManager'
+import { logManager } from './lib/LogManager'
 
 // load dotenv file if exists
 config()

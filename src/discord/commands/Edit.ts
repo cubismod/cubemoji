@@ -1,9 +1,9 @@
 import { AutocompleteInteraction, CommandInteraction, GuildMember } from 'discord.js'
 import { Discord, Slash, SlashOption } from 'discordx'
+import { editAutocomplete, emoteAutocomplete } from '../../lib/cmd/Autocomplete'
+import { EditDiscord } from '../../lib/image/DiscordLogic'
 import imgEffects from '../../res/imgEffects.json'
 import strings from '../../res/strings.json'
-import { editAutocomplete, emoteAutocomplete } from '../../util/Autocomplete'
-import { EditDiscord } from '../../util/DiscordLogic'
 
 @Discord()
 export abstract class Edit {

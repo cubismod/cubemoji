@@ -1,8 +1,8 @@
 import { AutocompleteInteraction, CommandInteraction } from 'discord.js'
 import { Discord, Slash, SlashChoice, SlashOption } from 'discordx'
+import { emoteAutocomplete } from '../../lib/cmd/Autocomplete'
+import { FaceDiscord, getUrl } from '../../lib/image/DiscordLogic'
 import strings from '../../res/strings.json'
-import { emoteAutocomplete } from '../../util/Autocomplete'
-import { FaceDiscord, getUrl } from '../../util/DiscordLogic'
 
 @Discord()
 export abstract class AddFace {

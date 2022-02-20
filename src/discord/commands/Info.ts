@@ -2,11 +2,11 @@
 import { AutocompleteInteraction, CommandInteraction, GuildMember, MessageEmbed } from 'discord.js'
 import { Discord, Slash, SlashOption } from 'discordx'
 import { container } from 'tsyringe'
+import { emoteAutocomplete } from '../../lib/cmd/Autocomplete'
+import { Source } from '../../lib/emote/Cmoji'
+import { EmoteCache } from '../../lib/emote/EmoteCache'
+import { logManager } from '../../lib/LogManager'
 import strings from '../../res/strings.json'
-import { emoteAutocomplete } from '../../util/Autocomplete'
-import { Source } from '../../util/Cubemoji'
-import { EmoteCache } from '../../util/EmoteCache'
-import { logManager } from '../../util/LogManager'
 
 @Discord()
 export abstract class Info {

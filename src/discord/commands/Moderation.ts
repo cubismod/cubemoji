@@ -1,33 +1,60 @@
 // Various server configuration commands
 
 import { Pagination } from '@discordx/pagination'
-import { AutocompleteInteraction, CommandInteraction, MessageEmbed } from 'discord.js'
+import { AutocompleteInteraction, CommandInteraction, MessageEmbed, SnowflakeUtil, TextChannel, VoiceChannel } from 'discord.js'
 import { Discord, Permission, Slash, SlashChoice, SlashGroup, SlashOption } from 'discordx'
+import pkg from 'micromatch'
 import { container } from 'tsyringe'
+import { serverAutocomplete } from '../../lib/cmd/Autocomplete'
+import { CubeStorage } from '../../lib/db/Storage'
+import { EmoteCache } from '../../lib/emote/EmoteCache'
+import { guildOwnersCheck } from '../../lib/image/DiscordLogic'
+import { logManager } from '../../lib/LogManager'
 import strings from '../../res/strings.json'
-import { serverAutocomplete } from '../../util/Autocomplete'
-import { validateServerOwner } from '../../util/DiscordLogic'
-import { EmoteCache } from '../../util/EmoteCache'
-import { logManager } from '../../util/LogManager'
-import { CubeStorage } from '../../util/Storage'
 import { OwnerCheck } from '../Permissions'
+const { parse } = pkg
 
 interface enrolledServer {
   value: string, // user tag
   expires: null
 }
 
-async function reply (interaction: CommandInteraction, serverName = '', success: boolean, action: string) {
-  if (success) await interaction.editReply(`✅ Successfully **${action}** "${serverName}"`)
-  else await interaction.editReply(`❌ Could not **${action}** "${serverName}". You may be not be the owner or identifier was invalid.`)
+/**
+ * reply with an embed to indicate status of action
+ * @param interaction discord interaction which should be deferred
+ * @param serverName aka guild name
+ * @param success result of action
+ * @param action something like 'enroll', 'unenroll', etc.
+ * @param notes add'l notes to include for user
+ */
+async function reply (interaction: CommandInteraction, serverName = '', success: boolean, action: string, notes = '') {
+  const embed = new MessageEmbed({
+    title: `Action: ${action}`,
+    fields: [
+      {
+        name: 'Server Name',
+        value: serverName
+      },
+      {
+        name: 'Status',
+        value: success ? 'Success' : 'Failure'
+      }
+    ],
+    color: success ? 'GREEN' : 'RED',
+    footer: {
+      text: 'cubemoji moderation tools'
+    }
+  })
+  if (notes !== '') embed.addField('Notes', notes)
+  interaction.editReply({ embeds: [embed] })
 }
 
 @Discord()
 @Permission(false)
 @Permission(await OwnerCheck)
-@SlashGroup({ name: 'moderation', description: 'moderation functionality for the bot' })
+@SlashGroup({ name: 'mod', description: 'moderation functionality for the bot' })
 @SlashGroup('moderation')
-export abstract class Moderation {
+export abstract class Mod {
   @Slash('help')
   async help (
     interaction: CommandInteraction
@@ -37,16 +64,15 @@ export abstract class Moderation {
       .setDescription(strings.modIntro)
       .addField('Enrollment', strings.modEnrollment)
       .addField('Blacklist', strings.modBlacklist)
-      .addField('Commands', `
-      - Enrollment
-      -- modify
-      -- list
-      - Blacklist
-      -- emojimod
-      -- channelmod
-      -- list
-      `)
-      .setColor('#c5e0e9')
+      .addField('Commands', `\`\`\`
+-> Enrollment
+--* modify
+--* list
+-> Blacklist
+--* emojimod
+--* channelmod
+--* list\`\`\``)
+      .setColor('GOLD')
     await interaction.reply({ embeds: [helpEmbed], ephemeral: true })
   }
 }
@@ -54,8 +80,8 @@ export abstract class Moderation {
 @Discord()
 @Permission(false)
 @Permission(await OwnerCheck)
-@SlashGroup({ name: 'enrollment', root: 'moderation' })
-@SlashGroup('enrollment', 'moderation')
+@SlashGroup({ name: 'enrollment', root: 'mod' })
+@SlashGroup('enrollment', 'mod')
 export abstract class Enrollment {
   logger = logManager().getLogger('ServerConfig')
 
@@ -72,16 +98,17 @@ export abstract class Enrollment {
         interaction: CommandInteraction
   ) {
     await interaction.deferReply({ ephemeral: true })
-    const guildInfo = await validateServerOwner(interaction.user.id, server, interaction.client)
+    const guildInfo = await guildOwnersCheck(interaction.user.id, server, interaction.client)
     if (guildInfo) {
+      // user triggering command has permissions to use it
       const enrollment = container.resolve(CubeStorage).enrollment
       if (action === 'enroll') {
         await enrollment.set(guildInfo[0], interaction.user.tag)
         this.logger.info(`${interaction.user.tag} enrolled [${guildInfo}] in big server mode.`)
-        await reply(interaction, guildInfo[1], true, 'enrolled')
+        await reply(interaction, guildInfo[1], true, 'enroll')
       } else {
         await enrollment.delete(guildInfo[0])
-        await reply(interaction, guildInfo[1], true, 'unenrolled')
+        await reply(interaction, guildInfo[1], true, 'unenroll')
         this.logger.info(`${interaction.user.tag} unenrolled [${guildInfo}] from big server mode.`)
       }
     } else {
@@ -133,8 +160,8 @@ export abstract class Enrollment {
 @Discord()
 @Permission(false)
 @Permission(await OwnerCheck)
-@SlashGroup({ name: 'blacklist', root: 'moderation' })
-@SlashGroup('blacklist', 'moderation')
+@SlashGroup({ name: 'blacklist', root: 'mod' })
+@SlashGroup('blacklist', 'mod')
 export abstract class Blacklist {
   logger = logManager().getLogger('ServerConfig')
   emoteCache = container.resolve(EmoteCache)
@@ -151,25 +178,64 @@ export abstract class Blacklist {
       type: 'STRING'
     }) server: string,
     @SlashOption('emoji', {
-      description: 'emojis including this string in it won\'t work on your server',
+      description: 'glob syntax to block emoji, see /mod help fmi',
       type: 'STRING'
     }) emoji: string,
       interaction: CommandInteraction
   ) {
     await interaction.deferReply({ ephemeral: true })
-    const guildInfo = await validateServerOwner(interaction.user.id, server, interaction.client)
-    if (guildInfo && interaction.guildId && interaction.guild && emoji.length < 25) {
-      const key = guildInfo[0] + '_' + emoji.toLowerCase()
+    const guildInfo = await guildOwnersCheck(interaction.user.id, server, interaction.client)
+    // validate the glob expression
+    const parsed = parse(emoji)
+    if (guildInfo && interaction.guildId && interaction.guild && emoji.length < 25 && parsed) {
+      // db key made of the guildID_randomsnowflake
+      const key = guildInfo[0] + '_' + SnowflakeUtil.generate()
+
       if (action === 'block') {
-        this.emoteCache.modifyBlockedEmoji(emoji.toLowerCase(), guildInfo[0], true)
-        await this.storage.emojiBlocked.set(key, '')
-        await reply(interaction, guildInfo[1], true, `blocked "${emoji}" in`)
+        if (this.emoteCache.modifyBlockedEmoji(emoji, guildInfo[0], true)) {
+          // success
+          await this.storage.emojiBlocked.set(key, emoji)
+          await reply(interaction, guildInfo[1], true, `block \`${emoji}\``)
+        } else await reply(interaction, guildInfo[1], false, `block \`${emoji}\``)
       } else {
-        this.emoteCache.modifyBlockedEmoji(emoji.toLowerCase(), guildInfo[0], false)
+        this.emoteCache.modifyBlockedEmoji(emoji, guildInfo[0], false)
         await this.storage.emojiBlocked.delete(key)
+        await reply(interaction, guildInfo[1], true, `unblocked \`${emoji}\``)
       }
     } else if (guildInfo) {
-      await reply(interaction, guildInfo[1], false, `modify "${emoji} in`)
+      await reply(interaction, guildInfo[1], false, `modify \`${emoji}\``, 'cubemoji uses [micromatch globbing syntax](https://github.com/micromatch/micromatch#matching-features)')
+    }
+  }
+
+  @Slash('channelmod', { description: 'block unblock cubemoji interactions from a channel' })
+  async channelMod (
+    @SlashChoice('block', 'block')
+    @SlashChoice('unblock', 'unblock')
+    @SlashOption('action') action: string,
+    @SlashOption('channel', { type: 'CHANNEL' }) channel: TextChannel | VoiceChannel,
+      interaction: CommandInteraction
+  ) {
+    await interaction.deferReply({ ephemeral: true })
+    await interaction.guild?.fetch()
+    if (channel instanceof TextChannel && interaction.guildId && await guildOwnersCheck(interaction.user.id, interaction.guildId, interaction.client)) {
+      const storage = container.resolve(CubeStorage)
+      const guildName = interaction.guild?.name ?? '<no server name found>'
+      const guildId = interaction.guildId ?? ''
+
+      if (action === 'block') {
+        await storage.blockedChannels.set(channel.id, {
+          channelName: channel.name,
+          guildId: guildId,
+          guildName: guildName
+        })
+        this.logger.info(`#${channel.name} has been added to blocked channels list from ${guildName}`)
+      } else {
+        await storage.blockedChannels.delete(channel.id)
+        this.logger.info(`#${channel.name} has been removed from blocked channels list in ${guildName}`)
+      }
+      await reply(interaction, interaction.guild?.name, true, `${action} \`#${channel.name}\``)
+    } else {
+      await interaction.editReply({ content: 'Command failed. Cubemoji does\'t do anything in voice channels so you can\'t block those. Additionally, you may not have permission to perform this command.' })
     }
   }
 
@@ -183,7 +249,7 @@ export abstract class Blacklist {
       interaction: CommandInteraction
   ) {
     await interaction.deferReply({ ephemeral: true })
-    const guildInfo = await validateServerOwner(interaction.user.id, server, interaction.client)
+    const guildInfo = await guildOwnersCheck(interaction.user.id, server, interaction.client)
     if (guildInfo) {
       // valid owner so let's see what emoji are blocked on that server
       const blockedEmoji = this.emoteCache.blockedEmoji.get(guildInfo[0])

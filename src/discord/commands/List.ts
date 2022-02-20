@@ -1,9 +1,9 @@
 import { CommandInteraction } from 'discord.js'
 import { Discord, Slash, SlashChoice, SlashOption } from 'discordx'
 import { container } from 'tsyringe'
-import { Source } from '../../util/Cubemoji'
-import { sendPagination } from '../../util/DiscordLogic'
-import { EmoteCache } from '../../util/EmoteCache'
+import { Source } from '../../lib/emote/Cmoji'
+import { EmoteCache } from '../../lib/emote/EmoteCache'
+import { sendPagination } from '../../lib/image/DiscordLogic'
 
 @Discord()
 export abstract class List {

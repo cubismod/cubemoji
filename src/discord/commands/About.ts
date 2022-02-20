@@ -3,8 +3,8 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 import { CommandInteraction, Message, MessageEmbed } from 'discord.js'
 import { Discord, Guard, Slash } from 'discordx'
 import { container } from 'tsyringe'
-import { EmoteCache } from '../../util/EmoteCache'
-import { CubeMessageManager } from '../../util/MessageManager'
+import { CubeMessageManager } from '../../lib/cmd/MessageManager'
+import { EmoteCache } from '../../lib/emote/EmoteCache'
 import { bigServerDetect } from '../Guards'
 
 dayjs.extend(relativeTime)

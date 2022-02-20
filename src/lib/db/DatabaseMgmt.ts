@@ -13,7 +13,7 @@ import { mkdir, readdir, stat, unlink } from 'fs/promises'
 import { pipeline } from 'stream'
 import { promisify } from 'util'
 import { createGzip } from 'zlib'
-import { logManager } from './LogManager'
+import { logManager } from '../LogManager'
 
 const logger = logManager().getLogger('DatabaseMgmt')
 

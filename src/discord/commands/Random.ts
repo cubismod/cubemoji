@@ -2,8 +2,8 @@ import { CommandInteraction } from 'discord.js'
 import { Discord, Slash, SlashOption } from 'discordx'
 import { choice, geometricReservoirSample } from 'pandemonium'
 import { container } from 'tsyringe'
-import { Cmoji } from '../../util/Cubemoji'
-import { EmoteCache } from '../../util/EmoteCache'
+import { Cmoji } from '../../lib/emote/Cmoji'
+import { EmoteCache } from '../../lib/emote/EmoteCache'
 
 @Discord()
 export abstract class Random {

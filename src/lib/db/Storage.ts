@@ -10,13 +10,19 @@ import { createInterface } from 'readline'
 import { pipeline } from 'stream'
 import { singleton } from 'tsyringe'
 import { promisify } from 'util'
-import { gotOptions } from './Cubemoji'
-import { logManager } from './LogManager'
+import { gotOptions } from '../emote/Cmoji'
+import { logManager } from '../LogManager'
 const { got } = await import('got')
 
 export interface ServerOwner {
   id: string,
   name: string
+}
+
+export interface ChannelInfo {
+  channelName: string,
+  guildName: string,
+  guildId: string,
 }
 
 export interface KeyVRaw {
@@ -53,14 +59,28 @@ export class CubeStorage {
   serverOwners: Keyv<ServerOwner[]>
 
   /**
+   * roles allowed to make changes to moderation settings
+   * excluding enrollment/unenrollment of servers
+   * key: guildId_roleId
+   * value: bool
+   */
+  moderators: Keyv<boolean>
+
+  /**
+   * key is channel id
+   * value is server name
+   */
+  blockedChannels: Keyv<ChannelInfo>
+
+  /**
    * enrolled servers stored w/ key of server unique id
    * and just user tag as value
    */
   enrollment: Keyv<string>
 
   /**
-   * key is server ID_emoji block string
-   * value is empty
+   * key is server ID_randomguild block string
+   * value is a glob statement from https://www.npmjs.com/package/micromatch
    */
   emojiBlocked: Keyv<string>
 
@@ -86,6 +106,8 @@ export class CubeStorage {
 
     this.logger = logManager().getLogger('Storage')
     this.serverOwners = new Keyv<ServerOwner[]>('sqlite://' + this.serverInfoPath, { namespace: 'owners' })
+    this.moderators = new Keyv<boolean>('sqlite://' + this.serverInfoPath, { namespace: 'mods' })
+    this.blockedChannels = new Keyv<ChannelInfo>('sqlite://' + this.serverInfoPath, { namespace: 'channels' })
   }
 
   async initHosts () {

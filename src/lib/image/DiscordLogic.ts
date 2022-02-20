@@ -1,5 +1,5 @@
 // Lots of functions that actually perform the Discord
-// commands
+// commands when doing image effects
 import { Pagination } from '@discordx/pagination'
 import { watch } from 'chokidar'
 import { Client as DiscordClient, CommandInteraction, ContextMenuInteraction, Message, MessageAttachment, MessageEmbed, MessageReaction, PartialUser, User } from 'discord.js'
@@ -9,13 +9,13 @@ import { Logger } from 'log4js'
 import { choice } from 'pandemonium'
 import { container } from 'tsyringe'
 import { URL } from 'url'
-import { Cmoji, Source } from './Cubemoji'
-import { EmoteCache } from './EmoteCache'
+import { CubeMessageManager } from '../cmd/MessageManager'
+import { CubeStorage } from '../db/Storage'
+import { Cmoji, Source } from '../emote/Cmoji'
+import { EmoteCache } from '../emote/EmoteCache'
+import { logManager } from '../LogManager'
 import { EditOperation, FaceOperation, MsgContext, RescaleOperation, splitEffects } from './ImageLogic'
 import { ImageQueue } from './ImageQueue'
-import { logManager } from './LogManager'
-import { CubeMessageManager } from './MessageManager'
-import { CubeStorage } from './Storage'
 import { WorkerPool } from './WorkerPool'
 const { got } = await import('got')
 
@@ -409,23 +409,26 @@ export function autoDeleteMsg (msg: Message|undefined) {
  * owns the server specified or else undefined
  * checks against the discord api as well
  * @param userId id of user we are checking
- * @param identifier name or id
+ * @param identifier name or id of guild we are checking
  * @param client Discord client
  * @returns [guild ID, guild name] or undefined
  */
-export async function validateServerOwner (userId: string, identifier: string, client: DiscordClient) {
+export async function guildOwnersCheck (userId: string, identifier: string, client: DiscordClient) {
   const serverOwners = container.resolve(CubeStorage).serverOwners
   const servers = await serverOwners.get(userId)
   let serverId = ''
 
   if (servers) {
-    servers.forEach(server => {
+    for (const server of servers) {
+      // find a server that matches
       if (server.id === identifier || server.name === identifier) {
         serverId = server.id
+        break
       }
-    })
+    }
   }
 
+  // then fully validate with discord
   const discResolved = client.guilds.resolve(serverId)
   if (discResolved && discResolved.ownerId === userId) {
     return [discResolved.id, discResolved.name]

@@ -2,11 +2,11 @@ import { ApplicationCommandOptionChoice, AutocompleteInteraction } from 'discord
 import Fuse from 'fuse.js'
 import { choice, geometricReservoirSample } from 'pandemonium'
 import { container } from 'tsyringe'
-import imgEffects from '../res/imgEffects.json'
-import { Cmoji, Source } from './Cubemoji'
-import { EmoteCache } from './EmoteCache'
-import { logManager } from './LogManager'
-import { CubeStorage } from './Storage'
+import imgEffects from '../../res/imgEffects.json'
+import { CubeStorage } from '../db/Storage'
+import { Cmoji, Source } from '../emote/Cmoji'
+import { EmoteCache } from '../emote/EmoteCache'
+import { logManager } from '../LogManager'
 
 const logger = logManager().getLogger('Autocomplete')
 

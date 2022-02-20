@@ -6,10 +6,10 @@ import Fuse from 'fuse.js'
 import { Logger } from 'log4js'
 import { container, singleton } from 'tsyringe'
 import { parse } from 'twemoji-parser'
-import mutantNames from '../res/emojiNames.json'
-import { Cmoji, Source } from './Cubemoji'
-import { logManager } from './LogManager'
-import { CubeStorage } from './Storage'
+import mutantNames from '../../res/emojiNames.json'
+import { CubeStorage } from '../db/Storage'
+import { logManager } from '../LogManager'
+import { Cmoji, Source } from './Cmoji'
 const { got } = await import('got')
 
 @singleton()
@@ -244,19 +244,29 @@ export class EmoteCache {
 
   /**
    * block or unblock an emoji
-   * @param name emoji to block
+   * @param glob emoji to block
    * @param serverId id of server this emoji shouldn't show up on
    * @param block true for blocking, false for unblocking
+   * @returns true if glob can be added, false if it can't bc of size limit
    */
-  modifyBlockedEmoji (name: string, serverId: string, block = true) {
+  modifyBlockedEmoji (glob: string, serverId: string, block = true) {
     const vals = this.blockedEmoji.get(serverId)
+    /**
+     * limit of 50 blocks per guild
+     */
     if (vals) {
-      if (block) this.blockedEmoji.set(serverId, vals.add(name))
-      else this.blockedEmoji.delete(serverId)
-    } else {
-      if (block) this.blockedEmoji.set(serverId, new Set<string>().add(name))
-      // nothing to do otherwise as no key existed in the first place
+      if (vals.size < 51) {
+        // vals exists so we can append because its also doesn't have more than 50 emoji
+        if (block) this.blockedEmoji.set(serverId, vals.add(glob))
+        else this.blockedEmoji.delete(serverId)
+      } else {
+        // too large
+        return false
+      }
     }
+    // no val set
+    if (block) this.blockedEmoji.set(serverId, new Set<string>().add(glob))
+    return true
   }
 
   /**

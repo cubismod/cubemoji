@@ -1,7 +1,7 @@
 import { CommandInteraction, ContextMenuInteraction } from 'discord.js'
 import { ArgsOf, GuardFunction } from 'discordx'
 import { container } from 'tsyringe'
-import { CubeStorage } from '../util/Storage'
+import { CubeStorage } from '../lib/db/Storage'
 
 /**
  * passes along guard data to tell the main function
