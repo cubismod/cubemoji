@@ -11,7 +11,7 @@ export const bigServerDetect: GuardFunction<
 | ArgsOf<'messageReactionAdd'>
 | CommandInteraction
 | ContextMenuInteraction > = async (arg, _client, next, data: {enrolled: boolean}) => {
-  const enrollment = container.resolve(CubeStorage).enrollment
+  const enrollment = container.resolve(CubeStorage).serverEnrollment
   if ((arg instanceof CommandInteraction || arg instanceof ContextMenuInteraction)) {
     if (arg.guildId) {
       const status = await enrollment.get(arg.guildId)

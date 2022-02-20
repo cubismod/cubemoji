@@ -1,14 +1,14 @@
 // Various server configuration commands
 
 import { Pagination } from '@discordx/pagination'
-import { AutocompleteInteraction, CommandInteraction, MessageEmbed, SnowflakeUtil, TextChannel, VoiceChannel } from 'discord.js'
+import { AutocompleteInteraction, CommandInteraction, MessageEmbed, Role, TextChannel, VoiceChannel } from 'discord.js'
 import { Discord, Permission, Slash, SlashChoice, SlashGroup, SlashOption } from 'discordx'
 import pkg from 'micromatch'
 import { container } from 'tsyringe'
 import { serverAutocomplete } from '../../lib/cmd/Autocomplete'
+import { guildOwnersCheck, reply } from '../../lib/cmd/ModHelper'
 import { CubeStorage } from '../../lib/db/Storage'
 import { EmoteCache } from '../../lib/emote/EmoteCache'
-import { guildOwnersCheck } from '../../lib/image/DiscordLogic'
 import { logManager } from '../../lib/LogManager'
 import strings from '../../res/strings.json'
 import { OwnerCheck } from '../Permissions'
@@ -17,36 +17,6 @@ const { parse } = pkg
 interface enrolledServer {
   value: string, // user tag
   expires: null
-}
-
-/**
- * reply with an embed to indicate status of action
- * @param interaction discord interaction which should be deferred
- * @param serverName aka guild name
- * @param success result of action
- * @param action something like 'enroll', 'unenroll', etc.
- * @param notes add'l notes to include for user
- */
-async function reply (interaction: CommandInteraction, serverName = '', success: boolean, action: string, notes = '') {
-  const embed = new MessageEmbed({
-    title: `Action: ${action}`,
-    fields: [
-      {
-        name: 'Server Name',
-        value: serverName
-      },
-      {
-        name: 'Status',
-        value: success ? 'Success' : 'Failure'
-      }
-    ],
-    color: success ? 'GREEN' : 'RED',
-    footer: {
-      text: 'cubemoji moderation tools'
-    }
-  })
-  if (notes !== '') embed.addField('Notes', notes)
-  interaction.editReply({ embeds: [embed] })
 }
 
 @Discord()
@@ -101,18 +71,45 @@ export abstract class Enrollment {
     const guildInfo = await guildOwnersCheck(interaction.user.id, server, interaction.client)
     if (guildInfo) {
       // user triggering command has permissions to use it
-      const enrollment = container.resolve(CubeStorage).enrollment
+      const enrollment = container.resolve(CubeStorage).serverEnrollment
       if (action === 'enroll') {
         await enrollment.set(guildInfo[0], interaction.user.tag)
-        this.logger.info(`${interaction.user.tag} enrolled [${guildInfo}] in big server mode.`)
         await reply(interaction, guildInfo[1], true, 'enroll')
       } else {
         await enrollment.delete(guildInfo[0])
         await reply(interaction, guildInfo[1], true, 'unenroll')
-        this.logger.info(`${interaction.user.tag} unenrolled [${guildInfo}] from big server mode.`)
       }
     } else {
-      await reply(interaction, undefined, false, 'modify enrollment for')
+      await reply(interaction, undefined, false, 'modify enrollment')
+    }
+  }
+
+  @Slash('rolemod', {description: 'grant/revoke a role moderation perms'})
+  async roleMod (
+    @SlashChoice('grant', 'grant')
+    @SlashChoice('revoke', 'revoke')
+    @SlashOption('action') action: string,
+    @SlashOption('role', {
+      description: 'role to grant/remove mod permissions',
+      type: 'ROLE'
+    }) role: Role,
+    interaction: CommandInteraction
+  ) {
+    await interaction.deferReply({ ephemeral: true })
+    const guildInfo = await guildOwnersCheck(interaction.user.id, interaction.guildId, interaction.client)
+    if (guildInfo) {
+      const modEnrollment = container.resolve(CubeStorage).modEnrollment
+      // keys are guildId_roleId
+      const key = guildInfo[0] + '_' + role.id
+      if (action === 'enroll') {
+        await modEnrollment.set(key, true)
+        await reply(interaction, guildInfo[1], true, `grant ${role.name} mod perms`)
+      } else {
+        await modEnrollment.delete(key)
+        await reply(interaction, guildInfo[1], true, `revoke ${role.name} mod perms`)
+      }
+    } else {
+      await reply(interaction, undefined, false, 'modify moderation permissions')
     }
   }
 
@@ -167,7 +164,52 @@ export abstract class Blacklist {
   emoteCache = container.resolve(EmoteCache)
   storage = container.resolve(CubeStorage)
 
-  @Slash('emojimod', { description: 'block/unblock an emoji on a specified server that you own' })
+  @Slash('modify', { description: 'block/unblock emoji glob or channel' })
+  async modify (
+  @SlashChoice('block', 'block')
+  @SlashChoice('unblock', 'unblock')
+  @SlashOption('action') action: string,
+  @SlashOption('server', {
+    description: 'name of server you want to block emoji on, not req for channel',
+    autocomplete: (interaction: AutocompleteInteraction) => serverAutocomplete(interaction),
+    type: 'STRING',
+    required: false
+  }) server: string,
+  @SlashOption('glob', {
+    description: 'glob syntax to block emoji, see /mod help fmi',
+    type: 'STRING',
+    required: false
+  }) glob: string,
+  @SlashOption('channel', { type: 'CHANNEL', description: 'channel that cubemoji is blocked from interacting in' }) channel: TextChannel | VoiceChannel,
+    interaction: CommandInteraction) {
+    // first determine what the end user is trying to do
+    // block an emoji glob?
+    // block a channel?
+    // learn how to use command?
+    await interaction.deferReply({ ephemeral: true })
+    if (glob) {
+      let blockedGuild = ''
+      // emoji entered
+      if (!server) {
+        // implicit that the user wants to block the emoji on the server that they are on
+        blockedGuild = interaction.guildId ?? blockedGuild
+      else {
+        blockedGuild = 
+      }
+      }
+    }
+    if (channel) {
+      // user wants to block channel
+    }
+    if (!glob && !channel) {
+      // display a help message
+      await interaction.editReply({
+        content: '**Usage**: If you want to block an emoji on a server, then enter a glob following this syntax <https://github.com/micromatch/micromatch#matching-features>. Optionally enter a server to block this string on that particular server, otherwise we assume you want to block the emoji on this current server.\nIf you want to block cubemoji interactions in a specific channel, then enter an option in channel which will autofill with channels on the current server you\'re on.'
+      })
+    }
+  }
+
+  /* @Slash('emojimod', { description: 'block/unblock an emoji on a specified server that you own' })
   async emojiMod (
     @SlashChoice('block', 'block')
     @SlashChoice('unblock', 'unblock')
@@ -238,7 +280,7 @@ export abstract class Blacklist {
       await interaction.editReply({ content: 'Command failed. Cubemoji does\'t do anything in voice channels so you can\'t block those. Additionally, you may not have permission to perform this command.' })
     }
   }
-
+ */
   @Slash('list', { description: 'list blocked emoji' })
   async list (
     @SlashOption('server', {

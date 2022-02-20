@@ -64,7 +64,7 @@ export class CubeStorage {
    * key: guildId_roleId
    * value: bool
    */
-  moderators: Keyv<boolean>
+  modEnrollment: Keyv<boolean>
 
   /**
    * key is channel id
@@ -76,7 +76,7 @@ export class CubeStorage {
    * enrolled servers stored w/ key of server unique id
    * and just user tag as value
    */
-  enrollment: Keyv<string>
+  serverEnrollment: Keyv<string>
 
   /**
    * key is server ID_randomguild block string
@@ -101,12 +101,12 @@ export class CubeStorage {
       })
     })
 
-    this.enrollment = new Keyv<string>('sqlite://' + this.serverInfoPath, { namespace: 'servers' })
+    this.serverEnrollment = new Keyv<string>('sqlite://' + this.serverInfoPath, { namespace: 'servers' })
     this.emojiBlocked = new Keyv<string>('sqlite://' + this.serverInfoPath, { namespace: 'emoji' })
 
     this.logger = logManager().getLogger('Storage')
     this.serverOwners = new Keyv<ServerOwner[]>('sqlite://' + this.serverInfoPath, { namespace: 'owners' })
-    this.moderators = new Keyv<boolean>('sqlite://' + this.serverInfoPath, { namespace: 'mods' })
+    this.modEnrollment = new Keyv<boolean>('sqlite://' + this.serverInfoPath, { namespace: 'mods' })
     this.blockedChannels = new Keyv<ChannelInfo>('sqlite://' + this.serverInfoPath, { namespace: 'channels' })
   }
 

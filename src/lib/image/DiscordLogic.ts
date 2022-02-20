@@ -2,7 +2,7 @@
 // commands when doing image effects
 import { Pagination } from '@discordx/pagination'
 import { watch } from 'chokidar'
-import { Client as DiscordClient, CommandInteraction, ContextMenuInteraction, Message, MessageAttachment, MessageEmbed, MessageReaction, PartialUser, User } from 'discord.js'
+import { CommandInteraction, ContextMenuInteraction, Message, MessageAttachment, MessageEmbed, MessageReaction, PartialUser, User } from 'discord.js'
 import { Client } from 'discordx'
 import { fileTypeFromStream } from 'file-type'
 import { Logger } from 'log4js'
@@ -401,38 +401,5 @@ export function autoDeleteMsg (msg: Message|undefined) {
     setTimeout(async () => {
       await msg.delete()
     }, 30000)
-  }
-}
-
-/**
- * returns Discord obtained guild id & name if the user
- * owns the server specified or else undefined
- * checks against the discord api as well
- * @param userId id of user we are checking
- * @param identifier name or id of guild we are checking
- * @param client Discord client
- * @returns [guild ID, guild name] or undefined
- */
-export async function guildOwnersCheck (userId: string, identifier: string, client: DiscordClient) {
-  const serverOwners = container.resolve(CubeStorage).serverOwners
-  const servers = await serverOwners.get(userId)
-  let serverId = ''
-
-  if (servers) {
-    for (const server of servers) {
-      // find a server that matches
-      if (server.id === identifier || server.name === identifier) {
-        serverId = server.id
-        break
-      }
-    }
-  }
-
-  // then fully validate with discord
-  const discResolved = client.guilds.resolve(serverId)
-  if (discResolved && discResolved.ownerId === userId) {
-    return [discResolved.id, discResolved.name]
-  } else {
-    return undefined
   }
 }

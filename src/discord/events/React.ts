@@ -27,7 +27,7 @@ export abstract class ReactEvents {
     if (msg.guildId) {
       // stored indicates whether the message is in a channel
       // in a guild that is in big server mode
-      const stored = storage.enrollment.get(msg.guildId)
+      const stored = storage.serverEnrollment.get(msg.guildId)
       if (cubeMessageManager && user) {
         switch (reaction.emoji.toString()) {
           case '🗑️': {
