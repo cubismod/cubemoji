@@ -48,6 +48,7 @@
     "log4js": "^6.4.1",
     "micromatch": "^4.0.4",
     "node-emoji": "^1.11.0",
+    "node-object-hash": "^2.3.10",
     "pandemonium": "^2.3.0",
     "probe-image-size": "^7.2.3",
     "reflect-metadata": "^0.1.13",

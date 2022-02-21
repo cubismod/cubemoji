@@ -4,6 +4,7 @@ import { GuildEmoji } from 'discord.js'
 import { Client } from 'discordx'
 import Fuse from 'fuse.js'
 import { Logger } from 'log4js'
+import hash from 'node-object-hash'
 import { container, singleton } from 'tsyringe'
 import { parse } from 'twemoji-parser'
 import mutantNames from '../../res/emojiNames.json'
@@ -244,12 +245,14 @@ export class EmoteCache {
 
   /**
    * block or unblock an emoji
+   * performs this step both on in memory struct and (optionally) database
    * @param glob emoji to block
    * @param serverId id of server this emoji shouldn't show up on
    * @param block true for blocking, false for unblocking
+   * @param database perform database operations with this?
    * @returns true if glob can be added, false if it can't bc of size limit
    */
-  modifyBlockedEmoji (glob: string, serverId: string, block = true) {
+  async modifyBlockedEmoji (glob: string, serverId: string, block = true, database = true) {
     const vals = this.blockedEmoji.get(serverId)
     /**
      * limit of 50 blocks per guild
@@ -258,15 +261,26 @@ export class EmoteCache {
       if (vals.size < 51) {
         // vals exists so we can append because its also doesn't have more than 50 emoji
         if (block) this.blockedEmoji.set(serverId, vals.add(glob))
-        else this.blockedEmoji.delete(serverId)
+        else await this.blockedEmoji.delete(serverId)
+        if (database) await this.modifyEmojiDB(glob, serverId, block)
       } else {
         // too large
         return false
       }
+    } else {
+      // no val set
+      if (block) this.blockedEmoji.set(serverId, new Set<string>().add(glob))
+      if (database) await this.modifyEmojiDB(glob, serverId, block)
     }
-    // no val set
-    if (block) this.blockedEmoji.set(serverId, new Set<string>().add(glob))
+
     return true
+  }
+
+  private async modifyEmojiDB (glob: string, serverId: string, block: boolean) {
+    const blockedEmojis = container.resolve(CubeStorage).emojiBlocked
+    const key = serverId + '-' + hash().hash(glob)
+    if (block) await blockedEmojis.set(key, glob)
+    else await blockedEmojis.delete(key)
   }
 
   /**
@@ -285,7 +299,7 @@ export class EmoteCache {
           if (idAndName.length > 1) {
             // idAndName[0] = id
             // idAndName[1] = name
-            this.modifyBlockedEmoji(idAndName[1], idAndName[0], true)
+            this.modifyBlockedEmoji(idAndName[1], idAndName[0], true, false)
           }
         }
       })

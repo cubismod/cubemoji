@@ -117,6 +117,7 @@ export function editAutocomplete (interaction: AutocompleteInteraction) {
 
 /**
  * performs autocomplete of server names
+ * returned autocomplete values are the id - then truncated name
  * @param interaction
  */
 export async function serverAutocomplete (interaction: AutocompleteInteraction) {
@@ -128,11 +129,12 @@ export async function serverAutocomplete (interaction: AutocompleteInteraction) 
       const responses: ApplicationCommandOptionChoice[] = []
       if (guilds) {
         guilds.forEach(guild => {
+          const name = guild.id + '-' + guild.name.slice(0, 60)
           // try not to go over autocomplete limits
           if (responses.length < 10) {
             responses.push({
-              name: guild.name,
-              value: guild.name
+              name: name,
+              value: name
             })
           }
         })

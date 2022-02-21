@@ -50,14 +50,15 @@ export abstract class ClientEvents {
         )
 
         await container.resolve(CubeStorage).loadServerOwners(client)
-        // once an hour refresh our cache of who the server owners are
+        // every 30 min, refresh our cache of who the server owners are
         // and re-init permissions on Moderation commands
         setInterval(
           async () => {
             await container.resolve(CubeStorage).loadServerOwners(client)
             await client.initApplicationPermissions()
+            logger.debug('permission sync completed')
           },
-          3.6e+6 // 1 hour
+          1.8e+6 // 30 min
         )
 
         // schedule a backup for 2am EST
@@ -96,6 +97,17 @@ export abstract class ClientEvents {
       // set a new status msg every 5 min
       setStatus(client)
       setInterval(setStatus, 300000, client)
+
+      if (process.env.CM_ENVIRONMENT === 'npr') {
+        setInterval(() => {
+          const memUse = process.memoryUsage()
+          for (const key in memUse) {
+            logger.debug(`${key} ${Math.round(memUse[key] / 1024 / 1024 * 100) / 100} MB`)
+          }
+        },
+        30000 // 30 sec
+        )
+      }
     }
   }
 

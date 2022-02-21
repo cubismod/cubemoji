@@ -25,6 +25,7 @@ export interface ChannelInfo {
   guildId: string,
 }
 
+// value is raw json
 export interface KeyVRaw {
   key: string,
   value: string
@@ -62,13 +63,13 @@ export class CubeStorage {
    * roles allowed to make changes to moderation settings
    * excluding enrollment/unenrollment of servers
    * key: guildId_roleId
-   * value: bool
+   * value: role name
    */
-  modEnrollment: Keyv<boolean>
+  modEnrollment: Keyv<string>
 
   /**
    * key is channel id
-   * value is server name
+   * value ChannelInfo interface
    */
   blockedChannels: Keyv<ChannelInfo>
 
@@ -79,7 +80,7 @@ export class CubeStorage {
   serverEnrollment: Keyv<string>
 
   /**
-   * key is server ID_randomguild block string
+   * key is server ID-hashofglob string
    * value is a glob statement from https://www.npmjs.com/package/micromatch
    */
   emojiBlocked: Keyv<string>
@@ -106,7 +107,7 @@ export class CubeStorage {
 
     this.logger = logManager().getLogger('Storage')
     this.serverOwners = new Keyv<ServerOwner[]>('sqlite://' + this.serverInfoPath, { namespace: 'owners' })
-    this.modEnrollment = new Keyv<boolean>('sqlite://' + this.serverInfoPath, { namespace: 'mods' })
+    this.modEnrollment = new Keyv<string>('sqlite://' + this.serverInfoPath, { namespace: 'mods' })
     this.blockedChannels = new Keyv<ChannelInfo>('sqlite://' + this.serverInfoPath, { namespace: 'channels' })
   }
 

@@ -1,43 +1,98 @@
 // helper commands for Moderation group
 
-import { Client, CommandInteraction, MessageEmbed } from 'discord.js'
+import { Client, CommandInteraction, MessageEmbed, User } from 'discord.js'
 import { container } from 'tsyringe'
-import { CubeStorage } from '../db/Storage'
+import { ChannelInfo, CubeStorage } from '../db/Storage'
 import { logManager } from '../LogManager'
 
 const logger = logManager().getLogger('ServerConfig')
+
+/**
+ * @param guildIdentifier guild id from autocomplete
+ * @returns regular expression result including the snowflake id
+ */
+function resolveId (guildIdentifier: string) {
+  // should match snowflake-servername
+  // just snowflake
+  // as well as just snowflake w/ snowflake in group 1
+  const re = /(.*?)(-|$)/
+  return re.exec(guildIdentifier)
+}
 
 /**
  * returns Discord obtained guild id & name if the user
  * owns the server specified or else undefined
  * checks against the discord api as well
  * @param userId id of user we are checking
- * @param identifier name or id of guild we are checking
+ * @param guildIdentifier identifier returned from autocomplete function
  * @param client Discord client
  * @returns [guild ID, guild name] or undefined
  */
-export async function guildOwnersCheck (userId: string, identifier: string | null, client: Client) {
-  const serverOwners = container.resolve(CubeStorage).serverOwners
-  const servers = await serverOwners.get(userId)
-  let serverId = ''
+export async function guildOwnersCheck (userId: string, guildIdentifier: string | null, client: Client) {
+  if (guildIdentifier) {
+    // extract snowflake from the identifier
+    const matches = resolveId(guildIdentifier)
+    if (matches) {
+      const snowflake = matches[1]
+      const resolvedGuild = client.guilds.resolve(snowflake)
+      // verify that the guild owner matches the user who invoked the command
+      if (resolvedGuild && resolvedGuild.ownerId === userId) {
+        return [resolvedGuild.id, resolvedGuild.name]
+      }
+    }
+    return undefined
+  }
+}
 
-  if (servers) {
-    for (const server of servers) {
-      // find a server that matches
-      if (server.id === identifier || server.name === identifier) {
-        serverId = server.id
-        break
+/**
+ * validates whether a user has mod permissions by checking their roles
+ * against the database
+ * @param user user to check roles of
+ * @param guildIdentifier name or id of guild we are checking
+ * @param client Discord client
+ * @returns [guild ID, guild name] or undefined
+ */
+export async function guildModsCheck (user: User, guildIdentifier: string | null, client: Client) {
+  let valid: undefined | [string, string]
+  if (guildIdentifier) {
+    const matches = resolveId(guildIdentifier)
+    if (matches) {
+      const snowflake = matches[1]
+      const resolvedGuild = client.guilds.resolve(snowflake)
+      if (resolvedGuild) {
+        // now check roles for the user
+        const resolvedMember = resolvedGuild.members.resolve(user)
+        if (resolvedMember) {
+          // check against database
+          const modEnrollment = container.resolve(CubeStorage).modEnrollment
+          for (const role of resolvedMember.roles.cache) {
+            // check against each role that member has assigned
+            const existsInDb = await modEnrollment.get(resolvedGuild.id + '-' + role[1].id)
+            if (existsInDb) {
+              valid = [resolvedGuild.id, resolvedGuild.name]
+              break
+            }
+          }
+        }
       }
     }
   }
+  return valid
+}
 
-  // then fully validate with discord
-  const discResolved = client.guilds.resolve(serverId)
-  if (discResolved && discResolved.ownerId === userId) {
-    return [discResolved.id, discResolved.name]
-  } else {
-    return undefined
-  }
+/**
+ * validates whether a user has permission to run this command
+ * either they are an owner or part of a moderation role
+ * @param user user to check
+ * @param guildIdentifier id as returned from autocomplete
+ * @param client Discord client
+ * @returns [guild ID, guild name] or undefined
+ */
+export async function validUser (user: User, guildIdentifier: string | null, client: Client) {
+  let result = await guildOwnersCheck(user.id, guildIdentifier, client)
+  // try against mod members
+  if (!result) result = await guildModsCheck(user, guildIdentifier, client)
+  return result
 }
 
 /**
@@ -69,4 +124,68 @@ export async function reply (interaction: CommandInteraction, serverName = '', s
   if (notes !== '') embed.addField('Notes', notes)
   await interaction.editReply({ embeds: [embed] })
   logger.info(`Action: ${action}| Success: ${success} | Server: ${serverName} | Invoker: ${interaction.user.tag}`)
+}
+
+export async function buildList (interaction: CommandInteraction, namespaces: string[]) {
+  // max of 25 fields per embed
+  const storage = container.resolve(CubeStorage)
+  const elements = 0
+  const pages: MessageEmbed[] = []
+  const curEmbed = new MessageEmbed({ title: 'Moderation List' })
+  // first get all values from a namespace
+  namespaces.forEach((ns) => {
+    const items = storage.getNamespace(ns)
+    items?.forEach(async (item) => {
+      // lists are used for several different purposes
+      switch (ns) {
+        case 'servers': {
+          // determine if user has permission over this server
+          const info = await validUser(interaction.user, item.value, interaction.client)
+          if (info) {
+            curEmbed.addField(
+              'Enrolled Server',
+              info[1]
+            )
+          }
+          break
+        }
+        case 'emoji': {
+          const glob = item.value
+          const info = await validUser(
+            interaction.user,
+            item.key.replace('emoji:', ''), // serverID-globHash
+            interaction.client
+          )
+          if (info) {
+            curEmbed.addField(
+              'Blocked Glob',
+              `Glob: \`${glob}\`\nServer: ${info[1]}`
+            )
+          }
+          break
+        }
+        case 'channel': {
+          const val: ChannelInfo = JSON.parse(item.value)
+          const info = await validUser(
+            interaction.user,
+            val.guildId,
+            interaction.client
+          )
+          if (info) {
+            curEmbed.addField(
+              'Blocked Channel',
+              `Channel: <#${item.key}>\nServer: ${info[1]}`
+            )
+          }
+          break
+        }
+        case 'mods': {
+          const info = await validUser(
+            interaction.user
+
+          )
+        }
+      }
+    })
+  })
 }
