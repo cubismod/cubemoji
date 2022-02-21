@@ -2,7 +2,7 @@
 
 import { Client, CommandInteraction, MessageEmbed, User } from 'discord.js'
 import { container } from 'tsyringe'
-import { ChannelInfo, CubeStorage } from '../db/Storage'
+import { ChannelInfo, CubeStorage, ValRaw } from '../db/Storage'
 import { logManager } from '../LogManager'
 
 const logger = logManager().getLogger('ServerConfig')
@@ -129,63 +129,84 @@ export async function reply (interaction: CommandInteraction, serverName = '', s
 export async function buildList (interaction: CommandInteraction, namespaces: string[]) {
   // max of 25 fields per embed
   const storage = container.resolve(CubeStorage)
-  const elements = 0
+  let elements = 0
   const pages: MessageEmbed[] = []
-  const curEmbed = new MessageEmbed({ title: 'Moderation List' })
+  let curEmbed = new MessageEmbed({ title: 'Moderation List', color: 'BLUE' })
   // first get all values from a namespace
-  namespaces.forEach((ns) => {
+  for (const ns of namespaces) {
     const items = storage.getNamespace(ns)
-    items?.forEach(async (item) => {
-      // lists are used for several different purposes
-      switch (ns) {
-        case 'servers': {
-          // determine if user has permission over this server
-          const info = await validUser(interaction.user, item.value, interaction.client)
-          if (info) {
-            curEmbed.addField(
-              'Enrolled Server',
-              info[1]
-            )
+    if (items) {
+      for (const item of items) {
+        if (elements % 24 === 0 && elements !== 0) {
+          // new page
+          pages.push(curEmbed)
+          curEmbed = new MessageEmbed({ title: 'Moderation List', color: 'BLUE' })
+        }
+        // lists are used for several different purposes
+        switch (ns) {
+          case 'servers': {
+            // determine if user has permission over this server
+            const info = await validUser(interaction.user, item.key.replace('servers:', ''), interaction.client)
+            if (info) {
+              curEmbed = curEmbed.addField(
+                'Enrolled Server',
+                info[1]
+              )
+            }
+            break
           }
-          break
-        }
-        case 'emoji': {
-          const glob = item.value
-          const info = await validUser(
-            interaction.user,
-            item.key.replace('emoji:', ''), // serverID-globHash
-            interaction.client
-          )
-          if (info) {
-            curEmbed.addField(
-              'Blocked Glob',
-              `Glob: \`${glob}\`\nServer: ${info[1]}`
+          case 'emoji': {
+            // emoji json looks like this
+            // {"value":"eee**","expires":null}
+            const parsedVal: ValRaw = JSON.parse(item.value)
+            const glob = parsedVal.value
+            const info = await validUser(
+              interaction.user,
+              item.key.replace('emoji:', ''), // serverID-globHash
+              interaction.client
             )
+            if (info) {
+              curEmbed = curEmbed.addField(
+                'Blocked Glob',
+                `Glob: \`${glob}\`\nServer: ${info[1]}`
+              )
+            }
+            break
           }
-          break
-        }
-        case 'channel': {
-          const val: ChannelInfo = JSON.parse(item.value)
-          const info = await validUser(
-            interaction.user,
-            val.guildId,
-            interaction.client
-          )
-          if (info) {
-            curEmbed.addField(
-              'Blocked Channel',
-              `Channel: <#${item.key}>\nServer: ${info[1]}`
+          case 'channels': {
+            const val: ChannelInfo = JSON.parse(item.value).value
+            const info = await validUser(
+              interaction.user,
+              val.guildId,
+              interaction.client
             )
+            if (info) {
+              curEmbed = curEmbed.addField(
+                'Blocked Channel',
+                `Channel: <#${item.key.replace('channels:', '')}>\nServer: ${info[1]}`
+              )
+            }
+            break
           }
-          break
+          case 'mods': {
+            const info = await validUser(
+              interaction.user,
+              item.key.replace('mods:', ''),
+              interaction.client
+            )
+            if (info) {
+              curEmbed = curEmbed.addField(
+                'Moderator Role',
+                // remove namespace tag and server ID in key
+                `Role: <@${item.key.replace(/(.*?-)/, '')}>\nServer: ${info[1]}`
+              )
+            }
+          }
         }
-        case 'mods': {
-          const info = await validUser(
-            interaction.user
-
-          )
-        }
+        elements++
       }
-    })
-  })
+    }
+  }
+  pages.push(curEmbed)
+  return pages
 }

@@ -295,7 +295,7 @@ export class EmoteCache {
         // which is in the format emoji:serverid_emojiname
         const split = emoji.key.split(':')
         if (split.length > 1) {
-          const idAndName = split[1].split('_')
+          const idAndName = split[1].split('-')
           if (idAndName.length > 1) {
             // idAndName[0] = id
             // idAndName[1] = name

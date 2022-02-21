@@ -5,17 +5,12 @@ import { AutocompleteInteraction, CommandInteraction, MessageEmbed, Role, TextCh
 import { Discord, Permission, Slash, SlashChoice, SlashGroup, SlashOption } from 'discordx'
 import { container } from 'tsyringe'
 import { serverAutocomplete } from '../../lib/cmd/Autocomplete'
-import { guildOwnersCheck, reply, validUser } from '../../lib/cmd/ModHelper'
+import { buildList, guildOwnersCheck, reply, validUser } from '../../lib/cmd/ModHelper'
 import { CubeStorage } from '../../lib/db/Storage'
 import { EmoteCache } from '../../lib/emote/EmoteCache'
 import { logManager } from '../../lib/LogManager'
 import strings from '../../res/strings.json'
 import { OwnerCheck } from '../Permissions'
-
-interface enrolledServer {
-  value: string, // user tag
-  expires: null
-}
 
 @Discord()
 @Permission(false)
@@ -99,7 +94,7 @@ export abstract class Enrollment {
       const modEnrollment = container.resolve(CubeStorage).modEnrollment
       // keys are guildId_roleId
       // see Client.ts where we run a sync of perms every 30 min
-      const key = guildInfo[0] + '_' + role.id
+      const key = guildInfo[0] + '-' + role.id
       const notice = 'May take up to 30 min for permissions to sync.'
       if (action === 'enroll') {
         await modEnrollment.set(key, role.name)
@@ -118,39 +113,10 @@ export abstract class Enrollment {
     interaction: CommandInteraction
   ) {
     await interaction.deferReply({ ephemeral: true })
-    const storage = container.resolve(CubeStorage)
-    const servers = storage.getNamespace('server')
-    if (servers) {
-      // we now have a list of servers like so
-      // key: servers:server_id
-      // value: {"value": "user_tag", "expires": null}
-      const paginatedList : string[] = []
-
-      servers.forEach((server, i) => {
-        const parsed: enrolledServer = JSON.parse(server.value)
-        // remove prefix from result
-        const serverId = server.key.replace('servers:', '')
-        const guild = interaction.client.guilds.resolve(serverId)
-        let guildName = ''
-        if (guild) {
-          guildName = guild.name
-        }
-        const text = `**${guildName}**\nServer Owner: "${parsed.value}"\n\n`
-        if (i % 10 === 0) {
-          // start new page
-          paginatedList.push(text)
-        } else {
-          // otherwise append to last element in array
-          const last = paginatedList.splice(-1)
-          paginatedList.push(last + text)
-        }
-      })
-      // now we have a list with one entry per server
-      // but we want to create a paginated list where each entry
-      // is a page and we have 10 servers per page
-
-      new Pagination(interaction, paginatedList).send()
-    }
+    new Pagination(
+      interaction,
+      await buildList(interaction, ['servers'])
+    ).send()
   }
 }
 
@@ -236,38 +202,14 @@ export abstract class Blacklist {
     }
   }
 
-  @Slash('list', { description: 'list blocked emoji' })
+  @Slash('list', { description: 'list blocked emoji and channels' })
   async list (
-    @SlashOption('server', {
-      description: 'name of server you want to block emoji on',
-      autocomplete: (interaction: AutocompleteInteraction) => serverAutocomplete(interaction),
-      type: 'STRING'
-    }) server: string,
-      interaction: CommandInteraction
+    interaction: CommandInteraction
   ) {
     await interaction.deferReply({ ephemeral: true })
-    const guildInfo = await validUser(interaction.user, server, interaction.client)
-    if (guildInfo) {
-      // valid owner so let's see what emoji are blocked on that server
-      const blockedEmoji = this.emoteCache.blockedEmoji.get(guildInfo[0])
-      if (blockedEmoji) {
-        const paginatedList : string[] = [
-          `**Blacklisted emoji on ${guildInfo[1]}**\n`
-        ]
-        let i = 1
-        blockedEmoji.forEach((emoji) => {
-          if (i % 20 === 0) {
-            paginatedList.push(`${emoji}\n`)
-          } else {
-            const last = paginatedList.splice(-1)
-            paginatedList.push(last + `${emoji}\n`)
-          }
-          i++
-        })
-        new Pagination(interaction, paginatedList).send()
-        return
-      }
-    }
-    await interaction.editReply('No blocked emoji on this server.')
+    new Pagination(
+      interaction,
+      await buildList(interaction, ['emoji', 'channels'])
+    ).send()
   }
 }

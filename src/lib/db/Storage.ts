@@ -31,6 +31,14 @@ export interface KeyVRaw {
   value: string
 }
 
+/**
+ * raw keyv value item
+ */
+export interface ValRaw {
+  value: string,
+  expires: null
+}
+
 // database storage using https://github.com/zaaack/keyv-file
 // we utilize a plain JSON file for blocked hosts list because it loads so quickly
 // and SQLite for the other storage as its consistent
@@ -62,7 +70,7 @@ export class CubeStorage {
   /**
    * roles allowed to make changes to moderation settings
    * excluding enrollment/unenrollment of servers
-   * key: guildId_roleId
+   * key: guildId-roleId
    * value: role name
    */
   modEnrollment: Keyv<string>
