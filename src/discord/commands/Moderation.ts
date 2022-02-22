@@ -49,6 +49,8 @@ export abstract class Mod {
 @SlashGroup('enrollment', 'mod')
 export abstract class Enrollment {
   logger = logManager().getLogger('ServerConfig')
+  enrollment = container.resolve(CubeStorage).serverEnrollment
+  serverAudit = container.resolve(CubeStorage).serverAuditInfo
 
   @Slash('modify', { description: 'enroll/unenroll a new server into big server mode' })
   async modify (
@@ -66,16 +68,39 @@ export abstract class Enrollment {
     const guildInfo = await guildOwnersCheck(interaction.user.id, server, interaction.client)
     if (guildInfo) {
       // user triggering command has permissions to use it
-      const enrollment = container.resolve(CubeStorage).serverEnrollment
       if (action === 'enroll') {
-        await enrollment.set(guildInfo[0], interaction.user.tag)
-        await reply(interaction, guildInfo[1], true, 'enroll')
+        await this.enrollment.set(guildInfo[0], interaction.user.tag)
+        await reply(interaction, guildInfo[1], true, 'enroll', '', guildInfo[0])
       } else {
-        await enrollment.delete(guildInfo[0])
-        await reply(interaction, guildInfo[1], true, 'unenroll')
+        await this.enrollment.delete(guildInfo[0])
+        await reply(interaction, guildInfo[1], true, 'unenroll', '', guildInfo[0])
       }
     } else {
-      await reply(interaction, undefined, false, 'modify enrollment')
+      await reply(interaction, 'Error!', false, 'modify enrollment')
+    }
+  }
+
+  @Slash('audit', { description: 'set a channel to log changes made to permissions' })
+  async audit (
+    @SlashOption('clear', { description: 'remove audit channel', type: 'BOOLEAN', required: false }) clear: boolean,
+    @SlashOption('channel', { description: 'channel to log actions to, cubemoji must have write permission here', type: 'CHANNEL', required: false }) channel: TextChannel | VoiceChannel,
+      interaction: CommandInteraction
+  ) {
+    await interaction.deferReply({ ephemeral: true })
+    const guildInfo = await guildOwnersCheck(interaction.user.id, interaction.guildId, interaction.client)
+    if (guildInfo) {
+      const key = interaction.guildId
+      if (clear && key) {
+        await this.serverAudit.delete(key)
+        await reply(interaction, guildInfo[1], true, 'clear audit channel', '', guildInfo[0])
+      } else if (channel && key && channel instanceof TextChannel) {
+        await this.serverAudit.set(key, channel.id)
+        await reply(interaction, guildInfo[1], true, 'set new audit channel', `Set to <#${channel.id}>`, guildInfo[0])
+      } else {
+        await interaction.editReply({ content: `${process.env.CM_BROKEN} Command failure or no options specified!\n**Command Usage**: Set an audit channel to log all changes to cubemoji settings.` })
+      }
+    } else {
+      await reply(interaction, 'Error!', false, 'change audit settings')
     }
   }
 
@@ -100,10 +125,10 @@ export abstract class Enrollment {
       const notice = 'May take up to 30 min for permissions to sync.'
       if (action === 'grant') {
         await modEnrollment.set(key, role.name)
-        await reply(interaction, guildInfo[1], true, `grant ${role.name} mod perms`, notice)
+        await reply(interaction, guildInfo[1], true, `grant ${role.name} mod perms`, notice, guildInfo[0])
       } else {
         await modEnrollment.delete(key)
-        await reply(interaction, guildInfo[1], true, `revoke ${role.name} mod perms`, notice)
+        await reply(interaction, guildInfo[1], true, `revoke ${role.name} mod perms`, notice, guildInfo[0])
       }
     } else {
       await reply(interaction, 'Error!', false, 'modify moderation permissions', 'You may not have permissions to use this command.')
@@ -174,7 +199,7 @@ export abstract class Blacklist {
         let blocked = true
         if (action === 'unblock') blocked = false
         const success = await this.emoteCache.modifyBlockedEmoji(glob, guildInfo[0], blocked)
-        if (success) await reply(interaction, guildInfo[1], success, `${action} glob \`${glob}\``)
+        if (success) await reply(interaction, guildInfo[1], success, `${action} glob \`${glob}\``, '', guildInfo[0])
       } else await guildErrorFinish(interaction, interaction.guild?.name, glob, action)
     }
     if (channel) {
@@ -191,7 +216,7 @@ export abstract class Blacklist {
         } else {
           await this.storage.blockedChannels.delete(channel.id)
         }
-        await reply(interaction, channel.guild.name, action === 'block', `${action} #${channel.name}`)
+        await reply(interaction, channel.guild.name, true, `${action} #${channel.name}`, `Linked version<#${channel.id}>`, guildInfo[0])
       }
     }
     if (!glob && !channel) {

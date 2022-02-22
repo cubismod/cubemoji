@@ -97,24 +97,63 @@ export async function validUser (user: User, guildIdentifier: string | null, cli
 }
 
 /**
+ * log an audit message to the channel as set in the database
+ */
+export async function auditMsg (interaction: CommandInteraction, message: {
+  action: string,
+  notes: string
+  guildId: string,
+  guildName: string
+}) {
+  const auditInfo = container.resolve(CubeStorage).serverAuditInfo
+  // check audit channel first
+  const auditChannel = await auditInfo.get(message.guildId)
+  if (auditChannel) {
+    // try to post to channel and handle any permission errors
+    try {
+      const channel = await interaction.client.channels.fetch(auditChannel)
+      if (channel?.isText()) {
+        channel.send({
+          embeds: [
+            new MessageEmbed({
+              description: `**Action**: ${message.action}\n**Invoker**: <@${interaction.user.id}>/${interaction.user.tag}\n${message.notes}`,
+              timestamp: Date.now(),
+              footer: {
+                text: `cubemoji audit log for "${message.guildName}"`
+              },
+              color: (message.guildName.length * 1000000) % 16777215
+            })
+          ]
+        })
+      }
+    } catch (err) {
+      logger.error(err)
+      // unset channel value so we don't keep erroring ourselves
+      await auditInfo.delete(auditChannel)
+    }
+  }
+}
+
+/**
  * reply with an embed to indicate status of action
  * @param interaction discord interaction which should be deferred
- * @param serverName aka guild name
+ * @param guildName aka guild name
  * @param success result of action
  * @param action something like 'enroll', 'unenroll', etc.
  * @param notes add'l notes to include for user
+ * @param guildId discord provided guildid
  */
-export async function reply (interaction: CommandInteraction, serverName = '', success: boolean, action: string, notes = '') {
+export async function reply (interaction: CommandInteraction, guildName = '', success: boolean, action: string, notes = '', guildId = '') {
   const embed = new MessageEmbed({
     title: `Action: ${action}`,
     fields: [
       {
         name: 'Server Name',
-        value: serverName
+        value: guildName
       },
       {
         name: 'Status',
-        value: success ? 'Success' : 'Failure'
+        value: success ? 'Success' : `${process.env.CM_BROKEN} Failure`
       }
     ],
     color: success ? 'GREEN' : 'RED',
@@ -124,11 +163,20 @@ export async function reply (interaction: CommandInteraction, serverName = '', s
   })
   if (notes !== '') embed.addField('Notes', notes)
   await interaction.editReply({ embeds: [embed] })
-  logger.info(`Action: ${action}| Success: ${success} | Server: ${serverName} | Invoker: ${interaction.user.tag}`)
+  logger.info(`Action: ${action}| Success: ${success} | Guild: ${guildName}/${guildId} | Invoker: ${interaction.user.tag}`)
+  // try to send an audit message
+  if (success) {
+    await auditMsg(interaction, {
+      action: action,
+      guildId: guildId,
+      guildName: guildName,
+      notes: notes
+    })
+  }
 }
 
 export async function buildList (interaction: CommandInteraction, namespaces: string[]) {
-  // max of 25 fields per embed
+  // max of 10 fields per embed for us
   const storage = container.resolve(CubeStorage)
   let elements = 0
   const pages: MessageEmbed[] = []
@@ -140,7 +188,7 @@ export async function buildList (interaction: CommandInteraction, namespaces: st
     const items = storage.getNamespace(ns)
     if (items) {
       for (const item of items) {
-        if (elements % 24 === 0 && elements !== 0) {
+        if (elements % 10 === 0 && elements !== 0) {
           // new page
           pages.push(curEmbed)
           curEmbed = new MessageEmbed({ title: 'Moderation List', color: color })
@@ -151,9 +199,14 @@ export async function buildList (interaction: CommandInteraction, namespaces: st
             // determine if user has permission over this server
             const info = await validUser(interaction.user, item.key.replace('servers:', ''), interaction.client)
             if (info) {
+              // include audit channel if set
+              const auditChannel = await storage.serverAuditInfo.get(info[0])
+              let auditInfo = ''
+              if (auditChannel) auditInfo = `Audit Channel: <#${auditChannel}>`
               curEmbed = curEmbed.addField(
                 'Enrolled Server',
-                `${info[1]}\nOwner: <@${interaction.client.guilds.resolve(info[0])?.ownerId}>`
+                `*${info[1]}*\nOwner: <@${interaction.client.guilds.resolve(info[0])?.ownerId}>\n${auditInfo}`,
+                true
               )
             }
             break
@@ -171,7 +224,8 @@ export async function buildList (interaction: CommandInteraction, namespaces: st
             if (info) {
               curEmbed = curEmbed.addField(
                 'Blocked Glob',
-                `Glob: \`${glob}\`\nServer: ${info[1]}`
+                `Glob: \`${glob}\`\nServer: *${info[1]}*`,
+                true
               )
             }
             break
@@ -186,7 +240,8 @@ export async function buildList (interaction: CommandInteraction, namespaces: st
             if (info) {
               curEmbed = curEmbed.addField(
                 'Blocked Channel',
-                `Channel: <#${item.key.replace('channels:', '')}>\nServer: ${info[1]}`
+                `Channel: <#${item.key.replace('channels:', '')}>\nServer: *${info[1]}*`,
+                true
               )
             }
             break
@@ -201,7 +256,8 @@ export async function buildList (interaction: CommandInteraction, namespaces: st
               curEmbed = curEmbed.addField(
                 'Moderator Role',
                 // remove namespace tag and server ID in key
-                `Role: <@&${item.key.replace(/(.*?-)/, '')}>\nServer: ${info[1]}`
+                `Role: <@&${item.key.replace(/(.*?-)/, '')}>\nServer: *${info[1]}*`,
+                true
               )
             }
           }

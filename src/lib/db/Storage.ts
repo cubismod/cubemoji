@@ -93,6 +93,11 @@ export class CubeStorage {
    */
   emojiBlocked: Keyv<string>
 
+  /**
+   * key is guildId, value is the audit channel
+   */
+  serverAuditInfo: Keyv<string>
+
   private location = 'data/'
   private logger: Logger
   private serverInfoPath = 'data/serverInfo.sqlite'
@@ -110,13 +115,17 @@ export class CubeStorage {
       })
     })
 
-    this.serverEnrollment = new Keyv<string>('sqlite://' + this.serverInfoPath, { namespace: 'servers' })
-    this.emojiBlocked = new Keyv<string>('sqlite://' + this.serverInfoPath, { namespace: 'emoji' })
+    const sqliteUri = 'sqlite://' + this.serverInfoPath
+
+    this.serverEnrollment = new Keyv<string>(sqliteUri, { namespace: 'servers' })
+    this.emojiBlocked = new Keyv<string>(sqliteUri, { namespace: 'emoji' })
 
     this.logger = logManager().getLogger('Storage')
-    this.serverOwners = new Keyv<ServerOwner[]>('sqlite://' + this.serverInfoPath, { namespace: 'owners' })
-    this.modEnrollment = new Keyv<string>('sqlite://' + this.serverInfoPath, { namespace: 'mods' })
-    this.blockedChannels = new Keyv<ChannelInfo>('sqlite://' + this.serverInfoPath, { namespace: 'channels' })
+    this.serverOwners = new Keyv<ServerOwner[]>(sqliteUri, { namespace: 'owners' })
+    this.modEnrollment = new Keyv<string>(sqliteUri, { namespace: 'mods' })
+    this.blockedChannels = new Keyv<ChannelInfo>(sqliteUri, { namespace: 'channels' })
+
+    this.serverAuditInfo = new Keyv<string>(sqliteUri, { namespace: 'audit' })
   }
 
   async initHosts () {
