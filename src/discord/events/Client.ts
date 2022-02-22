@@ -85,7 +85,7 @@ export abstract class ClientEvents {
           global: { log: true },
           guild: { log: true }
         })
-        await client.initApplicationPermissions()
+        await client.initApplicationPermissions(true)
       } catch (err) {
         logger.error('Error initializing application commands and permissions!!!')
         logger.error(err)
@@ -100,22 +100,17 @@ export abstract class ClientEvents {
 
       if (process.env.CM_ENVIRONMENT === 'npr') {
         setInterval(() => {
+          const list: string[] = []
           const memUse = process.memoryUsage()
           for (const key in memUse) {
-            logger.debug(`${key} ${Math.round(memUse[key] / 1024 / 1024 * 100) / 100} MB`)
+            list.push(`${key} ${Math.round(memUse[key] / 1024 / 1024 * 100) / 100} MB`)
           }
+          logger.debug(list.join(' | '))
         },
         30000 // 30 sec
         )
       }
     }
-  }
-
-  @On('rateLimit')
-  rateLimit (
-    [data]: ArgsOf<'rateLimit'>
-  ) {
-    logger.debug(data)
   }
 
   @On('warn')
@@ -153,5 +148,19 @@ export abstract class ClientEvents {
       logger.error(`Type: ${interaction.type}\nTimestamp: ${Date()}\nGuild: ${interaction.guild}\nUser: ${interaction.user.tag}\nChannel: ${interaction.channel}`)
       logger.error(err)
     }
+  }
+
+  /**
+   * emitted when cubemoji joins a guild
+   */
+  @On('guildCreate')
+  async guildCreate (
+    [guild]: ArgsOf<'guildCreate'>,
+    client: Client
+  ) {
+    logger.info(`New guild "${guild.id}", "${guild.name}" joined, re-initing app commands & perms`)
+    client.botGuilds.push(guild.id)
+    await client.initApplicationCommands()
+    await client.initApplicationPermissions()
   }
 }

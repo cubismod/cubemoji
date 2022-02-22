@@ -10,14 +10,18 @@ import { CubeStorage } from '../../lib/db/Storage'
 import { EmoteCache } from '../../lib/emote/EmoteCache'
 import { logManager } from '../../lib/LogManager'
 import strings from '../../res/strings.json'
-import { OwnerCheck } from '../Permissions'
+import { ModOwnerCheck } from '../Permissions'
 
 @Discord()
 @Permission(false)
-@Permission(await OwnerCheck)
+// @Permission(await OwnerCheck())
+@Permission(await ModOwnerCheck())
 @SlashGroup({ name: 'mod', description: 'moderation functionality for the bot' })
-@SlashGroup('moderation')
+@SlashGroup('mod')
 export abstract class Mod {
+  @Permission(false)
+  // @Permission(await OwnerCheck())
+  // @Permission(await ModCheck())
   @Slash('help')
   async help (
     interaction: CommandInteraction
@@ -41,8 +45,6 @@ export abstract class Mod {
 }
 
 @Discord()
-@Permission(false)
-@Permission(await OwnerCheck)
 @SlashGroup({ name: 'enrollment', root: 'mod' })
 @SlashGroup('enrollment', 'mod')
 export abstract class Enrollment {
@@ -96,7 +98,7 @@ export abstract class Enrollment {
       // see Client.ts where we run a sync of perms every 30 min
       const key = guildInfo[0] + '-' + role.id
       const notice = 'May take up to 30 min for permissions to sync.'
-      if (action === 'enroll') {
+      if (action === 'grant') {
         await modEnrollment.set(key, role.name)
         await reply(interaction, guildInfo[1], true, `grant ${role.name} mod perms`, notice)
       } else {
@@ -104,18 +106,18 @@ export abstract class Enrollment {
         await reply(interaction, guildInfo[1], true, `revoke ${role.name} mod perms`, notice)
       }
     } else {
-      await reply(interaction, undefined, false, 'modify moderation permissions')
+      await reply(interaction, 'Error!', false, 'modify moderation permissions', 'You may not have permissions to use this command.')
     }
   }
 
-  @Slash('list', { description: 'list servers currently enrolled in big server mode' })
+  @Slash('list', { description: 'list servers currently enrolled in big server mode as well as moderator roles' })
   async list (
     interaction: CommandInteraction
   ) {
     await interaction.deferReply({ ephemeral: true })
     new Pagination(
       interaction,
-      await buildList(interaction, ['servers'])
+      await buildList(interaction, ['servers', 'mods'])
     ).send()
   }
 }
@@ -128,8 +130,6 @@ async function guildErrorFinish (interaction: CommandInteraction, guildName: str
 }
 
 @Discord()
-@Permission(false)
-@Permission(await OwnerCheck)
 @SlashGroup({ name: 'blacklist', root: 'mod' })
 @SlashGroup('blacklist', 'mod')
 export abstract class Blacklist {

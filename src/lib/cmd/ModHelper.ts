@@ -1,6 +1,7 @@
 // helper commands for Moderation group
 
 import { Client, CommandInteraction, MessageEmbed, User } from 'discord.js'
+import { choice } from 'pandemonium'
 import { container } from 'tsyringe'
 import { ChannelInfo, CubeStorage, ValRaw } from '../db/Storage'
 import { logManager } from '../LogManager'
@@ -131,7 +132,9 @@ export async function buildList (interaction: CommandInteraction, namespaces: st
   const storage = container.resolve(CubeStorage)
   let elements = 0
   const pages: MessageEmbed[] = []
-  let curEmbed = new MessageEmbed({ title: 'Moderation List', color: 'BLUE' })
+  // fune color
+  const color = (choice(namespaces).length * 1000000) % 16777215
+  let curEmbed = new MessageEmbed({ title: 'Moderation List', color: color })
   // first get all values from a namespace
   for (const ns of namespaces) {
     const items = storage.getNamespace(ns)
@@ -140,7 +143,7 @@ export async function buildList (interaction: CommandInteraction, namespaces: st
         if (elements % 24 === 0 && elements !== 0) {
           // new page
           pages.push(curEmbed)
-          curEmbed = new MessageEmbed({ title: 'Moderation List', color: 'BLUE' })
+          curEmbed = new MessageEmbed({ title: 'Moderation List', color: color })
         }
         // lists are used for several different purposes
         switch (ns) {
@@ -150,7 +153,7 @@ export async function buildList (interaction: CommandInteraction, namespaces: st
             if (info) {
               curEmbed = curEmbed.addField(
                 'Enrolled Server',
-                info[1]
+                `${info[1]}\nOwner: <@${interaction.client.guilds.resolve(info[0])?.ownerId}>`
               )
             }
             break
@@ -198,7 +201,7 @@ export async function buildList (interaction: CommandInteraction, namespaces: st
               curEmbed = curEmbed.addField(
                 'Moderator Role',
                 // remove namespace tag and server ID in key
-                `Role: <@${item.key.replace(/(.*?-)/, '')}>\nServer: ${info[1]}`
+                `Role: <@&${item.key.replace(/(.*?-)/, '')}>\nServer: ${info[1]}`
               )
             }
           }
