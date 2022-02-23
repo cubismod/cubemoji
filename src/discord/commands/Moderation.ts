@@ -51,6 +51,7 @@ export abstract class Enrollment {
   logger = logManager().getLogger('ServerConfig')
   enrollment = container.resolve(CubeStorage).serverEnrollment
   serverAudit = container.resolve(CubeStorage).serverAuditInfo
+  serverOwnerMsg = 'Only server owners can modify this setting'
 
   @Slash('modify', { description: 'enroll/unenroll a new server into big server mode' })
   async modify (
@@ -76,7 +77,7 @@ export abstract class Enrollment {
         await reply(interaction, guildInfo[1], true, 'unenroll', '', guildInfo[0])
       }
     } else {
-      await reply(interaction, 'Error!', false, 'modify enrollment')
+      await reply(interaction, 'Error!', false, 'modify enrollment', this.serverOwnerMsg)
     }
   }
 
@@ -100,7 +101,7 @@ export abstract class Enrollment {
         await interaction.editReply({ content: `${process.env.CM_BROKEN} Command failure or no options specified!\n**Command Usage**: Set an audit channel to log all changes to cubemoji settings.` })
       }
     } else {
-      await reply(interaction, 'Error!', false, 'change audit settings')
+      await reply(interaction, 'Error!', false, 'change audit settings', this.serverOwnerMsg)
     }
   }
 
@@ -131,7 +132,7 @@ export abstract class Enrollment {
         await reply(interaction, guildInfo[1], true, `revoke ${role.name} mod perms`, notice, guildInfo[0])
       }
     } else {
-      await reply(interaction, 'Error!', false, 'modify moderation permissions', 'You may not have permissions to use this command.')
+      await reply(interaction, 'Error!', false, 'modify moderation permissions', this.serverOwnerMsg)
     }
   }
 

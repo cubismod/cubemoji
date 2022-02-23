@@ -113,18 +113,9 @@ export async function auditMsg (interaction: CommandInteraction, message: {
     try {
       const channel = await interaction.client.channels.fetch(auditChannel)
       if (channel?.isText()) {
-        channel.send({
-          embeds: [
-            new MessageEmbed({
-              description: `**Action**: ${message.action}\n**Invoker**: <@${interaction.user.id}>/${interaction.user.tag}\n${message.notes}`,
-              timestamp: Date.now(),
-              footer: {
-                text: `cubemoji audit log for "${message.guildName}"`
-              },
-              color: (message.guildName.length * 1000000) % 16777215
-            })
-          ]
-        })
+        channel.send(
+          `<t:${Math.round(Date.now() / 1000)}>\n**Action**: ${message.action}\n**Invoker**: ${interaction.user.tag} (${interaction.user.id})\n${message.notes}`
+        )
       }
     } catch (err) {
       logger.error(err)

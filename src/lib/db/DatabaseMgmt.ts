@@ -13,6 +13,7 @@ import { mkdir, readdir, stat, unlink } from 'fs/promises'
 import { pipeline } from 'stream'
 import { promisify } from 'util'
 import { createGzip } from 'zlib'
+import { Milliseconds } from '../constants/Units'
 import { logManager } from '../LogManager'
 
 const logger = logManager().getLogger('DatabaseMgmt')
@@ -59,7 +60,7 @@ export async function runBackups (firstRun = true) {
   }
   if (firstRun) {
     // setup an interval to run every 24 hours
-    setInterval(runBackups, 8.64e+7, false)
+    setInterval(runBackups, Milliseconds.day, false)
   }
   logger.info('Finished database backups')
 }

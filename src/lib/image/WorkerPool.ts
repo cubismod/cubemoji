@@ -1,6 +1,7 @@
 import { State } from 'gm'
 import { Logger } from 'log4js'
 import { singleton } from 'tsyringe'
+import { Milliseconds } from '../constants/Units'
 import { logManager } from '../LogManager'
 
 /**
@@ -53,7 +54,7 @@ export class WorkerPool {
 
       // free up that worker after 5 min if needed...although this doesn't actually
       // stop the gm process
-      setTimeout(() => { this.runningWorkers.delete(path) }, 300000)
+      setTimeout(() => { this.runningWorkers.delete(path) }, Milliseconds.fiveMin)
     } else {
       this.logger.info(`job queued: "${path.slice(-8)}"`)
     }

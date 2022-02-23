@@ -3,6 +3,7 @@
 import { ArgsOf, Client, Discord, DIService, On, Once } from 'discordx'
 import { container } from 'tsyringe'
 import { CubeMessageManager } from '../../lib/cmd/MessageManager'
+import { Milliseconds } from '../../lib/constants/Units'
 import { scheduleBackup } from '../../lib/db/DatabaseMgmt'
 import { CubeStorage } from '../../lib/db/Storage'
 import { EmoteCache } from '../../lib/emote/EmoteCache'
@@ -46,7 +47,7 @@ export abstract class ClientEvents {
           async () => {
             await container.resolve(CubeStorage).initHosts()
           },
-          6.048e+8 // 1 week interval
+          Milliseconds.week
         )
 
         await container.resolve(CubeStorage).loadServerOwners(client)
@@ -58,7 +59,7 @@ export abstract class ClientEvents {
             await client.initApplicationPermissions()
             logger.debug('permission sync completed')
           },
-          1.8e+6 // 30 min
+          Milliseconds.thirtyMin
         )
 
         // schedule a backup for 2am EST
@@ -96,7 +97,7 @@ export abstract class ClientEvents {
       logger.info(`It took ${process.uptime()}s to startup this time`)
       // set a new status msg every 5 min
       setStatus(client)
-      setInterval(setStatus, 300000, client)
+      setInterval(setStatus, Milliseconds.fiveMin, client)
 
       if (process.env.CM_ENVIRONMENT === 'npr') {
         setInterval(() => {
@@ -107,7 +108,7 @@ export abstract class ClientEvents {
           }
           logger.debug(list.join(' | '))
         },
-        30000 // 30 sec
+        Milliseconds.thirtySec // 30 sec
         )
       }
     }

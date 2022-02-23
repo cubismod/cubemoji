@@ -10,6 +10,7 @@ import { choice } from 'pandemonium'
 import { container } from 'tsyringe'
 import { URL } from 'url'
 import { CubeMessageManager } from '../cmd/MessageManager'
+import { Milliseconds } from '../constants/Units'
 import { CubeStorage } from '../db/Storage'
 import { Cmoji, Source } from '../emote/Cmoji'
 import { EmoteCache } from '../emote/EmoteCache'
@@ -400,6 +401,6 @@ export function autoDeleteMsg (msg: Message|undefined) {
   if (msg) {
     setTimeout(async () => {
       await msg.delete()
-    }, 30000)
+    }, Milliseconds.thirtySec)
   }
 }
