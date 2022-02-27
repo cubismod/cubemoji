@@ -1,14 +1,14 @@
 // responses to message reacts
 
 import { MessageEmbed, MessageReaction, TextChannel } from 'discord.js'
-import { ArgsOf, Discord, On } from 'discordx'
+import { ArgsOf, Client, Discord, On } from 'discordx'
 import { choice } from 'pandemonium'
 import { container } from 'tsyringe'
 import { adjectives, animals, colors, names, uniqueNamesGenerator } from 'unique-names-generator'
 import { CubeMessageManager } from '../../lib/cmd/MessageManager'
-import { CubeStorage } from '../../lib/db/Storage'
 import { EditDiscord, getMessageImage, isUrl, RescaleDiscord } from '../../lib/image/DiscordLogic'
 import { logManager } from '../../lib/LogManager'
+import { BSGuardData } from '../Guards'
 
 @Discord()
 export abstract class ReactEvents {
@@ -16,19 +16,19 @@ export abstract class ReactEvents {
 
   @On('messageReactionAdd')
   async onMessageReactionAdd (
-    [reaction]: ArgsOf<'messageReactionAdd'>
+    [reaction]: ArgsOf<'messageReactionAdd'>,
+    _client: Client,
+    data: BSGuardData
   ) {
     const cubeMessageManager = container.resolve(CubeMessageManager)
     const reactionUsers = await reaction.users.fetch()
     // last person to react is the user who initated this reaction event
     const user = reactionUsers.last()
-    const storage = container.resolve(CubeStorage)
     const msg = await reaction.message.fetch()
     if (msg.guildId) {
-      // stored indicates whether the message is in a channel
-      // in a guild that is in big server mode
-      const stored = storage.serverEnrollment.get(msg.guildId)
       if (cubeMessageManager && user) {
+        // if a server is enrolled in big server mode, users can't use the
+        // rescale, edit, and best of reactions in that server
         switch (reaction.emoji.toString()) {
           case '🗑️': {
             // delete a message
@@ -47,7 +47,7 @@ export abstract class ReactEvents {
             break
           }
           case '📷': {
-            if (!stored) {
+            if (!data.enrolled) {
               // perform an edit
               const source = getMessageImage(msg)
               if (reaction instanceof MessageReaction) {
@@ -59,7 +59,7 @@ export abstract class ReactEvents {
           }
           case '📏': {
             // perform a rescale
-            if (!stored) {
+            if (!data.enrolled) {
               const source = getMessageImage(await reaction.message.fetch())
               if (reaction instanceof MessageReaction) {
                 const rsDiscord = new RescaleDiscord(reaction, source, user)
@@ -69,7 +69,7 @@ export abstract class ReactEvents {
             break
           }
           case '🌟': {
-            if (!stored) {
+            if (!data.enrolled) {
               if (reaction.partial) {
                 reaction = await reaction.fetch()
               }

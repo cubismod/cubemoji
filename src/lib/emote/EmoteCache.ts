@@ -64,9 +64,10 @@ export class EmoteCache {
         emojis.push(new Cmoji(emoji.name, emoji.url, Source.Discord, emoji, emoji.id))
       }
     })
+    const baseUrl = process.env.CM_EXTEMOJI ? process.env.CM_EXTEMOJI : 'https://storage.googleapis.com/cubemoji.appspot.com/mutant-emotes/'
     // then add mutant emojis
     mutantNames.forEach(emoji => {
-      const url = `https://storage.googleapis.com/cubemoji.appspot.com/mutant-emotes/${emoji}`
+      const url = baseUrl + emoji
       // remove the file extension
       const name = emoji.slice(0, -4)
       emojis.push(new Cmoji(name, url, Source.Mutant, null))
