@@ -9,12 +9,13 @@ Execution
 - `npm start` to run the built JS files
 - `npm run test` to run through unit tests
 - `npm run dev` to use the [tsc-watch](https://www.npmjs.com/package/tsc-watch) package to rebuild the software in real-time while testing features.
-- Docker
-  - This bot is intended to be run using Docker. My own docker-compose.yml file is included which is what I use to execute the bot on my Pi.
+
+## Fly.io
+Cubemoji uses https://fly.io/ for cheap hosting.
 
 Backend Storage
 ---------------
-Cubemoji uses [Keyv](https://www.npmjs.com/package/keyv) w/ the [keyv-file](https://github.com/zaaack/keyv-file) adapter for persistent storage. These files are saved to data/ subdirectory which can then be mapped to an external folder in Docker-Compose.
+Cubemoji uses [Keyv](https://www.npmjs.com/package/keyv) w/ the [keyv-file](https://github.com/zaaack/keyv-file) adapter for persistent storage as well as the built-in sqlite storage. These files are saved to data/ subdirectory which can then be mapped to an external folder in Docker-Compose.
 
 Secrets
 -------
