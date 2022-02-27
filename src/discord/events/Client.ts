@@ -9,7 +9,6 @@ import { CubeStorage } from '../../lib/db/Storage'
 import { EmoteCache } from '../../lib/emote/EmoteCache'
 import { setStatus } from '../../lib/image/DiscordLogic'
 import { ImageQueue } from '../../lib/image/ImageQueue'
-import { WorkerPool } from '../../lib/image/WorkerPool'
 import { logManager } from '../../lib/LogManager'
 
 const logger = logManager().getLogger('Client')
@@ -27,90 +26,81 @@ export abstract class ClientEvents {
   ) {
     logger.info('Gateway ready.')
     DIService.container = container
+    // dependency injection initialization
     if (DIService.container !== undefined) {
-      // dependency injection initialization
-      if (DIService.container !== undefined) {
-        DIService.container.register(ImageQueue, { useValue: new ImageQueue() })
-        logger.info('registered ImageQueue')
+      DIService.container.register(ImageQueue, { useValue: new ImageQueue() })
+      logger.info('registered ImageQueue')
 
-        const imageQueue = container.resolve(ImageQueue)
-        await imageQueue.clear()
-        logger.info('cleared download directory')
+      const imageQueue = container.resolve(ImageQueue)
+      await imageQueue.clear()
+      logger.info('cleared download directory')
 
-        DIService.container.register(CubeMessageManager, { useValue: new CubeMessageManager() })
-        logger.info('registered CubeMessageManager')
+      DIService.container.register(CubeMessageManager, { useValue: new CubeMessageManager() })
+      logger.info('registered CubeMessageManager')
 
-        DIService.container.register(CubeStorage, { useValue: new CubeStorage() })
-        logger.info('registered CubeStorage')
-        await container.resolve(CubeStorage).initHosts()
-        setInterval(
-          async () => {
-            await container.resolve(CubeStorage).initHosts()
-          },
-          Milliseconds.week
-        )
-
-        await container.resolve(CubeStorage).loadServerOwners(client)
-        // every 30 min, refresh our cache of who the server owners are
-        // and re-init permissions on Moderation commands
-        setInterval(
-          async () => {
-            await container.resolve(CubeStorage).loadServerOwners(client)
-            await client.initApplicationPermissions()
-            logger.debug('permission sync completed')
-          },
-          Milliseconds.thirtyMin
-        )
-
-        // schedule a backup for 2am EST
-        scheduleBackup()
-
-        let workers = 4
-        if (process.env.CM_WORKERS) workers = parseInt(process.env.CM_WORKERS)
-        DIService.container.register(WorkerPool, { useValue: new WorkerPool(workers) })
-        logger.info('registered WorkerPool')
-
-        DIService.container.register(EmoteCache, { useValue: new EmoteCache() })
-        logger.info('registered EmoteCache')
-        // load up cubemoji emote cache
-        const emoteCache = container.resolve(EmoteCache)
-        await emoteCache.init(client)
-        emoteCache.loadBlockedEmojis()
-        logger.info('initialized EmoteCache')
-      } else {
-        throw new Error('DIServer.container is undefined therefore cannot initialize dependency injection')
-      }
-
-      try {
-        await client.initApplicationCommands({
-          global: { log: true },
-          guild: { log: true }
-        })
-        await client.initApplicationPermissions(true)
-      } catch (err) {
-        logger.error('Error initializing application commands and permissions!!!')
-        logger.error(err)
-        throw new Error('exiting application as commands can\'t init properly')
-      }
-
-      logger.info(`cubemoji ${process.env.CM_VERSION} is now running...`)
-      logger.info(`It took ${process.uptime()}s to startup this time`)
-      // set a new status msg every 5 min
-      setStatus(client)
-      setInterval(setStatus, Milliseconds.fiveMin, client)
-
-      if (process.env.CM_ENVIRONMENT === 'npr') {
-        setInterval(() => {
-          const list: string[] = []
-          const memUse = process.memoryUsage()
-          for (const key in memUse) {
-            list.push(`${key} ${Math.round(memUse[key] / 1024 / 1024 * 100) / 100} MB`)
-          }
-          logger.debug(list.join(' | '))
+      DIService.container.register(CubeStorage, { useValue: new CubeStorage() })
+      logger.info('registered CubeStorage')
+      await container.resolve(CubeStorage).initHosts()
+      setInterval(
+        async () => {
+          await container.resolve(CubeStorage).initHosts()
         },
-        Milliseconds.thirtySec // 30 sec
-        )
-      }
+        Milliseconds.week
+      )
+
+      await container.resolve(CubeStorage).loadServerOwners(client)
+      // every 30 min, refresh our cache of who the server owners are
+      // and re-init permissions on Moderation commands
+      setInterval(
+        async () => {
+          await container.resolve(CubeStorage).loadServerOwners(client)
+          await client.initApplicationPermissions()
+          logger.debug('permission sync completed')
+        },
+        Milliseconds.thirtyMin
+      )
+
+      // schedule a backup for 2am EST
+      scheduleBackup()
+
+      // load up cubemoji emote cache
+      const emoteCache = container.resolve(EmoteCache)
+      await emoteCache.init(client)
+      emoteCache.loadBlockedEmojis()
+      logger.info('initialized EmoteCache')
+    } else {
+      throw new Error('DIServer.container is undefined therefore cannot initialize dependency injection')
+    }
+
+    try {
+      await client.initApplicationCommands({
+        global: { log: true },
+        guild: { log: true }
+      })
+      await client.initApplicationPermissions(true)
+    } catch (err) {
+      logger.error('Error initializing application commands and permissions!!!')
+      logger.error(err)
+      throw new Error('exiting application as commands can\'t init properly')
+    }
+
+    logger.info(`cubemoji ${process.env.CM_VERSION} is now running...`)
+    logger.info(`It took ${process.uptime()}s to startup this time`)
+    // set a new status msg every 5 min
+    setStatus(client)
+    setInterval(setStatus, Milliseconds.fiveMin, client)
+
+    if (process.env.CM_ENVIRONMENT === 'npr') {
+      setInterval(() => {
+        const list: string[] = []
+        const memUse = process.memoryUsage()
+        for (const key in memUse) {
+          list.push(`${key} ${Math.round(memUse[key] / 1024 / 1024 * 100) / 100} MB`)
+        }
+        logger.debug(list.join(' | '))
+      },
+      Milliseconds.thirtySec // 30 sec
+      )
     }
   }
 

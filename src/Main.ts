@@ -4,7 +4,7 @@ import { Intents } from 'discord.js'
 import { Client } from 'discordx'
 import { config } from 'dotenv'
 import 'reflect-metadata'
-import { bigServerDetect } from './discord/Guards'
+import { bigServerDetect, blockedChannelDetect } from './discord/Guards'
 import { logManager } from './lib/LogManager'
 
 // load dotenv file if exists
@@ -42,8 +42,9 @@ export class Main {
       partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
       // for testing purposes in cubemoji server
       silent: silent,
-      guards: [bigServerDetect]
+      guards: [blockedChannelDetect, bigServerDetect]
     })
+
     if (process.env.CM_TOKEN) await this._client.login(process.env.CM_TOKEN)
     else throw new Error('No token specified with environment variable $CM_TOKEN')
   }
