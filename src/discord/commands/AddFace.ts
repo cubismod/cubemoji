@@ -1,8 +1,9 @@
 import { AutocompleteInteraction, CommandInteraction } from 'discord.js'
-import { Discord, Slash, SlashChoice, SlashOption } from 'discordx'
+import { Client, Discord, Slash, SlashChoice, SlashOption } from 'discordx'
 import { emoteAutocomplete } from '../../lib/cmd/Autocomplete'
 import { FaceDiscord, getUrl } from '../../lib/image/DiscordLogic'
 import strings from '../../res/strings.json'
+import { BSGuardData } from '../Guards'
 
 @Discord()
 export abstract class AddFace {
@@ -24,9 +25,11 @@ export abstract class AddFace {
     @SlashChoice('flushed')
     @SlashOption('face', { description: 'face to composite on an image' })
       face: string,
-      interaction: CommandInteraction
+      interaction: CommandInteraction,
+      _client: Client,
+      data: BSGuardData
   ) {
-    await interaction.deferReply()
+    await interaction.deferReply({ ephemeral: data.enrolled, fetchReply: !data.enrolled })
     const url = await getUrl(source)
     if (url) {
       const addFace = new FaceDiscord(interaction, face, url, interaction.user)

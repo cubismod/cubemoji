@@ -1,9 +1,10 @@
 import { CommandInteraction } from 'discord.js'
-import { Discord, Slash, SlashChoice, SlashOption } from 'discordx'
+import { Client, Discord, Slash, SlashChoice, SlashOption } from 'discordx'
 import { container } from 'tsyringe'
 import { Source } from '../../lib/emote/Cmoji'
 import { EmoteCache } from '../../lib/emote/EmoteCache'
-import { sendPagination } from '../../lib/image/DiscordLogic'
+import { sendPagination as sendList } from '../../lib/image/DiscordLogic'
+import { BSGuardData } from '../Guards'
 
 @Discord()
 export abstract class List {
@@ -14,21 +15,25 @@ export abstract class List {
     @SlashChoice('All', 'all')
     @SlashChoice('Discord', 'discord')
     @SlashChoice('Mutant', 'mutant')
+    @SlashChoice('This Server', 'thisserver')
     @SlashOption('subset', { description: 'Which subset of emotes would you like to choose from?' })
       subset: string,
-      interaction: CommandInteraction) {
+      interaction: CommandInteraction,
+      _client: Client,
+      data: BSGuardData) {
     const emoteCache = container.resolve(EmoteCache)
+    let type = Source.Any
 
-    if (emoteCache !== undefined) {
-      if (subset === 'download') {
-        // TO IMPLEMENT
-      }
-    } else {
-      // the code for paginating is encapsulated in this other function
-      let type = Source.Any
-      if (subset === 'discord') type = Source.Discord
-      if (subset === 'mutant') type = Source.Mutant
-      sendPagination(interaction, type, emoteCache)
+    switch (subset) {
+      case 'discord':
+        type = Source.Discord
+        break
+      case 'mutant':
+        type = Source.Mutant
+        break
+      case 'thisserver':
+        type = Source.ThisServer
     }
+    sendList(interaction, type, emoteCache, data.enrolled)
   }
 }

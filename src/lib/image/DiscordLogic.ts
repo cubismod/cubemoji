@@ -80,21 +80,20 @@ export class RescaleDiscord {
           // add trash can reaction
           if (!msg) {
             this.logger.error('could not get a message during image operation, not proceeding with adding trash react')
-          } else {
-            if (msg instanceof Message) {
-              await cubeMessageManager.registerTrashReact(this.context, msg, this.user.id)
-              // job is finished so send status to trigger next jobs
-              workerPool.done(filename)
+          } else if (msg instanceof Message && !msg.flags.has('EPHEMERAL')) {
+            // check if ephemeral to avoid discord API errors (can't react to an ephermeral message)
+            await cubeMessageManager.registerTrashReact(this.context, msg, this.user.id)
+            // job is finished so send status to trigger next jobs
+            workerPool.done(filename)
 
-              // queue up attachment for later
-              const attach = msg.attachments.at(0)
+            // queue up attachment for later
+            const attach = msg.attachments.at(0)
 
-              if (attach !== undefined) {
-                imageQueue.enqueue({
-                  localPath: filename,
-                  url: attach.url
-                })
-              }
+            if (attach !== undefined) {
+              imageQueue.enqueue({
+                localPath: filename,
+                url: attach.url
+              })
             }
           }
         })
@@ -212,7 +211,7 @@ export function getMessageImage (message: Message) {
 /**
   * send a new pagination to the specified interaction
   */
-export function sendPagination (interaction: CommandInteraction, type: Source, emoteCache: EmoteCache) {
+export async function sendPagination (interaction: CommandInteraction, type: Source, emoteCache: EmoteCache, ephemeral: boolean) {
   // first setup embeds
   const embeds: MessageEmbed[] = []
   const menuText: string[] = [] // page markers like alphabet-bean for example
@@ -220,7 +219,7 @@ export function sendPagination (interaction: CommandInteraction, type: Source, e
   let embedBody = ''
   let curEmotePage = newPage(new MessageEmbed(), type)
   let emotesPerPage = 0
-  let emoteSource: Cmoji[] = [] // the source of our list
+  let emoteSource: Cmoji[] = [] // list of emojis we're pulling from to display
   if (curEmotePage) {
     switch (type) {
       case Source.Discord:
@@ -231,11 +230,31 @@ export function sendPagination (interaction: CommandInteraction, type: Source, e
         emoteSource = emoteCache.mutantEmojis
         emotesPerPage = 120
         break
+      case Source.ThisServer:
+        // collect emotes from the current server and save as Cmoji objs
+        // we're not actually using our own emote cache here to build this list
+        if (interaction.guild) {
+          await interaction.guild.emojis.fetch()
+          for (const emoji of interaction.guild.emojis.cache) {
+            emoteSource.push(
+              new Cmoji(
+                emoji[1].name,
+                emoji[1].url,
+                Source.Discord,
+                emoji[1],
+                emoji[1].id
+              )
+            )
+          }
+        }
+        emotesPerPage = 60
+        break
       case Source.Any:
         emoteSource = emoteCache.emojis
         emotesPerPage = 120
     }
     emoteSource.forEach((emote, i) => {
+      // TODO: implement blacklisting here
       // for discord emojis we want 60 emojis in one embed
       // mutant and any we can do 100 in one embed
       if (embedBody === '') {
@@ -243,7 +262,7 @@ export function sendPagination (interaction: CommandInteraction, type: Source, e
         menuItem = `(${menuText.length + 1}): ${emote.name} - `
       }
       // append to emote list
-      if (type === Source.Discord && emote.guildEmoji) {
+      if ((type === Source.Discord || type === Source.ThisServer) && emote.guildEmoji) {
         // discord emoji specific code
         embedBody = embedBody.concat(emote.guildEmoji.toString())
       }
@@ -285,7 +304,8 @@ export function sendPagination (interaction: CommandInteraction, type: Source, e
       type: 'SELECT_MENU',
       // ephemeral: true, have a feeling this is causing api errors
       pageText: menuText,
-      showStartEnd: false
+      showStartEnd: false,
+      ephemeral: ephemeral
     }).send()
   }
 }
@@ -317,6 +337,9 @@ function newPage (embed: MessageEmbed, type: Source) {
     case Source.Mutant:
       embed.setTitle('List of Mutant Emoji')
       embed.addField('License Info', mutantAttr)
+      break
+    case Source.ThisServer:
+      embed.setTitle('Emoji on this Server')
   }
   embed.setColor('RANDOM')
   return embed

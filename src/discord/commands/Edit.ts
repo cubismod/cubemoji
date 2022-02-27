@@ -1,9 +1,10 @@
 import { AutocompleteInteraction, CommandInteraction, GuildMember } from 'discord.js'
-import { Discord, Slash, SlashOption } from 'discordx'
+import { Client, Discord, Slash, SlashOption } from 'discordx'
 import { editAutocomplete, emoteAutocomplete } from '../../lib/cmd/Autocomplete'
 import { EditDiscord } from '../../lib/image/DiscordLogic'
 import imgEffects from '../../res/imgEffects.json'
 import strings from '../../res/strings.json'
+import { BSGuardData } from '../Guards'
 
 @Discord()
 export abstract class Edit {
@@ -27,20 +28,26 @@ export abstract class Edit {
       effects: string,
     @SlashOption('list', { description: 'get a list of the available effects', required: false })
       list: boolean,
-      interaction: CommandInteraction
+      interaction: CommandInteraction,
+      _client: Client,
+      data: BSGuardData
   ) {
     if (list) {
       // just give the user back the effects options
       interaction.reply({ content: imgEffects.join(' '), ephemeral: true })
     } else {
+      const deferOptions = {
+        ephemeral: data.enrolled,
+        fetchReply: !data.enrolled
+      }
       if (!emote && !user) {
         interaction.reply({ content: strings.noArgs, ephemeral: true })
       } else if (emote) {
-        await interaction.deferReply()
+        await interaction.deferReply(deferOptions)
         const edDiscord = new EditDiscord(interaction, effects, emote, interaction.user)
         await edDiscord.run()
       } else if (user) {
-        await interaction.deferReply()
+        await interaction.deferReply(deferOptions)
         const edDiscord = new EditDiscord(interaction, effects, user.displayAvatarURL({ format: 'png', dynamic: true, size: 256 }), interaction.user)
         await edDiscord.run()
       }

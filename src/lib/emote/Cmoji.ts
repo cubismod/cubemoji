@@ -12,6 +12,7 @@ export enum Source {
   Discord,
   Mutant,
   URL,
+  ThisServer,
   Any
 }
 
