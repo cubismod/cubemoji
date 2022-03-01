@@ -43,7 +43,8 @@ export function logManager () {
       Events: categoryConfig,
       ServerConfig: categoryConfig,
       DatabaseMgmt: categoryConfig,
-      Client: categoryConfig
+      Client: categoryConfig,
+      Web: categoryConfig
     }
   })
 }
