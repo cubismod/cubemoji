@@ -7,6 +7,8 @@ import { Milliseconds } from '../../lib/constants/Units'
 import { scheduleBackup } from '../../lib/db/DatabaseMgmt'
 import { CubeStorage } from '../../lib/db/Storage'
 import { EmoteCache } from '../../lib/emote/EmoteCache'
+import { setupHTTP } from '../../lib/http/HealthCheck'
+import { PugGenerator } from '../../lib/http/PugGenerator'
 import { setStatus } from '../../lib/image/DiscordLogic'
 import { ImageQueue } from '../../lib/image/ImageQueue'
 import { logManager } from '../../lib/LogManager'
@@ -49,16 +51,6 @@ export abstract class ClientEvents {
       )
 
       await container.resolve(CubeStorage).loadServerOwners(client)
-      // every 30 min, refresh our cache of who the server owners are
-      // and re-init permissions on Moderation commands
-      setInterval(
-        async () => {
-          await container.resolve(CubeStorage).loadServerOwners(client)
-          await client.initApplicationPermissions()
-          logger.debug('permission sync completed')
-        },
-        Milliseconds.thirtyMin
-      )
 
       // schedule a backup for 2am EST
       scheduleBackup()
@@ -68,6 +60,23 @@ export abstract class ClientEvents {
       await emoteCache.init(client)
       emoteCache.loadBlockedEmojis()
       logger.info('initialized EmoteCache')
+
+      DIService.container.register(PugGenerator, { useValue: new PugGenerator() })
+      await container.resolve(PugGenerator).render()
+      logger.info('initialized PugGenerator')
+
+      // every 30 min, refresh our cache of who the server owners are
+      // and re-init permissions on Moderation commands as well as
+      // regen pug
+      setInterval(
+        async () => {
+          await container.resolve(CubeStorage).loadServerOwners(client)
+          await client.initApplicationPermissions()
+          await container.resolve(PugGenerator).render()
+          logger.debug('permission sync & pug-regen completed')
+        },
+        Milliseconds.thirtyMin
+      )
     } else {
       throw new Error('DIServer.container is undefined therefore cannot initialize dependency injection')
     }
@@ -83,6 +92,9 @@ export abstract class ClientEvents {
       logger.error(err)
       throw new Error('exiting application as commands can\'t init properly')
     }
+
+    // setup healthcheck listener for fly
+    setupHTTP()
 
     logger.info(`cubemoji ${process.env.CM_VERSION} is now running...`)
     logger.info(`It took ${process.uptime()}s to startup this time`)

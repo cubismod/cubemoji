@@ -1,10 +1,12 @@
 import { CommandInteraction } from 'discord.js'
 import { Discord, Slash, SlashOption } from 'discordx'
 import Qty from 'js-quantities'
+import { logManager } from '../../lib/LogManager'
 
 @Discord()
 export abstract class Convert {
-  @Slash('convert', { description: 'perform unit conversions' })
+  logger = logManager().getLogger('Convert')
+  @Slash('convert', { description: 'perform unit conversions for common scientific calculations (not currency)' })
   async convert (
     @SlashOption('fromval', {
       description: 'the value of whatever you are converting from',
@@ -27,6 +29,8 @@ export abstract class Convert {
       const converted = qty.to(tounit)
       interaction.reply(`${qty.toString()} is equivalent to ${converted.toString()}`)
     } catch (err) {
+      this.logger.error(err)
+      this.logger.error(`from: ${fromval}${fromunit} to ${tounit} by ${interaction.user.tag}`)
       interaction.reply({ content: `Conversion error! Check your units. Error details below:\n\`${err}\``, ephemeral: true })
     }
   }

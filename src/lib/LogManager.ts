@@ -44,7 +44,8 @@ export function logManager () {
       ServerConfig: categoryConfig,
       DatabaseMgmt: categoryConfig,
       Client: categoryConfig,
-      Web: categoryConfig
+      Web: categoryConfig,
+      Convert: categoryConfig
     }
   })
 }
