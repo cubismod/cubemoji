@@ -33,6 +33,10 @@ processes = []
 source="cm_data"
 destination="/usr/src/cubemoji/data/"
 
-[statics]
-  guest_path = '/html/public'
-  url_prefix = '/web'
+[[statics]]
+  guest_path = '/static/emotes'
+  url_prefix = '/emotes'
+
+[[statics]]
+  guest_path = '/static/pug'
+  url_prefix = '/list'

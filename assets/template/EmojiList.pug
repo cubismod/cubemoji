@@ -15,21 +15,26 @@ html(lang='en')
       div(class='row')
         div(class='col')
           h1(class='display-2') cubemoji list
+          p This is a list of every emoji available to cubemoji
       
       div(class='row row-cols-auto')
         div(class='col')
           a(href='https://gitlab.com/cubismod/cubemoji')
-            img(alt='Cubemoji GitLab', src='https://img.shields.io/gitlab/v/release/23331669?style=flat-square')
+            img(alt='Cubemoji GitLab', src='https://img.shields.io/gitlab/v/release/23331669?style=for-the-badge')
         div(class='col')
           a(href='https://discord.gg/rQZVTpEyuG')
-            img(alt='Discord Server', src='https://img.shields.io/discord/545784892492087303?label=Discord&style=flat-square')
+            img(alt='Discord Server', src='https://img.shields.io/discord/545784892492087303?label=Discord&style=for-the-badge')
         div(class='col')
           a(href='https://www.buymeacoffee.com/cubis')
-            img(alt='Buy Me a Coffee', src='https://img.shields.io/badge/-Buy%20me%20a%20Coffee-brightgreen?style=flat-square')
-        
+            img(alt='Buy Me a Coffee', src='https://img.shields.io/badge/-Buy%20me%20a%20Coffee-brightgreen?style=for-the-badge')
+      
       div(class='row')
         div(class='col')
-          div(id='emojis' class='mt-5')
+          div(class='alert alert-dark mt-4', role='alert')=`Last updated at ${new Date().toUTCString()}`  
+
+      div(class='row')
+        div(class='col')
+          div(id='emojis' class='mt-2')
             input(class='search form-control form-control-lg', placeholder='Search')
             table(class='table table-striped')
                 thead 
