@@ -5,11 +5,14 @@ import { container } from 'tsyringe'
 import { emoteAutocomplete } from '../../lib/cmd/Autocomplete'
 import { Source } from '../../lib/emote/Cmoji'
 import { EmoteCache } from '../../lib/emote/EmoteCache'
-import { logManager } from '../../lib/LogManager'
+import { CubeLogger } from '../../lib/logger/CubeLogger'
 import strings from '../../res/strings.json'
 
 @Discord()
 export abstract class Info {
+  private emoteCache = container.resolve(EmoteCache)
+  private logger = container.resolve(CubeLogger).command
+
   @Slash('info', {
     description: 'Provides information about an emote or user'
   })
@@ -25,15 +28,12 @@ export abstract class Info {
       member: GuildMember,
       interaction: CommandInteraction
   ) {
-    const logger = logManager().getLogger('Info')
-
-    const emoteCache = container.resolve(EmoteCache)
-    if (emoteCache !== undefined) {
+    if (this.emoteCache !== undefined) {
       // check our args
       if (emote !== undefined) {
         // emote parsing code
         const emoteName = emote.toLowerCase()
-        const res = await emoteCache.retrieve(emoteName)
+        const res = await this.emoteCache.retrieve(emoteName)
         if (res !== undefined) {
           await interaction.deferReply()
 
@@ -53,7 +53,7 @@ export abstract class Info {
               try {
                 await interaction.editReply({ embeds: [embed] })
               } catch (err) {
-                logger.error(err)
+                this.logger.error(err)
               }
               break
             }
@@ -62,7 +62,7 @@ export abstract class Info {
               try {
                 await interaction.editReply({ embeds: [embed] })
               } catch (err) {
-                logger.error(err)
+                this.logger.error(err)
               }
               break
             }
@@ -88,7 +88,7 @@ export abstract class Info {
         try {
           await interaction.reply({ embeds: [embed] })
         } catch (err) {
-          logger.error(err)
+          this.logger.error(err)
         }
       }
       if ((member === undefined) && (emote === undefined)) {

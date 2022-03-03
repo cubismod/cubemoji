@@ -1,9 +1,10 @@
 // primitive HP responder for health checks with fly.io
 import { createServer } from 'http'
-import { logManager } from '../LogManager'
+import { container } from 'tsyringe'
+import { CubeLogger } from '../logger/CubeLogger'
 
 export function setupHTTP () {
-  const logger = logManager().getLogger('Web')
+  const logger = container.resolve(CubeLogger).web
   const server = createServer((request, response) => {
     response.statusCode = 200
     response.setHeader('Content-Type', 'text/plain')

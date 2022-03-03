@@ -1,20 +1,18 @@
 import { Snowflake } from 'discord-api-types'
 import { CommandInteraction, ContextMenuInteraction, Message, MessageReaction } from 'discord.js'
-import { Logger } from 'log4js'
 import { container, singleton } from 'tsyringe'
 import { CubeStorage } from '../db/Storage'
 import { MsgContext } from '../image/ImageLogic'
-import { logManager } from '../LogManager'
+import { CubeLogger } from '../logger/CubeLogger'
 
 @singleton()
 // used to keep track of cubemoji sent messages
 export class CubeMessageManager {
   // first option is the message ID, second option is the user ID who sent the message
   private storage: CubeStorage
-  private logger: Logger
+  private logger = container.resolve(CubeLogger).messageManager
   constructor () {
     this.storage = container.resolve(CubeStorage)
-    this.logger = logManager().getLogger('MessageManager')
   }
 
   // register a new trash react to save to our list of reacts

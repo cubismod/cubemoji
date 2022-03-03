@@ -1,9 +1,8 @@
 import { unlink } from 'fs'
 import { readdir } from 'fs/promises'
 import Fuse from 'fuse.js'
-import { Logger } from 'log4js'
-import { singleton } from 'tsyringe'
-import { logManager } from '../LogManager'
+import { container, singleton } from 'tsyringe'
+import { CubeLogger } from '../logger/CubeLogger'
 
 export interface Image {
   // url as saved in discord cdn
@@ -16,7 +15,7 @@ export interface Image {
 @singleton()
 export class ImageQueue {
   private images: Image[]
-  private logger: Logger
+  private logger = container.resolve(CubeLogger).imageQueue
   /**
   * Used to keep track of images saved on disk
   * basically we just add another image to the queue
@@ -30,7 +29,6 @@ export class ImageQueue {
   */
   constructor () {
     this.images = []
-    this.logger = logManager().getLogger('ImageQueue')
   }
 
   /**

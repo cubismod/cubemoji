@@ -1,11 +1,13 @@
 import { CommandInteraction } from 'discord.js'
 import { Discord, Slash, SlashOption } from 'discordx'
 import Qty from 'js-quantities'
-import { logManager } from '../../lib/LogManager'
+import { container } from 'tsyringe'
+import { CubeLogger } from '../../lib/logger/CubeLogger'
 
 @Discord()
 export abstract class Convert {
-  logger = logManager().getLogger('Convert')
+  private logger = container.resolve(CubeLogger).command
+
   @Slash('convert', { description: 'perform unit conversions for common scientific calculations (not currency)' })
   async convert (
     @SlashOption('fromval', {

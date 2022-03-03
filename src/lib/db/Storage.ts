@@ -4,14 +4,13 @@ import { Client } from 'discordx'
 import { createReadStream, createWriteStream } from 'fs'
 import Keyv from 'keyv'
 import { KeyvFile } from 'keyv-file'
-import { Logger } from 'log4js'
 import { resolve } from 'path'
 import { createInterface } from 'readline'
 import { pipeline } from 'stream'
-import { singleton } from 'tsyringe'
+import { container, singleton } from 'tsyringe'
 import { promisify } from 'util'
 import { gotOptions } from '../emote/Cmoji'
-import { logManager } from '../LogManager'
+import { CubeLogger } from '../logger/CubeLogger'
 const { got } = await import('got')
 
 export interface ServerOwner {
@@ -99,7 +98,7 @@ export class CubeStorage {
   serverAuditInfo: Keyv<string>
 
   private location = 'data/'
-  private logger: Logger
+  private logger = container.resolve(CubeLogger).storage
   private serverInfoPath = 'data/serverInfo.sqlite'
   constructor () {
     this.trashReacts = new Keyv<string>(
@@ -120,7 +119,6 @@ export class CubeStorage {
     this.serverEnrollment = new Keyv<string>(sqliteUri, { namespace: 'servers' })
     this.emojiBlocked = new Keyv<string>(sqliteUri, { namespace: 'emoji' })
 
-    this.logger = logManager().getLogger('Storage')
     this.serverOwners = new Keyv<ServerOwner[]>(sqliteUri, { namespace: 'owners' })
     this.modEnrollment = new Keyv<string>(sqliteUri, { namespace: 'mods' })
     this.blockedChannels = new Keyv<ChannelInfo>(sqliteUri, { namespace: 'channels' })

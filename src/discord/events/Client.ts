@@ -12,12 +12,12 @@ import { PugGenerator } from '../../lib/http/PugGenerator'
 import { setStatus } from '../../lib/image/DiscordLogic'
 import { ImageQueue } from '../../lib/image/ImageQueue'
 import { WorkerPool } from '../../lib/image/WorkerPool'
-import { logManager } from '../../lib/LogManager'
-
-const logger = logManager().getLogger('Client')
+import { CubeLogger } from '../../lib/logger/CubeLogger'
 
 @Discord()
 export abstract class ClientEvents {
+  private cubeLogger = new CubeLogger()
+  private logger = this.cubeLogger.client
   /**
    * core setup of the bot including dependency init
    * and command init
@@ -27,22 +27,24 @@ export abstract class ClientEvents {
     [_args]: ArgsOf<'ready'>, // we don't care about Discord.js's client object
     client: Client
   ) {
-    logger.info('Gateway ready.')
     DIService.container = container
     // dependency injection initialization
     if (DIService.container !== undefined) {
+      DIService.container.register(CubeLogger, { useValue: this.cubeLogger })
+      this.logger.info('registered CubeLogger')
+
       DIService.container.register(ImageQueue, { useValue: new ImageQueue() })
-      logger.info('registered ImageQueue')
+      this.logger.info('registered ImageQueue')
 
       const imageQueue = container.resolve(ImageQueue)
       await imageQueue.clear()
-      logger.info('cleared download directory')
+      this.logger.info('cleared download directory')
 
       DIService.container.register(CubeMessageManager, { useValue: new CubeMessageManager() })
-      logger.info('registered CubeMessageManager')
+      this.logger.info('registered CubeMessageManager')
 
       DIService.container.register(CubeStorage, { useValue: new CubeStorage() })
-      logger.info('registered CubeStorage')
+      this.logger.info('registered CubeStorage')
       await container.resolve(CubeStorage).initHosts()
       setInterval(
         async () => {
@@ -60,16 +62,16 @@ export abstract class ClientEvents {
       const emoteCache = container.resolve(EmoteCache)
       await emoteCache.init(client)
       emoteCache.loadBlockedEmojis()
-      logger.info('initialized EmoteCache')
+      this.logger.info('initialized EmoteCache')
 
       DIService.container.register(PugGenerator, { useValue: new PugGenerator() })
       await container.resolve(PugGenerator).render()
-      logger.info('initialized PugGenerator')
+      this.logger.info('initialized PugGenerator')
 
       let workers = 4
       if (process.env.CM_WORKERS) workers = parseInt(process.env.CM_WORKERS)
       DIService.container.register(WorkerPool, { useValue: new WorkerPool(workers) })
-      logger.info('registered WorkerPool')
+      this.logger.info('registered WorkerPool')
 
       // every 30 min, refresh our cache of who the server owners are
       // and re-init permissions on Moderation commands as well as
@@ -79,7 +81,7 @@ export abstract class ClientEvents {
           await container.resolve(CubeStorage).loadServerOwners(client)
           await client.initApplicationPermissions()
           await container.resolve(PugGenerator).render()
-          logger.debug('permission sync & pug-regen completed')
+          this.logger.debug('permission sync & pug-regen completed')
         },
         Milliseconds.thirtyMin
       )
@@ -94,16 +96,16 @@ export abstract class ClientEvents {
       })
       await client.initApplicationPermissions(true)
     } catch (err) {
-      logger.error('Error initializing application commands and permissions!!!')
-      logger.error(err)
+      this.logger.error('Error initializing application commands and permissions!!!')
+      this.logger.error(err)
       throw new Error('exiting application as commands can\'t init properly')
     }
 
     // setup healthcheck listener for fly
     setupHTTP()
 
-    logger.info(`cubemoji ${process.env.CM_VERSION} is now running...`)
-    logger.info(`It took ${process.uptime()}s to startup this time`)
+    this.logger.info(`cubemoji ${process.env.CM_VERSION} is now running...`)
+    this.logger.info(`It took ${process.uptime()}s to startup this time`)
     // set a new status msg every 5 min
     setStatus(client)
     setInterval(setStatus, Milliseconds.fiveMin, client)
@@ -115,7 +117,7 @@ export abstract class ClientEvents {
         for (const key in memUse) {
           list.push(`${key} ${Math.round(memUse[key] / 1024 / 1024 * 100) / 100} MB`)
         }
-        logger.debug(list.join(' | '))
+        this.logger.debug(list.join(' | '))
       },
       Milliseconds.thirtySec // 30 sec
       )
@@ -126,7 +128,7 @@ export abstract class ClientEvents {
   warning (
     [data]: ArgsOf<'warn'>
   ) {
-    logger.debug(data)
+    this.logger.debug(data)
   }
 
   @On('debug')
@@ -134,7 +136,7 @@ export abstract class ClientEvents {
     [data]: ArgsOf<'debug'>
   ) {
     // don't log our own bot token
-    if (!data.includes('token')) logger.debug(data)
+    if (!data.includes('token')) this.logger.debug(data)
   }
 
   /**
@@ -153,9 +155,9 @@ export abstract class ClientEvents {
     try {
       await client.executeInteraction(interaction)
     } catch (err: unknown) {
-      logger.error('INTERACTION FAILURE')
-      logger.error(`Type: ${interaction.type}\nTimestamp: ${Date()}\nGuild: ${interaction.guild}\nUser: ${interaction.user.tag}\nChannel: ${interaction.channel}`)
-      logger.error(err)
+      this.logger.error('INTERACTION FAILURE')
+      this.logger.error(`Type: ${interaction.type}\nTimestamp: ${Date()}\nGuild: ${interaction.guild}\nUser: ${interaction.user.tag}\nChannel: ${interaction.channel}`)
+      this.logger.error(err)
     }
   }
 
@@ -167,7 +169,7 @@ export abstract class ClientEvents {
     [guild]: ArgsOf<'guildCreate'>,
     client: Client
   ) {
-    logger.info(`New guild "${guild.id}", "${guild.name}" joined, re-initing app commands & perms`)
+    this.logger.info(`New guild "${guild.id}", "${guild.name}" joined, re-initing app commands & perms`)
     client.botGuilds.push(guild.id)
     await client.initApplicationCommands()
     await client.initApplicationPermissions()

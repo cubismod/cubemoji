@@ -8,7 +8,6 @@ import { serverAutocomplete } from '../../lib/cmd/Autocomplete'
 import { buildList, guildOwnersCheck, reply, validUser } from '../../lib/cmd/ModHelper'
 import { CubeStorage } from '../../lib/db/Storage'
 import { EmoteCache } from '../../lib/emote/EmoteCache'
-import { logManager } from '../../lib/LogManager'
 import strings from '../../res/strings.json'
 import { ModOwnerCheck } from '../Permissions'
 
@@ -48,7 +47,6 @@ export abstract class Mod {
 @SlashGroup({ name: 'enrollment', root: 'mod' })
 @SlashGroup('enrollment', 'mod')
 export abstract class Enrollment {
-  logger = logManager().getLogger('ServerConfig')
   enrollment = container.resolve(CubeStorage).serverEnrollment
   serverAudit = container.resolve(CubeStorage).serverAuditInfo
   serverOwnerMsg = 'Only server owners can modify this setting'
@@ -159,7 +157,6 @@ async function guildErrorFinish (interaction: CommandInteraction, guildName: str
 @SlashGroup({ name: 'blacklist', root: 'mod' })
 @SlashGroup('blacklist', 'mod')
 export abstract class Blacklist {
-  logger = logManager().getLogger('ServerConfig')
   emoteCache = container.resolve(EmoteCache)
   storage = container.resolve(CubeStorage)
 

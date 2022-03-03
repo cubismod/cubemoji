@@ -6,9 +6,9 @@ import imgEffects from '../../res/imgEffects.json'
 import { CubeStorage } from '../db/Storage'
 import { Cmoji, Source } from '../emote/Cmoji'
 import { EmoteCache } from '../emote/EmoteCache'
-import { logManager } from '../LogManager'
+import { CubeLogger } from '../logger/CubeLogger'
 
-const logger = logManager().getLogger('Autocomplete')
+const logger = container.resolve(CubeLogger).autocomplete
 
 // useful autocomplete commands for discord functions
 

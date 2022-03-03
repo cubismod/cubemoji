@@ -47,7 +47,6 @@
     "js-quantities": "^1.7.6",
     "keyv": "^4.1.1",
     "keyv-file": "^0.2.0",
-    "log4js": "^6.4.1",
     "micromatch": "^4.0.4",
     "node-emoji": "^1.11.0",
     "node-object-hash": "^2.3.10",
@@ -58,7 +57,8 @@
     "tsyringe": "^4.6.0",
     "twemoji-parser": "^13.1.0",
     "unique-names-generator": "^4.7.1",
-    "uuid": "^8.3.2"
+    "uuid": "^8.3.2",
+    "winston": "^3.6.0"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.4.2",

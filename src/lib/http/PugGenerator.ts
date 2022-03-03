@@ -3,13 +3,13 @@ import { writeFile } from 'fs/promises'
 import { compileFile, compileTemplate } from 'pug'
 import { container, singleton } from 'tsyringe'
 import { EmoteCache } from '../emote/EmoteCache'
-import { logManager } from '../LogManager'
+import { CubeLogger } from '../logger/CubeLogger'
 
 @singleton()
 export class PugGenerator {
   emoteCache = container.resolve(EmoteCache)
   template: compileTemplate
-  logger = logManager().getLogger('Web')
+  private logger = container.resolve(CubeLogger).web
   constructor () {
     const source = './assets/template/EmojiList.pug'
     this.template = compileFile(source, {

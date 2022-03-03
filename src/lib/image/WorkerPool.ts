@@ -1,8 +1,7 @@
 import { State } from 'gm'
-import { Logger } from 'log4js'
-import { singleton } from 'tsyringe'
+import { container, singleton } from 'tsyringe'
 import { Milliseconds } from '../constants/Units'
-import { logManager } from '../LogManager'
+import { CubeLogger } from '../logger/CubeLogger'
 
 /**
  * workers here aren't actually tracked in any meaningful way by the program
@@ -16,14 +15,12 @@ export class WorkerPool {
   limit: number
   runningWorkers: Map<string, State>
   waitingWorkers: Map<string, State>
-  private logger: Logger
+  private logger = container.resolve(CubeLogger).workerPool
 
   constructor (limit: number) {
     this.runningWorkers = new Map<string, State>()
     this.waitingWorkers = new Map<string, State>()
     this.limit = limit
-
-    this.logger = logManager().getLogger('WorkerPool')
   }
 
   /**

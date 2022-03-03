@@ -5,12 +5,10 @@ import { Client } from 'discordx'
 import { config } from 'dotenv'
 import 'reflect-metadata'
 import { bigServerDetect, blockedChannelDetect } from './discord/Guards'
-import { logManager } from './lib/LogManager'
+import { CubeLogger } from './lib/logger/CubeLogger'
 
 // load dotenv file if exists
 config()
-
-const logger = logManager().getLogger('Main')
 
 export class Main {
   private static _client: Client
@@ -20,6 +18,8 @@ export class Main {
   }
 
   static async start () {
+    const logger = new CubeLogger().main
+
     await importx(dirname(import.meta.url) + '/discord/**/*.js')
     logger.info('🅲🆄🅱🅴🅼🅾🅹🅸')
     let silent: false|undefined

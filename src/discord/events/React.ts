@@ -7,12 +7,12 @@ import { container } from 'tsyringe'
 import { adjectives, animals, colors, names, uniqueNamesGenerator } from 'unique-names-generator'
 import { CubeMessageManager } from '../../lib/cmd/MessageManager'
 import { EditDiscord, getMessageImage, isUrl, RescaleDiscord } from '../../lib/image/DiscordLogic'
-import { logManager } from '../../lib/LogManager'
+import { CubeLogger } from '../../lib/logger/CubeLogger'
 import { BSGuardData } from '../Guards'
 
 @Discord()
 export abstract class ReactEvents {
-  private logger = logManager().getLogger('Events')
+  private logger = container.resolve(CubeLogger).events
 
   @On('messageReactionAdd')
   async onMessageReactionAdd (

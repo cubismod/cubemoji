@@ -6,3 +6,7 @@ export namespace Milliseconds {
   export const thirtySec = 30000
   export const day = 8.64e+7
 }
+
+export namespace Bytes {
+  export const fiveMB = 5e+6
+}

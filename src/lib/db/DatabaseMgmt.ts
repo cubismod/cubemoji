@@ -11,12 +11,13 @@ import dayjs from 'dayjs'
 import { createReadStream, createWriteStream } from 'fs'
 import { mkdir, readdir, stat, unlink } from 'fs/promises'
 import { pipeline } from 'stream'
+import { container } from 'tsyringe'
 import { promisify } from 'util'
 import { createGzip } from 'zlib'
 import { Milliseconds } from '../constants/Units'
-import { logManager } from '../LogManager'
+import { CubeLogger } from '../logger/CubeLogger'
 
-const logger = logManager().getLogger('DatabaseMgmt')
+const logger = container.resolve(CubeLogger).databaseMgmt
 
 export async function runBackups (firstRun = true) {
   logger.info('Running database backups')

@@ -3,13 +3,12 @@
 import { GuildEmoji } from 'discord.js'
 import { Client } from 'discordx'
 import Fuse from 'fuse.js'
-import { Logger } from 'log4js'
 import hash from 'node-object-hash'
 import { container, singleton } from 'tsyringe'
 import { parse } from 'twemoji-parser'
 import mutantNames from '../../res/emojiNames.json'
 import { CubeStorage } from '../db/Storage'
-import { logManager } from '../LogManager'
+import { CubeLogger } from '../logger/CubeLogger'
 import { Cmoji, Source } from './Cmoji'
 const { got } = await import('got')
 
@@ -36,7 +35,7 @@ export class EmoteCache {
     threshold: 0.3
   }
 
-  private logger: Logger
+  private logger = container.resolve(CubeLogger).emoteCache
 
   constructor () {
     this.emojis = []
@@ -44,7 +43,6 @@ export class EmoteCache {
     this.discEmojis = []
     this.mutantEmojis = []
 
-    this.logger = logManager().getLogger('EmoteCache')
     this.blockedEmoji = new Map<string, Set<string>>()
 
     this.discFuse = new Fuse(this.discEmojis, this.fuseOpts)

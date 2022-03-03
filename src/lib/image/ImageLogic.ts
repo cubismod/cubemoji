@@ -14,14 +14,14 @@ import { pipeline } from 'stream/promises'
 import { container } from 'tsyringe'
 import imgEffects from '../../res/imgEffects.json'
 import { gotOptions } from '../emote/Cmoji'
-import { logManager } from '../LogManager'
+import { CubeLogger } from '../logger/CubeLogger'
 import { ImageQueue } from './ImageQueue'
 import { WorkerPool } from './WorkerPool'
 const { got } = await import('got')
 
 export type MsgContext = ContextMenuInteraction | CommandInteraction | MessageReaction
 
-const logger = logManager().getLogger('ImageLogic')
+const logger = container.resolve(CubeLogger).imageLogic
 
 interface outputtedFile {
   outPath: string,
