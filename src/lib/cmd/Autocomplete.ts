@@ -43,7 +43,7 @@ export function emoteAutocomplete (interaction: AutocompleteInteraction) {
           }
           let queryItem: Cmoji[] = []
           if (firstResult.length < 100) {
-            queryItem = [new Cmoji(firstResult, firstResult, Source.URL)]
+            queryItem = [new Cmoji(null, firstResult, firstResult, Source.URL)]
           }
           const randomEmojis = geometricReservoirSample(10, emoteCache.emojis)
           const res = queryItem.concat(randomEmojis)

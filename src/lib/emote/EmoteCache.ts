@@ -26,6 +26,16 @@ export class EmoteCache {
    * memory for quick access
    */
   blockedEmoji: Map<string, Set<string>> // keys are server IDs, values is a list of emojis
+
+  private discFuse: Fuse<Cmoji>
+  private allFuse: Fuse<Cmoji>
+  private fuseOpts = {
+    keys: ['name', 'id'],
+    useExtendedSearch: true,
+    minMatchCharLength: 1,
+    threshold: 0.3
+  }
+
   private logger: Logger
 
   constructor () {
@@ -36,6 +46,9 @@ export class EmoteCache {
 
     this.logger = logManager().getLogger('EmoteCache')
     this.blockedEmoji = new Map<string, Set<string>>()
+
+    this.discFuse = new Fuse(this.discEmojis, this.fuseOpts)
+    this.allFuse = new Fuse(this.emojis, this.fuseOpts)
   }
 
   /**
@@ -49,6 +62,9 @@ export class EmoteCache {
     this.deduper()
     this.extractEmojis()
     this.sortArray()
+
+    this.allFuse = new Fuse(this.emojis, this.fuseOpts)
+    this.discFuse = new Fuse(this.emojis, this.fuseOpts)
   }
 
   /**
@@ -61,7 +77,7 @@ export class EmoteCache {
     // add discord emojis
     client.guilds.cache.forEach(guild => {
       for (const emoji of guild.emojis.cache.values()) {
-        emojis.push(new Cmoji(emoji.name, emoji.url, Source.Discord, emoji, emoji.id))
+        emojis.push(new Cmoji(emoji))
       }
     })
     const baseUrl = process.env.CM_EXTEMOJI ? process.env.CM_EXTEMOJI : 'https://storage.googleapis.com/cubemoji.appspot.com/mutant-emotes/'
@@ -70,7 +86,7 @@ export class EmoteCache {
       const url = baseUrl + emoji
       // remove the file extension
       const name = emoji.slice(0, -4)
-      emojis.push(new Cmoji(name, url, Source.Mutant, null))
+      emojis.push(new Cmoji(null, name, url, Source.Mutant))
     })
     return emojis
   }
@@ -81,7 +97,12 @@ export class EmoteCache {
  */
   async addEmote (emote: GuildEmoji) {
     this.logger.info(`new emoji registered: ${emote.name}`)
-    this.emojis.push(new Cmoji(emote.name, emote.url, Source.Discord, emote, emote.id))
+    const newEmote = new Cmoji(emote)
+    this.emojis.push(newEmote)
+    this.discEmojis.push(newEmote)
+
+    this.allFuse.add(newEmote)
+    this.discFuse.add(newEmote)
   }
 
   /**
@@ -115,15 +136,7 @@ export class EmoteCache {
    * @returns a list of results
    */
   search (query: string) {
-    const options = {
-      keys: ['name', 'id'],
-      useExtendedSearch: true,
-      minMatchCharLength: 1,
-      threshold: 0.3
-    }
-
-    const search = new Fuse(this.emojis, options)
-    return (search.search(query))
+    return (this.allFuse.search(query))
   }
 
   /**
@@ -132,14 +145,7 @@ export class EmoteCache {
  * @returns a list of results
  */
   searchDiscord (query: string) {
-    const options = {
-      keys: ['name'],
-      useExtendedSearch: true,
-      minMatchCharLength: 1,
-      threshold: 0.3
-    }
-    const search = new Fuse(this.discEmojis, options)
-    return (search.search(query))
+    return (this.discFuse.search(query))
   }
 
   /**
@@ -166,14 +172,14 @@ export class EmoteCache {
       try {
         await got(url)
         // success
-        return new Cmoji(split[1], url, Source.URL, null)
+        return new Cmoji(null, split[1], url, Source.URL)
       } catch {
         // don't do anything on error, means that this is not a nitro emote
       }
     }
     // try to parse a twemoji
     const twemoji = this.parseTwemoji(identifier)
-    if (twemoji !== '') return new Cmoji(identifier, twemoji, Source.URL, null)
+    if (twemoji !== '') return new Cmoji(null, identifier, twemoji, Source.URL)
     // last resort, return a similar emoji
     if (searchResults.length > 0) return searchResults[0].item
     return undefined // nothing found at all

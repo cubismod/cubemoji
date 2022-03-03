@@ -238,13 +238,7 @@ export async function sendPagination (interaction: CommandInteraction, type: Sou
           await interaction.guild.emojis.fetch()
           for (const emoji of interaction.guild.emojis.cache) {
             emoteSource.push(
-              new Cmoji(
-                emoji[1].name,
-                emoji[1].url,
-                Source.Discord,
-                emoji[1],
-                emoji[1].id
-              )
+              new Cmoji(emoji[1])
             )
           }
         }
@@ -301,13 +295,15 @@ export async function sendPagination (interaction: CommandInteraction, type: Sou
       }
     })
     // now we send an actual pagination
-    new Pagination(interaction, embeds, {
+    await new Pagination(interaction, embeds, {
       type: 'SELECT_MENU',
       // ephemeral: true, have a feeling this is causing api errors
       pageText: menuText,
       showStartEnd: false,
       ephemeral: ephemeral
     }).send()
+
+    await interaction.followUp({ content: `Web list is available at ${process.env.CM_URL}`, ephemeral: true })
   }
 }
 

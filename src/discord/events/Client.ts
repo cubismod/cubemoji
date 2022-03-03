@@ -11,6 +11,7 @@ import { setupHTTP } from '../../lib/http/HealthCheck'
 import { PugGenerator } from '../../lib/http/PugGenerator'
 import { setStatus } from '../../lib/image/DiscordLogic'
 import { ImageQueue } from '../../lib/image/ImageQueue'
+import { WorkerPool } from '../../lib/image/WorkerPool'
 import { logManager } from '../../lib/LogManager'
 
 const logger = logManager().getLogger('Client')
@@ -64,6 +65,11 @@ export abstract class ClientEvents {
       DIService.container.register(PugGenerator, { useValue: new PugGenerator() })
       await container.resolve(PugGenerator).render()
       logger.info('initialized PugGenerator')
+
+      let workers = 4
+      if (process.env.CM_WORKERS) workers = parseInt(process.env.CM_WORKERS)
+      DIService.container.register(WorkerPool, { useValue: new WorkerPool(workers) })
+      logger.info('registered WorkerPool')
 
       // every 30 min, refresh our cache of who the server owners are
       // and re-init permissions on Moderation commands as well as
