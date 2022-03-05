@@ -1,6 +1,7 @@
 import { singleton } from 'tsyringe'
 import { createLogger, format, Logger, transports } from 'winston'
 import { Bytes } from '../constants/Units'
+import { LokiTransport } from './LokiTransport'
 
 /**
  * cubemoji logging using Winston
@@ -40,7 +41,9 @@ export class CubeLogger {
           new transports.Console(),
           new transports.File({
             filename: 'data/logs/cubemoji.log',
-            maxsize: Bytes.fiveMB,
+            maxsize: Bytes.oneMB,
+            maxFiles: 4,
+            zippedArchive: true,
             format: format.combine(
               format.uncolorize(),
               format.json()
@@ -49,6 +52,12 @@ export class CubeLogger {
         ]
       })
     } else {
+      /**
+         * Grafana Loki logging process
+         * send log file over syslog to Promtail
+         * instance which then will upload files to
+         * Grafana cloud. This is done with HTTP.
+         */
       this.parent = createLogger({
         level: 'info',
         format: format.combine(
@@ -58,9 +67,17 @@ export class CubeLogger {
         ),
         transports: [
           new transports.Console()
-          // TODO: add loki
         ]
       })
+      if (process.env.CM_HTTP_LOG === 'true' &&
+      process.env.CM_HTTP_PORT &&
+      process.env.CM_HTTP_HOST) {
+        this.parent.add(new LokiTransport({
+          host: process.env.CM_HTTP_HOST,
+          port: parseInt(process.env.CM_HTTP_PORT),
+          label: 'cubemoji'
+        }))
+      }
     }
 
     // now setup child loggers

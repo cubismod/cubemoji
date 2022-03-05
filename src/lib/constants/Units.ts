@@ -8,5 +8,5 @@ export namespace Milliseconds {
 }
 
 export namespace Bytes {
-  export const fiveMB = 5e+6
+  export const oneMB = 1000000
 }

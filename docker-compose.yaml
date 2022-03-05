@@ -2,11 +2,19 @@ version: '3.3'
 services:
   cubemoji:
     build: .
-    container_name: "cubemoji_${VERSION}"
+    container_name: 'cubemoji'
     restart: unless-stopped
     volumes:
       - /mnt/extdr/cubemoji/data/:/usr/src/cubemoji/data
     logging:
           driver: journald
           options:
-            tag: 'cubemoji_${VERSION}'
+            tag: 'cubemoji'
+  promtail:
+    image: grafana/promtail:2.4.2
+    ports: 
+      - '9080:9080'
+      - '3547:3547'
+    volumes:
+      - ./scripts/promtail/docker-config.yml:/etc/promtail/docker-config.yml
+    command: -config.file=/etc/promtail/docker-config.yml
