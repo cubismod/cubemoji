@@ -25,8 +25,8 @@ export abstract class Emote {
     await interaction.deferReply()
     let rep: Message|undefined
     const emoteCache = container.resolve(EmoteCache)
-    if (emoteCache !== undefined) {
-      const retrievedEmoji = await emoteCache.retrieve(emote)
+    if (emoteCache !== undefined && interaction.guild) {
+      const retrievedEmoji = await emoteCache.retrieve(emote, interaction.guild.id)
       if (retrievedEmoji !== undefined) {
         let msg = ''
         // now send a different obj depending on what type of emote we are sending

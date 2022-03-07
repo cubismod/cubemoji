@@ -51,8 +51,9 @@ export class RescaleDiscord {
   }
 
   async run () {
-    if (this.source === null) return
-    const url = await getUrl(this.source)
+    const guildId = getContextGuild(this.context)
+    if (this.source === null || guildId === null) return
+    const url = await getUrl(this.source, guildId)
     if (url) {
       // overwrite the source variable from whatever the user inputted
       // to the actual URL we acquired
@@ -183,13 +184,13 @@ export async function isUrl (url: string) {
 
 // checks a string to see if there is an emote or URL there and then returns the URL
 // that we will use for edits
-export async function getUrl (source: string) {
+export async function getUrl (source: string, guildId: string) {
   const emoteCache = container.resolve(EmoteCache)
   // yes that's a URL we can use for editing
   if (await isUrl(source)) return source
   else if (emoteCache !== undefined) {
     // see if it's an emote
-    const res = await emoteCache.retrieve(source)
+    const res = await emoteCache.retrieve(source, guildId)
     if (res === undefined) return undefined
     else return res.url
   } else return ''
@@ -245,50 +246,52 @@ export async function sendPagination (interaction: CommandInteraction, type: Sou
         emoteSource = emoteCache.emojis
         emotesPerPage = 120
     }
-    emoteSource.forEach((emote, i) => {
-      // TODO: implement blacklisting here
+    emoteSource.forEach(async (emote, i) => {
+      if (interaction.guildId && !await emoteCache.isBlocked(emote.name, interaction.guildId)) {
+        // TODO: implement blacklisting here
       // for discord emojis we want 60 emojis in one embed
       // mutant and any we can do 100 in one embed
-      if (embedBody === '') {
+        if (embedBody === '') {
         // beginning a new page so let's mark that
-        menuItem = `(${menuText.length + 1}): ${emote.name} - `
-      }
-      // append to emote list
-      if ((type === Source.Discord || type === Source.ThisServer) && emote.guildEmoji) {
-        // discord emoji specific code
-        embedBody = embedBody.concat(emote.guildEmoji.toString())
-      }
-      if (type === Source.Any || type === Source.Mutant) {
-        // just grab names for these objects
-        embedBody = `${embedBody} \`${emote.name}\``
-        if (type === Source.Any) {
-          // append (D) for Discord (M) for Mutant
-          if (emote.source === Source.Discord) embedBody = `${embedBody} (D)`
-          else embedBody = `${embedBody} (M)`
+          menuItem = `(${menuText.length + 1}): ${emote.name} - `
         }
-      }
-      if (i !== 0 && (i % emotesPerPage === 0)) {
+        // append to emote list
+        if ((type === Source.Discord || type === Source.ThisServer) && emote.guildEmoji) {
+        // discord emoji specific code
+          embedBody = embedBody.concat(emote.guildEmoji.toString())
+        }
+        if (type === Source.Any || type === Source.Mutant) {
+        // just grab names for these objects
+          embedBody = `${embedBody} \`${emote.name}\``
+          if (type === Source.Any) {
+          // append (D) for Discord (M) for Mutant
+            if (emote.source === Source.Discord) embedBody = `${embedBody} (D)`
+            else embedBody = `${embedBody} (M)`
+          }
+        }
+        if (i !== 0 && (i % emotesPerPage === 0)) {
         // this is when we reach the max emotes per page
         // get the last emote that we added to the page
         // and add to menu text
-        menuItem = menuItem.concat(emoteSource[i - 1].name)
-        curEmotePage.setDescription(embedBody)
-        curEmotePage.footer = { text: menuItem }
-        // append page to embeds
-        embeds.push(curEmotePage)
-        menuText.push(menuItem)
-        // clear working page, menu item
-        curEmotePage = newPage(new MessageEmbed(), type)
-        menuItem = ''
-        embedBody = ''
-      } else if (i === emoteSource.length - 1) {
+          menuItem = menuItem.concat(emoteSource[i - 1].name)
+          curEmotePage.setDescription(embedBody)
+          curEmotePage.footer = { text: menuItem }
+          // append page to embeds
+          embeds.push(curEmotePage)
+          menuText.push(menuItem)
+          // clear working page, menu item
+          curEmotePage = newPage(new MessageEmbed(), type)
+          menuItem = ''
+          embedBody = ''
+        } else if (i === emoteSource.length - 1) {
         // if the size of the array isn't a multiple of the emotes per page
         // then we need to also end now
-        menuItem = menuItem.concat(emoteSource[i - 1].name)
-        curEmotePage.setDescription(embedBody)
-        curEmotePage.footer = { text: menuItem }
-        embeds.push(curEmotePage)
-        menuText.push(menuItem)
+          menuItem = menuItem.concat(emoteSource[i - 1].name)
+          curEmotePage.setDescription(embedBody)
+          curEmotePage.footer = { text: menuItem }
+          embeds.push(curEmotePage)
+          menuText.push(menuItem)
+        }
       }
     })
     // now we send an actual pagination
@@ -307,12 +310,13 @@ export async function sendPagination (interaction: CommandInteraction, type: Sou
 export async function parseForEmote (interaction: CommandInteraction, emote: string) {
   const emoteCache = container.resolve(EmoteCache)
   // emote parsing code
-  const retrievedEmoji = await emoteCache.retrieve(emote)
-  if (retrievedEmoji !== undefined) {
-    return retrievedEmoji.url
-  } else {
-    return false
+  if (interaction.guildId) {
+    const retrievedEmoji = await emoteCache.retrieve(emote, interaction.guildId)
+    if (retrievedEmoji !== undefined) {
+      return retrievedEmoji.url
+    }
   }
+  return false
 }
 
 /**
@@ -365,6 +369,15 @@ export async function reply (context: MsgContext, content: MessageAttachment | s
     if (context instanceof MessageReaction) msg = await context.message.reply({ content: content, allowedMentions: { repliedUser: false } })
   }
   return msg
+}
+
+// get the guild id from context obj
+function getContextGuild (context: MsgContext) {
+  if (context instanceof MessageReaction) {
+    return context.message.guildId
+  } else {
+    return context.guildId
+  }
 }
 
 /**

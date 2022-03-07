@@ -30,10 +30,10 @@ export abstract class Info {
   ) {
     if (this.emoteCache !== undefined) {
       // check our args
-      if (emote !== undefined) {
+      if (emote !== undefined && interaction.guildId) {
         // emote parsing code
         const emoteName = emote.toLowerCase()
-        const res = await this.emoteCache.retrieve(emoteName)
+        const res = await this.emoteCache.retrieve(emoteName, interaction.guildId)
         if (res !== undefined) {
           await interaction.deferReply()
 

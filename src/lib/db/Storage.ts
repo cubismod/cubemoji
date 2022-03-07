@@ -82,7 +82,7 @@ export class CubeStorage {
 
   /**
    * enrolled servers stored w/ key of server unique id
-   * and just user tag as value
+   * and just user tag of owner as value
    */
   serverEnrollment: Keyv<string>
 

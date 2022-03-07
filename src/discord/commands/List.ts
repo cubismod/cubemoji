@@ -3,7 +3,7 @@ import { Client, Discord, Slash, SlashChoice, SlashOption } from 'discordx'
 import { container } from 'tsyringe'
 import { Source } from '../../lib/emote/Cmoji'
 import { EmoteCache } from '../../lib/emote/EmoteCache'
-import { sendPagination as sendList } from '../../lib/image/DiscordLogic'
+import { sendPagination } from '../../lib/image/DiscordLogic'
 import { BSGuardData } from '../Guards'
 
 @Discord()
@@ -34,6 +34,6 @@ export abstract class List {
       case 'thisserver':
         type = Source.ThisServer
     }
-    sendList(interaction, type, emoteCache, data.enrolled)
+    sendPagination(interaction, type, emoteCache, data.enrolled)
   }
 }

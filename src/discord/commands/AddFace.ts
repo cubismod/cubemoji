@@ -30,10 +30,12 @@ export abstract class AddFace {
       data: BSGuardData
   ) {
     await interaction.deferReply({ ephemeral: data.enrolled, fetchReply: !data.enrolled })
-    const url = await getUrl(source)
-    if (url) {
-      const addFace = new FaceDiscord(interaction, face, url, interaction.user)
-      await addFace.run()
+    if (interaction.guildId) {
+      const url = await getUrl(source, interaction.guildId)
+      if (url) {
+        const addFace = new FaceDiscord(interaction, face, url, interaction.user)
+        await addFace.run()
+      }
     }
   }
 }

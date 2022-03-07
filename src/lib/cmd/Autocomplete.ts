@@ -10,25 +10,27 @@ import { CubeLogger } from '../logger/CubeLogger'
 
 const logger = container.resolve(CubeLogger).autocomplete
 
-// useful autocomplete commands for discord functions
-
 /**
  * emote autocomplete resolver, follows the user's
  * query and presents them with emotes that match
  * whatever they are typing
  */
-export function emoteAutocomplete (interaction: AutocompleteInteraction) {
+export async function emoteAutocomplete (interaction: AutocompleteInteraction) {
   const emoteCache = container.resolve(EmoteCache)
   try {
-    if (emoteCache) {
+    if (emoteCache && interaction.guildId) {
       const query = interaction.options.getFocused(true).value
       if (typeof query === 'string' && query.length < 100) {
         const res = emoteCache.search(query)
         if (res.length > 0) {
+          const suggestions: {name: string, value: string}[] = []
           // if we actually get some choices back we send to cubemoji
-          interaction.respond(res.slice(0, 8).map(result => {
-            return { name: result.item.name, value: result.item.name }
-          }))
+          for (const fuseRes of res) {
+            if (!await emoteCache.isBlocked(fuseRes.item.name, interaction.guildId)) {
+              suggestions.push({ name: fuseRes.item.name, value: fuseRes.item.name })
+            }
+          }
+          if (suggestions.length > 0) interaction.respond(suggestions.slice(0, 20))
         } else {
           // otherwise we return some random emojis
           // first option should be the query itself so if the
@@ -41,12 +43,10 @@ export function emoteAutocomplete (interaction: AutocompleteInteraction) {
             // we choose a random emote to send as the first one
             firstResult = choice(emoteCache.emojis).name
           }
-          let queryItem: Cmoji[] = []
-          if (firstResult.length < 100) {
-            queryItem = [new Cmoji(null, firstResult, firstResult, Source.URL)]
-          }
-          const randomEmojis = geometricReservoirSample(10, emoteCache.emojis)
-          const res = queryItem.concat(randomEmojis)
+          let suggestions: Cmoji[] = []
+          if (firstResult.length < 100) suggestions = [new Cmoji(null, firstResult, firstResult, Source.URL)]
+          const randomEmojis = await emoteCache.randomChoice(20, interaction.guildId)
+          const res = suggestions.concat([...randomEmojis])
           interaction.respond(res.map(result => {
             return { name: result.name, value: result.name }
           }))

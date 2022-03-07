@@ -3,14 +3,18 @@
 import { GuildEmoji } from 'discord.js'
 import { Client } from 'discordx'
 import Fuse from 'fuse.js'
+import pkg from 'micromatch'
 import hash from 'node-object-hash'
+import { choice } from 'pandemonium'
 import { container, singleton } from 'tsyringe'
 import { parse } from 'twemoji-parser'
 import mutantNames from '../../res/emojiNames.json'
-import { CubeStorage } from '../db/Storage'
+import { CubeStorage, ValRaw } from '../db/Storage'
 import { CubeLogger } from '../logger/CubeLogger'
 import { Cmoji, Source } from './Cmoji'
+
 const { got } = await import('got')
+const { isMatch } = pkg
 
 @singleton()
 // a class which can return an array version of emotes
@@ -23,8 +27,11 @@ export class EmoteCache {
   /**
    * we maintain blocked emojis both in the database for persistent use as well as in
    * memory for quick access
+   *
+   * key - guild ID, value - set of emoji globs
    */
-  blockedEmoji: Map<string, Set<string>> // keys are server IDs, values is a list of emojis
+  private blockedEmoji: Map<string, Set<string>>
+  private storage = container.resolve(CubeStorage)
 
   private discFuse: Fuse<Cmoji>
   private allFuse: Fuse<Cmoji>
@@ -151,36 +158,65 @@ export class EmoteCache {
    * emote object in their message, we return that emote object
    * if it is a nitro emote then we return a URL to the emote image
    * @param identifier an emote name or message content
-   * @returns a Cmoji or nothing if we can't find an emote
+   * @param guildId guild ID to perform filtering if necessary
+   * @returns a Cmoji or undefined if we can't find an emote
    */
-  async retrieve (identifier: string) {
+  async retrieve (identifier: string, guildId: string) {
     // discord emojis are represented in text
     // like <:flass:781664252058533908>
     // so we split to get the components including name and ID
-    const split = identifier.slice(1, -1).split(':')
-    // search by ID or name w/ fuse's extended syntax https://fusejs.io/examples.html#extended-search
-    if (split.length > 2) identifier = `${split[2]}|${split[1]}`
-    const searchResults = await this.search(identifier)
-    // want an exact match
-    if (searchResults.length > 0 && searchResults[0].item.id === split[2]) return searchResults[0].item
-    // now we see if we have a nitro emote cubemoji doesn't have in its guilds
-    if (split.length > 2) {
-      const url = `https://cdn.discordapp.com/emojis/${split[2]}`
-      // see if the URL will resolve
-      try {
-        await got(url)
-        // success
-        return new Cmoji(null, split[1], url, Source.URL)
-      } catch {
-        // don't do anything on error, means that this is not a nitro emote
+    if (!await this.isBlocked(identifier, guildId)) {
+      const split = identifier.slice(1, -1).split(':')
+      // search by ID or name w/ fuse's extended syntax https://fusejs.io/examples.html#extended-search
+      if (split.length > 2) identifier = `${split[2]}|${split[1]}`
+      const searchResults = await this.search(identifier)
+      // want an exact match
+      if (searchResults.length > 0 && searchResults[0].item.id === split[2]) return searchResults[0].item
+      // now we see if we have a nitro emote cubemoji doesn't have in its guilds
+      if (split.length > 2) {
+        const url = `https://cdn.discordapp.com/emojis/${split[2]}`
+        // see if the URL will resolve
+        try {
+          await got(url)
+          // success
+          return new Cmoji(null, split[1], url, Source.URL)
+        } catch {
+          // don't do anything on error, means that this is not a nitro emote
+        }
       }
+      // try to parse a twemoji
+      const twemoji = this.parseTwemoji(identifier)
+      if (twemoji !== '') return new Cmoji(null, identifier, twemoji, Source.URL)
+      // last resort, return a similar emoji
+      if (searchResults.length > 0) return searchResults[0].item
     }
-    // try to parse a twemoji
-    const twemoji = this.parseTwemoji(identifier)
-    if (twemoji !== '') return new Cmoji(null, identifier, twemoji, Source.URL)
-    // last resort, return a similar emoji
-    if (searchResults.length > 0) return searchResults[0].item
     return undefined // nothing found at all
+  }
+
+  /**
+   * returns a set of random emotes
+   * with filtering around guildIds
+   * not guaranteed to return as many copies as you specify
+   * if there are a small amount of emojis to go through
+   * @param items how many emotes to return
+   * @param guildId guild ID for filtering if enabled
+   * @param discord flag to set if you only want to return discord emoji
+   */
+  async randomChoice (items: number, guildId: string, discord = false) {
+    const emotes = new Set<Cmoji>()
+    let j = 0
+    for (let i = 0; i < items; i++) {
+      const emoteList = discord ? this.discEmojis : this.emojis
+
+      const emote = choice(emoteList)
+      // avoid an infinite loop case if we have blocked emoji and the list of emoji
+      // is small so we can quickly iterate through them
+      if (!await this.isBlocked(emote.name, guildId) && j < emoteList.length && !emotes.has(emote)) {
+        emotes.add(emote)
+      }
+      j++
+    }
+    return emotes
   }
 
   /**
@@ -197,7 +233,7 @@ export class EmoteCache {
   /**
  * iterates through emojis and ensures they each have a unique name
  */
-  deduper () {
+  private deduper () {
     // keep track of each name and the increments on it
     const names = new Map<string, number>()
     this.emojis.forEach((emoji, index) => {
@@ -222,7 +258,7 @@ export class EmoteCache {
    * extracts Mutant and Discord emojis
    * and places each into their own sorted arrays
    */
-  extractEmojis () {
+  private extractEmojis () {
     const discord: Cmoji[] = []
     const mutant: Cmoji[] = []
     this.emojis.forEach(emoji => {
@@ -244,7 +280,7 @@ export class EmoteCache {
   /**
    * sorts the emoji array in place
    */
-  sortArray () {
+  private sortArray () {
     this.emojis = this.emojis.sort((a, b) => a.name.localeCompare(b.name))
   }
 
@@ -282,7 +318,7 @@ export class EmoteCache {
   }
 
   private async modifyEmojiDB (glob: string, serverId: string, block: boolean) {
-    const blockedEmojis = container.resolve(CubeStorage).emojiBlocked
+    const blockedEmojis = this.storage.emojiBlocked
     const key = serverId + '-' + hash().hash(glob)
     if (block) await blockedEmojis.set(key, glob)
     else await blockedEmojis.delete(key)
@@ -292,23 +328,45 @@ export class EmoteCache {
    * load blocked emojis from database
    */
   loadBlockedEmojis () {
-    const storage = container.resolve(CubeStorage)
-    const dbEmoji = storage.getNamespace('emoji')
+    const dbEmoji = this.storage.getNamespace('emoji')
     if (dbEmoji) {
       dbEmoji.forEach((emoji) => {
         // parse the key
-        // which is in the format emoji:serverid_emojiname
+        // which is in the format emoji:serverid_emojinamehash
         const split = emoji.key.split(':')
         if (split.length > 1) {
-          const idAndName = split[1].split('-')
-          if (idAndName.length > 1) {
+          const idAndHash = split[1].split('-')
+          if (idAndHash.length > 0) {
             // idAndName[0] = id
-            // idAndName[1] = name
-            this.modifyBlockedEmoji(idAndName[1], idAndName[0], true, false)
+            // parse the value as well
+            const parsedVal: ValRaw = JSON.parse(emoji.value)
+            this.modifyBlockedEmoji(parsedVal.value, idAndHash[0], true, false)
           }
         }
       })
     }
     this.logger.info('loaded blocked emojis from database to memory')
+  }
+
+  /**
+   * validate whether an emoji is blocked
+   * on a particular guild
+   * also checks against database which is
+   * why it is async
+   * @param name emoji name
+   * @param guildId guild ID
+   * @returns true if blocked/ f if not blocked
+   */
+  async isBlocked (name: string, guildId: string) {
+    const enrollment = this.storage.serverEnrollment
+
+    const globSet = this.blockedEmoji.get(guildId)
+    if (globSet && await enrollment.get(guildId)) {
+      // using micromatch
+      for (const glob of globSet) {
+        if (isMatch(name, glob)) return true
+      }
+    }
+    return false
   }
 }

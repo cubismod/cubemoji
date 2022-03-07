@@ -29,9 +29,9 @@ export abstract class Search {
         // keep a count of both
         let discCount = 0
         let mutantCount = 0
-        results.forEach(result => {
-          if (discCount < 51 && mutantCount < 9) {
-            if (result.item.guildEmoji !== null) {
+        results.forEach(async result => {
+          if (discCount < 51 && mutantCount < 9 && interaction.guildId) {
+            if (result.item.guildEmoji !== null && !await emoteCache.isBlocked(result.item.name, interaction.guildId)) {
               discEmotes.push(result.item.guildEmoji.toString())
               ++discCount
             } else {
@@ -48,7 +48,6 @@ export abstract class Search {
           .setTitle(`Search for ${query} (${results.length})`)
           .setDescription(discEmotes.join('').slice(0, 2047)) // avoid api error of going over char count
           .setColor('BLUE')
-          .setFooter('Searches yielding tons of results will be truncated. Use `/list` to get a list of all emotes.')
           .addField('Mutant Emojis', 'Below there may be emotes from the [Mutant emote pack](https://mutant.tech/) that you can use with Cubemoji as well with their names!')
         embeds.unshift(discEmbed)
         await interaction.editReply({ embeds: embeds })
