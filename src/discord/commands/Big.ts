@@ -23,9 +23,9 @@ export abstract class Big {
       member: GuildMember,
       interaction: CommandInteraction
   ) {
+    await interaction.deferReply()
     let msg: Message|undefined
     if (emote !== undefined) {
-      await interaction.deferReply()
       const res = await parseForEmote(interaction, emote)
       if (res) {
         msg = await reply(interaction, res)

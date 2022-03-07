@@ -73,26 +73,30 @@ export class RescaleDiscord {
           const workerPool = container.resolve(WorkerPool)
 
           // now we send out the rescaled message
-          const msg = await reply(this.context, new MessageAttachment(filename))
-          await watcher.close()
-          // add trash can reaction
-          if (!msg) {
-            this.logger.error('could not get a message during image operation, not proceeding with adding trash react')
-          } else if (msg instanceof Message && !msg.flags.has('EPHEMERAL')) {
-            // check if ephemeral to avoid discord API errors (can't react to an ephermeral message)
-            await cubeMessageManager.registerTrashReact(this.context, msg, this.user.id)
-            // job is finished so send status to trigger next jobs
-            workerPool.done(filename)
+          try {
+            const msg = await reply(this.context, new MessageAttachment(filename))
+            if (!msg) {
+              this.logger.error('could not get a message during image operation, not proceeding with adding trash react')
+            } else if (msg instanceof Message && !msg.flags.has('EPHEMERAL')) {
+              // check if ephemeral to avoid discord API errors (can't react to an ephermeral message)
+              await cubeMessageManager.registerTrashReact(this.context, msg, this.user.id)
+              // job is finished so send status to trigger next jobs
+              workerPool.done(filename)
 
-            // queue up attachment for later
-            const attach = msg.attachments.at(0)
+              // queue up attachment for later
+              const attach = msg.attachments.at(0)
 
-            if (attach !== undefined) {
-              imageQueue.enqueue({
-                localPath: filename,
-                url: attach.url
-              })
+              if (attach !== undefined) {
+                imageQueue.enqueue({
+                  localPath: filename,
+                  url: attach.url
+                })
+              }
             }
+          } catch (err) {
+            this.logger.error(err)
+          } finally {
+            await watcher.close()
           }
         })
       }
