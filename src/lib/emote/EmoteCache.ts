@@ -2,6 +2,7 @@
 // emote cache and some helper functions
 import { GuildEmoji } from 'discord.js'
 import { Client } from 'discordx'
+import { fileTypeFromStream } from 'file-type'
 import Fuse from 'fuse.js'
 import pkg from 'micromatch'
 import hash from 'node-object-hash'
@@ -177,9 +178,10 @@ export class EmoteCache {
         const url = `https://cdn.discordapp.com/emojis/${split[2]}`
         // see if the URL will resolve
         try {
-          await got(url)
-          // success
-          return new Cmoji(null, split[1], url, Source.URL)
+          const stream = await got.stream(url)
+          const fileType = await fileTypeFromStream(stream)
+          // include the extension so Discord animates actual animated emotes
+          if (fileType) return new Cmoji(null, split[1], `${url}.${fileType.ext}`, Source.URL)
         } catch {
           // don't do anything on error, means that this is not a nitro emote
         }
