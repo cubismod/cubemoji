@@ -7,19 +7,15 @@
         "jasmine": true
         },
     "extends": [
-        "standard",
-        "plugin:jasmine/recommended"
+        "standard"
     ],
     "parserOptions": {
         "ecmaVersion": 12
     },
-    "plugins": ["jasmine"],
+    "plugins": ["uvu"],
     "ignorePatterns": ["build/"],
     "rules": {
-        "jest/no-disabled-tests": "warn",
-        "jest/no-focused-tests": "error",
-        "jest/no-identical-title": "error",
-        "jest/prefer-to-have-length": "warn",
-        "jest/valid-expect": "error"
+        "uvu/prefer-is-for-primitives": "error",
+        "uvu/no-identical-titles": "error"
       }
 }

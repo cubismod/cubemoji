@@ -40,7 +40,7 @@ export class CubeLogger {
         transports: [
           new transports.Console(),
           new transports.File({
-            filename: 'data/logs/cubemoji.log',
+            filename: 'data/logs/npr/cubemoji.log',
             maxsize: Bytes.oneMB,
             maxFiles: 4,
             zippedArchive: true,
@@ -66,7 +66,13 @@ export class CubeLogger {
           format.json()
         ),
         transports: [
-          new transports.Console()
+          new transports.Console(),
+          new transports.File({
+            filename: 'data/logs/prd/cubemoji.log',
+            maxsize: Bytes.oneMB,
+            maxFiles: 10,
+            zippedArchive: true
+          })
         ]
       })
       if (process.env.CM_HTTP_LOG === 'true' &&

@@ -7,9 +7,9 @@
   "type": "module",
   "scripts": {
     "build": "tsc",
-    "start": "node build/Main.js",
-    "profile": "clinic doctor -- node build/Main.js",
-    "test": "tsc && npx jasmine npx jasmine \"build/spec/support/*.mjs\"",
+    "start": "node --es-module-specifier-resolution=node build/Main.js",
+    "profile": "clinic doctor -- node --es-module-specifier-resolution=node build/Main.js",
+    "test": "tsc && node --es-module-specifier-resolution=node build/tests/Tests.js",
     "dev": "tsc-watch --noClear -p ./tsconfig.json --onSuccess \"node --inspect --es-module-specifier-resolution=node build/Main.js\"",
     "clean": "rm -rf build/"
   },
@@ -63,7 +63,6 @@
   "devDependencies": {
     "@types/better-sqlite3": "^7.4.2",
     "@types/gm": "^1.18.11",
-    "@types/jasmine": "^3.10.3",
     "@types/js-quantities": "^1.6.3",
     "@types/keyv": "^3.1.3",
     "@types/micromatch": "^4.0.2",
@@ -77,12 +76,12 @@
     "eslint": "^8.9.0",
     "eslint-config-standard": "^16.0.3",
     "eslint-plugin-import": "^2.25.4",
-    "eslint-plugin-jest": "^26.1.1",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^6.0.0",
-    "jasmine": "^4.0.2",
+    "eslint-plugin-uvu": "^0.1.1",
     "tsc-watch": "^4.6.0",
     "tslib": "^2.3.1",
-    "typescript": "^4.5.5"
+    "typescript": "^4.5.5",
+    "uvu": "^0.5.3"
   }
 }

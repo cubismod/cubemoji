@@ -161,7 +161,7 @@ export class RescaleOperation extends ImageOperation {
 
 export class EditOperation extends ImageOperation {
   effects: string[]
-
+  
   constructor (externalUrl: string, effects: string[]) {
     super(externalUrl)
     this.effects = effects

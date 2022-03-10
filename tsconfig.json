@@ -17,9 +17,6 @@
       "es2021",
       "esnext.asynciterable"
     ],
-    "types": [
-      "@types/jasmine"
-    ],
     "allowSyntheticDefaultImports": true,
     "allowJs": true,
     "checkJs": false,
@@ -30,9 +27,6 @@
     "importHelpers": true,
     "moduleResolution": "Node"
   },
-  "ts-node": {
-    "transpileOnly": true
-  },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "build", "**/tests/*.test.ts"]
+  "exclude": ["node_modules", "build"]
 }

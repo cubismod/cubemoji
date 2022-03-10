@@ -152,9 +152,14 @@ export class CubeStorage {
       this.logger.info('initializing bad hosts list which will take a while...')
       let i = 0
 
+      // for testing cubemoji
+      await this.badHosts.set('example.com', 1)
+
       for await (const line of rlInterface) {
         const items = line.split(' ')
         if (items.length === 2 && items[0] === '0.0.0.0') {
+          // each line is like a host file obv
+          // 0.0.0.0 domain
           await this.badHosts.set(items[1], 1)
           i++
 
