@@ -9,7 +9,7 @@
     "build": "tsc",
     "start": "node --es-module-specifier-resolution=node build/Main.js",
     "profile": "clinic doctor -- node --es-module-specifier-resolution=node build/Main.js",
-    "test": "jest --detectOpenHandles && rm download/*",
+    "test": "tsc && npx jasmine npx jasmine \"build/spec/support/*.mjs\"",
     "dev": "tsc-watch --noClear -p ./tsconfig.json --onSuccess \"node --inspect --es-module-specifier-resolution=node build/Main.js\"",
     "clean": "rm -rf build/"
   },
@@ -32,7 +32,6 @@
     "@discordx/pagination": "^1.2.0",
     "@discordx/utilities": "3.4.2",
     "@keyv/sqlite": "^3.0.0",
-    "@types/jest": "^27.4.0",
     "better-sqlite3": "^7.5.0",
     "chokidar": "^3.5.3",
     "dayjs": "^1.10.7",
@@ -64,6 +63,7 @@
   "devDependencies": {
     "@types/better-sqlite3": "^7.4.2",
     "@types/gm": "^1.18.11",
+    "@types/jasmine": "^3.10.3",
     "@types/js-quantities": "^1.6.3",
     "@types/keyv": "^3.1.3",
     "@types/micromatch": "^4.0.2",
@@ -80,9 +80,7 @@
     "eslint-plugin-jest": "^26.1.1",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^6.0.0",
-    "jest": "^27.5.1",
-    "jest-junit": "^13.0.0",
-    "ts-jest": "^27.1.3",
+    "jasmine": "^4.0.2",
     "tsc-watch": "^4.6.0",
     "tslib": "^2.3.1",
     "typescript": "^4.5.5"

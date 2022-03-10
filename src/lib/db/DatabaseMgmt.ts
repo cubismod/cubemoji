@@ -36,10 +36,12 @@ export async function runBackups (firstRun = true) {
         db.close()
         // assuming backup succeeded, we compress
         await compress(backupName)
+        return true
       } catch (err) {
         success = false
         logger.error(`Backup of ${filename} failed!`)
         logger.error(err)
+        return false
       }
     }
   })

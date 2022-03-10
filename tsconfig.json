@@ -18,7 +18,7 @@
       "esnext.asynciterable"
     ],
     "types": [
-      "@types/jest"
+      "@types/jasmine"
     ],
     "allowSyntheticDefaultImports": true,
     "allowJs": true,
