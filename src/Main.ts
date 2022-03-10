@@ -5,7 +5,7 @@ import { Client } from 'discordx'
 import { config } from 'dotenv'
 import 'reflect-metadata'
 import { bigServerDetect, blockedChannelDetect } from './discord/Guards'
-import { CubeLogger } from './lib/logger/CubeLogger'
+import { CubeLogger } from './lib/logger/CubeLogger.js'
 
 // load dotenv file if exists
 config()

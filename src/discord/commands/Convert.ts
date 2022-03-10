@@ -2,7 +2,7 @@ import { CommandInteraction } from 'discord.js'
 import { Discord, Slash, SlashOption } from 'discordx'
 import Qty from 'js-quantities'
 import { container } from 'tsyringe'
-import { CubeLogger } from '../../lib/logger/CubeLogger'
+import { CubeLogger } from '../../lib/logger/CubeLogger.js'
 
 @Discord()
 export abstract class Convert {

@@ -1,7 +1,7 @@
 import { AutocompleteInteraction, CommandInteraction, GuildMember } from 'discord.js'
 import { Discord, Slash, SlashOption } from 'discordx'
 import { emoteAutocomplete } from '../../lib/cmd/Autocomplete'
-import { EditDiscord, parseForEmote } from '../../lib/image/DiscordLogic'
+import { EditDiscord, parseForEmote } from '../../lib/image/DiscordLogic.js'
 import strings from '../../res/strings.json'
 
 @Discord()

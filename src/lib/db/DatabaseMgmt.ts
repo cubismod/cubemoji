@@ -14,8 +14,8 @@ import { pipeline } from 'stream'
 import { container } from 'tsyringe'
 import { promisify } from 'util'
 import { createGzip } from 'zlib'
-import { Milliseconds } from '../constants/Units'
-import { CubeLogger } from '../logger/CubeLogger'
+import { Milliseconds } from '../constants/Units.js'
+import { CubeLogger } from '../logger/CubeLogger.js'
 
 const logger = container.resolve(CubeLogger).databaseMgmt
 

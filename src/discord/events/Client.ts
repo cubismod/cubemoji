@@ -2,17 +2,17 @@
 
 import { ArgsOf, Client, Discord, DIService, On, Once } from 'discordx'
 import { container } from 'tsyringe'
-import { CubeMessageManager } from '../../lib/cmd/MessageManager'
-import { Milliseconds } from '../../lib/constants/Units'
-import { scheduleBackup } from '../../lib/db/DatabaseMgmt'
-import { CubeStorage } from '../../lib/db/Storage'
-import { EmoteCache } from '../../lib/emote/EmoteCache'
-import { setupHTTP } from '../../lib/http/HealthCheck'
-import { PugGenerator } from '../../lib/http/PugGenerator'
-import { setStatus } from '../../lib/image/DiscordLogic'
-import { ImageQueue } from '../../lib/image/ImageQueue'
-import { WorkerPool } from '../../lib/image/WorkerPool'
-import { CubeLogger } from '../../lib/logger/CubeLogger'
+import { CubeMessageManager } from '../../lib/cmd/MessageManager.js'
+import { Milliseconds } from '../../lib/constants/Units.js'
+import { scheduleBackup } from '../../lib/db/DatabaseMgmt.js'
+import { CubeStorage } from '../../lib/db/Storage.js'
+import { EmoteCache } from '../../lib/emote/EmoteCache.js'
+import { setupHTTP } from '../../lib/http/HealthCheck.js'
+import { PugGenerator } from '../../lib/http/PugGenerator.js'
+import { setStatus } from '../../lib/image/DiscordLogic.js'
+import { ImageQueue } from '../../lib/image/ImageQueue.js'
+import { WorkerPool } from '../../lib/image/WorkerPool.js'
+import { CubeLogger } from '../../lib/logger/CubeLogger.js'
 
 @Discord()
 export abstract class ClientEvents {

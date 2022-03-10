@@ -2,7 +2,7 @@ import { unlink } from 'fs'
 import { readdir } from 'fs/promises'
 import Fuse from 'fuse.js'
 import { container, singleton } from 'tsyringe'
-import { CubeLogger } from '../logger/CubeLogger'
+import { CubeLogger } from '../logger/CubeLogger.js'
 
 export interface Image {
   // url as saved in discord cdn

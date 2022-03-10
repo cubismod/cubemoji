@@ -1,7 +1,7 @@
 import { singleton } from 'tsyringe'
 import { createLogger, format, Logger, transports } from 'winston'
-import { Bytes } from '../constants/Units'
-import { LokiTransport } from './LokiTransport'
+import { Bytes } from '../constants/Units.js'
+import { LokiTransport } from './LokiTransport.js'
 
 /**
  * cubemoji logging using Winston

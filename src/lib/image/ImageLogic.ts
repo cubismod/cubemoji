@@ -13,10 +13,10 @@ import probe from 'probe-image-size'
 import { pipeline } from 'stream/promises'
 import { container } from 'tsyringe'
 import imgEffects from '../../res/imgEffects.json'
-import { gotOptions } from '../emote/Cmoji'
-import { CubeLogger } from '../logger/CubeLogger'
-import { ImageQueue } from './ImageQueue'
-import { WorkerPool } from './WorkerPool'
+import { gotOptions } from '../emote/Cmoji.js'
+import { CubeLogger } from '../logger/CubeLogger.js'
+import { ImageQueue } from './ImageQueue.js'
+import { WorkerPool } from './WorkerPool.js'
 const { got } = await import('got')
 
 export type MsgContext = ContextMenuInteraction | CommandInteraction | MessageReaction

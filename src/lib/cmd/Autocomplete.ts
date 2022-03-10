@@ -3,10 +3,10 @@ import Fuse from 'fuse.js'
 import { choice, geometricReservoirSample } from 'pandemonium'
 import { container } from 'tsyringe'
 import imgEffects from '../../res/imgEffects.json'
-import { CubeStorage } from '../db/Storage'
-import { Cmoji, Source } from '../emote/Cmoji'
-import { EmoteCache } from '../emote/EmoteCache'
-import { CubeLogger } from '../logger/CubeLogger'
+import { CubeStorage } from '../db/Storage.js'
+import { Cmoji, Source } from '../emote/Cmoji.js'
+import { EmoteCache } from '../emote/EmoteCache.js'
+import { CubeLogger } from '../logger/CubeLogger.js'
 
 const logger = container.resolve(CubeLogger).autocomplete
 

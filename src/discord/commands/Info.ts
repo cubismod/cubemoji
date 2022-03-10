@@ -3,9 +3,9 @@ import { AutocompleteInteraction, CommandInteraction, GuildMember, MessageEmbed 
 import { Discord, Slash, SlashOption } from 'discordx'
 import { container } from 'tsyringe'
 import { emoteAutocomplete } from '../../lib/cmd/Autocomplete'
-import { Source } from '../../lib/emote/Cmoji'
-import { EmoteCache } from '../../lib/emote/EmoteCache'
-import { CubeLogger } from '../../lib/logger/CubeLogger'
+import { Source } from '../../lib/emote/Cmoji.js'
+import { EmoteCache } from '../../lib/emote/EmoteCache.js'
+import { CubeLogger } from '../../lib/logger/CubeLogger.js'
 import strings from '../../res/strings.json'
 
 @Discord()

@@ -1,6 +1,6 @@
 import { ApplicationCommandPermissions } from 'discord.js'
 import { container } from 'tsyringe'
-import { CubeStorage } from '../lib/db/Storage'
+import { CubeStorage } from '../lib/db/Storage.js'
 
 /**
  * List or server owners

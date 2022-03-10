@@ -2,8 +2,8 @@
 import { writeFile } from 'fs/promises'
 import { compileFile, compileTemplate } from 'pug'
 import { container, singleton } from 'tsyringe'
-import { EmoteCache } from '../emote/EmoteCache'
-import { CubeLogger } from '../logger/CubeLogger'
+import { EmoteCache } from '../emote/EmoteCache.js'
+import { CubeLogger } from '../logger/CubeLogger.js'
 
 @singleton()
 export class PugGenerator {

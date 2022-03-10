@@ -7,8 +7,8 @@
   "type": "module",
   "scripts": {
     "build": "tsc",
-    "start": "node --es-module-specifier-resolution=node build/Main.js",
-    "profile": "clinic doctor -- node --es-module-specifier-resolution=node build/Main.js",
+    "start": "node build/Main.js",
+    "profile": "clinic doctor -- node build/Main.js",
     "test": "tsc && npx jasmine npx jasmine \"build/spec/support/*.mjs\"",
     "dev": "tsc-watch --noClear -p ./tsconfig.json --onSuccess \"node --inspect --es-module-specifier-resolution=node build/Main.js\"",
     "clean": "rm -rf build/"

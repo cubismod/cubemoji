@@ -3,8 +3,8 @@
 import { Client, CommandInteraction, MessageEmbed, User } from 'discord.js'
 import { choice } from 'pandemonium'
 import { container } from 'tsyringe'
-import { ChannelInfo, CubeStorage, ValRaw } from '../db/Storage'
-import { CubeLogger } from '../logger/CubeLogger'
+import { ChannelInfo, CubeStorage, ValRaw } from '../db/Storage.js'
+import { CubeLogger } from '../logger/CubeLogger.js'
 
 const logger = container.resolve(CubeLogger).discordLogic
 

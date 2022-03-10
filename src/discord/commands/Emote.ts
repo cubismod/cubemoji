@@ -2,10 +2,10 @@ import { AutocompleteInteraction, CommandInteraction, Message } from 'discord.js
 import { Discord, Slash, SlashOption } from 'discordx'
 import { container } from 'tsyringe'
 import { emoteAutocomplete } from '../../lib/cmd/Autocomplete'
-import { CubeMessageManager } from '../../lib/cmd/MessageManager'
-import { Source } from '../../lib/emote/Cmoji'
-import { EmoteCache } from '../../lib/emote/EmoteCache'
-import { autoDeleteMsg, reply } from '../../lib/image/DiscordLogic'
+import { CubeMessageManager } from '../../lib/cmd/MessageManager.js'
+import { Source } from '../../lib/emote/Cmoji.js'
+import { EmoteCache } from '../../lib/emote/EmoteCache.js'
+import { autoDeleteMsg, reply } from '../../lib/image/DiscordLogic.js'
 import strings from '../../res/strings.json'
 
 @Discord()

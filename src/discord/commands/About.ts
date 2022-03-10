@@ -3,7 +3,7 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 import { CommandInteraction, MessageEmbed } from 'discord.js'
 import { Client, Discord, Guard, Slash } from 'discordx'
 import { container } from 'tsyringe'
-import { EmoteCache } from '../../lib/emote/EmoteCache'
+import { EmoteCache } from '../../lib/emote/EmoteCache.js'
 import { bigServerDetect, BSGuardData } from '../Guards'
 
 dayjs.extend(relativeTime)

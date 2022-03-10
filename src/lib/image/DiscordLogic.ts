@@ -15,8 +15,8 @@ import { Cmoji, Source } from '../emote/Cmoji.js'
 import { EmoteCache } from '../emote/EmoteCache.js'
 import { CubeLogger } from '../logger/CubeLogger.js'
 import { EditOperation, FaceOperation, MsgContext, RescaleOperation, splitEffects } from './ImageLogic'
-import { ImageQueue } from './ImageQueue'
-import { WorkerPool } from './WorkerPool'
+import { ImageQueue } from './ImageQueue.js'
+import { WorkerPool } from './WorkerPool.js'
 const { got } = await import('got')
 
 /**

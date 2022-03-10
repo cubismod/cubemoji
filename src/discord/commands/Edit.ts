@@ -1,7 +1,7 @@
 import { AutocompleteInteraction, CommandInteraction, GuildMember } from 'discord.js'
 import { Client, Discord, Slash, SlashOption } from 'discordx'
 import { editAutocomplete, emoteAutocomplete } from '../../lib/cmd/Autocomplete'
-import { EditDiscord } from '../../lib/image/DiscordLogic'
+import { EditDiscord } from '../../lib/image/DiscordLogic.js'
 import imgEffects from '../../res/imgEffects.json'
 import strings from '../../res/strings.json'
 import { BSGuardData } from '../Guards'

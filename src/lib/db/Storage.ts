@@ -9,8 +9,8 @@ import { createInterface } from 'readline'
 import { pipeline } from 'stream'
 import { container, singleton } from 'tsyringe'
 import { promisify } from 'util'
-import { gotOptions } from '../emote/Cmoji'
-import { CubeLogger } from '../logger/CubeLogger'
+import { gotOptions } from '../emote/Cmoji.js'
+import { CubeLogger } from '../logger/CubeLogger.js'
 const { got } = await import('got')
 
 export interface ServerOwner {

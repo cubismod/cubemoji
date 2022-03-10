@@ -6,8 +6,8 @@ import { Discord, Permission, Slash, SlashChoice, SlashGroup, SlashOption } from
 import { container } from 'tsyringe'
 import { serverAutocomplete } from '../../lib/cmd/Autocomplete'
 import { buildList, guildOwnersCheck, reply, validUser } from '../../lib/cmd/ModHelper'
-import { CubeStorage } from '../../lib/db/Storage'
-import { EmoteCache } from '../../lib/emote/EmoteCache'
+import { CubeStorage } from '../../lib/db/Storage.js'
+import { EmoteCache } from '../../lib/emote/EmoteCache.js'
 import strings from '../../res/strings.json'
 import { ModOwnerCheck } from '../Permissions'
 

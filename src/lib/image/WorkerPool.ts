@@ -1,7 +1,7 @@
 import { State } from 'gm'
 import { container, singleton } from 'tsyringe'
-import { Milliseconds } from '../constants/Units'
-import { CubeLogger } from '../logger/CubeLogger'
+import { Milliseconds } from '../constants/Units.js'
+import { CubeLogger } from '../logger/CubeLogger.js'
 
 /**
  * workers here aren't actually tracked in any meaningful way by the program

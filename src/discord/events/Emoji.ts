@@ -4,7 +4,7 @@
 import { GuildEmoji } from 'discord.js'
 import { Discord, On } from 'discordx'
 import { container } from 'tsyringe'
-import { EmoteCache } from '../../lib/emote/EmoteCache'
+import { EmoteCache } from '../../lib/emote/EmoteCache.js'
 
 @Discord()
 export abstract class EmojiEvents {

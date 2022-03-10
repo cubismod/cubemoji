@@ -1,9 +1,9 @@
 import { CommandInteraction } from 'discord.js'
 import { Client, Discord, Slash, SlashChoice, SlashOption } from 'discordx'
 import { container } from 'tsyringe'
-import { Source } from '../../lib/emote/Cmoji'
-import { EmoteCache } from '../../lib/emote/EmoteCache'
-import { sendPagination } from '../../lib/image/DiscordLogic'
+import { Source } from '../../lib/emote/Cmoji.js'
+import { EmoteCache } from '../../lib/emote/EmoteCache.js'
+import { sendPagination } from '../../lib/image/DiscordLogic.js'
 import { BSGuardData } from '../Guards'
 
 @Discord()

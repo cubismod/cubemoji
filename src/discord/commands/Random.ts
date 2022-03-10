@@ -1,7 +1,7 @@
 import { CommandInteraction } from 'discord.js'
 import { Discord, Slash, SlashOption } from 'discordx'
 import { container } from 'tsyringe'
-import { EmoteCache } from '../../lib/emote/EmoteCache'
+import { EmoteCache } from '../../lib/emote/EmoteCache.js'
 
 @Discord()
 export abstract class Random {

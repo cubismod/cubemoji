@@ -1,7 +1,7 @@
 // primitive HP responder for health checks with fly.io
 import { createServer } from 'http'
 import { container } from 'tsyringe'
-import { CubeLogger } from '../logger/CubeLogger'
+import { CubeLogger } from '../logger/CubeLogger.js'
 
 export function setupHTTP () {
   const logger = container.resolve(CubeLogger).web

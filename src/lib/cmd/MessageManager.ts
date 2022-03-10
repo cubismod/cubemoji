@@ -1,9 +1,9 @@
 import { Snowflake } from 'discord-api-types'
 import { CommandInteraction, ContextMenuInteraction, Message, MessageReaction } from 'discord.js'
 import { container, singleton } from 'tsyringe'
-import { CubeStorage } from '../db/Storage'
-import { MsgContext } from '../image/ImageLogic'
-import { CubeLogger } from '../logger/CubeLogger'
+import { CubeStorage } from '../db/Storage.js'
+import { MsgContext } from '../image/ImageLogic.js'
+import { CubeLogger } from '../logger/CubeLogger.js'
 
 @singleton()
 // used to keep track of cubemoji sent messages
