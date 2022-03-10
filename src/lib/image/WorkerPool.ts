@@ -53,7 +53,7 @@ export class WorkerPool {
       // stop the gm process
       setTimeout(() => { this.runningWorkers.delete(path) }, Milliseconds.fiveMin)
     } else {
-      this.logger.info(`job queued: "${path.slice(-8)}"`)
+      this.logger.info(`job queued: "${path.slice(-8)}". ${this.waitingWorkers.size} workers are waiting. ${this.runningWorkers.size} workers are running.`)
     }
   }
 
@@ -65,7 +65,7 @@ export class WorkerPool {
    * @param path output path of image
    */
   done (path: string) {
-    this.logger.info(`job finished: "${path.slice(-8)}"`)
+    this.logger.info(`job finished: "${path.slice(-8)}". ${this.waitingWorkers.size} workers are waiting. ${this.runningWorkers.size} workers are running.`)
     const worker = this.runningWorkers.get(path)
     if (worker) {
       this.runningWorkers.delete(path)

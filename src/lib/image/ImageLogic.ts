@@ -71,7 +71,10 @@ abstract class ImageOperation {
    */
   protected async determine () {
     const ft = await fileTypeFromFile(this.localPath)
-    if (ft === undefined) return ''
+    if (ft === undefined) {
+      logger.error(`Cannot determine filetype for ${this.localPath}`)
+      return ''
+    } 
     return {
       outPath: path.resolve(`download/${randomUUID()}.${ft.ext}`),
       fileType: ft

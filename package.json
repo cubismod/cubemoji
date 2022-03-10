@@ -9,7 +9,7 @@
     "build": "tsc",
     "start": "node --es-module-specifier-resolution=node build/Main.js",
     "profile": "clinic doctor -- node --es-module-specifier-resolution=node build/Main.js",
-    "test": "tsc && node --es-module-specifier-resolution=node build/tests/Tests.js",
+    "test": "tsc && export CM_TEST=true && node --es-module-specifier-resolution=node build/tests/Tests.js",
     "dev": "tsc-watch --noClear -p ./tsconfig.json --onSuccess \"node --inspect --es-module-specifier-resolution=node build/Main.js\"",
     "clean": "rm -rf build/"
   },

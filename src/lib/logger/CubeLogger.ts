@@ -38,7 +38,6 @@ export class CubeLogger {
           format.simple()
         ),
         transports: [
-          new transports.Console(),
           new transports.File({
             filename: 'data/logs/npr/cubemoji.log',
             maxsize: Bytes.oneMB,
@@ -51,6 +50,8 @@ export class CubeLogger {
           })
         ]
       })
+      // only log to file during testing
+      if (!process.env.CM_TEST) this.parent.add(new transports.Console())
     } else {
       /**
          * Grafana Loki logging process

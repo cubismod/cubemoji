@@ -22,6 +22,7 @@ export class Main {
 
     await importx(dirname(import.meta.url) + '/discord/**/*.js')
     logger.info('🅲🆄🅱🅴🅼🅾🅹🅸')
+    logger.info(`v. ${process.env.npm_package_version}`)
     let silent: false|undefined
     if (process.env.CM_ENVIRONMENT === 'prd') {
       logger.info('running in PRD')

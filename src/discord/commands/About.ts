@@ -31,7 +31,7 @@ export abstract class About {
         },
         {
           name: 'Version',
-          value: `${process.env.CM_VERSION}`
+          value: `${process.env.npm_package_version}`
         },
         {
           name: 'License',

@@ -46,9 +46,9 @@ export class Cmoji {
 
 export const gotOptions = {
   retry: {
-    limit: 2
+    limit: 4
   },
   timeout: {
-    request: 3000
+    request: 30000
   }
 }
