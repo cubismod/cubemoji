@@ -8,7 +8,6 @@
   - Edit
   - AddFace
   - generateEditOptions
-  - splitEffects
   - downloadImage
 - ImageQueue
 - Storage

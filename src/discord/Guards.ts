@@ -1,4 +1,4 @@
-import { CommandInteraction, ContextMenuInteraction } from 'discord.js'
+import { ButtonInteraction, CommandInteraction, ContextMenuInteraction } from 'discord.js'
 import { ArgsOf, GuardFunction } from 'discordx'
 import { container } from 'tsyringe'
 import { CubeStorage } from '../lib/db/Storage.js'
@@ -27,7 +27,9 @@ export const bigServerDetect: GuardFunction<
       const status = await enrollment.get(arg.guildId)
       if (status) data.enrolled = true
     }
-  } else if (arg[0].message) {
+  } else if (arg[0] &&
+    arg[0].hasOwnProperty('message') && 
+    arg[0].message) {
     // reactions
     const guildId = arg[0].message.guildId
     if (guildId) {
@@ -45,6 +47,7 @@ export const bigServerDetect: GuardFunction<
 export const blockedChannelDetect: GuardFunction<
 | ArgsOf<'messageReactionAdd'>
 | CommandInteraction
+| ButtonInteraction
 | ContextMenuInteraction > = async (arg, _client, next) => {
   const blockedChannels = container.resolve(CubeStorage).blockedChannels
   if (arg instanceof CommandInteraction) {
@@ -55,7 +58,12 @@ export const blockedChannelDetect: GuardFunction<
     else if (!await blockedChannels.get(arg.channelId)) await next()
   } else if (arg instanceof ContextMenuInteraction) {
     if (!await blockedChannels.get(arg.channelId)) await next()
-  } else if (
+  } else if(arg[0] && arg[0] instanceof ButtonInteraction) {
+    if (!await blockedChannels.get(arg[0].channelId)) await next()
+  } else if (arg instanceof ButtonInteraction) {
+    if (!await blockedChannels.get(arg.channelId)) await next()
+  } else if (arg[0] &&
+    arg[0].hasOwnProperty('message') &&
     arg[0].message &&
     !await blockedChannels.get(arg[0].message.channelId)) await next()
   // reaction commands ^

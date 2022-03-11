@@ -150,7 +150,7 @@ export function setStatus (client: Client) {
   } else {
     // display an emote status
     const emoteCache = container.resolve(EmoteCache)
-    if (emoteCache) client.user?.setActivity(`:${choice(emoteCache.emojis).name}:`, { type: 'WATCHING' })
+    if (emoteCache) client.user?.setActivity(`:${choice(emoteCache.discEmojis).name}:`, { type: 'WATCHING' })
   }
 }
 

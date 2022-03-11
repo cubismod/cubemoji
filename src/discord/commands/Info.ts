@@ -1,10 +1,12 @@
 // https://github.com/oceanroleplay/discord.ts-example/blob/main/src/commands/slashes.ts
-import { AutocompleteInteraction, CommandInteraction, GuildMember, MessageEmbed } from 'discord.js'
-import { Discord, Slash, SlashOption } from 'discordx'
+import { AutocompleteInteraction, ButtonInteraction, CommandInteraction, GuildMember, MessageActionRow, MessageButton, MessageEmbed } from 'discord.js'
+import { ButtonComponent, Discord, Slash, SlashOption } from 'discordx'
+import hexRgb from 'hex-rgb'
 import { container } from 'tsyringe'
 import { emoteAutocomplete } from '../../lib/cmd/Autocomplete'
 import { Source } from '../../lib/emote/Cmoji.js'
 import { EmoteCache } from '../../lib/emote/EmoteCache.js'
+import { getColors } from '../../lib/image/ColorExtract'
 import { CubeLogger } from '../../lib/logger/CubeLogger.js'
 import strings from '../../res/strings.json'
 
@@ -12,6 +14,7 @@ import strings from '../../res/strings.json'
 export abstract class Info {
   private emoteCache = container.resolve(EmoteCache)
   private logger = container.resolve(CubeLogger).command
+  private imgUrl = ''
 
   @Slash('info', {
     description: 'Provides information about an emote or user'
@@ -37,10 +40,15 @@ export abstract class Info {
         if (res !== undefined) {
           await interaction.deferReply()
 
-          const embed = new MessageEmbed()
-          embed.setColor('RANDOM')
+          let embed = new MessageEmbed()
+          embed = await this.setColors(embed, res.url)
           embed.setImage(res.url)
           embed.setTitle(res.name)
+
+          // button setup
+          this.imgUrl = res.url
+          const row = this.buttonCreate()
+          
           switch (res.source) {
             case Source.Discord: {
               if (res.guildEmoji?.createdAt) embed.addField('Creation Date', `<t:${Math.round(res.guildEmoji.createdAt.getTime() / 1000)}>`)
@@ -50,25 +58,13 @@ export abstract class Info {
               if (res.guildEmoji?.guild.name) embed.addField('Origin Server Name', res.guildEmoji.guild.name)
               const author = await res.guildEmoji?.fetchAuthor()
               if (author !== undefined) embed.addField('Author', author.username)
-              try {
-                await interaction.editReply({ embeds: [embed] })
-              } catch (err) {
-                this.logger.error(err)
-              }
+              await interaction.editReply({ embeds: [embed], components: [row] })
               break
             }
             case Source.Mutant: {
               embed.addField('Disclaimer', ' This bot uses Mutant Standard emoji (https://mutant.tech) which are licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License (https://creativecommons.org/licenses/by-nc-sa/4.0/).')
-              try {
-                await interaction.editReply({ embeds: [embed] })
-              } catch (err) {
-                this.logger.error(err)
-              }
+              await interaction.editReply({ embeds: [embed], components: [row] })
               break
-            }
-            default: {
-              embed.setFooter('Note that this emote may actually be animated but the Discord embed is not, click and open in your browser to check.')
-              await interaction.editReply({ embeds: [embed] })
             }
           }
         } else {
@@ -77,8 +73,13 @@ export abstract class Info {
       } else if (member !== undefined) {
         // user code
         const avatarURL = member.user.displayAvatarURL({ format: 'png', dynamic: true, size: 256 })
-        const embed = new MessageEmbed()
-        embed.setColor('RANDOM')
+        let embed = new MessageEmbed()
+
+        // button setup
+        this.imgUrl = avatarURL
+        const row = this.buttonCreate()
+  
+        embed = await this.setColors(embed, avatarURL)
         embed.setTitle(member.user.tag)
         embed.setImage(avatarURL)
         embed.addField('ID', member.user.id)
@@ -86,7 +87,7 @@ export abstract class Info {
         if (member.joinedAt) embed.addField('This Server Join Date', `<t:${Math.round(member.joinedAt.getTime() / 1000)}>`)
         embed.addField('Bot', member.user.bot.toString())
         try {
-          await interaction.reply({ embeds: [embed] })
+          await interaction.reply({ embeds: [embed], components: [row] })
         } catch (err) {
           this.logger.error(err)
         }
@@ -94,6 +95,54 @@ export abstract class Info {
       if ((member === undefined) && (emote === undefined)) {
         await interaction.reply({ content: strings.noArgs, ephemeral: true })
       }
+    }
+  }
+
+  private async setColors(embed: MessageEmbed, url: string) {
+    const colors = await getColors(url)
+    if (colors) {
+      const hexCol = hexRgb(colors[0])
+      embed.setColor([hexCol.red, hexCol.green, hexCol.blue])
+    } else embed.setColor('RANDOM')
+    return embed
+  }
+
+  private buttonCreate () {
+    const button = new MessageButton()
+      .setLabel('Generate a palette of primary colors')
+      .setEmoji('🎨')
+      .setStyle('PRIMARY')
+      .setCustomId('color-button')
+    return new MessageActionRow().addComponents(button)
+  }
+
+  @ButtonComponent('color-button')
+  async colorButton(interaction: ButtonInteraction) {
+    await interaction.deferReply({ephemeral: true})
+    // snag url if this is a cached reply
+    // since we won't have the imgUrl saved
+    if (this.imgUrl === '') {
+      const msg = interaction.message
+      if (msg.embeds[0] && msg.embeds[0].image) {
+        this.imgUrl = msg.embeds[0].image.url
+      }
+    }
+    const colors = await getColors(this.imgUrl)
+    const embeds: MessageEmbed[] = []
+    if (colors && this.imgUrl !== '') {
+      colors.forEach((color, i) => {
+        if (i < 9) {
+          const hexCol = hexRgb(color)
+          const embed = new MessageEmbed({
+            description: `\`${color}\``,
+            color: [hexCol.red, hexCol.green, hexCol.blue]
+          })
+          embeds.push(embed)
+        }
+      })
+      interaction.editReply({embeds: embeds})
+    } else {
+      interaction.editReply('colors could not be determined')
     }
   }
 }
