@@ -21,4 +21,4 @@ RUN npm run build
 
 ENV CMG_DEST=/usr/src/cubemoji/static/emotes
 
-CMD node build/src/Main.js
+CMD node --es-module-specifier-resolution=node build/Main.js
