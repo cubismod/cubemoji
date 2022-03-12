@@ -1,7 +1,7 @@
 // https://github.com/oceanroleplay/discord.ts-example/blob/main/src/commands/slashes.ts
 import { AutocompleteInteraction, ButtonInteraction, CommandInteraction, GuildMember, MessageActionRow, MessageButton, MessageEmbed } from 'discord.js'
 import { ButtonComponent, Discord, Slash, SlashOption } from 'discordx'
-import hexRgb from 'hex-rgb'
+import rgbHex from 'rgb-hex'
 import { container } from 'tsyringe'
 import { emoteAutocomplete } from '../../lib/cmd/Autocomplete'
 import { Source } from '../../lib/emote/Cmoji.js'
@@ -100,16 +100,16 @@ export abstract class Info {
 
   private async setColors(embed: MessageEmbed, url: string) {
     const colors = await getColors(url)
+    const dominant = colors[0]
     if (colors) {
-      const hexCol = hexRgb(colors[0])
-      embed.setColor([hexCol.red, hexCol.green, hexCol.blue])
+      embed.setColor([dominant[0], dominant[1], dominant[2]])
     } else embed.setColor('RANDOM')
     return embed
   }
 
   private buttonCreate () {
     const button = new MessageButton()
-      .setLabel('Generate a palette of primary colors')
+      .setLabel('Generate a palette of dominant colors')
       .setEmoji('🎨')
       .setStyle('PRIMARY')
       .setCustomId('color-button')
@@ -132,10 +132,9 @@ export abstract class Info {
     if (colors && this.imgUrl !== '') {
       colors.forEach((color, i) => {
         if (i < 9) {
-          const hexCol = hexRgb(color)
           const embed = new MessageEmbed({
-            description: `\`${color}\``,
-            color: [hexCol.red, hexCol.green, hexCol.blue]
+            description: `RGB: \`${color}\`\nHex: \`#${rgbHex(color[0], color[1], color[2])}\``,
+            color: color
           })
           embeds.push(embed)
         }

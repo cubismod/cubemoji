@@ -23,10 +23,6 @@ variables:
   # container, thanks to volume mount from config.toml
   DOCKER_TLS_CERTDIR: "/certs"
 
-
-before_script:
-  - docker info
-  
 services:
   - docker:20.10.13-dind
 cache:

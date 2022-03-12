@@ -1,11 +1,11 @@
-FROM node:17.4-bullseye
+FROM node:17.4-alpine
 WORKDIR /usr/src/cubemoji
 
 ENV TZ=America/New_York
 
 # setup any requisite packages
-COPY scripts/setup-image.sh .
-RUN ./setup-image.sh
+COPY scripts/ ./scripts/
+RUN scripts/setup-image.sh
 
 COPY package-lock.json .
 COPY package.json .
@@ -18,6 +18,6 @@ RUN npm install -g typescript
 RUN npm run build
 
 ENV CMG_DEST=/usr/src/cubemoji/static/emotes
-RUN scripts/gen-images/gen.py
+RUN ["python3", "scripts/gen-images/gen.py"]
 
 CMD node build/src/Main.js
