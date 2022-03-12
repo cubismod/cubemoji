@@ -43,3 +43,7 @@ destination="/usr/src/cubemoji/data/"
 [[statics]]
   guest_path = '/static/pug'
   url_prefix = '/list'
+
+[metrics]
+port=9091
+path='/metrics'
