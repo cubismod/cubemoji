@@ -33,6 +33,7 @@ cache:
 stages:
 - build
 - test
+- deploy
 build:
   stage: build
   script:
@@ -47,6 +48,14 @@ sast:
     SAST_EXCLUDED_ANALYZERS: bandit, brakeman, flawfinder, gosec, kubesec, phpcs-security-audit,
       pmd-apex, security-code-scan, sobelow, spotbugs, semgrep,  retire-js-dependency_scanning
   stage: test
+
+# only deploy when a new tag is created
+deploy:
+  stage: deploy
+  rules:
+    - if: '$CI_COMMIT_TAG'
+  script:
+    - scripts/fly-deploy.sh
 
 include:
 - template: Security/SAST.gitlab-ci.yml

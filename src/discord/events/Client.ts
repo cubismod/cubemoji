@@ -104,7 +104,7 @@ export abstract class ClientEvents {
     // setup healthcheck listener for fly
     setupHTTP()
 
-    this.logger.info(`cubemoji ${process.env.CM_VERSION} is now running...`)
+    this.logger.info(`cubemoji ${process.env.npm_package_version} is now running...`)
     this.logger.info(`It took ${process.uptime()}s to startup this time`)
     // set a new status msg every 5 min
     setStatus(client)

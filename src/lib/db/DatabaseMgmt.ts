@@ -31,13 +31,15 @@ export async function runBackups (firstRun = true) {
   const paths: string[] = []
   let success = true
   
-  const contents = await readdir('data/')
+  const dataLocation = process.env.CM_TEST ? '/data/test' : 'data/'
+
+  const contents = await readdir(dataLocation)
   
   for (const filename of contents) {
     if (filename.endsWith('.sqlite')) {
       // found SQLite to backup
       try {
-        const db = new Database('data/' + filename, { readonly: true, fileMustExist: true })
+        const db = new Database(dataLocation + filename, { readonly: true, fileMustExist: true })
         // if source filename is serverInfo.sqlite, backup name would be like
         // serverInfo-2021-02-15-14_48_00.sqlite
         const backupName = `data/backups/${filename.replace('.sqlite', '')}-${dayjs().format('YYYY-MM-DD-HH_mm_ss')}.sqlite`

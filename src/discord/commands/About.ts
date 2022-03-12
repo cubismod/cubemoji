@@ -48,6 +48,10 @@ export abstract class About {
         {
           name: 'Bugs and Feature Requests',
           value: 'https://gitlab.com/cubismod/cubemoji/-/issues'
+        },
+        {
+          name: 'Guide',
+          value: 'https://gitlab.com/cubismod/cubemoji/-/wikis/home'
         }
       ])
       // ephemeral replies when in an enrolled server

@@ -28,16 +28,6 @@ export abstract class Mod {
     const helpEmbed = new MessageEmbed()
       .setTitle('Moderation Help')
       .setDescription(strings.modIntro)
-      .addField('Enrollment', strings.modEnrollment)
-      .addField('Blacklist', strings.modBlacklist)
-      .addField('Commands', `\`\`\`
--> Enrollment
---* modify
---* list
--> Blacklist
---* emojimod
---* channelmod
---* list\`\`\``)
       .setColor('GOLD')
     await interaction.reply({ embeds: [helpEmbed], ephemeral: true })
   }

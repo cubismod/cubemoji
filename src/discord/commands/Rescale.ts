@@ -16,7 +16,7 @@ export abstract class Rescale {
       required: false
     })
       emote: string,
-    @SlashOption('user', { description: 'a user', required: false })
+    @SlashOption('member', { description: 'a user', required: false })
       user: GuildMember,
       interaction: CommandInteraction,
       _client: Client,

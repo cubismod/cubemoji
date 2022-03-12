@@ -97,12 +97,16 @@ export class CubeStorage {
    */
   serverAuditInfo: Keyv<string>
 
-  private location = 'data/'
   private logger = container.resolve(CubeLogger).storage
-  private serverInfoPath = 'data/serverInfo.sqlite'
+  private dbLocation = 'data/'
+  private serverInfoPath: string
   constructor () {
+    // create separate databases when testing
+    if (process.env.CM_TEST === 'true') this.dbLocation = 'data/test/'
+    this.serverInfoPath = this.dbLocation + 'serverInfo.sqlite'
+
     this.trashReacts = new Keyv<string>(
-      'sqlite://data/trashReacts.sqlite',
+      `sqlite://${this.dbLocation}trashReacts.sqlite`,
       {
         ttl: 6.048e+8 // 1 week in ms
       }
@@ -110,7 +114,7 @@ export class CubeStorage {
 
     this.badHosts = new Keyv<number>({
       store: new KeyvFile({
-        filename: resolve(this.location, 'badHosts.json')
+        filename: resolve(this.dbLocation, 'badHosts.json')
       })
     })
 

@@ -17,8 +17,8 @@ export abstract class Edit {
       required: false
     })
       emote: string,
-    @SlashOption('user', { description: 'a user', required: false })
-      user: GuildMember,
+    @SlashOption('member', { description: 'a server member', required: false })
+      member: GuildMember,
     @SlashOption('effects', {
       description: 'list of effects (space separated, max 20). If not specified then random effects will be applied',
       autocomplete: (interaction: AutocompleteInteraction) => editAutocomplete(interaction),
@@ -40,15 +40,15 @@ export abstract class Edit {
         ephemeral: data.enrolled,
         fetchReply: !data.enrolled
       }
-      if (!emote && !user) {
+      if (!emote && !member) {
         interaction.reply({ content: strings.noArgs, ephemeral: true })
       } else if (emote) {
         await interaction.deferReply(deferOptions)
         const edDiscord = new EditDiscord(interaction, effects, emote, interaction.user)
         await edDiscord.run()
-      } else if (user) {
+      } else if (member) {
         await interaction.deferReply(deferOptions)
-        const edDiscord = new EditDiscord(interaction, effects, user.displayAvatarURL({ format: 'png', dynamic: true, size: 256 }), interaction.user)
+        const edDiscord = new EditDiscord(interaction, effects, member.displayAvatarURL({ format: 'png', dynamic: true, size: 256 }), interaction.user)
         await edDiscord.run()
       }
     }
