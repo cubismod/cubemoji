@@ -65,10 +65,10 @@ export class WorkerPool {
    * @param path output path of image
    */
   done (path: string) {
-    this.logger.info(`job finished: "${path.slice(-8)}". ${this.waitingWorkers.size} workers are waiting. ${this.runningWorkers.size} workers are running.`)
     const worker = this.runningWorkers.get(path)
     if (worker) {
       this.runningWorkers.delete(path)
+      this.logger.info(`job finished: "${path.slice(-8)}". ${this.waitingWorkers.size} workers are waiting. ${this.runningWorkers.size} workers are running.`)
       // run next worker
       const paths = this.waitingWorkers.keys()
       for (const p of paths) {

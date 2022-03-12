@@ -6,7 +6,8 @@ import { CubeStorage } from '../lib/db/Storage'
 import { ImageQueue } from '../lib/image/ImageQueue'
 import { WorkerPool } from '../lib/image/WorkerPool'
 import { CubeLogger } from '../lib/logger/CubeLogger'
-import { discSuite } from './suites/Discord'
+import { databaseSuites } from './suites/Database'
+import { discSuites } from './suites/Discord'
 import { imgSuites } from './suites/Image'
 
 
@@ -30,8 +31,9 @@ async function run() {
   container.register(ImageQueue, {useValue: imageQueue})
   
   
-  discSuite.run()
+  discSuites().run()
   imgSuites().forEach((suite) => suite.run())
+  databaseSuites().run()
 }
 
 await run()

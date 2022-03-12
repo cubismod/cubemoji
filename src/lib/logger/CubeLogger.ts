@@ -40,9 +40,8 @@ export class CubeLogger {
         transports: [
           new transports.File({
             filename: 'data/logs/npr/cubemoji.log',
-            maxsize: Bytes.oneMB,
-            maxFiles: 4,
-            zippedArchive: true,
+            maxsize: Bytes.oneMB * 10,
+            tailable: true,
             format: format.combine(
               format.uncolorize(),
               format.json()

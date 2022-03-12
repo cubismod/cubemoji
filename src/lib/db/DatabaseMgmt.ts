@@ -19,11 +19,21 @@ import { CubeLogger } from '../logger/CubeLogger.js'
 
 const logger = container.resolve(CubeLogger).databaseMgmt
 
+/**
+ * runs SQL database backups using dump and then performs backup rotations
+ * @param firstRun if toggled yes, then will set an interval to perform backups every 24
+ * hours
+ * @returns list of backup files (relative to root node dir) or undefined on error
+ */
 export async function runBackups (firstRun = true) {
   logger.info('Running database backups')
   await mkdir('data/backups', { recursive: true })
-  let success = true;
-  (await readdir('data/')).forEach(async (filename) => {
+  const paths: string[] = []
+  let success = true
+  
+  const contents = await readdir('data/')
+  
+  for (const filename of contents) {
     if (filename.endsWith('.sqlite')) {
       // found SQLite to backup
       try {
@@ -36,18 +46,23 @@ export async function runBackups (firstRun = true) {
         db.close()
         // assuming backup succeeded, we compress
         await compress(backupName)
-        return true
+        paths.push(backupName + '.gz')
       } catch (err) {
         success = false
         logger.error(`Backup of ${filename} failed!`)
         logger.error(err)
-        return false
       }
     }
-  })
+  }
+  if (firstRun) {
+    // setup an interval to run every 24 hours
+    setInterval(runBackups, Milliseconds.day, false)
+  }
+
   if (success) {
     // let's remove old backup files
-    (await readdir('data/backups')).forEach(async (filename) => {
+    const contents = await readdir('data/backups')
+    for (const filename of contents) {
       try {
         const statInfo = await stat('data/backups/' + filename)
         if (dayjs(statInfo.ctime) < dayjs().subtract(1, 'week')) {
@@ -59,13 +74,9 @@ export async function runBackups (firstRun = true) {
         logger.error(`Backup cleanup of ${filename} failed!`)
         logger.error(err)
       }
-    })
-  }
-  if (firstRun) {
-    // setup an interval to run every 24 hours
-    setInterval(runBackups, Milliseconds.day, false)
-  }
-  logger.info('Finished database backups')
+    }
+    return paths
+  } return undefined
 }
 
 async function compress (sourcePath: string) {

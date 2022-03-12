@@ -186,8 +186,14 @@ export async function isUrl (url: string) {
   }
 }
 
-// checks a string to see if there is an emote or URL there and then returns the URL
-// that we will use for edits
+
+/**
+ * checks a string to see if there is an emote or URL there and then returns the URL
+ * that we will use for edits
+ * @param source URL/emote string
+ * @param guildId guild ID snowflake for checking for blocked emotes
+ * @returns 
+ */
 export async function getUrl (source: string, guildId: string) {
   const emoteCache = container.resolve(EmoteCache)
   // yes that's a URL we can use for editing

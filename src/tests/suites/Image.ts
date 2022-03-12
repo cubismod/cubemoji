@@ -4,9 +4,10 @@ import { choice } from "pandemonium"
 import { container } from "tsyringe"
 import { suite } from "uvu"
 import * as assert from 'uvu/assert'
-import { EditOperation, FaceOperation, generateEditOptions, RescaleOperation } from "../../lib/image/ImageLogic"
+import { downloadImage, EditOperation, FaceOperation, generateEditOptions, RescaleOperation } from "../../lib/image/ImageLogic"
 import { WorkerPool } from "../../lib/image/WorkerPool"
 import faces from '../../res/faces.json'
+import effects from '../../res/imgEffects.json'
 
 export function imgSuites() {
   // a number of different image files to try
@@ -38,10 +39,11 @@ export function imgSuites() {
   const rescaleSuite = suite('Rescale')
   const editSuite = suite('Edit')
   const addFaceSuite = suite('AddFace')
+  const downloadSuite = suite('Download Image')
   
   const workerPool = container.resolve(WorkerPool)
   
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < 4; i++) {
     const img = choice(urls)
     rescaleSuite(`rescaling ${img}`, async() => {
       const rescale = new RescaleOperation(img)
@@ -70,6 +72,19 @@ export function imgSuites() {
         workerPool.done(file)
       )
     })
+    
+    downloadSuite(`downloading ${img} to disk`, async() => {
+      assert.is.not(await downloadImage(img), undefined)
+    })
   }
-  return [rescaleSuite, editSuite, addFaceSuite]
+
+  editSuite('generate edit options', () => {
+    const opts = generateEditOptions()
+    opts.forEach(opt => {
+      const includes = effects.includes(opt)
+      assert.ok(includes)
+    })
+  })
+
+  return [rescaleSuite, editSuite, addFaceSuite, downloadSuite]
 }
