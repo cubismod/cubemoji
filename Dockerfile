@@ -7,6 +7,8 @@ ENV TZ=America/New_York
 COPY scripts/ ./scripts/
 RUN scripts/setup-image.sh
 
+RUN ["python3", "scripts/gen-images/gen.py"]
+
 COPY package-lock.json .
 COPY package.json .
 COPY tsconfig.json .
@@ -18,6 +20,5 @@ RUN npm install -g typescript
 RUN npm run build
 
 ENV CMG_DEST=/usr/src/cubemoji/static/emotes
-RUN ["python3", "scripts/gen-images/gen.py"]
 
 CMD node build/src/Main.js

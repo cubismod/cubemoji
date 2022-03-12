@@ -45,7 +45,7 @@ build:
 sast:
   variables:
     SAST_EXCLUDED_ANALYZERS: bandit, brakeman, flawfinder, gosec, kubesec, phpcs-security-audit,
-      pmd-apex, security-code-scan, sobelow, spotbugs, semgrep
+      pmd-apex, security-code-scan, sobelow, spotbugs, semgrep,  retire-js-dependency_scanning
   stage: test
 
 include:
