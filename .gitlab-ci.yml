@@ -14,11 +14,7 @@ stages:
 build:
   stage: build
   script:
-  - npm install
-  - chmod +x setup-ci.sh
-  - bash setup-ci.sh
-  - npm i -g typescript jest
-  - npm run build
+  - docker build -t cubis/cubemoji:latest .
 sast:
   variables:
     SAST_EXCLUDED_ANALYZERS: bandit, brakeman, flawfinder, gosec, kubesec, phpcs-security-audit,
