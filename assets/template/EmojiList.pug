@@ -13,21 +13,16 @@ html(lang='en')
   body
     div(class='container')
       div(class='row')
-        div(class='col')
+        div(class='col-2 align-self-center justify-content-center')
+          img(src='https://gitlab.com/cubismod/cubemoji/-/raw/master/assets/icon.svg', class='img-fluid', alt='cubemoji logo' width=130, height=130)
+        div(class='col-9')
           h1(class='display-2') cubemoji list
           p This is a list of every emoji available to cubemoji
-      
-      div(class='row row-cols-auto')
-        div(class='col')
-          a(href='https://gitlab.com/cubismod/cubemoji')
-            img(alt='Cubemoji GitLab', src='https://img.shields.io/gitlab/v/release/23331669?style=for-the-badge')
-        div(class='col')
-          a(href='https://discord.gg/rQZVTpEyuG')
-            img(alt='Discord Server', src='https://img.shields.io/discord/545784892492087303?label=Discord&style=for-the-badge')
-        div(class='col')
-          a(href='https://www.buymeacoffee.com/cubis')
-            img(alt='Buy Me a Coffee', src='https://img.shields.io/badge/-Buy%20me%20a%20Coffee-brightgreen?style=for-the-badge')
-      
+          div(class='btn-group', role='group', aria-label='links')
+            a(target='_blank' class='btn btn-outline-success' href='https://gitlab.com/cubismod/cubemoji') GitLab
+            a(target='_blank' class='btn btn-outline-success' href='https://discord.gg/rQZVTpEyuG') Discord Server
+            a(target='_blank' class='btn btn-outline-success' href='https://www.buymeacoffee.com/cubis') Buy Me a Coffee
+        
       div(class='row')
         div(class='col')
           div(class='alert alert-dark mt-4', role='alert')=`Last updated at ${new Date().toUTCString()}`  
@@ -36,21 +31,22 @@ html(lang='en')
         div(class='col')
           div(id='emojis' class='mt-2')
             input(class='search form-control form-control-lg', placeholder='Search')
-            table(class='table table-striped')
-                thead 
-                  tr 
-                    th(scope='col') Name
-                    th(scope='col') Server
-                    th(scope='col') Link
-                    th(scope='col') ID
-                tbody(class='list')
-                  each emote in emotes 
-                    tr
-                      td(class='name')=emote.name
-                      td(class='server')=emote.guildEmoji ? emote.guildEmoji.guild.name: 'N/A'
-                      td(class='link')
-                        a(href=emote.url target='_blank')=emote.url 
-                      td(class='id')=emote.id        
+            div(class='table-responsive')
+              table(class='table table-striped')
+                  thead 
+                    tr 
+                      th(scope='col') Name
+                      th(scope='col') Server
+                      th(scope='col') Link
+                      th(scope='col') ID
+                  tbody(class='list')
+                    each emote in emotes 
+                      tr
+                        td(class='name')=emote.name
+                        td(class='server')=emote.guildEmoji ? emote.guildEmoji.guild.name: 'N/A'
+                        td(class='link')
+                          a(href=emote.url target='_blank')=emote.url 
+                        td(class='id')=emote.id        
         
     script(src='https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js' integrity='sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p' crossorigin='anonymous')
 

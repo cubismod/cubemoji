@@ -17,7 +17,6 @@ import { createGzip } from 'zlib'
 import { Milliseconds } from '../constants/Units.js'
 import { CubeLogger } from '../logger/CubeLogger.js'
 
-const logger = container.resolve(CubeLogger).databaseMgmt
 
 /**
  * runs SQL database backups using dump and then performs backup rotations
@@ -26,6 +25,7 @@ const logger = container.resolve(CubeLogger).databaseMgmt
  * @returns list of backup files (relative to root node dir) or undefined on error
  */
 export async function runBackups (firstRun = true) {
+  const logger = container.resolve(CubeLogger).databaseMgmt
   logger.info('Running database backups')
   await mkdir('data/backups', { recursive: true })
   const paths: string[] = []
@@ -93,6 +93,7 @@ async function compress (sourcePath: string) {
 }
 
 export function scheduleBackup () {
+  const logger = container.resolve(CubeLogger).databaseMgmt
   const cur = dayjs()
   // run backup immedieatly if backup between these times
   if (cur.hour() > 0 && cur.hour() < 5) {

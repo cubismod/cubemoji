@@ -16,6 +16,7 @@ export abstract class List {
     @SlashChoice('Discord', 'discord')
     @SlashChoice('Mutant', 'mutant')
     @SlashChoice('This Server', 'thisserver')
+    @SlashChoice('Web', 'web')
     @SlashOption('subset', { description: 'Which subset of emotes would you like to choose from?' })
       subset: string,
       interaction: CommandInteraction,
@@ -33,6 +34,9 @@ export abstract class List {
         break
       case 'thisserver':
         type = Source.ThisServer
+      case 'web':
+        interaction.reply(`Check out an online emoji list at ${process.env.CM_URL}.`)
+        return
     }
     sendPagination(interaction, type, emoteCache, data.enrolled)
   }

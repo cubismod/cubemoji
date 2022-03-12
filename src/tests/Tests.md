@@ -11,4 +11,5 @@
   - downloadImage
 - Database
   - runBackups
-  - 
+  - initHosts
+- ImageQueue

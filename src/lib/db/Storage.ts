@@ -137,10 +137,15 @@ export class CubeStorage {
       const pl = promisify(pipeline)
       // downloading this blocklist
       // https://github.com/StevenBlack/hosts
-      await pl(
-        got.stream('http://sbc.io/hosts/alternates/porn/hosts', gotOptions),
-        createWriteStream(fn)
-      )
+      try {
+        await pl(
+          got.stream('http://sbc.io/hosts/alternates/porn/hosts', gotOptions),
+          createWriteStream(fn)
+        )
+      } catch(err) {
+        this.logger.error(err)
+        return -1
+      }
 
       // once we have that file we gotta parse it
       const fileStream = createReadStream(fn)
