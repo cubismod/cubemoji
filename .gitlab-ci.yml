@@ -58,7 +58,7 @@ deploy:
     - apk add --no-cache curl
     - curl -L https://fly.io/install.sh | sh
   script:
-    - flyctl deploy -a cubemoji
+    - /root/.fly/bin/flyctl deploy -a cubemoji
 
 include:
 - template: Security/SAST.gitlab-ci.yml
