@@ -65,13 +65,15 @@ export abstract class ClientEvents {
       this.logger.info('initialized EmoteCache')
 
       DIService.container.register(PugGenerator, { useValue: new PugGenerator() })
-      await container.resolve(PugGenerator).render()
+      await container.resolve(PugGenerator).render(client.guilds)
       this.logger.info('initialized PugGenerator')
 
       let workers = 4
       if (process.env.CM_WORKERS) workers = parseInt(process.env.CM_WORKERS)
       DIService.container.register(WorkerPool, { useValue: new WorkerPool(workers) })
       this.logger.info('registered WorkerPool')
+
+      client.guilds.cache
 
       // every 30 min, refresh our cache of who the server owners are
       // and re-init permissions on Moderation commands as well as
@@ -80,7 +82,7 @@ export abstract class ClientEvents {
         async () => {
           await container.resolve(CubeStorage).loadServerOwners(client)
           await client.initApplicationPermissions()
-          await container.resolve(PugGenerator).render()
+          await container.resolve(PugGenerator).render(client.guilds)
           this.logger.debug('permission sync & pug-regen completed')
         },
         Milliseconds.thirtyMin

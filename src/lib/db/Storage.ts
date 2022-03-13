@@ -97,6 +97,11 @@ export class CubeStorage {
    */
   serverAuditInfo: Keyv<string>
 
+  /**
+   * key is guildId, value is a random server name
+   */
+  serverAnonNames: Keyv<string>
+
   private logger = container.resolve(CubeLogger).storage
   private dbLocation = 'data/'
   private serverInfoPath: string
@@ -126,6 +131,7 @@ export class CubeStorage {
     this.serverOwners = new Keyv<ServerOwner[]>(sqliteUri, { namespace: 'owners' })
     this.modEnrollment = new Keyv<string>(sqliteUri, { namespace: 'mods' })
     this.blockedChannels = new Keyv<ChannelInfo>(sqliteUri, { namespace: 'channels' })
+    this.serverAnonNames = new Keyv<string>(sqliteUri, { namespace: 'server-anon' })
 
     this.serverAuditInfo = new Keyv<string>(sqliteUri, { namespace: 'audit' })
   }

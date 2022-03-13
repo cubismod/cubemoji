@@ -43,7 +43,7 @@ html(lang='en')
                     each emote in emotes 
                       tr
                         td(class='name')=emote.name
-                        td(class='server')=emote.guildEmoji ? emote.guildEmoji.guild.name: 'N/A'
+                        td(class='server')=emote.guildEmoji ? servers.get(emote.guildEmoji.guild.id): 'N/A'
                         td(class='link')
                           a(href=emote.url target='_blank')=emote.url 
                         td(class='id')=emote.id        

@@ -32,7 +32,7 @@ processes = []
     port = "443"
 
    [[services.http_checks]]
-    interval = 10000
+    interval = 300000 # 5 min healtcheck
     grace_period = "30s"
     method = "get"
     path = "/status"
@@ -45,7 +45,7 @@ source="cm_data"
 destination="/usr/src/cubemoji/data/"
 
 [[statics]]
-  guest_path = '/static/emotes'
+  guest_path = '/usr/src/cubemoji/static/emotes'
   url_prefix = '/emotes'
 
 [metrics]
