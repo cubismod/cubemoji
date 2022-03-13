@@ -83,7 +83,7 @@ export abstract class ClientEvents {
           await container.resolve(CubeStorage).loadServerOwners(client)
           await client.initApplicationPermissions()
           await container.resolve(PugGenerator).render(client.guilds)
-          this.logger.debug('permission sync & pug-regen completed')
+          this.logger.info('permission sync & pug-regen completed')
         },
         Milliseconds.thirtyMin
       )

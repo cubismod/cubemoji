@@ -95,6 +95,7 @@ async function compress (sourcePath: string) {
 }
 
 export function scheduleBackup () {
+  
   const logger = container.resolve(CubeLogger).databaseMgmt
   const cur = dayjs()
   // run backup immedieatly if backup between these times
@@ -103,7 +104,9 @@ export function scheduleBackup () {
   } else {
     // schedule backup for tomorrow
     const backupTime = cur.add(1, 'day').set('hour', 2).set('minute', 0)
-    logger.info(`Backup scheduled for ${backupTime.toString()}`)
+    logger.info(`Backup scheduled for ${backupTime.toDate().toLocaleString('en-US', {
+      timeZoneName: 'long'
+    })}`)
     const offset = backupTime.diff(cur)
     setTimeout(runBackups, offset)
   }

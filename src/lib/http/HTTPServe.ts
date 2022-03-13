@@ -16,10 +16,10 @@ export function setupHTTP () {
       response.statusCode = 307
       response.setHeader('Location', 'https://gitlab.com/cubismod/cubemoji')
       response.end()
-    } else if (request.url === '/list') {
+    } else if (request.url === '/list' || request.url === '/list/') {
       response.writeHead(200, {'content-type': 'text/html'})
       createReadStream('static/list/emoji.html').pipe(response)
-    } else if (!request.url?.startsWith('/emotes')) {
+    } else if (!request.url?.startsWith('/emotes') && !request.url?.startsWith('/favicon')) {
       response.statusCode = 404
       response.setHeader('Content-Type', 'text/plain')
       response.write('404 Error, Page Not Found')

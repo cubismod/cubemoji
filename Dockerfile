@@ -7,13 +7,15 @@ ENV TZ=America/New_York
 COPY scripts/ ./scripts/
 RUN scripts/setup-image.sh
 
-ENV CMG_DEST=/usr/src/cubemoji/static/emotes
+COPY assets/ ./assets/
+
+ENV CMG_DEST=/usr/src/cubemoji/static
+ENV CMG_FAV_SRC=/usr/src/cubemoji/assets/favicon
 RUN ["python3", "scripts/gen-images/gen.py"]
 
 COPY package-lock.json .
 COPY package.json .
 COPY tsconfig.json .
-COPY assets/ ./assets/
 COPY src/ ./src/
 
 RUN npm install --production
