@@ -15,10 +15,11 @@ RUN ["python3", "scripts/gen-images/gen.py"]
 
 COPY package-lock.json .
 COPY package.json .
+RUN npm install --production
+
 COPY tsconfig.json .
 COPY src/ ./src/
 
-RUN npm install --production
 RUN npm install -g typescript 
 RUN npm run build
 

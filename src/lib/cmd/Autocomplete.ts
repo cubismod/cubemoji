@@ -156,12 +156,12 @@ export function unitAutocomplete (interaction: AutocompleteInteraction) {
     try {
       if (query === '') {
         // return well known units if nothing inputted
-        interaction.respond(geometricReservoirSample(20, Qty.getKinds()).map(kind => {
+        interaction.respond(geometricReservoirSample<string>(25, Qty.getUnits()).map(kind => {
           return {name: kind, value: kind}
         }))
       } else {
         const units = Qty.getUnits()
-        const fuse = new Fuse(units)
+        const fuse = new Fuse<string>(units)
         const res = fuse.search(query, {limit: 10})
   
         interaction.respond(res.map(result => {
