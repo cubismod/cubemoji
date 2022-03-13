@@ -19,7 +19,7 @@ export function setupHTTP () {
     } else if (request.url === '/list') {
       response.writeHead(200, {'content-type': 'text/html'})
       createReadStream('static/list/emoji.html').pipe(response)
-    } else {
+    } else if (!request.url?.startsWith('/emotes')) {
       response.statusCode = 404
       response.setHeader('Content-Type', 'text/plain')
       response.write('404 Error, Page Not Found')

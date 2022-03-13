@@ -55,8 +55,9 @@ deploy:
   rules:
     - if: '$CI_COMMIT_TAG'
   script:
-    - chmod +x scripts/fly-deploy.sh
-    - scripts/fly-deploy.sh
+    - apk add --no-cache curl
+    - curl -L https://fly.io/install.sh | FLYCTL_INSTALL=/usr/local sh
+    - flyctl deploy -a cubemoji -t $CM_FLY_TOK
 
 include:
 - template: Security/SAST.gitlab-ci.yml
