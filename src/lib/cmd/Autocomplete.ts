@@ -1,5 +1,6 @@
 import { ApplicationCommandOptionChoice, AutocompleteInteraction } from 'discord.js'
 import Fuse from 'fuse.js'
+import Qty from 'js-quantities'
 import { choice, geometricReservoirSample } from 'pandemonium'
 import { container } from 'tsyringe'
 import imgEffects from '../../res/imgEffects.json'
@@ -139,6 +140,33 @@ export async function serverAutocomplete (interaction: AutocompleteInteraction) 
           }
         })
         await interaction.respond(responses)
+      }
+    } catch (err) {
+      logger.error(err)
+    }
+  }
+}
+
+/**
+ * autocomplete for /convert function
+ */
+export function unitAutocomplete (interaction: AutocompleteInteraction) {
+  const query = interaction.options.getFocused(true).value
+  if (typeof query === 'string') {
+    try {
+      if (query === '') {
+        // return well known units if nothing inputted
+        interaction.respond(geometricReservoirSample(20, Qty.getKinds()).map(kind => {
+          return {name: kind, value: kind}
+        }))
+      } else {
+        const units = Qty.getUnits()
+        const fuse = new Fuse(units)
+        const res = fuse.search(query, {limit: 10})
+  
+        interaction.respond(res.map(result => {
+          return {name: result.item, value: result.item}
+        }))
       }
     } catch (err) {
       logger.error(err)
