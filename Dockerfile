@@ -20,4 +20,4 @@ RUN npm install --production
 RUN npm install -g typescript 
 RUN npm run build
 
-CMD node --es-module-specifier-resolution=node build/Main.js
+CMD npm start

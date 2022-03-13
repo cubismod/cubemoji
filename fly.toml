@@ -23,9 +23,17 @@ processes = []
     soft_limit = 20
     type = "connections"
 
+  [[services.ports]]
+    handlers = ["http"]
+    port = "80"
+  
+  [[services.ports]]
+    handlers = ["tls", "http"]
+    port = "443"
+
    [[services.http_checks]]
     interval = 10000
-    grace_period = "10s"
+    grace_period = "30s"
     method = "get"
     path = "/"
     protocol = "http"
@@ -39,10 +47,6 @@ destination="/usr/src/cubemoji/data/"
 [[statics]]
   guest_path = '/static/emotes'
   url_prefix = '/emotes'
-
-[[statics]]
-  guest_path = '/static/pug'
-  url_prefix = '/list'
 
 [metrics]
 port=9091

@@ -19,7 +19,7 @@ export class PugGenerator {
   }
 
   async render () {
-    await writeFile('./static/pug/emoji.html', this.template({
+    await writeFile('./static/list/emoji.html', this.template({
       emotes: this.emoteCache.discEmojis
     })).catch(err => this.logger.error(err))
   }
