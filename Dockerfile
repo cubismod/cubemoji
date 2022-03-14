@@ -5,6 +5,7 @@ ENV TZ=America/New_York
 
 # setup any requisite packages
 COPY scripts/ ./scripts/
+RUN scripts/imagemagick.sh
 RUN scripts/setup-image.sh
 
 COPY assets/ ./assets/

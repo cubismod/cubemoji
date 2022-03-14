@@ -30,7 +30,7 @@ processes = []
 
    [[services.http_checks]]
     interval = 300000 # 5 min healtcheck
-    grace_period = "30s"
+    grace_period = "25s"
     method = "get"
     path = "/status"
     protocol = "http"
@@ -42,7 +42,7 @@ source="cm_data"
 destination="/usr/src/cubemoji/data/"
 
 [[statics]]
-  guest_path = '/usr/src/cubemoji/static/emotes'
+  guest_path = '/usr/src/cubemoji/static/emoji'
   url_prefix = '/emotes'
 
 [[statics]]
