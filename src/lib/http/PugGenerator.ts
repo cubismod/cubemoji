@@ -17,7 +17,6 @@ export class PugGenerator {
   constructor () {
     const source = './assets/template/EmojiList.pug'
     this.template = compileFile(source, {
-      cache: true,
       filename: source
     })
   }
@@ -27,7 +26,7 @@ export class PugGenerator {
     try {
       await guilds.fetch()
     } catch (err) {
-      this.logger.info(`Discord Gateway Error!: ${err}`)
+      this.logger.info(`Discord is Stinky Error!: ${err}`)
     }
     const servers = new Map<string, string>()      
     for (const guild of guilds.cache) {

@@ -1,15 +1,7 @@
 import Database from 'better-sqlite3'
-import dayjs from 'dayjs'
 import { Client } from 'discordx'
-import { createReadStream, createWriteStream } from 'fs'
 import Keyv from 'keyv'
-import { KeyvFile } from 'keyv-file'
-import { resolve } from 'path'
-import { createInterface } from 'readline'
-import { pipeline } from 'stream'
 import { container, singleton } from 'tsyringe'
-import { promisify } from 'util'
-import { gotOptions } from '../emote/Cmoji.js'
 import { CubeLogger } from '../logger/CubeLogger.js'
 const { got } = await import('got')
 
@@ -52,12 +44,6 @@ export class CubeStorage {
     posted the image
     */
   trashReacts: Keyv<string>
-
-  /**
-   * Downloads a blocklist of bad hosts
-   * to avoid when performing downloads
-   */
-  badHosts: Keyv<number>
 
   /**
    * server owners with key of their id
@@ -118,12 +104,6 @@ export class CubeStorage {
       }
     )
 
-    this.badHosts = new Keyv<number>({
-      store: new KeyvFile({
-        filename: resolve(this.dbLocation, 'badHosts.json')
-      })
-    })
-
     const sqliteUri = 'sqlite://' + this.serverInfoPath
 
     this.serverEnrollment = new Keyv<string>(sqliteUri, { namespace: 'servers' })
@@ -135,56 +115,6 @@ export class CubeStorage {
     this.serverAnonNames = new Keyv<string>(sqliteUri, { namespace: 'server-anon' })
 
     this.serverAuditInfo = new Keyv<string>(sqliteUri, { namespace: 'audit' })
-  }
-
-  async initHosts () {
-    await this.badHosts.set('test', 3)
-    const refreshTime = await this.badHosts.get('refresh')
-    if (refreshTime === undefined || (refreshTime && Date.now() > refreshTime)) {
-      // set next refresh time
-      await this.badHosts.set('refresh', dayjs().add(1, 'week').valueOf())
-      // time to perform a refresh
-      const fn = resolve('download/', 'hosts.txt')
-      const pl = promisify(pipeline)
-      // downloading this blocklist
-      // https://github.com/StevenBlack/hosts
-      try {
-        await pl(
-          got.stream('http://sbc.io/hosts/alternates/porn/hosts', gotOptions),
-          createWriteStream(fn)
-        )
-      } catch(err) {
-        this.logger.error(err)
-        return -1
-      }
-
-      // once we have that file we gotta parse it
-      const fileStream = createReadStream(fn)
-      const rlInterface = createInterface({
-        input: fileStream,
-        crlfDelay: Infinity
-      })
-
-      this.logger.info('initializing bad hosts list which will take a while...')
-      let i = 0
-
-      // for testing cubemoji
-      await this.badHosts.set('example.com', 1)
-
-      for await (const line of rlInterface) {
-        const items = line.split(' ')
-        if (items.length === 2 && items[0] === '0.0.0.0') {
-          // each line is like a host file obv
-          // 0.0.0.0 domain
-          await this.badHosts.set(items[1], 1)
-          i++
-
-          if (i % 1000 === 0) {
-            this.logger.info(`${i} records processed of ~141k`)
-          }
-        }
-      }
-    }
   }
 
   /**

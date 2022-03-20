@@ -13,7 +13,6 @@ export function databaseSuites() {
 
   storage.before(async () => {
         // set values in each db so they are at least created
-    await cubeStorage.badHosts.set(randomUUID(), 2)
     await cubeStorage.blockedChannels.set(randomUUID(), {
       channelName: randomUUID(),
       guildId: randomUUID(),
@@ -24,10 +23,6 @@ export function databaseSuites() {
     await cubeStorage.serverAuditInfo.set(randomUUID(), randomUUID())
     await cubeStorage.serverEnrollment.set(randomUUID(), randomUUID())
     await cubeStorage.trashReacts.set(randomUUID(), randomUUID())
-  })
-
-  storage('inithosts', async() => {
-    assert.is.not(await cubeStorage.initHosts(), -1)
   })
 
   backups('backup test', async() => {

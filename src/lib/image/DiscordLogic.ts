@@ -10,9 +10,9 @@ import { container } from 'tsyringe'
 import { URL } from 'url'
 import { CubeMessageManager } from '../cmd/MessageManager.js'
 import { Milliseconds } from '../constants/Units.js'
-import { CubeStorage } from '../db/Storage.js'
 import { Cmoji, Source } from '../emote/Cmoji.js'
 import { EmoteCache } from '../emote/EmoteCache.js'
+import { BadHosts } from '../http/BadHosts.js'
 import { CubeLogger } from '../logger/CubeLogger.js'
 import { EditOperation, FaceOperation, MsgContext, RescaleOperation, splitEffects } from './ImageLogic.js'
 import { ImageQueue } from './ImageQueue.js'
@@ -168,10 +168,10 @@ export async function isUrl (url: string) {
     if (whatwgUrl.protocol !== 'https:') return false
 
     // check against blocked hosts
-    const storage = container.resolve(CubeStorage)
-    const res = await storage.badHosts.get(whatwgUrl.hostname)
+    const badHosts = container.resolve(BadHosts)
+    const res = await badHosts.checkHost(whatwgUrl.hostname)
     // on the blocklist, then we don't continue
-    if (res !== undefined) return false
+    if (res !== false) return false
 
     // now check the filetype
     const stream = await got.stream(url)

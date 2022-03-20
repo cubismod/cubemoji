@@ -4,6 +4,7 @@ import 'reflect-metadata'
 import { container } from 'tsyringe'
 import { CubeMessageManager } from '../lib/cmd/MessageManager'
 import { CubeStorage } from '../lib/db/Storage'
+import { BadHosts } from '../lib/http/BadHosts'
 import { ImageQueue } from '../lib/image/ImageQueue'
 import { WorkerPool } from '../lib/image/WorkerPool'
 import { CubeLogger } from '../lib/logger/CubeLogger'
@@ -20,14 +21,15 @@ async function run() {
   
   container.register(CubeLogger, {useValue: new CubeLogger()})
   
-  
+  const badHosts = new BadHosts()
+  await badHosts.downloadList()
   const storage = new CubeStorage()
-  await storage.initHosts()
   
   const imageQueue = new ImageQueue()
   await imageQueue.clear()
   
   container.register(CubeStorage, {useValue: storage})
+  container.register(BadHosts, {useValue: badHosts})
   container.register(WorkerPool, {useValue: new WorkerPool(5)})
   container.register(ImageQueue, {useValue: imageQueue})
   container.register(CubeMessageManager, { useValue: new CubeMessageManager() })

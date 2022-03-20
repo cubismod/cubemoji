@@ -8,9 +8,10 @@
   "scripts": {
     "build": "tsc",
     "start": "node --es-module-specifier-resolution=node build/Main.js",
+    "inspect": "node --inspect --es-module-specifier-resolution=node build/Main.js",
     "profile": "clinic doctor -- node --es-module-specifier-resolution=node build/Main.js",
     "test": "tsc && export CM_TEST=true && node --es-module-specifier-resolution=node build/tests/Tests.js",
-    "dev": "tsc-watch --noClear -p ./tsconfig.json --onSuccess \"node --inspect --es-module-specifier-resolution=node --trace-warnings build/Main.js\"",
+    "dev": "tsc-watch --noClear -p ./tsconfig.json --onSuccess \"node --es-module-specifier-resolution=node --trace-warnings build/Main.js\"",
     "clean": "rm -rf build/"
   },
   "repository": {
@@ -46,7 +47,6 @@
     "image-downloader": "^4.1.0",
     "js-quantities": "^1.7.6",
     "keyv": "^4.1.1",
-    "keyv-file": "^0.2.0",
     "micromatch": "^4.0.4",
     "node-emoji": "^1.11.0",
     "node-object-hash": "^2.3.10",

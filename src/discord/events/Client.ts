@@ -7,6 +7,7 @@ import { Milliseconds } from '../../lib/constants/Units.js'
 import { scheduleBackup } from '../../lib/db/DatabaseMgmt.js'
 import { CubeStorage } from '../../lib/db/Storage.js'
 import { EmoteCache } from '../../lib/emote/EmoteCache.js'
+import { BadHosts } from '../../lib/http/BadHosts.js'
 import { setupHTTP } from '../../lib/http/HTTPServe.js'
 import { PugGenerator } from '../../lib/http/PugGenerator.js'
 import { setStatus } from '../../lib/image/DiscordLogic.js'
@@ -45,10 +46,15 @@ export abstract class ClientEvents {
 
       DIService.container.register(CubeStorage, { useValue: new CubeStorage() })
       this.logger.info('registered CubeStorage')
-      await container.resolve(CubeStorage).initHosts()
+     
+      const badHosts = new BadHosts()
+      await badHosts.downloadList()
+      DIService.container.register(BadHosts, {useValue: badHosts})
+      this.logger.info('registered BadHosts')
+
       setInterval(
         async () => {
-          await container.resolve(CubeStorage).initHosts()
+          await badHosts.downloadList()
         },
         Milliseconds.week
       )
@@ -85,7 +91,7 @@ export abstract class ClientEvents {
           await container.resolve(PugGenerator).render(client.guilds)
           this.logger.info('permission sync & pug-regen completed')
         },
-        Milliseconds.thirtyMin
+        Milliseconds.ninetyMin
       )
     } else {
       throw new Error('DIServer.container is undefined therefore cannot initialize dependency injection')
