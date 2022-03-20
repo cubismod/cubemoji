@@ -24,7 +24,11 @@ export class PugGenerator {
 
   async render (guilds: GuildManager) {
     const db = container.resolve(CubeStorage).serverAnonNames
-    await guilds.fetch()
+    try {
+      await guilds.fetch()
+    } catch (err) {
+      this.logger.info(`Discord Gateway Error!: ${err}`)
+    }
     const servers = new Map<string, string>()      
     for (const guild of guilds.cache) {
       const val = await db.get(guild[0])

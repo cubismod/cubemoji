@@ -73,8 +73,7 @@ export class CubeLogger {
           new transports.File({
             filename: 'data/logs/prd/cubemoji.log',
             maxsize: Bytes.oneMB,
-            maxFiles: 10,
-            zippedArchive: true,
+            maxFiles: 20,
             handleExceptions: true,
             handleRejections: true
           })
