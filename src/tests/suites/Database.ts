@@ -1,3 +1,4 @@
+import { randomUUID } from "crypto";
 import { access } from "fs/promises";
 import { container } from "tsyringe";
 import { suite } from "uvu";
@@ -10,7 +11,7 @@ export function databaseSuites() {
   const storage = suite('Database Storage')
   const cubeStorage = container.resolve(CubeStorage)
 
- /*  storage.before(async () => {
+  storage.before(async () => {
         // set values in each db so they are at least created
     await cubeStorage.badHosts.set(randomUUID(), 2)
     await cubeStorage.blockedChannels.set(randomUUID(), {
@@ -24,7 +25,7 @@ export function databaseSuites() {
     await cubeStorage.serverEnrollment.set(randomUUID(), randomUUID())
     await cubeStorage.trashReacts.set(randomUUID(), randomUUID())
   })
- */
+
   storage('inithosts', async() => {
     assert.is.not(await cubeStorage.initHosts(), -1)
   })

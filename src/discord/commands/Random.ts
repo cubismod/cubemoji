@@ -17,7 +17,7 @@ export abstract class Random {
     await interaction.deferReply()
     if (interaction.guildId) {
       // we will need to use a different sampling method like this
-      const emotes = [...await emoteCache.randomChoice(items, interaction.guildId, true)].splice(0, 26)
+      const emotes = [...await emoteCache.randomChoice(items ?? 1, interaction.guildId, true)].splice(0, 26)
       // here we are iterating through the emotes to get textual representations in a string[]
       // and then we join that list to send back to the user
       await interaction.editReply(

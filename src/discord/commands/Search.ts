@@ -29,7 +29,7 @@ export abstract class Search {
         // keep a count of both
         let discCount = 0
         let mutantCount = 0
-        results.forEach(async result => {
+        for (const result of results) {
           if (discCount < 51 && mutantCount < 9 && interaction.guildId) {
             if (result.item.guildEmoji !== null && !await emoteCache.isBlocked(result.item.name, interaction.guildId)) {
               discEmotes.push(result.item.guildEmoji.toString())
@@ -42,7 +42,7 @@ export abstract class Search {
               ++mutantCount
             }
           }
-        })
+        }
         // then we create an embed for the discord emotes and put them at the beginning of the embeds array
         const discEmbed = new MessageEmbed()
           .setTitle(`Search for ${query} (${results.length})`)

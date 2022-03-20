@@ -45,9 +45,9 @@ export class CubeLogger {
             format: format.combine(
               format.uncolorize(),
               format.json()
-            )
+            ),
           })
-        ]
+        ],
       })
       // only log to file during testing
       if (!process.env.CM_TEST) this.parent.add(new transports.Console())
@@ -66,14 +66,19 @@ export class CubeLogger {
           format.json()
         ),
         transports: [
-          new transports.Console(),
+          new transports.Console({
+            handleExceptions: true,
+            handleRejections: true
+          }),
           new transports.File({
             filename: 'data/logs/prd/cubemoji.log',
             maxsize: Bytes.oneMB,
             maxFiles: 10,
-            zippedArchive: true
+            zippedArchive: true,
+            handleExceptions: true,
+            handleRejections: true
           })
-        ]
+        ],
       })
       if (process.env.CM_HTTP_LOG === 'true' &&
       process.env.CM_HTTP_PORT &&
@@ -81,7 +86,9 @@ export class CubeLogger {
         this.parent.add(new LokiTransport({
           host: process.env.CM_HTTP_HOST,
           port: parseInt(process.env.CM_HTTP_PORT),
-          label: 'cubemoji'
+          label: 'cubemoji',
+          handleExceptions: true,
+          handleRejections: true
         }))
       }
     }

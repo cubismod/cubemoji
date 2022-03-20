@@ -103,7 +103,8 @@ export class CubeStorage {
   serverAnonNames: Keyv<string>
 
   private logger = container.resolve(CubeLogger).storage
-  private dbLocation = 'data/'
+  // in testing mode, we are saving data to data/test/
+  dbLocation = 'data/'
   private serverInfoPath: string
   constructor () {
     // create separate databases when testing

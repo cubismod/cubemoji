@@ -34,6 +34,7 @@ export abstract class List {
         break
       case 'thisserver':
         type = Source.ThisServer
+        break
       case 'web':
         interaction.reply(`Check out an online emoji list at ${process.env.CM_URL}.`)
         return

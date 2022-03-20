@@ -16,6 +16,7 @@ import { promisify } from 'util'
 import { createGzip } from 'zlib'
 import { Milliseconds } from '../constants/Units.js'
 import { CubeLogger } from '../logger/CubeLogger.js'
+import { CubeStorage } from './Storage.js'
 
 
 /**
@@ -26,23 +27,23 @@ import { CubeLogger } from '../logger/CubeLogger.js'
  */
 export async function runBackups (firstRun = true) {
   const logger = container.resolve(CubeLogger).databaseMgmt
+  const dbLocation = container.resolve(CubeStorage).dbLocation
+
   logger.info('Running database backups')
-  await mkdir('data/backups', { recursive: true })
+  await mkdir(dbLocation, { recursive: true })
   const paths: string[] = []
   let success = true
   
-  const dataLocation = process.env.CM_TEST ? '/data/test' : 'data/'
-
-  const contents = await readdir(dataLocation)
+  const contents = await readdir(dbLocation)
   
   for (const filename of contents) {
     if (filename.endsWith('.sqlite')) {
       // found SQLite to backup
       try {
-        const db = new Database(dataLocation + filename, { readonly: true, fileMustExist: true })
+        const db = new Database(dbLocation + filename, { readonly: true, fileMustExist: true })
         // if source filename is serverInfo.sqlite, backup name would be like
         // serverInfo-2021-02-15-14_48_00.sqlite
-        const backupName = `data/backups/${filename.replace('.sqlite', '')}-${dayjs().format('YYYY-MM-DD-HH_mm_ss')}.sqlite`
+        const backupName = `${dbLocation}backups/${filename.replace('.sqlite', '')}-${dayjs().format('YYYY-MM-DD-HH_mm_ss')}.sqlite`
         // backup throws err if failed
         await db.backup(backupName)
         db.close()
@@ -63,13 +64,15 @@ export async function runBackups (firstRun = true) {
 
   if (success) {
     // let's remove old backup files
-    const contents = await readdir('data/backups')
+    const backupDir = `${dbLocation}backups/`
+
+    const contents = await readdir(backupDir)
     for (const filename of contents) {
       try {
-        const statInfo = await stat('data/backups/' + filename)
+        const statInfo = await stat(backupDir + filename)
         if (dayjs(statInfo.ctime) < dayjs().subtract(1, 'week')) {
           // file older than a week
-          await unlink('data/backups/' + filename)
+          await unlink(backupDir + filename)
           logger.info(`Deleted backup SQL file: ${filename}`)
         }
       } catch (err) {

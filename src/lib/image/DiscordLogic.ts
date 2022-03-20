@@ -1,6 +1,6 @@
 // Lots of functions that actually perform the Discord
 // commands when doing image effects
-import { Pagination } from '@discordx/pagination'
+import { Pagination, PaginationType } from '@discordx/pagination'
 import { watch } from 'chokidar'
 import { CommandInteraction, ContextMenuInteraction, Message, MessageAttachment, MessageEmbed, MessageReaction, PartialUser, User } from 'discord.js'
 import { Client } from 'discordx'
@@ -255,7 +255,9 @@ export async function sendPagination (interaction: CommandInteraction, type: Sou
         emoteSource = emoteCache.emojis
         emotesPerPage = 120
     }
-    emoteSource.forEach(async (emote, i) => {
+    for (let i = 0; i < emoteSource.length; i++) {
+      const emote = emoteSource[i]
+
       if (interaction.guildId && !await emoteCache.isBlocked(emote.name, interaction.guildId)) {
         // TODO: implement blacklisting here
       // for discord emojis we want 60 emojis in one embed
@@ -302,10 +304,10 @@ export async function sendPagination (interaction: CommandInteraction, type: Sou
           menuText.push(menuItem)
         }
       }
-    })
+    }
     // now we send an actual pagination
     await new Pagination(interaction, embeds, {
-      type: 'SELECT_MENU',
+      type: PaginationType.SelectMenu,
       // ephemeral: true, have a feeling this is causing api errors
       pageText: menuText,
       showStartEnd: false,
