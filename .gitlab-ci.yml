@@ -71,7 +71,7 @@ deploy:
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker pull $CI_REGISTRY_IMAGE:latest || true
-    - /root/.fly/bin/flyctl deploy -a cubemoji --local-only --detach
+    - /root/.fly/bin/flyctl deploy -a cubemoji -i $CI_REGISTRY_IMAGE --local-only --detach
 
 include:
 - template: Security/SAST.gitlab-ci.yml
