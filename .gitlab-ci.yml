@@ -43,6 +43,7 @@ cache:
 stages:
 - build
 - test
+
 - deploy
 build:
   stage: build
@@ -68,7 +69,9 @@ deploy:
     - apk add --no-cache curl
     - curl -L https://fly.io/install.sh | sh
   script:
-    - /root/.fly/bin/flyctl deploy . -a cubemoji --remote-only --detach
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker pull $CI_REGISTRY_IMAGE:latest || true
+    - /root/.fly/bin/flyctl deploy -a cubemoji --local-only --detach
 
 include:
 - template: Security/SAST.gitlab-ci.yml
