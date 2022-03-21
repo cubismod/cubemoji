@@ -1,5 +1,7 @@
 // Discord client events
 
+import { importx } from '@discordx/importer'
+import { Koa } from '@discordx/koa'
 import { ArgsOf, Client, Discord, DIService, On, Once } from 'discordx'
 import { container } from 'tsyringe'
 import { CubeMessageManager } from '../../lib/cmd/MessageManager.js'
@@ -8,7 +10,6 @@ import { scheduleBackup } from '../../lib/db/DatabaseMgmt.js'
 import { CubeStorage } from '../../lib/db/Storage.js'
 import { EmoteCache } from '../../lib/emote/EmoteCache.js'
 import { BadHosts } from '../../lib/http/BadHosts.js'
-import { setupHTTP } from '../../lib/http/HTTPServe.js'
 import { PugGenerator } from '../../lib/http/PugGenerator.js'
 import { setStatus } from '../../lib/image/DiscordLogic.js'
 import { ImageQueue } from '../../lib/image/ImageQueue.js'
@@ -109,8 +110,8 @@ export abstract class ClientEvents {
       throw new Error('exiting application as commands can\'t init properly')
     }
 
-    // setup healthcheck listener for fly
-    setupHTTP()
+    // setup HTTP server
+    await this.startHTTP()
 
     this.logger.info(`cubemoji ${process.env.npm_package_version} is now running...`)
     this.logger.info(`It took ${process.uptime()}s to startup this time`)
@@ -130,6 +131,17 @@ export abstract class ClientEvents {
       Milliseconds.thirtySec // 30 sec
       )
     }
+  }
+
+  async startHTTP () {
+    const server = new Koa()
+    
+    await importx('./build/lib/http/koa/*.js')
+    await server.build()
+
+    server.listen(7923, () => {
+      this.logger.info('HTTP server started on port 7923')
+    })
   }
 
   @On('warn')
