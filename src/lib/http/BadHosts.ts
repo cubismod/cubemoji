@@ -1,4 +1,6 @@
+import dayjs from 'dayjs'
 import { createReadStream, createWriteStream } from "fs"
+import { stat } from "fs/promises"
 import { choice } from "pandemonium"
 import { resolve } from "path"
 import { createInterface } from "readline"
@@ -9,26 +11,38 @@ import { gotOptions } from "../emote/Cmoji"
 import { CubeLogger } from "../logger/CubeLogger"
 const { got } = await import('got')
 
+// persist this file between restarts of bot
+const filename = resolve('data/', 'hosts.txt')
 
 export class BadHosts {
   private cache: Map<string, boolean> = new Map()
   private logger = container.resolve(CubeLogger).web
 
   async downloadList () {
-  
-    const fn = resolve('download/', 'hosts.txt')
-    const pl = promisify(pipeline)
-    // downloading this blocklist
-    // https://github.com/StevenBlack/hosts
+    let downloadFile = false
+    // check if blocklist exists
     try {
-      await pl(
-        got.stream('http://sbc.io/hosts/alternates/porn/hosts', gotOptions),
-        createWriteStream(fn)
-      )
-    } catch(err) {
-      this.logger.error(err)
-      return -1
-      }
+      const stats = await stat(filename)
+      if (dayjs(stats.ctime) < dayjs().subtract(1, 'week')) downloadFile = true
+    } catch {
+      downloadFile = true
+    }
+
+    if (downloadFile) {
+      const pl = promisify(pipeline)
+      // downloading this blocklist
+      // https://github.com/StevenBlack/hosts
+      try {
+        await pl(
+          got.stream('http://sbc.io/hosts/alternates/porn/hosts', gotOptions),
+          createWriteStream(filename)
+        )
+      } catch(err) {
+        this.logger.error(err)
+        // fatal flaw!
+        throw(err)
+        }
+    }
   }
 
   private cacheAdd (item: {
@@ -50,7 +64,7 @@ export class BadHosts {
     else if (cached === false) return false
     else {
       const rl = createInterface({
-        input: createReadStream(resolve('download/', 'hosts.txt')),
+        input: createReadStream(filename),
         crlfDelay: Infinity
       })
     
