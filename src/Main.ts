@@ -18,6 +18,7 @@ export class Main {
   }
 
   static async start () {
+
     const logger = new CubeLogger().main
 
     await importx(dirname(import.meta.url) + '/discord/**/*.js')

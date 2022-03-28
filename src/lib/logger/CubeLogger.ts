@@ -3,6 +3,7 @@ import { createLogger, format, Logger, transports } from 'winston'
 import { Bytes } from '../constants/Units.js'
 import { LokiTransport } from './LokiTransport.js'
 
+
 /**
  * cubemoji logging using Winston
  * https://www.npmjs.com/package/winston
@@ -25,8 +26,16 @@ export class CubeLogger {
   readonly databaseMgmt: Logger
   readonly client: Logger
   readonly web: Logger
+  readonly errors: Logger
 
   constructor () {
+    const lokiTransport = new LokiTransport({
+      host: process.env.CM_HTTP_HOST ?? 'localhost',
+      port: parseInt(process.env.CM_HTTP_PORT ?? '200'),
+      label: 'cubemoji'
+    })
+
+    // different transports when using different versions of bot
     if (process.env.CM_ENVIRONMENT === 'npr') {
       // in NPR we do more verbose logging and also log to a file
       this.parent = createLogger({
@@ -52,6 +61,7 @@ export class CubeLogger {
       // only log to file during testing
       if (!process.env.CM_TEST) this.parent.add(new transports.Console())
     } else {
+      // PRD logging
       /**
          * Grafana Loki logging process
          * send log file over syslog to Promtail
@@ -66,29 +76,18 @@ export class CubeLogger {
           format.json()
         ),
         transports: [
-          new transports.Console({
-            handleExceptions: true,
-            handleRejections: true
-          }),
+          new transports.Console({}),
           new transports.File({
             filename: 'data/logs/prd/cubemoji.log',
             maxsize: Bytes.oneMB,
             maxFiles: 20,
-            handleExceptions: true,
-            handleRejections: true
           })
         ],
       })
       if (process.env.CM_HTTP_LOG === 'true' &&
       process.env.CM_HTTP_PORT &&
       process.env.CM_HTTP_HOST) {
-        this.parent.add(new LokiTransport({
-          host: process.env.CM_HTTP_HOST,
-          port: parseInt(process.env.CM_HTTP_PORT),
-          label: 'cubemoji',
-          handleExceptions: true,
-          handleRejections: true
-        }))
+        this.parent.add(lokiTransport)
       }
     }
 
@@ -107,5 +106,35 @@ export class CubeLogger {
     this.databaseMgmt = this.parent.child({ module: 'DatabaseManagement' })
     this.client = this.parent.child({ module: 'Client' })
     this.web = this.parent.child({ module: 'web' })
+    this.errors = this.parent.child({module: 'errors'})
+
+    /* // exceptions/rejections log to separate file
+    const exReFileTransport = new transports.File({
+      filename: 'data/logs/exceptions.log',
+      maxsize: Bytes.oneMB,
+      maxFiles: 20
+    })
+
+    const exReConsoleTransport = new transports.Console()
+
+    const exReLogger = createLogger({
+      exceptionHandlers: [
+        exReFileTransport, exReConsoleTransport
+      ],
+      rejectionHandlers: [
+        exReFileTransport, exReConsoleTransport
+      ]
+    })
+
+
+    if (process.env.CM_HTTP_LOG === 'true' &&
+    process.env.CM_HTTP_PORT &&
+    process.env.CM_HTTP_HOST) { 
+      exReLogger.exceptions.handle(lokiTransport)
+      exReLogger.rejections.handle(lokiTransport)
+    }
+
+
+    // handle exceptions and errors with logger */
   }
 }

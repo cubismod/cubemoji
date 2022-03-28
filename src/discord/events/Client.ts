@@ -1,7 +1,5 @@
 // Discord client events
 
-import { importx } from '@discordx/importer'
-import { Koa } from '@discordx/koa'
 import { ArgsOf, Client, Discord, DIService, On, Once } from 'discordx'
 import { container } from 'tsyringe'
 import { CubeMessageManager } from '../../lib/cmd/MessageManager.js'
@@ -10,6 +8,7 @@ import { scheduleBackup } from '../../lib/db/DatabaseMgmt.js'
 import { CubeStorage } from '../../lib/db/Storage.js'
 import { EmoteCache } from '../../lib/emote/EmoteCache.js'
 import { BadHosts } from '../../lib/http/BadHosts.js'
+import { CubeServer } from '../../lib/http/CubeServer.js'
 import { PugGenerator } from '../../lib/http/PugGenerator.js'
 import { setStatus } from '../../lib/image/DiscordLogic.js'
 import { ImageQueue } from '../../lib/image/ImageQueue.js'
@@ -34,6 +33,21 @@ export abstract class ClientEvents {
     if (DIService.container !== undefined) {
       DIService.container.register(CubeLogger, { useValue: this.cubeLogger })
       this.logger.info('registered CubeLogger')
+
+      const sleep = new Promise(resolve => setTimeout(resolve, Milliseconds.fiveSec))
+      // setup logging on exceptions, unhandled rejections 
+      // and sent over http
+      process.on('uncaughtException', async (err, origin) => {
+        this.cubeLogger.errors.crit(`A fatal error ocurred: ${err}\n Origin: ${origin}.`)
+        await sleep
+        process.exit(1)
+      })
+
+      process.on('unhandledRejection', async (reason, promise) => {
+        this.cubeLogger.errors.crit(`Fatal unhandled rejection ocurred at: ${promise}, reason: ${reason}.`)
+        await sleep
+        process.exit(1)
+      })
 
       DIService.container.register(ImageQueue, { useValue: new ImageQueue() })
       this.logger.info('registered ImageQueue')
@@ -80,7 +94,7 @@ export abstract class ClientEvents {
       DIService.container.register(WorkerPool, { useValue: new WorkerPool(workers) })
       this.logger.info('registered WorkerPool')
 
-      client.guilds.cache
+      await DIService.container.register(CubeServer, {useValue: new CubeServer()})
 
       // every 30 min, refresh our cache of who the server owners are
       // and re-init permissions on Moderation commands as well as
@@ -110,9 +124,6 @@ export abstract class ClientEvents {
       throw new Error('exiting application as commands can\'t init properly')
     }
 
-    // setup HTTP server
-    await this.startHTTP()
-
     this.logger.info(`cubemoji ${process.env.npm_package_version} is now running...`)
     this.logger.info(`It took ${process.uptime()}s to startup this time`)
     // set a new status msg every 5 min
@@ -131,17 +142,8 @@ export abstract class ClientEvents {
       Milliseconds.thirtySec // 30 sec
       )
     }
-  }
 
-  async startHTTP () {
-    const server = new Koa()
-    
-    await importx('./build/lib/http/koa/*.js')
-    await server.build()
-
-    server.listen(7923, () => {
-      this.logger.info('HTTP server started on port 7923')
-    })
+    await DIService.container.resolve(CubeServer).start()
   }
 
   @On('warn')
