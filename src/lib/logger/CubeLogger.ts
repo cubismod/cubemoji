@@ -76,12 +76,12 @@ export class CubeLogger {
           format.json()
         ),
         transports: [
-          new transports.Console({}),
-          new transports.File({
+          new transports.Console({})
+          /* new transports.File({
             filename: 'data/logs/prd/cubemoji.log',
             maxsize: Bytes.oneMB,
             maxFiles: 20,
-          })
+          }) */
         ],
       })
       if (process.env.CM_HTTP_LOG === 'true' &&
