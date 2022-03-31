@@ -50,7 +50,7 @@ stages:
 build:
   stage: build
   script:
-  - docker login -u $QUAY_USERNAME -p $QUAY_PW quay.io
+  - docker login -u="$QUAY_USERNAME" -p="$QUAY_PW" quay.io
   - docker pull $REPO_NAME:latest || true
   - docker build --cache-from $REPO_NAME:latest --tag $REPO_NAME:$CI_COMMIT_SHA --tag $REPO_NAME:latest .
   - docker push $REPO_NAME:$CI_COMMIT_SHA
@@ -71,7 +71,7 @@ deploy:
     - apk add --no-cache curl
     - curl -L https://fly.io/install.sh | sh
   script:
-    - docker login -u $QUAY_USERNAME -p $QUAY_PW quay.io
+    - docker login -u="$QUAY_USERNAME" -p="$QUAY_PW" quay.io
     - docker pull $REPO_NAME:latest || true
     - docker tag $REPO_NAME:latest $REPO_NAME:$CI_COMMIT_TAG
     - docker push $REPO_NAME:$CI_COMMIT_TAG
