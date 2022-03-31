@@ -6,6 +6,9 @@ processes = []
 
 [env]
 
+[build]
+  image = "quay.io/cubismod/cubemoji"
+
 [experimental]
   allowed_public_ports = []
   auto_rollback = true
