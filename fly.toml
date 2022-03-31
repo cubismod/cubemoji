@@ -40,6 +40,7 @@ processes = []
     protocol = "http"
     timeout = 2000
     tls_skip_verify = false
+    restart_limit = 4
 
 [mounts]
 source="cm_data"
