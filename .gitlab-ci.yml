@@ -50,7 +50,7 @@ build:
   stage: build
   before_script:
     - mkdir -p ~/.docker/
-    - cat $QUAY_CREDS > ~/.docker/config.json
+    - echo $QUAY_CREDS > ~/.docker/config.json
   script:
   - docker pull $REPO_NAME:latest || true
   - docker build --cache-from $REPO_NAME:latest --tag $REPO_NAME:$CI_COMMIT_SHA --tag $REPO_NAME:latest .
@@ -70,7 +70,7 @@ deploy:
     - if: '$CI_COMMIT_TAG'
   before_script:
     - mkdir -p ~/.docker/
-    - cat $QUAY_CREDS > ~/.docker/config.json
+    - echo $QUAY_CREDS > ~/.docker/config.json
     - apk add --no-cache curl
     - curl -L https://fly.io/install.sh | sh
   script:
