@@ -46,7 +46,7 @@ cache:
 stages:
 - build
 - test
-# - deploy
+- deploy
 build:
   stage: build
   script:
@@ -62,7 +62,7 @@ sast:
       pmd-apex, security-code-scan, sobelow, spotbugs, semgrep,  retire-js-dependency_scanning
   stage: test
 
-only deploy when a new tag is created
+# only deploy when a new tag is created
 deploy:
   stage: deploy
   rules:
