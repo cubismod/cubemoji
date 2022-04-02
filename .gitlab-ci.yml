@@ -22,35 +22,30 @@ variables:
   # `/certs/client` to share between the service and job
   # container, thanks to volume mount from config.toml
   DOCKER_TLS_CERTDIR: "/certs"
-  GIT_SUBMODULE_STRATEGY: recursive
-  CM_BOTOWNER: $CM_BOTOWNER
-  CM_BROKEN: $CM_BROKEN
-  CM_ENVIRONMENT: $CM_ENVIRONMENT
-  CM_EXTEMOJI: $CM_EXTEMOJI
-  CM_HTTP_HOST: $CM_HTTP_HOST
-  CM_HTTP_PORT: $CM_HTTP_PORT
-  CM_TOKEN: $CM_TOKEN
-  CM_URL: $CM_URL
-  CM_WORKERS: $CM_WORKERS
-  FLY_API_TOKEN: $FLY_API_TOKEN
-  REPO_NAME: quay.io/cubismod/cubemoji
-  QUAY_CREDS: $QUAY_CREDS # saves path to docker config file
+  GIT_SUBMODULE_STRATEGY: "recursive"
+  # CM_BOTOWNER: $CM_BOTOWNER
+  # CM_BROKEN: $CM_BROKEN
+  # CM_ENVIRONMENT: $CM_ENVIRONMENT
+  # CM_EXTEMOJI: $CM_EXTEMOJI
+  # CM_HTTP_HOST: $CM_HTTP_HOST
+  # CM_HTTP_PORT: $CM_HTTP_PORT
+  # CM_TOKEN: $CM_TOKEN
+  # CM_URL: $CM_URL
+  # CM_WORKERS: $CM_WORKERS
+  # FLY_API_TOKEN: $FLY_API_TOKEN
+  REPO_NAME: "quay.io/cubismod/cubemoji"
 
 
 services:
   - docker:20.10.13-dind
-cache:
-  paths:
-  - node_modules/
 stages:
-- build
+- build 
 - test
 - deploy
 build:
   stage: build
-  before_script:
-    - mkdir -p ~/.docker/
-    - echo $QUAY_CREDS > ~/.docker/config.json
+  tags:
+    - cubemoji
   script:
   - docker pull $REPO_NAME:latest || true
   - docker build --cache-from $REPO_NAME:latest --tag $REPO_NAME:$CI_COMMIT_SHA --tag $REPO_NAME:latest .
@@ -58,6 +53,8 @@ build:
   - docker push $REPO_NAME:latest
 
 sast:
+  tags:
+    - cubemoji
   variables:
     SAST_EXCLUDED_ANALYZERS: bandit, brakeman, flawfinder, gosec, kubesec, phpcs-security-audit,
       pmd-apex, security-code-scan, sobelow, spotbugs, semgrep,  retire-js-dependency_scanning
@@ -66,17 +63,15 @@ sast:
 # only deploy when a new tag is created
 deploy:
   stage: deploy
+  tags:
+    - cubemoji
   rules:
     - if: '$CI_COMMIT_TAG'
   before_script:
-    - mkdir -p ~/.docker/
-    - echo $QUAY_CREDS > ~/.docker/config.json
     - apk add --no-cache curl
     - curl -L https://fly.io/install.sh | sh
   script:
     - docker pull $REPO_NAME:latest || true
-    - docker tag $REPO_NAME:latest $REPO_NAME:$CI_COMMIT_TAG
-    - docker push $REPO_NAME:$CI_COMMIT_TAG
     - /root/.fly/bin/flyctl deploy -a cubemoji -i $REPO_NAME --local-only --detach
 
 include:
