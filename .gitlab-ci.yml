@@ -32,7 +32,7 @@ variables:
   # CM_TOKEN: $CM_TOKEN
   # CM_URL: $CM_URL
   # CM_WORKERS: $CM_WORKERS
-  # FLY_API_TOKEN: $FLY_API_TOKEN
+  FLY_API_TOKEN: $FLY_API_TOKEN
   REPO_NAME: "quay.io/cubismod/cubemoji"
 
 
