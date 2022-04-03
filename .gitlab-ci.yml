@@ -64,8 +64,6 @@ sast:
     SAST_EXCLUDED_ANALYZERS: bandit, brakeman, flawfinder, gosec, kubesec, phpcs-security-audit,
       pmd-apex, security-code-scan, sobelow, spotbugs, semgrep,  retire-js-dependency_scanning
   stage: test
-  rules:
-    - if: '$CI_PIPELINE_SOURCE != "schedule"'
 
 
 # only deploy when a new tag is created
