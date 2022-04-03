@@ -54,6 +54,8 @@ build:
   - docker build --cache-from $REPO_NAME:latest --tag $REPO_NAME:$CI_COMMIT_SHA --tag $REPO_NAME:latest .
   - docker push $REPO_NAME:$CI_COMMIT_SHA
   - docker push $REPO_NAME:latest
+  rules:
+    - if: '$CI_PIPELINE_SOURCE != "schedule"'
 
 sast:
   tags:
@@ -62,6 +64,8 @@ sast:
     SAST_EXCLUDED_ANALYZERS: bandit, brakeman, flawfinder, gosec, kubesec, phpcs-security-audit,
       pmd-apex, security-code-scan, sobelow, spotbugs, semgrep,  retire-js-dependency_scanning
   stage: test
+  rules:
+    - if: '$CI_PIPELINE_SOURCE != "schedule"'
 
 
 # only deploy when a new tag is created
@@ -106,23 +110,13 @@ deploy:
 
 bundler:
   extends: .dependabot-gitlab
-  stage: maintain
-  tags:
-    - cubemoji
-  rules:
-    - if: $DEPENDENCY_UPDATES_DISABLED
-      when: never
-    - if: '$CI_PIPELINE_SOURCE == "schedule" && $PACKAGE_MANAGER_SET =~ /\bbundler\b/'
 
 npm:
   extends: .dependabot-gitlab
-  stage: maintain
-  tags:
-    - cubemoji
-  rules:
-    - if: $DEPENDENCY_UPDATES_DISABLED
-      when: never
-    - if: '$CI_PIPELINE_SOURCE == "schedule" && $PACKAGE_MANAGER_SET =~ /(\bnpm|yarn\b)/'
+
+docker:
+  extends: .dependabot-gitlab
+
 
 include:
 - template: Security/SAST.gitlab-ci.yml

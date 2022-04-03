@@ -1,7 +1,13 @@
 version: 2
 updates:
-  - package-ecosystem: yarn
-    directory: /
+  - package-ecosystem: "npm"
+    directory: "/"
     schedule:
-      interval: daily
-    versioning-strategy: increase
+      interval: "daily"
+    versioning-strategy: "increase"
+  
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    versioning-strategy: "increase"
