@@ -58,8 +58,6 @@ build:
     - if: '$CI_PIPELINE_SOURCE != "schedule"'
 
 sast:
-  tags:
-    - cubemoji
   variables:
     SAST_EXCLUDED_ANALYZERS: bandit, brakeman, flawfinder, gosec, kubesec, phpcs-security-audit,
       pmd-apex, security-code-scan, sobelow, spotbugs, semgrep,  retire-js-dependency_scanning
@@ -96,8 +94,6 @@ deploy:
     SETTINGS__GITLAB_URL: $CI_SERVER_URL
     SETTINGS__STANDALONE: "true"
     SETTINGS__LOG_COLOR: "true"
-  tags:
-    - cubemoji
   rules:
     - if: $DEPENDENCY_UPDATES_DISABLED
       when: never
