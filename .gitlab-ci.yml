@@ -43,6 +43,7 @@ services:
 stages:
 - build 
 - test
+- maintain
 - deploy
 build:
   stage: build
@@ -81,6 +82,7 @@ deploy:
 # dependabot setup
 # https://gitlab.com/dependabot-gitlab/dependabot-standalone
 .dependabot-gitlab:
+  stage: maintain
   image:
     name: $DEPENDABOT_IMAGE
     entrypoint: [""]
@@ -92,12 +94,21 @@ deploy:
     SETTINGS__GITLAB_URL: $CI_SERVER_URL
     SETTINGS__STANDALONE: "true"
     SETTINGS__LOG_COLOR: "true"
+  tags:
+    - cubemoji
+  rules:
+    - if: $DEPENDENCY_UPDATES_DISABLED
+      when: never
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
   script:
     - cd /home/dependabot/app
     - bundle exec rake "dependabot:update[$PROJECT_PATH,$PACKAGE_MANAGER,$DIRECTORY]"
 
 bundler:
   extends: .dependabot-gitlab
+  stage: maintain
+  tags:
+    - cubemoji
   rules:
     - if: $DEPENDENCY_UPDATES_DISABLED
       when: never
@@ -105,6 +116,9 @@ bundler:
 
 npm:
   extends: .dependabot-gitlab
+  stage: maintain
+  tags:
+    - cubemoji
   rules:
     - if: $DEPENDENCY_UPDATES_DISABLED
       when: never
