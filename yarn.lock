@@ -127,10 +127,10 @@
   resolved "https://registry.npmjs.org/@humanwhocodes/object-schema/-/object-schema-1.2.1.tgz"
   integrity sha512-ZnQMnLV4e7hDlUvw8H+U8ASL02SS2Gn6+9Ac3wGGLIe7+je2AeAOxPY+izIPJDfFDb7eDjev0Us8MO1iFRN8hA==
 
-"@keyv/sqlite@^3.0.0":
-  version "3.0.0"
-  resolved "https://registry.npmjs.org/@keyv/sqlite/-/sqlite-3.0.0.tgz"
-  integrity sha512-dbo7smkbCp/z9k5iPILlN9OIqCP0AKQ0mPK6C6hbTsOo0kEE9CnJQQbFQngtF3ylO5c0QqWTw7MlglCxsiOzhA==
+"@keyv/sqlite@^3.0.1":
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/@keyv/sqlite/-/sqlite-3.0.1.tgz#d3f025a38aa95c37710364a6cfcc02b9d938308e"
+  integrity sha512-dFcHiDEK/PB3oG+1eRKfpNAzwzWYegJTBgyc9barqGGxiO1CiBeH6fbDJNxdAvONivF122Zgc39mwQP5dS3Zrg==
   dependencies:
     better-sqlite3 "^7.5.0"
 
