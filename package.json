@@ -67,7 +67,7 @@
     "unique-names-generator": "^4.7.1",
     "uuid": "^8.3.2",
     "uvu": "^0.5.3",
-    "winston": "^3.6.0",
+    "winston": "^3.7.2",
     "winston-transport": "^4.5.0"
   },
   "devDependencies": {
@@ -84,11 +84,11 @@
     "@types/probe-image-size": "^7.0.1",
     "@types/pug": "^2.0.6",
     "@types/twemoji-parser": "^13.1.1",
-    "@typescript-eslint/eslint-plugin": "^5.16.0",
     "@typescript-eslint/parser": "^5.18.0",
+    "@typescript-eslint/eslint-plugin": "^5.18.0",
     "eslint": "^8.11.0",
     "eslint-config-standard": "^16.0.3",
-    "eslint-plugin-import": "^2.25.4",
+    "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^6.0.0",
     "eslint-plugin-uvu": "^0.1.1",
