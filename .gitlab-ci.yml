@@ -67,8 +67,6 @@ sast:
 # only deploy when a new tag is created
 deploy:
   stage: deploy
-  tags:
-    - cubemoji
   rules:
     - if: '$CI_COMMIT_TAG'
   before_script:
@@ -76,7 +74,7 @@ deploy:
     - curl -L https://fly.io/install.sh | sh
   script:
     - docker pull $REPO_NAME:latest || true
-    - /root/.fly/bin/flyctl deploy -a cubemoji -i $REPO_NAME --local-only --detach
+    - /root/.fly/bin/flyctl deploy -a cubemoji --detach --no-cache --now
 
 
 # dependabot setup
