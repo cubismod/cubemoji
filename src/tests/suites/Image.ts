@@ -1,15 +1,15 @@
-// image logic typa tests
-import { watch } from "chokidar"
-import { choice } from "pandemonium"
-import { container } from "tsyringe"
-import { suite } from "uvu"
+/* // image logic typa tests
+import { watch } from 'chokidar'
+import { choice } from 'pandemonium'
+import { container } from 'tsyringe'
+import { suite } from 'uvu'
 import * as assert from 'uvu/assert'
-import { downloadImage, EditOperation, FaceOperation, generateEditOptions, RescaleOperation } from "../../lib/image/ImageLogic"
-import { WorkerPool } from "../../lib/image/WorkerPool"
+import { downloadImage, EditOperation, FaceOperation, generateEditOptions, RescaleOperation } from '../../lib/image/ImageLogic'
+import { WorkerPool } from '../../lib/image/WorkerPool'
 import faces from '../../res/faces.json'
 import effects from '../../res/imgEffects.json'
 
-export function imgSuites() {
+export function imgSuites () {
   // a number of different image files to try
   const urls = [
     'https://upload.wikimedia.org/wikipedia/commons/a/a0/English_liberty-_being_a_collection_of_interesting_tracts%2C_from_the_year_1762_to_1769_Fleuron_T074071-20.png',
@@ -40,40 +40,41 @@ export function imgSuites() {
   const editSuite = suite('Edit')
   const addFaceSuite = suite('AddFace')
   const downloadSuite = suite('Download Image')
-  
+
   const workerPool = container.resolve(WorkerPool)
-  
+
   for (let i = 0; i < 4; i++) {
     const img = choice(urls)
-    rescaleSuite(`rescaling ${img}`, async() => {
+    rescaleSuite(`rescaling ${img}`, async () => {
       const rescale = new RescaleOperation(img)
       const file = await rescale.run()
       assert.is.not(file, '')
-      watch(file, {awaitWriteFinish: true}).on('add', async() =>
+      watch(file, { awaitWriteFinish: true }).on('add', async () =>
         workerPool.done(file)
       )
     })
-  
-    editSuite(`editing ${img}`, async() => {
+
+    editSuite(`editing ${img}`, async () => {
       const edit = new EditOperation(img, generateEditOptions())
       const file = await edit.run()
       assert.is.not(file, '')
-      watch(file, {awaitWriteFinish: true}).on('add', async() =>
+      watch(file, { awaitWriteFinish: true }).on('add', async () =>
         workerPool.done(file)
       )
     })
 
     const face = choice(faces)
-    addFaceSuite(`adding face ${face} to ${img}`, async() => {
+    addFaceSuite(`adding face ${face} to ${img}`, async () => {
       const addFace = new FaceOperation(img, face)
       const file = await addFace.run()
       assert.is.not(file, '')
-      watch(file, {awaitWriteFinish: true}).on('add', async() =>
+      watch(file, { awaitWriteFinish: true }).on('add', async () =>
         workerPool.done(file)
+        await
       )
     })
-    
-    downloadSuite(`downloading ${img} to disk`, async() => {
+
+    downloadSuite(`downloading ${img} to disk`, async () => {
       assert.is.not(await downloadImage(img), undefined)
     })
   }
@@ -88,3 +89,4 @@ export function imgSuites() {
 
   return [rescaleSuite, editSuite, addFaceSuite, downloadSuite]
 }
+ */

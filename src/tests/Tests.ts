@@ -10,33 +10,31 @@ import { WorkerPool } from '../lib/image/WorkerPool'
 import { CubeLogger } from '../lib/logger/CubeLogger'
 import { databaseSuites } from './suites/Database'
 import { discSuites } from './suites/Discord'
-import { imgSuites } from './suites/Image'
 
-
-async function run() {
+async function run () {
   DIService.container = container
 
   // load dotenv file if exists
   config()
-  
-  container.register(CubeLogger, {useValue: new CubeLogger()})
-  
+
+  container.register(CubeLogger, { useValue: new CubeLogger() })
+
   const badHosts = new BadHosts()
   await badHosts.downloadList()
   const storage = new CubeStorage()
-  
+
   const imageQueue = new ImageQueue()
   await imageQueue.clear()
-  
-  container.register(CubeStorage, {useValue: storage})
-  container.register(BadHosts, {useValue: badHosts})
-  container.register(WorkerPool, {useValue: new WorkerPool(5)})
-  container.register(ImageQueue, {useValue: imageQueue})
+
+  container.register(CubeStorage, { useValue: storage })
+  container.register(BadHosts, { useValue: badHosts })
+  container.register(WorkerPool, { useValue: new WorkerPool(5) })
+  container.register(ImageQueue, { useValue: imageQueue })
   container.register(CubeMessageManager, { useValue: new CubeMessageManager() })
-  
+
   databaseSuites().forEach((suite) => suite.run())
   discSuites().run()
-  imgSuites().forEach((suite) => suite.run())
+  // imgSuites().forEach((suite) => suite.run())
 }
 
 await run()
