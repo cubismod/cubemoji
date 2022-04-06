@@ -44,7 +44,7 @@ stages:
 - build 
 - test
 - maintain
-- deploy
+# - deploy
 build:
   stage: build
   tags:
@@ -69,19 +69,19 @@ sast:
 
 
 # only deploy when a new tag is created
-deploy:
-  stage: deploy
-  tags:
-    - cubemoji
-  rules:
-    - if: '$CI_COMMIT_TAG'
-  before_script:
-    - mkdir -p /root/.docker/
-    - cp /opt/auth/config.json /root/.docker/config.json
-    - apk add --no-cache curl
-    - curl -L https://fly.io/install.sh | sh
-  script:
-    - /root/.fly/bin/flyctl deploy --remote-only .
+# deploy:
+#   stage: deploy
+#   tags:
+#     - cubemoji
+#   rules:
+#     - if: '$CI_COMMIT_TAG'
+#   before_script:
+#     - mkdir -p /root/.docker/
+#     - cp /opt/auth/config.json /root/.docker/config.json
+#     - apk add --no-cache curl
+#     - curl -L https://fly.io/install.sh | sh
+#   script:
+#     - /root/.fly/bin/flyctl deploy --remote-only .
 
 
 # dependabot setup
