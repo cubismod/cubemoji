@@ -52,7 +52,7 @@ build:
   before_script:
     # copy quay auth when pulling/pushing cubemoji
     - mkdir -p /root/.docker/
-    - mv /root/config.json /root/.docker/config.json
+    - mv /opt/auth/config.json /root/.docker/config.json
   script:
   - docker pull $REPO_NAME:latest || true
   - docker build --cache-from $REPO_NAME:latest --tag $REPO_NAME:$CI_COMMIT_SHA --tag $REPO_NAME:latest .
