@@ -73,8 +73,7 @@ deploy:
     - apk add --no-cache curl
     - curl -L https://fly.io/install.sh | sh
   script:
-    - docker pull $REPO_NAME:latest || true
-    - /root/.fly/bin/flyctl deploy -a cubemoji --detach --no-cache --now
+    - /root/.fly/bin/flyctl deploy -a cubemoji --detach -i $REPO_NAME --now
 
 
 # dependabot setup
