@@ -68,12 +68,12 @@ sast:
 deploy:
   stage: deploy
   rules:
-    - if: '$CI_COMMIT_TAG'
+    - when: manual
   before_script:
     - apk add --no-cache curl
     - curl -L https://fly.io/install.sh | sh
   script:
-    - /root/.fly/bin/flyctl deploy -a cubemoji --remote-only --detach -i $REPO_NAME --now 
+    - /root/.fly/bin/flyctl deploy --remote-only .
 
 
 # dependabot setup
