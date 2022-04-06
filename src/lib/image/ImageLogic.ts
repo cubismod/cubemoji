@@ -12,7 +12,7 @@ import path from 'path'
 import probe from 'probe-image-size'
 import { pipeline } from 'stream/promises'
 import { container } from 'tsyringe'
-import imgEffects from '../../res/imgEffects.json'
+import imgEffects from '../../res/imgEffects.json' assert { type: 'json' }
 import { gotOptions } from '../emote/Cmoji.js'
 import { CubeLogger } from '../logger/CubeLogger.js'
 import { ImageQueue } from './ImageQueue.js'
@@ -74,7 +74,7 @@ abstract class ImageOperation {
     if (ft === undefined) {
       logger.error(`Cannot determine filetype for ${this.localPath}`)
       return ''
-    } 
+    }
     return {
       outPath: path.resolve(`download/${randomUUID()}.${ft.ext}`),
       fileType: ft
@@ -164,7 +164,7 @@ export class RescaleOperation extends ImageOperation {
 
 export class EditOperation extends ImageOperation {
   effects: string[]
-  
+
   constructor (externalUrl: string, effects: string[]) {
     super(externalUrl)
     this.effects = effects

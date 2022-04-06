@@ -8,7 +8,7 @@ import { Source } from '../../lib/emote/Cmoji.js'
 import { EmoteCache } from '../../lib/emote/EmoteCache.js'
 import { getColors } from '../../lib/image/ColorExtract'
 import { CubeLogger } from '../../lib/logger/CubeLogger.js'
-import strings from '../../res/strings.json'
+import strings from '../../res/strings.json' assert { type: 'json' }
 
 @Discord()
 export abstract class Info {
@@ -48,7 +48,7 @@ export abstract class Info {
           // button setup
           this.imgUrl = res.url
           const row = this.buttonCreate()
-          
+
           switch (res.source) {
             case Source.Discord: {
               if (res.guildEmoji?.createdAt) embed.addField('Creation Date', `<t:${Math.round(res.guildEmoji.createdAt.getTime() / 1000)}>`)
@@ -78,7 +78,7 @@ export abstract class Info {
         // button setup
         this.imgUrl = avatarURL
         const row = this.buttonCreate()
-  
+
         embed = await this.setColors(embed, avatarURL)
         embed.setTitle(member.user.tag)
         embed.setImage(avatarURL)
@@ -98,7 +98,7 @@ export abstract class Info {
     }
   }
 
-  private async setColors(embed: MessageEmbed, url: string) {
+  private async setColors (embed: MessageEmbed, url: string) {
     const colors = await getColors(url)
     const dominant = colors[0]
     if (colors) {
@@ -117,8 +117,8 @@ export abstract class Info {
   }
 
   @ButtonComponent('color-button')
-  async colorButton(interaction: ButtonInteraction) {
-    await interaction.deferReply({ephemeral: true})
+  async colorButton (interaction: ButtonInteraction) {
+    await interaction.deferReply({ ephemeral: true })
     // snag url if this is a cached reply
     // since we won't have the imgUrl saved
     if (this.imgUrl === '') {
@@ -139,7 +139,7 @@ export abstract class Info {
           embeds.push(embed)
         }
       })
-      interaction.editReply({embeds: embeds})
+      interaction.editReply({ embeds: embeds })
     } else {
       interaction.editReply('colors could not be determined')
     }

@@ -2,7 +2,7 @@ import { AutocompleteInteraction, CommandInteraction } from 'discord.js'
 import { Client, Discord, Slash, SlashChoice, SlashOption } from 'discordx'
 import { emoteAutocomplete } from '../../lib/cmd/Autocomplete'
 import { FaceDiscord, getUrl } from '../../lib/image/DiscordLogic.js'
-import strings from '../../res/strings.json'
+import strings from '../../res/strings.json' assert { type: 'json' }
 import { BSGuardData } from '../Guards'
 
 @Discord()

@@ -1,8 +1,9 @@
-FROM node:17.8-bullseye-slim
+FROM node:17.8-alpine
 WORKDIR /usr/src/cubemoji
 
 # setup any requisite packages
 COPY scripts/ ./scripts/
+RUN scripts/imagemagick.sh
 RUN scripts/setup-image.sh
 
 COPY assets/ ./assets/

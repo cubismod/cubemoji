@@ -2,7 +2,7 @@ import { CommandInteraction, MessageEmbed } from 'discord.js'
 import { Discord, Slash, SlashOption } from 'discordx'
 import { container } from 'tsyringe'
 import { EmoteCache } from '../../lib/emote/EmoteCache.js'
-import strings from '../../res/strings.json'
+import strings from '../../res/strings.json' assert { type: 'json' }
 
 @Discord()
 export abstract class Search {

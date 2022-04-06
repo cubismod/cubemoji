@@ -3,7 +3,7 @@ import Fuse from 'fuse.js'
 import Qty from 'js-quantities'
 import { choice, geometricReservoirSample } from 'pandemonium'
 import { container } from 'tsyringe'
-import imgEffects from '../../res/imgEffects.json'
+import imgEffects from '../../res/imgEffects.json' assert { type: 'json' }
 import { CubeStorage } from '../db/Storage.js'
 import { Cmoji, Source } from '../emote/Cmoji.js'
 import { EmoteCache } from '../emote/EmoteCache.js'
@@ -157,15 +157,15 @@ export function unitAutocomplete (interaction: AutocompleteInteraction) {
       if (query === '') {
         // return well known units if nothing inputted
         interaction.respond(geometricReservoirSample<string>(25, Qty.getUnits()).map(kind => {
-          return {name: kind, value: kind}
+          return { name: kind, value: kind }
         }))
       } else {
         const units = Qty.getUnits()
         const fuse = new Fuse<string>(units)
-        const res = fuse.search(query, {limit: 10})
-  
+        const res = fuse.search(query, { limit: 10 })
+
         interaction.respond(res.map(result => {
-          return {name: result.item, value: result.item}
+          return { name: result.item, value: result.item }
         }))
       }
     } catch (err) {

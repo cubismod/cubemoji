@@ -6,7 +6,7 @@ import { CubeMessageManager } from '../../lib/cmd/MessageManager.js'
 import { Source } from '../../lib/emote/Cmoji.js'
 import { EmoteCache } from '../../lib/emote/EmoteCache.js'
 import { autoDeleteMsg, reply } from '../../lib/image/DiscordLogic.js'
-import strings from '../../res/strings.json'
+import strings from '../../res/strings.json' assert { type: 'json' }
 
 @Discord()
 export abstract class Emote {

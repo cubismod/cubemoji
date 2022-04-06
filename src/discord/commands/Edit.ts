@@ -2,8 +2,8 @@ import { AutocompleteInteraction, CommandInteraction, GuildMember } from 'discor
 import { Client, Discord, Slash, SlashOption } from 'discordx'
 import { editAutocomplete, emoteAutocomplete } from '../../lib/cmd/Autocomplete'
 import { EditDiscord } from '../../lib/image/DiscordLogic.js'
-import imgEffects from '../../res/imgEffects.json'
-import strings from '../../res/strings.json'
+import imgEffects from '../../res/imgEffects.json' assert { type: 'json' }
+import strings from '../../res/strings.json' assert { type: 'json' }
 import { BSGuardData } from '../Guards'
 
 @Discord()

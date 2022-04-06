@@ -9,7 +9,7 @@ import hash from 'node-object-hash'
 import { choice } from 'pandemonium'
 import { container, singleton } from 'tsyringe'
 import { parse } from 'twemoji-parser'
-import mutantNames from '../../res/emojiNames.json'
+import mutantNames from '../../res/emojiNames.json' assert { type: 'json' }
 import { CubeStorage, ValRaw } from '../db/Storage.js'
 import { CubeLogger } from '../logger/CubeLogger.js'
 import { Cmoji, Source } from './Cmoji.js'

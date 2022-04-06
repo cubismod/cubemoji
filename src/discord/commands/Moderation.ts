@@ -8,7 +8,7 @@ import { serverAutocomplete } from '../../lib/cmd/Autocomplete'
 import { buildList, guildOwnersCheck, reply, validUser } from '../../lib/cmd/ModHelper'
 import { CubeStorage } from '../../lib/db/Storage.js'
 import { EmoteCache } from '../../lib/emote/EmoteCache.js'
-import strings from '../../res/strings.json'
+import strings from '../../res/strings.json' assert { type: 'json' }
 import { ModOwnerCheck } from '../Permissions'
 
 @Discord()
