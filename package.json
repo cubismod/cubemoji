@@ -49,7 +49,7 @@
     "got": "^12.0.2",
     "image-downloader": "^4.1.0",
     "js-quantities": "^1.7.6",
-    "keyv": "^4.2.1",
+    "keyv": "^4.2.2",
     "koa": "^2.13.4",
     "koa-compress": "^5.1.0",
     "koa-send": "^5.0.1",
