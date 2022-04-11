@@ -34,7 +34,7 @@ variables:
   FLY_API_TOKEN: $FLY_API_TOKEN
   QUAY_CONF: $QUAY_CONF
   REPO_NAME: "quay.io/cubismod/cubemoji"
-  CACHE_REPO: "quay.io/cubemoji/cubemoji-cache"
+  CACHE_REPO: "quay.io/cubismod/cubemoji-cache"
   SETTINGS__GITLAB_ACCESS_TOKEN: $SETTINGS__GITLAB_ACCESS_TOKEN
   DEPENDABOT_IMAGE: docker.io/andrcuns/dependabot-gitlab:0.16.0
 
