@@ -4,7 +4,6 @@
 # Dependency Scanning customization: https://docs.gitlab.com/ee/user/application_security/dependency_scanning/#customizing-the-dependency-scanning-settings
 # Note that environment variables can be set in several places
 # See https://docs.gitlab.com/ee/ci/variables/#cicd-variable-precedence
-image: docker:20.10.13
 
 variables:
   # When you use the dind service, you must instruct Docker to talk with
@@ -33,13 +32,13 @@ variables:
   # CM_URL: $CM_URL
   # CM_WORKERS: $CM_WORKERS
   FLY_API_TOKEN: $FLY_API_TOKEN
+  QUAY_CONF: $QUAY_CONF
   REPO_NAME: "quay.io/cubismod/cubemoji"
+  CACHE_REPO: "quay.io/cubemoji/cubemoji-cache"
   SETTINGS__GITLAB_ACCESS_TOKEN: $SETTINGS__GITLAB_ACCESS_TOKEN
   DEPENDABOT_IMAGE: docker.io/andrcuns/dependabot-gitlab:0.16.0
 
 
-services:
-  - docker:20.10.13-dind
 stages:
 - build 
 - test
@@ -47,17 +46,22 @@ stages:
 # - deploy
 build:
   stage: build
+  image: 
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [""]
   tags:
-    - cubemoji
-  before_script:
-    # copy quay auth when pulling/pushing cubemoji
-    - mkdir -p /root/.docker/
-    - cp /opt/auth/config.json /root/.docker/config.json
+    - kaniko
   script:
-  - docker pull $REPO_NAME:latest || true
-  - docker build --cache-from $REPO_NAME:latest --tag $REPO_NAME:$CI_COMMIT_SHA --tag $REPO_NAME:latest .
-  - docker push $REPO_NAME:$CI_COMMIT_SHA
-  - docker push $REPO_NAME:latest
+  - mkdir -p /kaniko/.docker
+  - echo $QUAY_CONF > /kaniko/.docker/config.json
+  - >-
+    /kaniko/executor
+    --context "${CI_PROJECT_DIR}"
+    --dockerfile "${CI_PROJECT_DIR}/Dockerfile"
+    --cache-copy-layers
+    --cache=true
+    --cache-repo $CACHE_REPO
+    --destination "$REPO_NAME:latest"
   rules:
     - if: '$CI_PIPELINE_SOURCE != "schedule"'
 
