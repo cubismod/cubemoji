@@ -3,7 +3,6 @@ import { createLogger, format, Logger, transports } from 'winston';
 import { Bytes } from '../constants/Units.js';
 import { LokiTransport } from './LokiTransport.js';
 
-
 /**
  * cubemoji logging using Winston
  * https://www.npmjs.com/package/winston
@@ -54,9 +53,9 @@ export class CubeLogger {
             format: format.combine(
               format.uncolorize(),
               format.json()
-            ),
+            )
           })
-        ],
+        ]
       });
       // only log to file during testing
       if (!process.env.CM_TEST) this.parent.add(new transports.Console());
@@ -82,7 +81,7 @@ export class CubeLogger {
             maxsize: Bytes.oneMB,
             maxFiles: 20,
           }) */
-        ],
+        ]
       });
       if (process.env.CM_HTTP_LOG === 'true' &&
         process.env.CM_HTTP_PORT &&
@@ -126,14 +125,12 @@ export class CubeLogger {
       ]
     })
 
-
     if (process.env.CM_HTTP_LOG === 'true' &&
     process.env.CM_HTTP_PORT &&
-    process.env.CM_HTTP_HOST) { 
+    process.env.CM_HTTP_HOST) {
       exReLogger.exceptions.handle(lokiTransport)
       exReLogger.rejections.handle(lokiTransport)
     }
-
 
     // handle exceptions and errors with logger */
   }

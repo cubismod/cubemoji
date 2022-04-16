@@ -77,6 +77,33 @@ export class LokiTransport extends TransportStream {
     ).catch(err => console.error(err));
     // fail quietly and don't create an infinite loop of error messages
 
+    if (info.level !== 'info') {
+      // log to gotify as well
+      const gotifyUrl = process.env.CM_GO_URL;
+      const gotifyToken = process.env.CM_GO_TOKEN;
+
+      if (gotifyUrl && gotifyToken) {
+        const body = {
+          title: info.module,
+          priority: 4,
+          message: JSON.stringify(info, null, 2)
+        };
+
+        await got.post(
+          `${gotifyUrl}/message?token=${gotifyToken}`,
+          {
+            json: body,
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            timeout: {
+              request: 10000
+            }
+          }
+        ).catch(err => console.error(err));
+      }
+    }
+
     next();
   }
 }

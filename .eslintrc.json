@@ -22,6 +22,10 @@
         "uvu/prefer-is-for-primitives": "error",
         "uvu/no-identical-titles": "error",
         "space-before-function-paren": "off",
-        "semi-style": "2"
+        "semi": [
+            "error",
+            "always"
+        ],
+        "camelcase": "error"
     }
 }
