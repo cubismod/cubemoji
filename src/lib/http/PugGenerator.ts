@@ -4,6 +4,7 @@ import { writeFile } from 'fs/promises';
 import { compileFile, compileTemplate } from 'pug';
 import { container, singleton } from 'tsyringe';
 import { adjectives, names, uniqueNamesGenerator } from 'unique-names-generator';
+import { generateList } from '../conversion/UnitList.js';
 import { CubeStorage } from '../db/Storage.js';
 import { EmoteCache } from '../emote/EmoteCache.js';
 import { CubeLogger } from '../logger/CubeLogger.js';
@@ -21,7 +22,20 @@ export class PugGenerator {
     });
   }
 
-  async render(guilds: GuildManager) {
+  async unitRender() {
+    const units = await generateList();
+
+    const source = './assets/template/UnitList.pug';
+    const template = compileFile(source, {
+      filename: source
+    });
+
+    await writeFile('./static/list/unit.html', template({
+      units: units
+    }));
+  }
+
+  async emojiRender(guilds: GuildManager) {
     const db = container.resolve(CubeStorage).serverAnonNames;
     try {
       await guilds.fetch();

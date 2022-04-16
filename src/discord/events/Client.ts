@@ -35,7 +35,7 @@ export abstract class ClientEvents {
       this.logger.info('registered CubeLogger');
 
       const sleep = new Promise(resolve => setTimeout(resolve, Milliseconds.fiveSec));
-      // setup logging on exceptions, unhandled rejections 
+      // setup logging on exceptions, unhandled rejections
       // and sent over http
       process.on('uncaughtException', async (err, origin) => {
         this.cubeLogger.errors.crit(`A fatal error ocurred: ${err}\n Origin: ${origin}.`);
@@ -85,8 +85,10 @@ export abstract class ClientEvents {
       emoteCache.loadBlockedEmojis();
       this.logger.info('initialized EmoteCache');
 
-      DIService.container.register(PugGenerator, { useValue: new PugGenerator() });
-      await container.resolve(PugGenerator).render(client.guilds);
+      const pugGenerator = new PugGenerator();
+      DIService.container.register(PugGenerator, { useValue: pugGenerator });
+      await pugGenerator.emojiRender(client.guilds);
+      await pugGenerator.unitRender();
       this.logger.info('initialized PugGenerator');
 
       let workers = 4;
@@ -103,7 +105,7 @@ export abstract class ClientEvents {
         async () => {
           await container.resolve(CubeStorage).loadServerOwners(client);
           await client.initApplicationPermissions();
-          await container.resolve(PugGenerator).render(client.guilds);
+          await container.resolve(PugGenerator).emojiRender(client.guilds);
           this.logger.info('permission sync & pug-regen completed');
         },
         Milliseconds.ninetyMin
@@ -138,8 +140,7 @@ export abstract class ClientEvents {
           list.push(`${key} ${Math.round(memUse[key] / 1024 / 1024 * 100) / 100} MB`);
         }
         this.logger.debug(list.join(' | '));
-      },
-        Milliseconds.thirtySec // 30 sec
+      }, Milliseconds.thirtySec // 30 sec
       );
     }
 
