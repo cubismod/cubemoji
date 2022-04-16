@@ -45,6 +45,8 @@ stages:
   - maintain
 lint:
   stage: lint
+  tags:
+    - cubemoji
   image:
     name: node:17.8
   script:
