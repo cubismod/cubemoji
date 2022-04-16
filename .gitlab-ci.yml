@@ -38,39 +38,47 @@ variables:
   SETTINGS__GITLAB_ACCESS_TOKEN: $SETTINGS__GITLAB_ACCESS_TOKEN
   DEPENDABOT_IMAGE: docker.io/andrcuns/dependabot-gitlab:0.16.0
 
-
 stages:
-- build 
-- test
-- maintain
-# - deploy
+  - lint
+  - build
+  - test
+  - maintain
+lint:
+  stage: lint
+  image:
+    name: node:17.8-alpine
+  script:
+    - corepack enable
+    - yarn install
+    - npx eslint
+
 build:
   stage: build
-  image: 
+  image:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]
   tags:
     - kaniko
   script:
-  - mkdir -p /kaniko/.docker
-  - echo $QUAY_CONF > /kaniko/.docker/config.json
-  - >-
-    /kaniko/executor
-    --context "${CI_PROJECT_DIR}"
-    --dockerfile "${CI_PROJECT_DIR}/Dockerfile"
-    --cache-copy-layers
-    --cache=true
-    --cache-repo $CACHE_REPO
-    --destination "$REPO_NAME:latest"
+    - mkdir -p /kaniko/.docker
+    - echo $QUAY_CONF > /kaniko/.docker/config.json
+    - >-
+      /kaniko/executor
+      --context "${CI_PROJECT_DIR}"
+      --dockerfile "${CI_PROJECT_DIR}/Dockerfile"
+      --cache-copy-layers
+      --cache=true
+      --cache-repo $CACHE_REPO
+      --destination "$REPO_NAME:latest"
   rules:
     - if: '$CI_PIPELINE_SOURCE != "schedule"'
 
 sast:
   variables:
-    SAST_EXCLUDED_ANALYZERS: bandit, brakeman, flawfinder, gosec, kubesec, phpcs-security-audit,
+    SAST_EXCLUDED_ANALYZERS:
+      bandit, brakeman, flawfinder, gosec, kubesec, phpcs-security-audit,
       pmd-apex, security-code-scan, sobelow, spotbugs, semgrep,  retire-js-dependency_scanning
   stage: test
-
 
 # only deploy when a new tag is created
 # deploy:
@@ -86,7 +94,6 @@ sast:
 #     - curl -L https://fly.io/install.sh | sh
 #   script:
 #     - /root/.fly/bin/flyctl deploy --remote-only .
-
 
 # dependabot setup
 # https://gitlab.com/dependabot-gitlab/dependabot-standalone
@@ -120,9 +127,8 @@ npm:
 docker:
   extends: .dependabot-gitlab
 
-
 include:
-- template: Security/SAST.gitlab-ci.yml
-- template: Security/Dependency-Scanning.gitlab-ci.yml
-- project: 'dependabot-gitlab/dependabot-standalone'
-  file: '.gitlab-ci.yml'
+  - template: Security/SAST.gitlab-ci.yml
+  - template: Security/Dependency-Scanning.gitlab-ci.yml
+  - project: "dependabot-gitlab/dependabot-standalone"
+    file: ".gitlab-ci.yml"

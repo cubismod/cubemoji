@@ -1,35 +1,35 @@
 /* eslint-disable node/no-path-concat */
-import { dirname, importx } from '@discordx/importer'
-import { Intents } from 'discord.js'
-import { Client } from 'discordx'
-import { config } from 'dotenv'
-import 'reflect-metadata'
-import { bigServerDetect, blockedChannelDetect } from './discord/Guards.js'
-import { CubeLogger } from './lib/logger/CubeLogger.js'
+import { dirname, importx } from '@discordx/importer';
+import { Intents } from 'discord.js';
+import { Client } from 'discordx';
+import { config } from 'dotenv';
+import 'reflect-metadata';
+import { bigServerDetect, blockedChannelDetect } from './discord/Guards.js';
+import { CubeLogger } from './lib/logger/CubeLogger.js';
 
 // load dotenv file if exists
-config()
+config();
 
 export class Main {
-  private static _client: Client
+  private static _client: Client;
 
-  static get Client (): Client {
-    return this._client
+  static get Client(): Client {
+    return this._client;
   }
 
-  static async start () {
+  static async start() {
 
-    const logger = new CubeLogger().main
+    const logger = new CubeLogger().main;
 
-    await importx(dirname(import.meta.url) + '/discord/**/*.js')
-    logger.info('🅲🆄🅱🅴🅼🅾🅹🅸')
-    logger.info(`v. ${process.env.npm_package_version}`)
-    let silent: false|undefined
+    await importx(dirname(import.meta.url) + '/discord/**/*.js');
+    logger.info('🅲🆄🅱🅴🅼🅾🅹🅸');
+    logger.info(`v. ${process.env.npm_package_version}`);
+    let silent: false | undefined;
     if (process.env.CM_ENVIRONMENT === 'prd') {
-      logger.info('running in PRD')
+      logger.info('running in PRD');
     } else {
-      logger.info('Running in NPR')
-      silent = false
+      logger.info('Running in NPR');
+      silent = false;
     }
 
     this._client = new Client({
@@ -45,11 +45,11 @@ export class Main {
       // for testing purposes in cubemoji server
       silent: silent,
       guards: [blockedChannelDetect, bigServerDetect]
-    })
+    });
 
-    if (process.env.CM_TOKEN) await this._client.login(process.env.CM_TOKEN)
-    else throw new Error('No token specified with environment variable $CM_TOKEN')
+    if (process.env.CM_TOKEN) await this._client.login(process.env.CM_TOKEN);
+    else throw new Error('No token specified with environment variable $CM_TOKEN');
   }
 }
 
-await Main.start()
+await Main.start();

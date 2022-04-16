@@ -1,13 +1,13 @@
-import Database from 'better-sqlite3'
-import { Client } from 'discordx'
-import Keyv from 'keyv'
-import { container, singleton } from 'tsyringe'
-import { CubeLogger } from '../logger/CubeLogger.js'
-const { got } = await import('got')
+import Database from 'better-sqlite3';
+import { Client } from 'discordx';
+import Keyv from 'keyv';
+import { container, singleton } from 'tsyringe';
+import { CubeLogger } from '../logger/CubeLogger.js';
+const { got } = await import('got');
 
 export interface ServerOwner {
   id: string,
-  name: string
+  name: string;
 }
 
 export interface ChannelInfo {
@@ -19,7 +19,7 @@ export interface ChannelInfo {
 // value is raw json
 export interface KeyVRaw {
   key: string,
-  value: string
+  value: string;
 }
 
 /**
@@ -27,7 +27,7 @@ export interface KeyVRaw {
  */
 export interface ValRaw {
   value: string,
-  expires: null
+  expires: null;
 }
 
 // database storage using https://github.com/zaaack/keyv-file
@@ -43,14 +43,14 @@ export class CubeStorage {
     Author is the user who reacted to the image not whoever
     posted the image
     */
-  trashReacts: Keyv<string>
+  trashReacts: Keyv<string>;
 
   /**
    * server owners with key of their id
    * value is a list of servers they own
    * namespace: owners
    */
-  serverOwners: Keyv<ServerOwner[]>
+  serverOwners: Keyv<ServerOwner[]>;
 
   /**
    * roles allowed to make changes to moderation settings
@@ -58,96 +58,96 @@ export class CubeStorage {
    * key: guildId-roleId
    * value: role name
    */
-  modEnrollment: Keyv<string>
+  modEnrollment: Keyv<string>;
 
   /**
    * key is channel id
    * value ChannelInfo interface
    */
-  blockedChannels: Keyv<ChannelInfo>
+  blockedChannels: Keyv<ChannelInfo>;
 
   /**
    * enrolled servers stored w/ key of server unique id
    * and just user tag of owner as value
    */
-  serverEnrollment: Keyv<string>
+  serverEnrollment: Keyv<string>;
 
   /**
    * key is server ID-hashofglob string
    * value is a glob statement from https://www.npmjs.com/package/micromatch
    */
-  emojiBlocked: Keyv<string>
+  emojiBlocked: Keyv<string>;
 
   /**
    * key is guildId, value is the audit channel
    */
-  serverAuditInfo: Keyv<string>
+  serverAuditInfo: Keyv<string>;
 
   /**
    * key is guildId, value is a random server name
    */
-  serverAnonNames: Keyv<string>
+  serverAnonNames: Keyv<string>;
 
-  private logger = container.resolve(CubeLogger).storage
+  private logger = container.resolve(CubeLogger).storage;
   // in testing mode, we are saving data to data/test/
-  dbLocation = 'data/'
-  private serverInfoPath: string
-  constructor () {
+  dbLocation = 'data/';
+  private serverInfoPath: string;
+  constructor() {
     // create separate databases when testing
-    if (process.env.CM_TEST === 'true') this.dbLocation = 'data/test/'
-    this.serverInfoPath = this.dbLocation + 'serverInfo.sqlite'
+    if (process.env.CM_TEST === 'true') this.dbLocation = 'data/test/';
+    this.serverInfoPath = this.dbLocation + 'serverInfo.sqlite';
 
     this.trashReacts = new Keyv<string>(
       `sqlite://${this.dbLocation}trashReacts.sqlite`,
       {
         ttl: 6.048e+8 // 1 week in ms
       }
-    )
+    );
 
-    const sqliteUri = 'sqlite://' + this.serverInfoPath
+    const sqliteUri = 'sqlite://' + this.serverInfoPath;
 
-    this.serverEnrollment = new Keyv<string>(sqliteUri, { namespace: 'servers' })
-    this.emojiBlocked = new Keyv<string>(sqliteUri, { namespace: 'emoji' })
+    this.serverEnrollment = new Keyv<string>(sqliteUri, { namespace: 'servers' });
+    this.emojiBlocked = new Keyv<string>(sqliteUri, { namespace: 'emoji' });
 
-    this.serverOwners = new Keyv<ServerOwner[]>(sqliteUri, { namespace: 'owners' })
-    this.modEnrollment = new Keyv<string>(sqliteUri, { namespace: 'mods' })
-    this.blockedChannels = new Keyv<ChannelInfo>(sqliteUri, { namespace: 'channels' })
-    this.serverAnonNames = new Keyv<string>(sqliteUri, { namespace: 'server-anon' })
+    this.serverOwners = new Keyv<ServerOwner[]>(sqliteUri, { namespace: 'owners' });
+    this.modEnrollment = new Keyv<string>(sqliteUri, { namespace: 'mods' });
+    this.blockedChannels = new Keyv<ChannelInfo>(sqliteUri, { namespace: 'channels' });
+    this.serverAnonNames = new Keyv<string>(sqliteUri, { namespace: 'server-anon' });
 
-    this.serverAuditInfo = new Keyv<string>(sqliteUri, { namespace: 'audit' })
+    this.serverAuditInfo = new Keyv<string>(sqliteUri, { namespace: 'audit' });
   }
 
   /**
    * load server owners into database for quick access
    * @param client Discordx client
    */
-  async loadServerOwners (client: Client) {
+  async loadServerOwners(client: Client) {
     // reset each time
-    await this.serverOwners.clear()
+    await this.serverOwners.clear();
 
     client.guilds.cache.forEach(async (guild) => {
-      const resolved = await guild.fetch()
-      const owner = resolved.ownerId
+      const resolved = await guild.fetch();
+      const owner = resolved.ownerId;
 
-      const guildsOwned = await this.serverOwners.get(owner)
+      const guildsOwned = await this.serverOwners.get(owner);
       if (guildsOwned) {
         // server owner has changed
         guildsOwned.push({
           name: resolved.name,
           id: resolved.id
-        })
-        await this.serverOwners.set(owner, guildsOwned)
+        });
+        await this.serverOwners.set(owner, guildsOwned);
       } else {
         const newArr: ServerOwner[] = [
           {
             name: resolved.name,
             id: resolved.id
           }
-        ]
-        await this.serverOwners.set(owner, newArr)
+        ];
+        await this.serverOwners.set(owner, newArr);
       }
-    })
-    this.logger.info('Successfully refreshed guild owners')
+    });
+    this.logger.info('Successfully refreshed guild owners');
   }
 
   /**
@@ -161,21 +161,21 @@ export class CubeStorage {
    * @param ns namespace such as emojis, serverOwners
    * @returns key value pairs or undefined if no results found
    */
-  getNamespace (ns: string) {
-    const db = new Database(this.serverInfoPath, { readonly: true })
-    const statement = db.prepare('SELECT * FROM keyv WHERE key LIKE ?')
-    const res = statement.all(ns + '%')
+  getNamespace(ns: string) {
+    const db = new Database(this.serverInfoPath, { readonly: true });
+    const statement = db.prepare('SELECT * FROM keyv WHERE key LIKE ?');
+    const res = statement.all(ns + '%');
     try {
       // convert type to just key and value
       const converted = res.map(value => {
-        const parsed = (value as KeyVRaw)
-        return parsed
-      })
-      db.close()
-      return converted
+        const parsed = (value as KeyVRaw);
+        return parsed;
+      });
+      db.close();
+      return converted;
     } catch (err) {
-      this.logger.error(err)
+      this.logger.error(err);
     }
-    db.close()
+    db.close();
   }
 }

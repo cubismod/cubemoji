@@ -1,12 +1,12 @@
-import dayjs from 'dayjs'
-import relativeTime from 'dayjs/plugin/relativeTime'
-import { CommandInteraction, MessageEmbed } from 'discord.js'
-import { Client, Discord, Guard, Slash } from 'discordx'
-import { container } from 'tsyringe'
-import { EmoteCache } from '../../lib/emote/EmoteCache.js'
-import { bigServerDetect, BSGuardData } from '../Guards'
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+import { CommandInteraction, MessageEmbed } from 'discord.js';
+import { Client, Discord, Guard, Slash } from 'discordx';
+import { container } from 'tsyringe';
+import { EmoteCache } from '../../lib/emote/EmoteCache.js';
+import { bigServerDetect, BSGuardData } from '../Guards';
 
-dayjs.extend(relativeTime)
+dayjs.extend(relativeTime);
 
 @Discord()
 export abstract class About {
@@ -14,15 +14,15 @@ export abstract class About {
   @Slash('about', {
     description: 'Provides information and stats about the bot.'
   })
-  async about (interaction: CommandInteraction, _client: Client, data: BSGuardData) {
-    const emoteCache = container.resolve(EmoteCache)
+  async about(interaction: CommandInteraction, _client: Client, data: BSGuardData) {
+    const emoteCache = container.resolve(EmoteCache);
     if (emoteCache !== undefined) {
-      const embed = new MessageEmbed()
-      embed.setTitle('Cubemoji')
-      embed.setThumbnail('https://gitlab.com/cubismod/cubemoji/-/raw/master/assets/icon.png')
-      embed.setColor(0x91d7f2)
-      embed.author = { name: 'Created by cubis' }
-      embed.setDescription('a simple emoji bot built to last ⌛')
+      const embed = new MessageEmbed();
+      embed.setTitle('Cubemoji');
+      embed.setThumbnail('https://gitlab.com/cubismod/cubemoji/-/raw/master/assets/icon.png');
+      embed.setColor(0x91d7f2);
+      embed.author = { name: 'Created by cubis' };
+      embed.setDescription('a simple emoji bot built to last ⌛');
 
       embed.addFields([
         {
@@ -53,9 +53,9 @@ export abstract class About {
           name: 'Guide',
           value: 'https://gitlab.com/cubismod/cubemoji/-/wikis/home'
         }
-      ])
+      ]);
       // ephemeral replies when in an enrolled server
-      await interaction.reply({ embeds: [embed], ephemeral: data.enrolled })
+      await interaction.reply({ embeds: [embed], ephemeral: data.enrolled });
     }
   }
 }

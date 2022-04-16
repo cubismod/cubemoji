@@ -1,23 +1,23 @@
-import { Get, Middleware, Router } from '@discordx/koa'
-import { RouterContext } from '@koa/router'
-import { randomUUID } from 'crypto'
-import { Context, Next } from 'koa'
-import koaCompress from 'koa-compress'
-import send from 'koa-send'
-import { container } from 'tsyringe'
-import { CubeLogger } from '../../logger/CubeLogger'
+import { Get, Middleware, Router } from '@discordx/koa';
+import { RouterContext } from '@koa/router';
+import { randomUUID } from 'crypto';
+import { Context, Next } from 'koa';
+import koaCompress from 'koa-compress';
+import send from 'koa-send';
+import { container } from 'tsyringe';
+import { CubeLogger } from '../../logger/CubeLogger';
 
-async function LogRequest (ctx: RouterContext, next: Next) {
-  const logger = container.resolve(CubeLogger).web
-  const trxId = randomUUID()
+async function LogRequest(ctx: RouterContext, next: Next) {
+  const logger = container.resolve(CubeLogger).web;
+  const trxId = randomUUID();
   logger.info({
     type: 'request',
     trxId: trxId,
     headers: ctx.headers,
     url: ctx.URL.pathname
-  })
+  });
 
-  await next()
+  await next();
 
   if (!ctx.URL.pathname.startsWith('/emotes' || !ctx.URL.pathname.startsWith('/favicon'))) {
     // don't log what will be passed off to Fly
@@ -26,7 +26,7 @@ async function LogRequest (ctx: RouterContext, next: Next) {
       trxId: trxId,
       url: ctx.URL.pathname,
       status: ctx.response.status
-    })
+    });
   }
 }
 
@@ -35,33 +35,33 @@ async function LogRequest (ctx: RouterContext, next: Next) {
 @Middleware(koaCompress())
 export class HTTPServe {
   @Get('/')
-  homeRedirect (context: Context) {
+  homeRedirect(context: Context) {
     // redirect to gitlab
-    context.redirect('https://gitlab.com/cubismod/cubemoji')
+    context.redirect('https://gitlab.com/cubismod/cubemoji');
   }
 
   @Get('/status')
-  status (context: Context) {
-    context.body = 'cubemoji is online...'
+  status(context: Context) {
+    context.body = 'cubemoji is online...';
   }
 
   @Get('/list')
   @Get('/list/')
-  async list (context: Context) {
-    await send(context, 'static/list/emoji.html')
+  async list(context: Context) {
+    await send(context, 'static/list/emoji.html');
   }
 
   @Get(/\/emotes.*/)
   @Get(/\/favicon.*/)
-  pass (context: Context) {
+  pass(context: Context) {
     // bypass to fly's network
-    context.respond = false
+    context.respond = false;
   }
 
   @Get(/.*/)
-  err (context: Context) {
-    context.body = '<html><head><title>404 Error!</title></head><body>404 error! Page not found!</br><img src="https://storage.googleapis.com/cubemoji.appspot.com/portalcoffee.svg" width=150 height =150></body></html>'
-    context.status = 404
+  err(context: Context) {
+    context.body = '<html><head><title>404 Error!</title></head><body>404 error! Page not found!</br><img src="https://storage.googleapis.com/cubemoji.appspot.com/portalcoffee.svg" width=150 height =150></body></html>';
+    context.status = 404;
   }
 }
 /* export function setupHTTP () {

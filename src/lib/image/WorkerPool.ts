@@ -1,7 +1,7 @@
-import { State } from 'gm'
-import { container, singleton } from 'tsyringe'
-import { Milliseconds } from '../constants/Units.js'
-import { CubeLogger } from '../logger/CubeLogger.js'
+import { State } from 'gm';
+import { container, singleton } from 'tsyringe';
+import { Milliseconds } from '../constants/Units.js';
+import { CubeLogger } from '../logger/CubeLogger.js';
 
 /**
  * workers here aren't actually tracked in any meaningful way by the program
@@ -12,15 +12,15 @@ import { CubeLogger } from '../logger/CubeLogger.js'
  */
 @singleton()
 export class WorkerPool {
-  limit: number
-  runningWorkers: Map<string, State>
-  waitingWorkers: Map<string, State>
-  private logger = container.resolve(CubeLogger).workerPool
+  limit: number;
+  runningWorkers: Map<string, State>;
+  waitingWorkers: Map<string, State>;
+  private logger = container.resolve(CubeLogger).workerPool;
 
-  constructor (limit: number) {
-    this.runningWorkers = new Map<string, State>()
-    this.waitingWorkers = new Map<string, State>()
-    this.limit = limit
+  constructor(limit: number) {
+    this.runningWorkers = new Map<string, State>();
+    this.waitingWorkers = new Map<string, State>();
+    this.limit = limit;
   }
 
   /**
@@ -28,9 +28,9 @@ export class WorkerPool {
    * @param path output path of image - should be passing a unique GUID in here
    * @param state graphics magick object containing state of edits to perofm
    */
-  add (path: string, state: State) {
-    this.waitingWorkers.set(path, state)
-    this.run(path)
+  add(path: string, state: State) {
+    this.waitingWorkers.set(path, state);
+    this.run(path);
     // or else we wait til next worker finished
   }
 
@@ -39,21 +39,21 @@ export class WorkerPool {
    * there are workers free to do it
    * @param path output path of image
    */
-  private run (path: string) {
-    const worker = this.waitingWorkers.get(path)
+  private run(path: string) {
+    const worker = this.waitingWorkers.get(path);
     if (worker && (this.runningWorkers.size <= this.limit)) {
-      this.waitingWorkers.delete(path)
-      this.logger.info(`job running: "${path.slice(-8)}"`)
+      this.waitingWorkers.delete(path);
+      this.logger.info(`job running: "${path.slice(-8)}"`);
       worker.write(path, (err) => {
-        if (err) this.logger.error(err)
-      })
-      this.runningWorkers.set(path, worker)
+        if (err) this.logger.error(err);
+      });
+      this.runningWorkers.set(path, worker);
 
       // free up that worker after 5 min if needed...although this doesn't actually
       // stop the gm process
-      setTimeout(() => { this.runningWorkers.delete(path) }, Milliseconds.fiveMin)
+      setTimeout(() => { this.runningWorkers.delete(path); }, Milliseconds.fiveMin);
     } else {
-      this.logger.info(`job queued: "${path.slice(-8)}". ${this.waitingWorkers.size} workers are waiting. ${this.runningWorkers.size} workers are running.`)
+      this.logger.info(`job queued: "${path.slice(-8)}". ${this.waitingWorkers.size} workers are waiting. ${this.runningWorkers.size} workers are running.`);
     }
   }
 
@@ -64,15 +64,15 @@ export class WorkerPool {
    * and possibly trigger another worker to run
    * @param path output path of image
    */
-  done (path: string) {
-    const worker = this.runningWorkers.get(path)
+  done(path: string) {
+    const worker = this.runningWorkers.get(path);
     if (worker) {
-      this.runningWorkers.delete(path)
-      this.logger.info(`job finished: "${path.slice(-8)}". ${this.waitingWorkers.size} workers are waiting. ${this.runningWorkers.size} workers are running.`)
+      this.runningWorkers.delete(path);
+      this.logger.info(`job finished: "${path.slice(-8)}". ${this.waitingWorkers.size} workers are waiting. ${this.runningWorkers.size} workers are running.`);
       // run next worker
-      const paths = this.waitingWorkers.keys()
+      const paths = this.waitingWorkers.keys();
       for (const p of paths) {
-        this.run(p)
+        this.run(p);
       }
     }
   }
