@@ -14,7 +14,7 @@ RUN ["python3", "scripts/gen-images/gen.py"]
 COPY yarn.lock .
 COPY package.json .
 
-RUN corepack enable && yarn install
+RUN corepack enable && yarn install --production=true
 
 COPY tsconfig.json .
 COPY src/ ./src/
