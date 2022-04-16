@@ -18,7 +18,6 @@ import { Milliseconds } from '../constants/Units.js';
 import { CubeLogger } from '../logger/CubeLogger.js';
 import { CubeStorage } from './Storage.js';
 
-
 /**
  * runs SQL database backups using dump and then performs backup rotations
  * @param firstRun if toggled yes, then will set an interval to perform backups every 24
@@ -98,7 +97,6 @@ async function compress(sourcePath: string) {
 }
 
 export function scheduleBackup() {
-
   const logger = container.resolve(CubeLogger).databaseMgmt;
   const cur = dayjs();
   // run backup immedieatly if backup between these times

@@ -1,14 +1,14 @@
 import dayjs from 'dayjs';
-import { createReadStream, createWriteStream } from "fs";
-import { stat } from "fs/promises";
-import { choice } from "pandemonium";
-import { resolve } from "path";
-import { createInterface } from "readline";
-import { pipeline } from "stream";
-import { container } from "tsyringe";
-import { promisify } from "util";
-import { gotOptions } from "../emote/Cmoji";
-import { CubeLogger } from "../logger/CubeLogger";
+import { createReadStream, createWriteStream } from 'fs';
+import { stat } from 'fs/promises';
+import { choice } from 'pandemonium';
+import { resolve } from 'path';
+import { createInterface } from 'readline';
+import { pipeline } from 'stream';
+import { container } from 'tsyringe';
+import { promisify } from 'util';
+import { gotOptions } from '../emote/Cmoji';
+import { CubeLogger } from '../logger/CubeLogger';
 const { got } = await import('got');
 
 // persist this file between restarts of bot
@@ -70,7 +70,7 @@ export class BadHosts {
 
       for await (const line of rl) {
         const split = line.split(' ');
-        if (split.length > 1 && split[0] == '0.0.0.0' && split[1] === line) {
+        if (split.length > 1 && split[0] === '0.0.0.0' && split[1] === line) {
           this.cacheAdd({
             hostname: host,
             blocked: true

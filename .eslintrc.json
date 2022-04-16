@@ -26,6 +26,10 @@
             "error",
             "always"
         ],
-        "camelcase": "error"
+        "camelcase": "error",
+        "quotes": [
+            "error",
+            "single"
+        ]
     }
 }

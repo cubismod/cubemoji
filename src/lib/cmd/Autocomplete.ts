@@ -4,6 +4,7 @@ import Qty from 'js-quantities';
 import { choice, geometricReservoirSample } from 'pandemonium';
 import { container } from 'tsyringe';
 import imgEffects from '../../res/imgEffects.json' assert { type: 'json' };
+import { generateList } from '../conversion/UnitList';
 import { CubeStorage } from '../db/Storage.js';
 import { Cmoji, Source } from '../emote/Cmoji.js';
 import { EmoteCache } from '../emote/EmoteCache.js';
@@ -150,7 +151,7 @@ export async function serverAutocomplete(interaction: AutocompleteInteraction) {
 /**
  * autocomplete for /convert function
  */
-export function unitAutocomplete(interaction: AutocompleteInteraction) {
+export async function unitAutocomplete(interaction: AutocompleteInteraction) {
   const query = interaction.options.getFocused(true).value;
   if (typeof query === 'string') {
     try {
@@ -160,13 +161,15 @@ export function unitAutocomplete(interaction: AutocompleteInteraction) {
           return { name: kind, value: kind };
         }));
       } else {
-        const units = Qty.getUnits();
-        const fuse = new Fuse<string>(units);
-        const res = fuse.search(query, { limit: 10 });
+        const units = await generateList();
+        if (units) {
+          const fuse = new Fuse<string>(units);
+          const res = fuse.search(query, { limit: 10 });
 
-        interaction.respond(res.map(result => {
-          return { name: result.item, value: result.item };
-        }));
+          interaction.respond(res.map(result => {
+            return { name: result.item, value: result.item };
+          }));
+        }
       }
     } catch (err) {
       logger.error(err);

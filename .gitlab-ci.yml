@@ -51,7 +51,7 @@ lint:
     name: node:17.8
   script:
     - corepack enable
-    - yarn install --production=true
+    - yarn install
     - npx eslint
 
 build:
