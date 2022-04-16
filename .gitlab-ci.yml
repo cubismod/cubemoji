@@ -49,8 +49,7 @@ lint:
     name: node:17.8-alpine
   before_script:
     - apk add graphicsmagick python3 pixman \
-      build-base \
-      g++ glib wget git
+      alpine-sdk g++ glib wget git
   script:
     - corepack enable
     - yarn install
