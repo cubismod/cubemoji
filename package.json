@@ -31,7 +31,7 @@
   "dependencies": {
     "@discordx/importer": "^1.1.2",
     "@discordx/koa": "^1.0.8",
-    "@discordx/pagination": "^2.0.1",
+    "@discordx/pagination": "^2.1.1",
     "@discordx/utilities": "4.1.0",
     "@keyv/sqlite": "^3.0.1",
     "@koa/router": "^10.1.1",
