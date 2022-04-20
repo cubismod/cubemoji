@@ -91,10 +91,10 @@
     lodash "^4.17.21"
     tslib "^2.3.1"
 
-"@discordx/utilities@4.1.0":
-  version "4.1.0"
-  resolved "https://registry.npmjs.org/@discordx/utilities/-/utilities-4.1.0.tgz"
-  integrity sha512-HdwSJeiergq+MHSbt3nnTHqHPII7O55V17mYDljRQgJrg/7rhwL0/pp+46hS8QaDMCnZamd0W+DA+GmNomjNQw==
+"@discordx/utilities@4.2.2":
+  version "4.2.2"
+  resolved "https://registry.yarnpkg.com/@discordx/utilities/-/utilities-4.2.2.tgz#45bdf6635c018490fc63fec477889ee10e2306c5"
+  integrity sha512-d9QXv/5QHJ9gpDlr4zSBaGJrnfv4NxzPPwtqVLOJZkCi/9oEaCrZtJ5qf5TgzQxyz/W51lDDMDYuJ8V5k0lsSw==
   dependencies:
     tslib "^2.3.1"
 
