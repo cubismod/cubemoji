@@ -39,25 +39,20 @@ variables:
   DEPENDABOT_IMAGE: docker.io/andrcuns/dependabot-gitlab:0.16.0
 
 stages:
-  - lint
+  - lint-audit
   - build
   - test
   - maintain
 lint:
-  stage: lint
+  stage: lint-audit
   tags:
     - cubemoji
   image:
     name: node:17.8
   script:
-    - |
-      npm i eslint \
-      eslint-config-standard \
-      eslint-plugin-import \
-      eslint-plugin-node \
-      eslint-plugin-promise \
-      eslint-plugin-uvu
+    - yarn install
     - npx eslint
+    - yarn install --audit
 
 build:
   stage: build
