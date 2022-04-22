@@ -50,7 +50,7 @@ lint:
   image:
     name: node:17.8
   script:
-    - yarn add eslint
+    - npm i eslint
     - npx eslint
 
 build:
