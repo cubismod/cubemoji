@@ -1,6 +1,6 @@
 // helper commands for Moderation group
 
-import { Client, CommandInteraction, MessageEmbed, User } from 'discord.js';
+import { Client, CommandInteraction, MessageActionRow, MessageButton, MessageEmbed, TextChannel, User } from 'discord.js';
 import { createReadStream } from 'fs';
 import { choice } from 'pandemonium';
 import { createInterface } from 'readline';
@@ -131,7 +131,7 @@ export async function auditMsg(interaction: CommandInteraction, message: {
 
 /**
  * reply with an embed to indicate status of action
- * @param interaction discord interaction which should be deferred
+ * @param interaction discord interaction which should be deferred na
  * @param guildName aka guild name
  * @param success result of action
  * @param action something like 'enroll', 'unenroll', etc.
@@ -182,6 +182,9 @@ export interface ModAction {
 /**
  * Perform bulk moderation actions with a text file
  * https://gitlab.com/cubismod/cubemoji/-/wikis/home#bulk-actions
+ * A button is created later on and then the actions are persisted
+ * to a database file until they are loaded in
+ * src/discord/events/Button.ts
  * @param interaction Discord interaction, this function expects
  * the interaction to be in a deferred state
  * @param fileLink link to plain text file of actions to perform
@@ -246,6 +249,8 @@ export async function bulk(interaction: CommandInteraction, fileLink: string) {
             }
           }
         }
+
+        await bulkActionsEmbed(interaction, actions, fileLink);
       } catch (err) {
         logger.error(err);
         await reply(interaction, interaction.guild?.name,
@@ -258,6 +263,52 @@ export async function bulk(interaction: CommandInteraction, fileLink: string) {
       false, 'Invalid URL',
       'Ensure you are using the raw text file link and this link is publicly accessible at an https:// url. See here: https://gitlab.com/cubismod/cubemoji/-/wikis/home#bulk-actions');
   }
+}
+
+/**
+ * displays an embed telling the user the bulk actions they can take and then
+ * allows them to confirm with an emoji
+ * @param interaction deferred command interaction that is NOT ephemeral
+ * @param actions list of actions to take
+ */
+export async function bulkActionsEmbed(interaction: CommandInteraction, actions: ModAction[], sourceUrl: string) {
+  const humanReadableActions: string[] = [];
+  for (const action of actions) {
+    humanReadableActions.push(action.blocked ? '⛔' : '👌' + ' ');
+    if (action.glob) humanReadableActions.push(action.glob);
+    if (action.channelId) {
+      const chan = await interaction.client.channels.resolve(action.channelId);
+      if (chan instanceof TextChannel) humanReadableActions.push(`in ${chan.name}`);
+    }
+    humanReadableActions.push('\n');
+  }
+
+  const embed = new MessageEmbed({
+    title: 'Please confirm you want to perform the below mod actions:',
+    description: humanReadableActions.join(''),
+    footer: {
+      text: 'If you included actions for servers you do not have permissions on, they were automatically removed.'
+    },
+    fields: [
+      { name: 'File Link', value: sourceUrl }
+    ],
+    color: 'GREYPLE'
+  });
+
+  const performActions = new MessageButton()
+    .setLabel('Perform Actions')
+    .setEmoji('👍')
+    .setCustomId('mod-action-confirm')
+    .setStyle('PRIMARY');
+
+  const modStorage = container.resolve(CubeStorage).pendingModActions;
+
+  const repId = await interaction.editReply({
+    embeds: [embed],
+    components: [new MessageActionRow().addComponents(performActions)]
+  });
+
+  await modStorage.set(repId.id, actions);
 }
 
 export async function buildList(interaction: CommandInteraction, namespaces: string[]) {

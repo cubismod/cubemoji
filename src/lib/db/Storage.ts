@@ -2,8 +2,9 @@ import Database from 'better-sqlite3';
 import { Client } from 'discordx';
 import Keyv from 'keyv';
 import { container, singleton } from 'tsyringe';
+import { ModAction } from '../cmd/ModHelper.js';
+import { Milliseconds } from '../constants/Units.js';
 import { CubeLogger } from '../logger/CubeLogger.js';
-const { got } = await import('got');
 
 export interface ServerOwner {
   id: string,
@@ -88,6 +89,12 @@ export class CubeStorage {
    */
   serverAnonNames: Keyv<string>;
 
+  /**
+   * lists of moderation actions
+   * key is message id, value is ModAction[]
+   */
+  pendingModActions: Keyv<ModAction[]>;
+
   private logger = container.resolve(CubeLogger).storage;
   // in testing mode, we are saving data to data/test/
   dbLocation = 'data/';
@@ -115,6 +122,8 @@ export class CubeStorage {
     this.serverAnonNames = new Keyv<string>(sqliteUri, { namespace: 'server-anon' });
 
     this.serverAuditInfo = new Keyv<string>(sqliteUri, { namespace: 'audit' });
+
+    this.pendingModActions = new Keyv<ModAction[]>(sqliteUri, { namespace: 'actions', ttl: Milliseconds.day });
   }
 
   /**
