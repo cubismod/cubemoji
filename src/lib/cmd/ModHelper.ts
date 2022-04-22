@@ -1,9 +1,13 @@
 // helper commands for Moderation group
 
 import { Client, CommandInteraction, MessageEmbed, User } from 'discord.js';
+import { createReadStream } from 'fs';
 import { choice } from 'pandemonium';
+import { createInterface } from 'readline';
 import { container } from 'tsyringe';
 import { ChannelInfo, CubeStorage, ValRaw } from '../db/Storage.js';
+import { isUrl } from '../image/DiscordLogic.js';
+import { downloadImage } from '../image/ImageLogic.js';
 import { CubeLogger } from '../logger/CubeLogger.js';
 
 const logger = container.resolve(CubeLogger).discordLogic;
@@ -163,6 +167,96 @@ export async function reply(interaction: CommandInteraction, guildName = '', suc
       guildName: guildName,
       notes: notes
     });
+  }
+}
+
+export interface ModAction {
+  blocked: boolean;
+  type: string; // glob or channel valid options
+  glob?: string;
+  channelId?: string;
+  guildId: string;
+  guildName: string;
+}
+
+/**
+ * Perform bulk moderation actions with a text file
+ * https://gitlab.com/cubismod/cubemoji/-/wikis/home#bulk-actions
+ * @param interaction Discord interaction, this function expects
+ * the interaction to be in a deferred state
+ * @param fileLink link to plain text file of actions to perform
+ */
+export async function bulk(interaction: CommandInteraction, fileLink: string) {
+  // check URL first
+  const valid = await isUrl(fileLink, 'txt');
+  if (valid) {
+    // download file and parse
+    const localName = await downloadImage(fileLink);
+    if (localName) {
+      try {
+        const rl = createInterface({
+          input: createReadStream(localName),
+          crlfDelay: Infinity
+        });
+
+        const actions: ModAction[] = [];
+
+        for await (const line of rl) {
+          if (!line.startsWith('#') && !line.startsWith(' ')) {
+            const errMsg = `Syntax error on this line!\n${line}`;
+
+            // parse each line
+            const split = line.split(' ');
+            if (split.length < 2) {
+              throw new Error(errMsg);
+            }
+
+            const type = split[1];
+            let guildId = '';
+            let glob: string | undefined;
+
+            if (type === 'channel') {
+              guildId = interaction.client.channels.resolveId(split[2]);
+            } else if (type === 'glob' && split.length > 2) {
+              guildId = split[3];
+            }
+
+            let blocked = false;
+
+            switch (split[0]) {
+              case '+':
+                blocked = true;
+                break;
+              case '-':
+                break;
+              default:
+                throw new Error(errMsg);
+            }
+
+            const guildInfo = await validUser(interaction.user, guildId, interaction.client);
+            if (guildInfo) {
+              // save this action
+              actions.push({
+                blocked: blocked,
+                type: type,
+                glob: glob,
+                guildId: guildId,
+                guildName: guildInfo[1]
+              });
+            }
+          }
+        }
+      } catch (err) {
+        logger.error(err);
+        await reply(interaction, interaction.guild?.name,
+          false, `Error downloading or processing file.',
+          'There was an error downloading or processing the file. Double check that the syntax is correct at https://gitlab.com/cubismod/cubemoji/-/wikis/home#bulk-actions\n\`${err}\``);
+      }
+    }
+  } else {
+    await reply(interaction, interaction.guild?.name,
+      false, 'Invalid URL',
+      'Ensure you are using the raw text file link and this link is publicly accessible at an https:// url. See here: https://gitlab.com/cubismod/cubemoji/-/wikis/home#bulk-actions');
   }
 }
 

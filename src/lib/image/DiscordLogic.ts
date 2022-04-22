@@ -160,7 +160,7 @@ export function setStatus(client: Client) {
 * @param url
 * @returns boolean indicating valid
 */
-export async function isUrl(url: string) {
+export async function isUrl(url: string, urlType = 'image') {
   try {
     const whatwgUrl = new URL(url);
 
@@ -176,7 +176,12 @@ export async function isUrl(url: string) {
     // now check the filetype
     const stream = await got.stream(url);
     const type = await fileTypeFromStream(stream);
-    const validTypes = ['jpg', 'jpeg', 'gif', 'png'];
+    let validTypes: string[] = [];
+    if (urlType === 'image') {
+      validTypes = ['jpg', 'jpeg', 'gif', 'png'];
+    } else if (urlType === 'txt') {
+      validTypes = ['txt'];
+    }
 
     if (type !== undefined && validTypes.includes(type.ext)) return true;
     else return false;

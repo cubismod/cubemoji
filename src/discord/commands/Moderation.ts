@@ -50,8 +50,7 @@ export abstract class Enrollment {
       description: 'name of server you want to enroll/unenroll',
       autocomplete: (interaction: AutocompleteInteraction) => serverAutocomplete(interaction),
       type: 'STRING'
-    }) server: string,
-    interaction: CommandInteraction
+    }) server: string, interaction: CommandInteraction
   ) {
     await interaction.deferReply({ ephemeral: true });
     const guildInfo = await guildOwnersCheck(interaction.user.id, server, interaction.client);
@@ -72,8 +71,7 @@ export abstract class Enrollment {
   @Slash('audit', { description: 'set a channel to log changes made to permissions' })
   async audit(
     @SlashOption('clear', { description: 'remove audit channel', type: 'BOOLEAN', required: false }) clear: boolean,
-    @SlashOption('channel', { description: 'channel to log actions to, cubemoji must have write permission here', type: 'CHANNEL', required: false }) channel: TextChannel | VoiceChannel,
-    interaction: CommandInteraction
+    @SlashOption('channel', { description: 'channel to log actions to, cubemoji must have write permission here', type: 'CHANNEL', required: false }) channel: TextChannel | VoiceChannel, interaction: CommandInteraction
   ) {
     await interaction.deferReply({ ephemeral: true });
     const guildInfo = await guildOwnersCheck(interaction.user.id, interaction.guildId, interaction.client);
@@ -101,8 +99,7 @@ export abstract class Enrollment {
     @SlashOption('role', {
       description: 'role to grant/remove mod permissions',
       type: 'ROLE'
-    }) role: Role,
-    interaction: CommandInteraction
+    }) role: Role, interaction: CommandInteraction
   ) {
     await interaction.deferReply({ ephemeral: true });
     const guildInfo = await guildOwnersCheck(interaction.user.id, interaction.guildId, interaction.client);
@@ -166,8 +163,7 @@ export abstract class Blacklist {
       type: 'STRING',
       required: false
     }) glob: string,
-    @SlashOption('channel', { type: 'CHANNEL', description: 'channel that cubemoji is blocked from interacting in', required: false }) channel: TextChannel | VoiceChannel,
-    interaction: CommandInteraction) {
+    @SlashOption('channel', { type: 'CHANNEL', description: 'channel that cubemoji is blocked from interacting in', required: false }) channel: TextChannel | VoiceChannel, interaction: CommandInteraction) {
     // first determine what the end user is trying to do
     // block an emoji glob?
     // block a channel?
