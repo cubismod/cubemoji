@@ -50,8 +50,7 @@ lint:
   image:
     name: node:17.8
   script:
-    - corepack enable
-    - yarn install
+    - yarn add eslint
     - npx eslint
 
 build:
