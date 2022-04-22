@@ -2,12 +2,13 @@
 
 import { Client, CommandInteraction, MessageActionRow, MessageButton, MessageEmbed, TextChannel, User } from 'discord.js';
 import { createReadStream } from 'fs';
+import { isBinaryFile } from 'isbinaryfile';
 import { choice } from 'pandemonium';
 import { createInterface } from 'readline';
 import { container } from 'tsyringe';
 import { ChannelInfo, CubeStorage, ValRaw } from '../db/Storage.js';
 import { isUrl } from '../image/DiscordLogic.js';
-import { downloadImage } from '../image/ImageLogic.js';
+import { downloadFile } from '../image/ImageLogic.js';
 import { CubeLogger } from '../logger/CubeLogger.js';
 
 const logger = container.resolve(CubeLogger).discordLogic;
@@ -189,24 +190,27 @@ export interface ModAction {
  * the interaction to be in a deferred state
  * @param fileLink link to plain text file of actions to perform
  */
-export async function bulk(interaction: CommandInteraction, fileLink: string) {
+export async function performBulkAction(interaction: CommandInteraction, fileLink: string) {
   // check URL first
   const valid = await isUrl(fileLink, 'txt');
   if (valid) {
     // download file and parse
-    const localName = await downloadImage(fileLink);
-    if (localName) {
+    const localPath = await downloadFile(fileLink);
+    if (localPath && !await isBinaryFile(localPath)) {
       try {
         const rl = createInterface({
-          input: createReadStream(localName),
+          input: createReadStream(localPath),
           crlfDelay: Infinity
         });
 
         const actions: ModAction[] = [];
 
+        let ln = 0;
+
         for await (const line of rl) {
-          if (!line.startsWith('#') && !line.startsWith(' ')) {
-            const errMsg = `Syntax error on this line!\n${line}`;
+          if (!line.startsWith('#') && !line.startsWith(' ') && line !== '') {
+            ln++;
+            const errMsg = `Syntax error on line #${ln} in ${fileLink}`;
 
             // parse each line
             const split = line.split(' ');
@@ -217,10 +221,16 @@ export async function bulk(interaction: CommandInteraction, fileLink: string) {
             const type = split[1];
             let guildId = '';
             let glob: string | undefined;
+            let chanId: string | undefined;
 
             if (type === 'channel') {
-              guildId = interaction.client.channels.resolveId(split[2]);
+              chanId = split[2];
+              const chan = interaction.client.channels.resolve(split[2]);
+              if (chan && chan instanceof TextChannel) {
+                guildId = chan.guildId;
+              }
             } else if (type === 'glob' && split.length > 2) {
+              glob = split[2];
               guildId = split[3];
             }
 
@@ -233,7 +243,7 @@ export async function bulk(interaction: CommandInteraction, fileLink: string) {
               case '-':
                 break;
               default:
-                throw new Error(errMsg);
+                throw new Error(errMsg + '\nCheck that you are using + or - to begin a line');
             }
 
             const guildInfo = await validUser(interaction.user, guildId, interaction.client);
@@ -241,6 +251,7 @@ export async function bulk(interaction: CommandInteraction, fileLink: string) {
               // save this action
               actions.push({
                 blocked: blocked,
+                channelId: chanId,
                 type: type,
                 glob: glob,
                 guildId: guildId,
@@ -254,13 +265,13 @@ export async function bulk(interaction: CommandInteraction, fileLink: string) {
       } catch (err) {
         logger.error(err);
         await reply(interaction, interaction.guild?.name,
-          false, `Error downloading or processing file.',
-          'There was an error downloading or processing the file. Double check that the syntax is correct at https://gitlab.com/cubismod/cubemoji/-/wikis/home#bulk-actions\n\`${err}\``);
+          false, 'Bulk Blocklisting',
+          `There was an error downloading or processing the file. Double check that the syntax is correct at https://gitlab.com/cubismod/cubemoji/-/wikis/home#bulk-actions\n*${err}*`);
       }
     }
   } else {
     await reply(interaction, interaction.guild?.name,
-      false, 'Invalid URL',
+      false, 'Bulk Blocklisting',
       'Ensure you are using the raw text file link and this link is publicly accessible at an https:// url. See here: https://gitlab.com/cubismod/cubemoji/-/wikis/home#bulk-actions');
   }
 }
@@ -272,43 +283,47 @@ export async function bulk(interaction: CommandInteraction, fileLink: string) {
  * @param actions list of actions to take
  */
 export async function bulkActionsEmbed(interaction: CommandInteraction, actions: ModAction[], sourceUrl: string) {
-  const humanReadableActions: string[] = [];
-  for (const action of actions) {
-    humanReadableActions.push(action.blocked ? '⛔' : '👌' + ' ');
-    if (action.glob) humanReadableActions.push(action.glob);
-    if (action.channelId) {
-      const chan = await interaction.client.channels.resolve(action.channelId);
-      if (chan instanceof TextChannel) humanReadableActions.push(`in ${chan.name}`);
+  if (actions.length > 0) {
+    const humanReadableActions: string[] = [];
+    for (const action of actions) {
+      humanReadableActions.push(action.blocked ? '⛔ Block ⛔' : '👌 Unblock 👌' + ' ');
+      if (action.glob) humanReadableActions.push(` the glob: \`${action.glob}\` that will match to emoji names`);
+      if (action.channelId) {
+        const chan = await interaction.client.channels.resolve(action.channelId);
+        if (chan instanceof TextChannel) humanReadableActions.push(` cubemoji from posting in ${chan.name}`);
+      }
+      humanReadableActions.push(` in server **${action.guildName}**\n`);
     }
-    humanReadableActions.push('\n');
+
+    const embed = new MessageEmbed({
+      title: 'Please confirm you want to perform the below mod actions:',
+      description: humanReadableActions.join(''),
+      footer: {
+        text: 'If you included actions for servers you do not have permissions on, they were automatically removed.'
+      },
+      fields: [
+        { name: 'File Link', value: sourceUrl }
+      ],
+      color: 'GREYPLE'
+    });
+
+    const performActions = new MessageButton()
+      .setLabel('Perform Actions')
+      .setEmoji('👍')
+      .setCustomId('mod-action-confirm')
+      .setStyle('PRIMARY');
+
+    const modStorage = container.resolve(CubeStorage).pendingModActions;
+
+    const repId = await interaction.editReply({
+      embeds: [embed],
+      components: [new MessageActionRow().addComponents(performActions)]
+    });
+
+    await modStorage.set(repId.id, actions);
+  } else {
+    await interaction.editReply('Uh, there were no valid items on your blocklist.');
   }
-
-  const embed = new MessageEmbed({
-    title: 'Please confirm you want to perform the below mod actions:',
-    description: humanReadableActions.join(''),
-    footer: {
-      text: 'If you included actions for servers you do not have permissions on, they were automatically removed.'
-    },
-    fields: [
-      { name: 'File Link', value: sourceUrl }
-    ],
-    color: 'GREYPLE'
-  });
-
-  const performActions = new MessageButton()
-    .setLabel('Perform Actions')
-    .setEmoji('👍')
-    .setCustomId('mod-action-confirm')
-    .setStyle('PRIMARY');
-
-  const modStorage = container.resolve(CubeStorage).pendingModActions;
-
-  const repId = await interaction.editReply({
-    embeds: [embed],
-    components: [new MessageActionRow().addComponents(performActions)]
-  });
-
-  await modStorage.set(repId.id, actions);
 }
 
 export async function buildList(interaction: CommandInteraction, namespaces: string[]) {

@@ -174,17 +174,20 @@ export async function isUrl(url: string, urlType = 'image') {
     if (res !== false) return false;
 
     // now check the filetype
-    const stream = await got.stream(url);
-    const type = await fileTypeFromStream(stream);
+
     let validTypes: string[] = [];
     if (urlType === 'image') {
+      // check image file
       validTypes = ['jpg', 'jpeg', 'gif', 'png'];
+      const stream = await got.stream(url);
+      const type = await fileTypeFromStream(stream);
+      if (type !== undefined && validTypes.includes(type.ext)) return true;
     } else if (urlType === 'txt') {
-      validTypes = ['txt'];
+      // check headers
+      const headers = await got.head(url);
+      if (headers.headers['content-type']?.startsWith('text/plain')) return true;
     }
-
-    if (type !== undefined && validTypes.includes(type.ext)) return true;
-    else return false;
+    return false;
   } catch (e) {
     return false;
   }

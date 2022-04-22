@@ -53,7 +53,7 @@ abstract class ImageOperation {
    * @returns boolean status
    */
   protected async download() {
-    const localUrl = await downloadImage(this.externalUrl).catch(
+    const localUrl = await downloadFile(this.externalUrl).catch(
       err => {
         logger.error(err);
       });
@@ -334,13 +334,13 @@ export function splitEffects(effects: string) {
 }
 
 /**
-* download an image file to the local FS under the download folder
+* download an image/text file to the local FS under the download folder
 * or use the cached version if that is saved
 * @param url - link to the img
 * @returns promise for local filename or undefined if can't be downloaded
 * local filename doesn't guarantee file has been written to diskif can't be downloaded
 */
-export async function downloadImage(url: string) {
+export async function downloadFile(url: string) {
   // check cache
   const queue = container.resolve(ImageQueue);
   const res = await queue.search(url);
@@ -353,7 +353,9 @@ export async function downloadImage(url: string) {
       logger.error(err);
       return undefined;
     });
-  if (headers && headers.headers['content-length'] && parseInt(headers.headers['content-length']) < 2e+7) {
+  if (headers && (
+    (headers.headers['content-length'] && parseInt(headers.headers['content-length']) < 2e+7) ||
+    headers.headers['content-type']?.startsWith('text/plain'))) {
     // limit to 2mb download
     const fn = path.resolve(`download/${randomUUID()}`);
     await pipeline(

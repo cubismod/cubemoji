@@ -5,7 +5,7 @@ import { AutocompleteInteraction, CommandInteraction, MessageEmbed, Role, TextCh
 import { Discord, Permission, Slash, SlashChoice, SlashGroup, SlashOption } from 'discordx';
 import { container } from 'tsyringe';
 import { serverAutocomplete } from '../../lib/cmd/Autocomplete';
-import { buildList, guildOwnersCheck, reply, validUser } from '../../lib/cmd/ModHelper';
+import { buildList, guildOwnersCheck, performBulkAction, reply, validUser } from '../../lib/cmd/ModHelper';
 import { CubeStorage } from '../../lib/db/Storage.js';
 import { EmoteCache } from '../../lib/emote/EmoteCache.js';
 import strings from '../../res/strings.json' assert { type: 'json' };
@@ -220,5 +220,18 @@ export abstract class Blacklist {
       interaction,
       await buildList(interaction, ['emoji', 'channels'])
     ).send();
+  }
+
+  @Slash('bulk', { description: 'perform bulk blocking/unblocking of globs and channels' })
+  async bulk(
+    @SlashOption('listlink', {
+      description: 'publicly available plaintext link following bulk syntax, (see wiki for details)',
+      required: true
+    })
+    listLink: string,
+    interaction: CommandInteraction
+  ) {
+    await interaction.deferReply({ ephemeral: true });
+    await performBulkAction(interaction, listLink);
   }
 }
