@@ -50,7 +50,13 @@ lint:
   image:
     name: node:17.8
   script:
-    - npm i eslint
+    - |
+      npm i eslint \
+      eslint-config-standard \
+      eslint-plugin-import \
+      eslint-plugin-node \
+      eslint-plugin-promise \
+      eslint-plugin-uvu
     - npx eslint
 
 build:
