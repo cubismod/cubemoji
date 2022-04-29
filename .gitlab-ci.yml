@@ -72,7 +72,7 @@ build:
       --cache=true
       --cache-repo $CACHE_REPO
       --reproducible
-      --destination "$REPO_NAME:$CI_COMMIT_BRANCH-$CI_COMMIT_SHORT_SHA"
+      --destination "$REPO_NAME:$CI_COMMIT_BRANCH$CI_COMMIT_SHORT_SHA"
   rules:
     - if: '$CI_PIPELINE_SOURCE != "schedule"'
 
