@@ -60,6 +60,7 @@
     "node-emoji": "^1.11.0",
     "node-object-hash": "^2.3.10",
     "pandemonium": "^2.3.0",
+    "pify": "^5.0.0",
     "probe-image-size": "^7.2.3",
     "pug": "^3.0.2",
     "reflect-metadata": "^0.1.13",

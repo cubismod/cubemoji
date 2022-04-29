@@ -141,9 +141,9 @@ async function guildErrorFinish(interaction: CommandInteraction, guildName: stri
 }
 
 @Discord()
-@SlashGroup({ name: 'blacklist', root: 'mod' })
-@SlashGroup('blacklist', 'mod')
-export abstract class Blacklist {
+@SlashGroup({ name: 'blocklist', root: 'mod' })
+@SlashGroup('blocklist', 'mod')
+export abstract class blocklist {
   emoteCache = container.resolve(EmoteCache);
   storage = container.resolve(CubeStorage);
 
