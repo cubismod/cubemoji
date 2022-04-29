@@ -266,7 +266,7 @@ export async function sendPagination(interaction: CommandInteraction, type: Sour
       const emote = emoteSource[i];
 
       if (interaction.guildId && !await emoteCache.isBlocked(emote.name, interaction.guildId)) {
-        // TODO: implement blacklisting here
+        // TODO: implement blocklisting here
         // for discord emojis we want 60 emojis in one embed
         // mutant and any we can do 100 in one embed
         if (embedBody === '') {
