@@ -1,8 +1,7 @@
-import { singleton } from 'tsyringe'
-import { createLogger, format, Logger, transports } from 'winston'
-import { Bytes } from '../constants/Units.js'
-import { LokiTransport } from './LokiTransport.js'
-
+import { singleton } from 'tsyringe';
+import { createLogger, format, Logger, transports } from 'winston';
+import { Bytes } from '../constants/Units.js';
+import { LokiTransport } from './LokiTransport.js';
 
 /**
  * cubemoji logging using Winston
@@ -10,30 +9,30 @@ import { LokiTransport } from './LokiTransport.js'
  */
 @singleton()
 export class CubeLogger {
-  readonly parent: Logger
+  readonly parent: Logger;
   // each child is its own logger
-  readonly main: Logger
-  readonly command: Logger
-  readonly autocomplete: Logger
-  readonly discordLogic: Logger
-  readonly emoteCache: Logger
-  readonly imageQueue: Logger
-  readonly storage: Logger
-  readonly workerPool: Logger
-  readonly imageLogic: Logger
-  readonly messageManager: Logger
-  readonly events: Logger
-  readonly databaseMgmt: Logger
-  readonly client: Logger
-  readonly web: Logger
-  readonly errors: Logger
+  readonly main: Logger;
+  readonly command: Logger;
+  readonly autocomplete: Logger;
+  readonly discordLogic: Logger;
+  readonly emoteCache: Logger;
+  readonly imageQueue: Logger;
+  readonly storage: Logger;
+  readonly workerPool: Logger;
+  readonly imageLogic: Logger;
+  readonly messageManager: Logger;
+  readonly events: Logger;
+  readonly databaseMgmt: Logger;
+  readonly client: Logger;
+  readonly web: Logger;
+  readonly errors: Logger;
 
-  constructor () {
+  constructor() {
     const lokiTransport = new LokiTransport({
       host: process.env.CM_HTTP_HOST ?? 'localhost',
       port: parseInt(process.env.CM_HTTP_PORT ?? '200'),
       label: 'cubemoji'
-    })
+    });
 
     // different transports when using different versions of bot
     if (process.env.CM_ENVIRONMENT === 'npr') {
@@ -54,12 +53,12 @@ export class CubeLogger {
             format: format.combine(
               format.uncolorize(),
               format.json()
-            ),
+            )
           })
-        ],
-      })
+        ]
+      });
       // only log to file during testing
-      if (!process.env.CM_TEST) this.parent.add(new transports.Console())
+      if (!process.env.CM_TEST) this.parent.add(new transports.Console());
     } else {
       // PRD logging
       /**
@@ -82,31 +81,31 @@ export class CubeLogger {
             maxsize: Bytes.oneMB,
             maxFiles: 20,
           }) */
-        ],
-      })
+        ]
+      });
       if (process.env.CM_HTTP_LOG === 'true' &&
-      process.env.CM_HTTP_PORT &&
-      process.env.CM_HTTP_HOST) {
-        this.parent.add(lokiTransport)
+        process.env.CM_HTTP_PORT &&
+        process.env.CM_HTTP_HOST) {
+        this.parent.add(lokiTransport);
       }
     }
 
     // now setup child loggers
-    this.main = this.parent.child({ module: 'Main' })
-    this.command = this.parent.child({ module: 'Command' })
-    this.autocomplete = this.parent.child({ module: 'Autocomplete' })
-    this.discordLogic = this.parent.child({ module: 'DiscordLogic' })
-    this.emoteCache = this.parent.child({ module: 'EmoteCache' })
-    this.imageQueue = this.parent.child({ module: 'ImageQueue' })
-    this.storage = this.parent.child({ module: 'Storage' })
-    this.workerPool = this.parent.child({ module: 'WorkerPool' })
-    this.imageLogic = this.parent.child({ module: 'ImageLogic' })
-    this.messageManager = this.parent.child({ module: 'MessageManager' })
-    this.events = this.parent.child({ module: 'Events' })
-    this.databaseMgmt = this.parent.child({ module: 'DatabaseManagement' })
-    this.client = this.parent.child({ module: 'Client' })
-    this.web = this.parent.child({ module: 'web' })
-    this.errors = this.parent.child({module: 'errors'})
+    this.main = this.parent.child({ module: 'Main' });
+    this.command = this.parent.child({ module: 'Command' });
+    this.autocomplete = this.parent.child({ module: 'Autocomplete' });
+    this.discordLogic = this.parent.child({ module: 'DiscordLogic' });
+    this.emoteCache = this.parent.child({ module: 'EmoteCache' });
+    this.imageQueue = this.parent.child({ module: 'ImageQueue' });
+    this.storage = this.parent.child({ module: 'Storage' });
+    this.workerPool = this.parent.child({ module: 'WorkerPool' });
+    this.imageLogic = this.parent.child({ module: 'ImageLogic' });
+    this.messageManager = this.parent.child({ module: 'MessageManager' });
+    this.events = this.parent.child({ module: 'Events' });
+    this.databaseMgmt = this.parent.child({ module: 'DatabaseManagement' });
+    this.client = this.parent.child({ module: 'Client' });
+    this.web = this.parent.child({ module: 'web' });
+    this.errors = this.parent.child({ module: 'errors' });
 
     /* // exceptions/rejections log to separate file
     const exReFileTransport = new transports.File({
@@ -126,14 +125,12 @@ export class CubeLogger {
       ]
     })
 
-
     if (process.env.CM_HTTP_LOG === 'true' &&
     process.env.CM_HTTP_PORT &&
-    process.env.CM_HTTP_HOST) { 
+    process.env.CM_HTTP_HOST) {
       exReLogger.exceptions.handle(lokiTransport)
       exReLogger.rejections.handle(lokiTransport)
     }
-
 
     // handle exceptions and errors with logger */
   }

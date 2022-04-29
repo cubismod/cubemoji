@@ -1,4 +1,4 @@
-import { getPaletteFromURL } from 'color-thief-node'
+import { getPaletteFromURL } from 'color-thief-node';
 
 /**
  * attempts to parse an image to get the key colors
@@ -7,6 +7,6 @@ import { getPaletteFromURL } from 'color-thief-node'
  * @returns color palette
  */
 export async function getColors(url: string) {
-  const palette = await getPaletteFromURL(url)
-  return palette
+  const palette = await getPaletteFromURL(url);
+  return palette;
 }

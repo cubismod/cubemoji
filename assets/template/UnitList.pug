@@ -1,0 +1,27 @@
+extends ParentTemplate.pug 
+
+block title 
+  h1(class='display-2') Unit List
+  p All units available to
+    code /convert
+
+block content 
+  div(class='row')
+    div(class='col')
+      div(id='units' class='mt-2')
+        input(type='search' class='search form-control form-control-lg', placeholder='Search')
+        ul(class='list list-group')
+          each unit in units 
+            li(class="list-group-item")
+              p(class='unit-item')=unit 
+  
+  // list code
+  script(src='https://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js')
+  script(src='https://cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js')
+
+  script. 
+    const options = {
+      valueNames: ['unit-item']
+    };
+
+    const userList = new List('units', options);

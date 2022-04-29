@@ -1,6 +1,7 @@
 {
   "name": "cubemoji",
-  "version": "3.2.3",
+  "author": "cubis",
+  "version": "3.2.4",
   "description": "A Discord emoji bot",
   "main": "Main.ts",
   "license": "MIT",
@@ -12,8 +13,10 @@
     "profile": "clinic doctor -- node --es-module-specifier-resolution=node build/Main.js",
     "test": "tsc && export CM_TEST=true && node --es-module-specifier-resolution=node build/tests/Tests.js",
     "dev": "tsc-watch --noClear -p ./tsconfig.json --onSuccess \"node --es-module-specifier-resolution=node --trace-warnings --inspect build/Main.js\"",
-    "clean": "rm -rf build/"
+    "clean": "rm -rf build/",
+    "lint": "eslint src/"
   },
+  "eslintPreCommitBaseCommand": "eslint --fix --max-warnings=0",
   "repository": {
     "type": "git",
     "url": "git+ssh://git@gitlab.com/cubismod/cubemoji.git"
@@ -23,7 +26,6 @@
     "emoji",
     "bot"
   ],
-  "author": "cubis",
   "bugs": {
     "url": "https://gitlab.com/cubismod/cubemoji/issues"
   },
@@ -48,6 +50,7 @@
     "gm": "^1.23.1",
     "got": "^12.0.4",
     "image-downloader": "^4.2.0",
+    "isbinaryfile": "^5.0.0",
     "js-quantities": "^1.7.6",
     "keyv": "^4.2.2",
     "koa": "^2.13.4",

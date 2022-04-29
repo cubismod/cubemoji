@@ -1,8 +1,8 @@
-import { unlink } from 'fs'
-import { readdir } from 'fs/promises'
-import Fuse from 'fuse.js'
-import { container, singleton } from 'tsyringe'
-import { CubeLogger } from '../logger/CubeLogger.js'
+import { unlink } from 'fs';
+import { readdir } from 'fs/promises';
+import Fuse from 'fuse.js';
+import { container, singleton } from 'tsyringe';
+import { CubeLogger } from '../logger/CubeLogger.js';
 
 export interface Image {
   // url as saved in discord cdn
@@ -14,8 +14,8 @@ export interface Image {
 
 @singleton()
 export class ImageQueue {
-  private images: Image[]
-  private logger = container.resolve(CubeLogger).imageQueue
+  private images: Image[];
+  private logger = container.resolve(CubeLogger).imageQueue;
   /**
   * Used to keep track of images saved on disk
   * basically we just add another image to the queue
@@ -27,8 +27,8 @@ export class ImageQueue {
   * IE front of queue is end of array, end of queue is the front of
   * the array.
   */
-  constructor () {
-    this.images = []
+  constructor() {
+    this.images = [];
   }
 
   /**
@@ -37,15 +37,15 @@ export class ImageQueue {
    * 40 images being stored right now
    * @param image new image to push in
    */
-  async enqueue (image: Image) {
+  async enqueue(image: Image) {
     if (this.images.length >= 40) {
       // delete first item
-      const first = this.images.shift()
+      const first = this.images.shift();
       if (first) {
-        await unlink(first.localPath, (_) => {})
+        await unlink(first.localPath, (_) => { });
       }
     }
-    this.images.push(image)
+    this.images.push(image);
   }
 
   /**
@@ -57,35 +57,35 @@ export class ImageQueue {
    * @param url - url from discord or the web we're looking
    * to see is downloaded locally
    */
-  async search (url: string) {
+  async search(url: string) {
     const options = {
       keys: ['url'],
       minMatchCharLength: 3,
       threshold: 0.0
-    }
-    const search = new Fuse(this.images, options)
-    const res = search.search(url)
+    };
+    const search = new Fuse(this.images, options);
+    const res = search.search(url);
     if (res.length > 0 && res[0].item.url === url) {
       // promote this item to the end of the queue
       // so it stays around for longer and doesnt get deleted
-      const i = res[0].refIndex
-      this.images.splice(i, 1)
-      this.images.push(res[0].item)
+      const i = res[0].refIndex;
+      this.images.splice(i, 1);
+      this.images.push(res[0].item);
       // return the first item
-      return res[0].item
-    } else { return undefined }
+      return res[0].item;
+    } else { return undefined; }
   }
 
   // clear downloads folder
-  async clear () {
+  async clear() {
     await readdir('download/').then(
       async (dir) => {
         dir.map(file => unlink(`download/${file}`, (err) => {
           if (err) {
-            this.logger.error(err)
+            this.logger.error(err);
           }
-        }))
+        }));
       }
-    )
+    );
   }
 }

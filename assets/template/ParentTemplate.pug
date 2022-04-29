@@ -1,0 +1,52 @@
+doctype html
+html(lang='en')
+  head 
+    meta(charset='utf-8')
+    meta(name='viewport', content=content='width=device-width, initial-scale=1')
+    meta(name='color-scheme', content='dark')
+
+    // bootstrap setup
+    link(href='https://cdn.jsdelivr.net/npm/bootstrap-dark-5@1.1.3/dist/css/bootstrap-night.min.css' rel='stylesheet')
+
+    // favicon setup
+    link(rel='apple-touch-icon'  sizes='180x180' href='/favicon/apple-touch-icon.png')
+    link(rel='icon' type='image/png' sizes='32x32' href='/favicon/favicon-32x32.png')
+    link(rel='icon' type='image/png' sizes='16x16' href='/favicon/favicon-16x16.png')
+    link(rel='icon', type='image/x-icon' href='/favicon/favicon.ico')
+    link(rel='manifest' href='/favicon/site.webmanifest')
+
+  block scripts
+    script(src='https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js' integrity='sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p' crossorigin='anonymous')
+  
+  body
+    block menu  
+      div(class='container')
+        div(class='row')
+          div(class='col-2 align-self-center justify-content-center')
+            img(src='https://gitlab.com/cubismod/cubemoji/-/raw/main/assets/icon.svg', class='img-fluid', alt='cubemoji logo' width=130, height=130)
+          div(class='col-9')
+            block title 
+              h1(class='display-2') Insert Text Here!
+            
+            block social
+              div(class='btn-group', role='group', aria-label='links')
+                a(class='btn btn-outline-light' href='/list') Emojis
+                a(class='btn btn-outline-light' href='/units') Units
+                a(target='_blank' class='btn btn-outline-light' href='https://gitlab.com/cubismod/cubemoji/-/wikis/home') Help
+                a(target='_blank' class='btn btn-outline-success' href='https://gitlab.com/cubismod/cubemoji') GitLab
+                a(target='_blank' class='btn btn-outline-success' href='https://discord.gg/rQZVTpEyuG') Discord Server
+                a(target='_blank' class='btn btn-outline-success' href='https://www.buymeacoffee.com/cubis') Buy Me a Coffee
+                
+    
+        block content 
+          div(class='row')
+            div(class='col')
+              p Replace me!
+    
+        block footer
+            div(class='card')
+              div(class='card-body')
+                small
+                  p(class='text-muted')=`Copyright ${new Date().getFullYear()} cubis`
+                  p(class='text-muted') If you have questions or feedback, you can email 
+                    a(href='mailto:contact-project+cubismod-cubemoji-23331669-issue-@incoming.gitlab.com') this support address.
