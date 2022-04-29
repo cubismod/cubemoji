@@ -292,10 +292,10 @@ export class EmoteCache {
    * @param glob emoji to block
    * @param serverId id of server this emoji shouldn't show up on
    * @param block true for blocking, false for unblocking
-   * @param database perform database operations with this?
+   * @param database perform database operations with this? default: false
    * @returns true if glob can be added, false if it can't bc of size limit
    */
-  async modifyBlockedEmoji(glob: string, serverId: string, block = true, database = true) {
+  async modifyBlockedEmoji(glob: string, serverId: string, block = true, database = false) {
     const vals = this.blockedEmoji.get(serverId);
     /**
      * limit of 50 blocks per guild

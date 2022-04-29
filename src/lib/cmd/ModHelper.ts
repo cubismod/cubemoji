@@ -1,6 +1,6 @@
 // helper commands for Moderation group
 
-import { Client, CommandInteraction, MessageActionRow, MessageButton, MessageEmbed, TextChannel, User } from 'discord.js';
+import { ButtonInteraction, Client, CommandInteraction, MessageActionRow, MessageButton, MessageEmbed, TextChannel, User } from 'discord.js';
 import { createReadStream } from 'fs';
 import { isBinaryFile } from 'isbinaryfile';
 import { choice } from 'pandemonium';
@@ -104,7 +104,7 @@ export async function validUser(user: User, guildIdentifier: string | null, clie
 /**
  * log an audit message to the channel as set in the database
  */
-export async function auditMsg(interaction: CommandInteraction, message: {
+export async function auditMsg(interaction: CommandInteraction | ButtonInteraction, message: {
   action: string,
   notes: string;
   guildId: string,
@@ -138,8 +138,9 @@ export async function auditMsg(interaction: CommandInteraction, message: {
  * @param action something like 'enroll', 'unenroll', etc.
  * @param notes add'l notes to include for user
  * @param guildId discord provided guildid
+ * @param msg send a message in discord, default true
  */
-export async function reply(interaction: CommandInteraction, guildName = '', success: boolean, action: string, notes = '', guildId = '') {
+export async function modReply(interaction: CommandInteraction | ButtonInteraction, guildName = '', success: boolean, action: string, notes = '', guildId = '', msg = true) {
   const embed = new MessageEmbed({
     title: `Action: ${action}`,
     fields: [
@@ -158,7 +159,6 @@ export async function reply(interaction: CommandInteraction, guildName = '', suc
     }
   });
   if (notes !== '') embed.addField('Notes', notes);
-  await interaction.editReply({ embeds: [embed] });
   logger.info(`Action: ${action}| Success: ${success} | Guild: ${guildName}/${guildId} | Invoker: ${interaction.user.tag}`);
   // try to send an audit message
   if (success) {
@@ -169,6 +169,9 @@ export async function reply(interaction: CommandInteraction, guildName = '', suc
       notes: notes
     });
   }
+
+  if (msg) await interaction.editReply({ embeds: [embed] });
+  return embed;
 }
 
 export interface ModAction {
@@ -264,13 +267,13 @@ export async function performBulkAction(interaction: CommandInteraction, fileLin
         await bulkActionsEmbed(interaction, actions, fileLink);
       } catch (err) {
         logger.error(err);
-        await reply(interaction, interaction.guild?.name,
+        await modReply(interaction, interaction.guild?.name,
           false, 'Bulk Blocklisting',
           `There was an error downloading or processing the file. Double check that the syntax is correct at https://gitlab.com/cubismod/cubemoji/-/wikis/home#bulk-actions\n*${err}*`);
       }
     }
   } else {
-    await reply(interaction, interaction.guild?.name,
+    await modReply(interaction, interaction.guild?.name,
       false, 'Bulk Blocklisting',
       'Ensure you are using the raw text file link and this link is publicly accessible at an https:// url. See here: https://gitlab.com/cubismod/cubemoji/-/wikis/home#bulk-actions');
   }

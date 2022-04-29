@@ -5,7 +5,7 @@ import { AutocompleteInteraction, CommandInteraction, MessageEmbed, Role, TextCh
 import { Discord, Permission, Slash, SlashChoice, SlashGroup, SlashOption } from 'discordx';
 import { container } from 'tsyringe';
 import { serverAutocomplete } from '../../lib/cmd/Autocomplete';
-import { buildList, guildOwnersCheck, performBulkAction, reply, validUser } from '../../lib/cmd/ModHelper';
+import { buildList, guildOwnersCheck, modReply, performBulkAction, validUser } from '../../lib/cmd/ModHelper';
 import { CubeStorage } from '../../lib/db/Storage.js';
 import { EmoteCache } from '../../lib/emote/EmoteCache.js';
 import strings from '../../res/strings.json' assert { type: 'json' };
@@ -58,13 +58,13 @@ export abstract class Enrollment {
       // user triggering command has permissions to use it
       if (action === 'enroll') {
         await this.enrollment.set(guildInfo[0], interaction.user.tag);
-        await reply(interaction, guildInfo[1], true, 'enroll', '', guildInfo[0]);
+        await modReply(interaction, guildInfo[1], true, 'enroll', '', guildInfo[0]);
       } else {
         await this.enrollment.delete(guildInfo[0]);
-        await reply(interaction, guildInfo[1], true, 'unenroll', '', guildInfo[0]);
+        await modReply(interaction, guildInfo[1], true, 'unenroll', '', guildInfo[0]);
       }
     } else {
-      await reply(interaction, 'Error!', false, 'modify enrollment', this.serverOwnerMsg);
+      await modReply(interaction, 'Error!', false, 'modify enrollment', this.serverOwnerMsg);
     }
   }
 
@@ -79,15 +79,15 @@ export abstract class Enrollment {
       const key = interaction.guildId;
       if (clear && key) {
         await this.serverAudit.delete(key);
-        await reply(interaction, guildInfo[1], true, 'clear audit channel', '', guildInfo[0]);
+        await modReply(interaction, guildInfo[1], true, 'clear audit channel', '', guildInfo[0]);
       } else if (channel && key && channel instanceof TextChannel) {
         await this.serverAudit.set(key, channel.id);
-        await reply(interaction, guildInfo[1], true, 'set new audit channel', `Set to <#${channel.id}>`, guildInfo[0]);
+        await modReply(interaction, guildInfo[1], true, 'set new audit channel', `Set to <#${channel.id}>`, guildInfo[0]);
       } else {
         await interaction.editReply({ content: `${process.env.CM_BROKEN} Command failure or no options specified!\n**Command Usage**: Set an audit channel to log all changes to cubemoji settings.` });
       }
     } else {
-      await reply(interaction, 'Error!', false, 'change audit settings', this.serverOwnerMsg);
+      await modReply(interaction, 'Error!', false, 'change audit settings', this.serverOwnerMsg);
     }
   }
 
@@ -111,13 +111,13 @@ export abstract class Enrollment {
       const notice = 'May take up to 30 min for permissions to sync.';
       if (action === 'grant') {
         await modEnrollment.set(key, role.name);
-        await reply(interaction, guildInfo[1], true, `grant ${role.name} mod perms`, notice, guildInfo[0]);
+        await modReply(interaction, guildInfo[1], true, `grant ${role.name} mod perms`, notice, guildInfo[0]);
       } else {
         await modEnrollment.delete(key);
-        await reply(interaction, guildInfo[1], true, `revoke ${role.name} mod perms`, notice, guildInfo[0]);
+        await modReply(interaction, guildInfo[1], true, `revoke ${role.name} mod perms`, notice, guildInfo[0]);
       }
     } else {
-      await reply(interaction, 'Error!', false, 'modify moderation permissions', this.serverOwnerMsg);
+      await modReply(interaction, 'Error!', false, 'modify moderation permissions', this.serverOwnerMsg);
     }
   }
 
@@ -134,7 +134,7 @@ export abstract class Enrollment {
 }
 
 async function guildErrorFinish(interaction: CommandInteraction, guildName: string | undefined, target: string, action: string) {
-  return await reply(interaction,
+  return await modReply(interaction,
     interaction.guild?.name, false,
     `${action} glob \`${target}\``,
     'You don\'t have access to modify this guild');
@@ -182,8 +182,8 @@ export abstract class Blacklist {
         // user at this point has been confirmed to have permissions
         let blocked = true;
         if (action === 'unblock') blocked = false;
-        const success = await this.emoteCache.modifyBlockedEmoji(glob, guildInfo[0], blocked);
-        if (success) await reply(interaction, guildInfo[1], success, `${action} glob \`${glob}\``, '', guildInfo[0]);
+        const success = await this.emoteCache.modifyBlockedEmoji(glob, guildInfo[0], blocked, true);
+        if (success) await modReply(interaction, guildInfo[1], success, `${action} glob \`${glob}\``, '', guildInfo[0]);
       } else await guildErrorFinish(interaction, interaction.guild?.name, glob, action);
     }
     if (channel) {
@@ -200,7 +200,7 @@ export abstract class Blacklist {
         } else {
           await this.storage.blockedChannels.delete(channel.id);
         }
-        await reply(interaction, channel.guild.name, true, `${action} #${channel.name}`, `Linked version<#${channel.id}>`, guildInfo[0]);
+        await modReply(interaction, channel.guild.name, true, `${action} #${channel.name}`, `Linked version<#${channel.id}>`, guildInfo[0]);
       }
     }
     if (!glob && !channel) {
@@ -228,8 +228,8 @@ export abstract class Blacklist {
       description: 'publicly available plaintext link following bulk syntax, (see wiki for details)',
       required: true
     })
-    listLink: string,
-    interaction: CommandInteraction
+      listLink: string,
+      interaction: CommandInteraction
   ) {
     await interaction.deferReply({ ephemeral: true });
     await performBulkAction(interaction, listLink);

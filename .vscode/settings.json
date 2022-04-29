@@ -1,6 +1,5 @@
 {
     "editor.tabSize": 2,
-    "jest.jestCommandLine": "jest",
     "cSpell.words": [
         "Cubemoji",
         "discord",
@@ -8,7 +7,5 @@
         "js",
         "require"
     ],
-    "python.linting.flake8Enabled": false,
-    "python.linting.banditEnabled": true,
-    "python.linting.enabled": true
+    "editor.formatOnSave": false
 }
