@@ -1,4 +1,4 @@
-// Various server configuration commands
+/* // Various server configuration commands
 
 import { Pagination } from '@discordx/pagination';
 import { AutocompleteInteraction, CommandInteraction, MessageEmbed, Role, TextChannel, VoiceChannel } from 'discord.js';
@@ -235,3 +235,4 @@ export abstract class blocklist {
     await performBulkAction(interaction, listLink);
   }
 }
+ */
