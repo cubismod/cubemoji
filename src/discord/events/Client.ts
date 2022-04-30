@@ -104,7 +104,7 @@ export abstract class ClientEvents {
       setInterval(
         async () => {
           await container.resolve(CubeStorage).loadServerOwners(client);
-          await client.initApplicationPermissions();
+          // await client.initApplicationPermissions();
           await container.resolve(PugGenerator).emojiRender(client.guilds);
           this.logger.info('permission sync & pug-regen completed');
         },
@@ -119,7 +119,7 @@ export abstract class ClientEvents {
         global: { log: true },
         guild: { log: true }
       });
-      await client.initApplicationPermissions(true);
+      // await client.initApplicationPermissions(true);
     } catch (err) {
       this.logger.error('Error initializing application commands and permissions!!!');
       this.logger.error(err);
@@ -195,6 +195,6 @@ export abstract class ClientEvents {
     this.logger.info(`New guild "${guild.id}", "${guild.name}" joined, re-initing app commands & perms`);
     client.botGuilds.push(guild.id);
     await client.initApplicationCommands();
-    await client.initApplicationPermissions();
+    // await client.initApplicationPermissions();
   }
 }
