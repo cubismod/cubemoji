@@ -75,12 +75,20 @@ build:
       --cache-repo ${CACHE_REPO}
       --reproducible
       --destination ${CONTAINER_DEST}
-    - apk add skopeo
-    - skopeo login --authfile $KANIKO_AUTH
-    - >-
-      skopeo copy docker://${CONTAINER_DEST} docker://${REPO_NAME}:latest
+    
   rules:
     - if: '$CI_PIPELINE_SOURCE != "schedule"'
+
+skopeo_copy:
+  stage: build
+  image:
+    name: apine
+  script:
+    - echo $QUAY_CONF > /tmp/auth.json
+    - apk add skopeo
+    - skopeo login --authfile /tmp/auth.json
+    - >-
+      skopeo copy docker://${CONTAINER_DEST} docker://${REPO_NAME}:latest
 
 sast:
   variables:
