@@ -41,12 +41,11 @@ variables:
   KANIKO_AUTH: /kaniko/.docker/config.json
 
 stages:
-  - lint-audit
   - build
   - test
   - maintain
 lint:
-  stage: lint-audit
+  stage: build
   tags:
     - cubemoji
   image:
@@ -81,14 +80,15 @@ build:
 
 skopeo_copy:
   stage: build
+  tags:
+    - cubemoji
   image:
     name: alpine
   script:
     - echo $QUAY_CONF > /tmp/auth.json
     - apk add skopeo
-    - skopeo login --authfile /tmp/auth.json
-    - >-
-      skopeo copy docker://${CONTAINER_DEST} docker://${REPO_NAME}:latest
+    - skopeo login --authfile /tmp/auth.json quay.io
+    - skopeo copy docker://${CONTAINER_DEST} docker://${REPO_NAME}:latest
 
 sast:
   variables:
