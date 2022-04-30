@@ -37,6 +37,8 @@ variables:
   CACHE_REPO: "quay.io/cubismod/cubemoji-cache"
   SETTINGS__GITLAB_ACCESS_TOKEN: $SETTINGS__GITLAB_ACCESS_TOKEN
   DEPENDABOT_IMAGE: docker.io/andrcuns/dependabot-gitlab:0.16.0
+  CONTAINER_DEST: $REPO_NAME:$CI_COMMIT_BRANCH$CI_COMMIT_SHORT_SHA
+  KANIKO_AUTH: /kaniko/.docker/config.json
 
 stages:
   - lint-audit
@@ -63,16 +65,20 @@ build:
     - kaniko
   script:
     - mkdir -p /kaniko/.docker
-    - echo $QUAY_CONF > /kaniko/.docker/config.json
+    - echo $QUAY_CONF > $KANIKO_AUTH
     - >-
       /kaniko/executor
-      --context "${CI_PROJECT_DIR}"
+      --context ${CI_PROJECT_DIR}
       --dockerfile "${CI_PROJECT_DIR}/Dockerfile"
       --cache-copy-layers
       --cache=true
-      --cache-repo $CACHE_REPO
+      --cache-repo ${CACHE_REPO}
       --reproducible
-      --destination "$REPO_NAME:$CI_COMMIT_BRANCH$CI_COMMIT_SHORT_SHA"
+      --destination ${CONTAINER_DEST}
+    - apk add skopeo
+    - skopeo login --authfile $KANIKO_AUTH
+    - >-
+      skopeo copy docker://${CONTAINER_DEST} docker://${REPO_NAME}:latest
   rules:
     - if: '$CI_PIPELINE_SOURCE != "schedule"'
 
