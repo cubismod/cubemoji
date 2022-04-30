@@ -82,7 +82,7 @@ build:
 skopeo_copy:
   stage: build
   image:
-    name: apine
+    name: alpine
   script:
     - echo $QUAY_CONF > /tmp/auth.json
     - apk add skopeo
