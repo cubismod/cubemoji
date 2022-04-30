@@ -95,6 +95,8 @@ skopeo_copy:
       skopeo copy 
       docker://${CONTAINER_DEST} docker://${REPO_NAME}:latest
       --authfile ${SKOP_AUTH}
+  rules:
+      - if: '$CI_COMMIT_BRANCH == "main"'
 
 sast:
   variables:
