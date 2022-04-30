@@ -43,6 +43,7 @@ variables:
 stages:
   - build
   - copy
+  - test
   - maintain
 lint:
   stage: build
