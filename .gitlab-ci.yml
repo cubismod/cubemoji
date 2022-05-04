@@ -37,7 +37,7 @@ variables:
   CACHE_REPO: "quay.io/cubismod/cubemoji-cache"
   SETTINGS__GITLAB_ACCESS_TOKEN: $SETTINGS__GITLAB_ACCESS_TOKEN
   DEPENDABOT_IMAGE: docker.io/andrcuns/dependabot-gitlab:0.16.0
-  CONTAINER_DEST: $REPO_NAME:$CI_COMMIT_BRANCH$CI_COMMIT_SHORT_SHA
+  CONTAINER_DEST: $REPO_NAME:$CI_COMMIT_REF_SLUG$CI_COMMIT_SHORT_SHA
   KANIKO_AUTH: /kaniko/.docker/config.json
   SKOP_AUTH: /tmp/skopeo.json
 
