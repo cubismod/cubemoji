@@ -40,7 +40,8 @@ export class EmoteCache {
     keys: ['name', 'id'],
     useExtendedSearch: true,
     minMatchCharLength: 1,
-    threshold: 0.3
+    threshold: 0.3,
+    fieldNormWeight: 1
   };
 
   private logger = container.resolve(CubeLogger).emoteCache;
