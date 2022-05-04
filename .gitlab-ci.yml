@@ -43,19 +43,9 @@ variables:
 
 stages:
   - build
-  - copy
+  - housekeeping
   - test
   - maintain
-lint:
-  stage: build
-  tags:
-    - cubemoji
-  image:
-    name: node:17.8
-  script:
-    - yarn install
-    - npx eslint
-    - yarn install --audit
 
 build:
   stage: build
@@ -81,8 +71,19 @@ build:
   rules:
     - if: '$CI_PIPELINE_SOURCE != "schedule"'
 
+lint:
+  stage: housekeeping
+  tags:
+    - cubemoji
+  image:
+    name: ${CONTAINER_DEST}
+  script:
+    - cd /usr/src/cubemoji
+    - npm run lint
+    - npm run audit
+
 skopeo_copy:
-  stage: copy
+  stage: housekeeping
   tags:
     - cubemoji
   image:
