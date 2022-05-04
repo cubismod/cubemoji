@@ -61,7 +61,8 @@ export class ImageQueue {
     const options = {
       keys: ['url'],
       minMatchCharLength: 3,
-      threshold: 0.0
+      threshold: 0.0,
+      fieldNormWeight: 1
     };
     const search = new Fuse(this.images, options);
     const res = search.search(url);
