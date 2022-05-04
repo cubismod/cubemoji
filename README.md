@@ -5,7 +5,7 @@ This bot uses TypeScript and Node.JS to perform fun image effects. Type / in cha
 
 Environment Setup
 -----------------
-We use [NVM](https://github.com/nvm-sh/nvm) for version management. Type `nvm use` to use the correct version of Node.
+We use [NVM](https://github.com/nvm-sh/nvm) for version management. Type `nvm use` to use the correct version of Node in your terminal. I use [vsc-nvm](https://marketplace.visualstudio.com/items?itemName=henrynguyen5-vsc.vsc-nvm) in VSCode to auto load the correct version of Node in new terminals.
 
 Execution
 ---------
