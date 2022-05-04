@@ -97,6 +97,7 @@ skopeo_copy:
       --authfile ${SKOP_AUTH}
   rules:
       - if: '$CI_COMMIT_BRANCH == "main"'
+      - if: '$CI_PIPELINE_SOURCE != "merge_request_event"'
 
 sast:
   variables:
