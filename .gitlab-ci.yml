@@ -79,6 +79,7 @@ lint:
     name: ${CONTAINER_DEST}
   script:
     - cd /usr/src/cubemoji
+    - yarn install  # install dev deps as well
     - npm run lint
     - npm run audit
 
