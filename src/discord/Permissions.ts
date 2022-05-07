@@ -29,6 +29,7 @@ async function ModCheck() {
   }
 }
 
+// currently unused until we get the updated permissions model in Discord.ts
 export async function ModOwnerCheck(): Promise<ApplicationCommandPermissions[]> {
   const owners = await OwnerCheck();
   const mods = await ModCheck();

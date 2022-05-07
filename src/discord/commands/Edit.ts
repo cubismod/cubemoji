@@ -16,21 +16,21 @@ export abstract class Edit {
       type: 'STRING',
       required: false
     })
-    emote: string,
+      emote: string,
     @SlashOption('member', { description: 'a server member', required: false })
-    member: GuildMember,
+      member: GuildMember,
     @SlashOption('effects', {
       description: 'list of effects (space separated, max 20). If not specified then random effects will be applied',
       autocomplete: (interaction: AutocompleteInteraction) => editAutocomplete(interaction),
       type: 'STRING',
       required: false
     })
-    effects: string,
+      effects: string,
     @SlashOption('list', { description: 'get a list of the available effects', required: false })
-    list: boolean,
-    interaction: CommandInteraction,
-    _client: Client,
-    data: BSGuardData
+      list: boolean,
+      interaction: CommandInteraction,
+      _client: Client,
+      data: BSGuardData
   ) {
     if (list) {
       // just give the user back the effects options

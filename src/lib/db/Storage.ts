@@ -43,6 +43,7 @@ export interface ValRaw {
   channels - Blocked channels in BSM
   server-anon - Used in the emoji list webpage for persistent randomized server names
   actions - lists of pending mod actions for BSM
+  timeouts - timeouts for big server mode, see https://gitlab.com/cubismod/cubemoji/-/issues/23#note_906825698
 
 */
 @singleton()
@@ -106,6 +107,13 @@ export class CubeStorage {
    */
   pendingModActions: Keyv<ModAction[]>;
 
+  // key is channelID_cm
+  // or channelID_all
+  // where CM values track timeouts between cubemoji messages and
+  // overall tracks the overall timeout of messages in a particular channel
+  // values are time values in milliseconds since Unix epoch
+  timeouts: Keyv<number>;
+
   private logger = container.resolve(CubeLogger).storage;
   // in testing mode, we are saving data to data/test/
   dbLocation = 'data/';
@@ -135,6 +143,8 @@ export class CubeStorage {
     this.serverAuditInfo = new Keyv<string>(sqliteUri, { namespace: 'audit' });
 
     this.pendingModActions = new Keyv<ModAction[]>(sqliteUri, { namespace: 'actions', ttl: Milliseconds.day });
+
+    this.timeouts = new Keyv<number>(sqliteUri, { namespace: 'timeouts', ttl: Milliseconds.fiveMin });
   }
 
   /**

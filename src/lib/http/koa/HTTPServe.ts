@@ -36,8 +36,8 @@ async function LogRequest(ctx: RouterContext, next: Next) {
 export class HTTPServe {
   @Get('/')
   homeRedirect(context: Context) {
-    // redirect to gitlab
-    context.redirect('https://gitlab.com/cubismod/cubemoji');
+    // redirect to list
+    context.redirect('/list');
   }
 
   @Get('/status')

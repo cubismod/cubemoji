@@ -67,6 +67,8 @@ export class RescaleDiscord {
       } else {
         // setup file watcher for resulting output
         const watcher = watch(filename, { awaitWriteFinish: true });
+
+        // here is where we actually perform the reply with the finished image
         watcher.on('add', async () => {
           const cubeMessageManager = container.resolve(CubeMessageManager);
           const imageQueue = container.resolve(ImageQueue);
