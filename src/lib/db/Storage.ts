@@ -31,9 +31,20 @@ export interface ValRaw {
   expires: null;
 }
 
-// database storage using https://github.com/zaaack/keyv-file
-// we utilize a plain JSON file for blocked hosts list because it loads so quickly
-// and SQLite for the other storage as its consistent
+/* database storage using https://github.com/zaaack/keyv-file
+  we utilize a plain JSON file for blocked hosts list because it loads so quickly
+  and SQLite for the other storage as its consistent
+
+  NAMESPACES
+  servers - Servers enrolled in Big Server mode
+  emoji - Blocked emojis in BSM
+  owners - Server owners
+  mods - Roles with moderation access in BSM
+  channels - Blocked channels in BSM
+  server-anon - Used in the emoji list webpage for persistent randomized server names
+  actions - lists of pending mod actions for BSM
+
+*/
 @singleton()
 export class CubeStorage {
   /*

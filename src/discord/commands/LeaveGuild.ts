@@ -14,8 +14,8 @@ export abstract class LeaveGuild {
   @Slash('leaveguild', { description: 'Leave a guild' })
   async leaveGuild(
     @SlashOption('id', { description: 'id of the guild to leave', required: false })
-    id: string,
-    interaction: CommandInteraction
+      id: string,
+      interaction: CommandInteraction
   ) {
     await interaction.deferReply();
     if (id === undefined) {

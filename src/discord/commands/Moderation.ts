@@ -1,24 +1,30 @@
-/* // Various server configuration commands
+// Various server configuration commands
 
 import { Pagination } from '@discordx/pagination';
 import { AutocompleteInteraction, CommandInteraction, MessageEmbed, Role, TextChannel, VoiceChannel } from 'discord.js';
-import { Discord, Permission, Slash, SlashChoice, SlashGroup, SlashOption } from 'discordx';
+import { Discord, Slash, SlashChoice, SlashGroup, SlashOption } from 'discordx';
 import { container } from 'tsyringe';
 import { serverAutocomplete } from '../../lib/cmd/Autocomplete';
 import { buildList, guildOwnersCheck, modReply, performBulkAction, validUser } from '../../lib/cmd/ModHelper';
 import { CubeStorage } from '../../lib/db/Storage.js';
 import { EmoteCache } from '../../lib/emote/EmoteCache.js';
 import strings from '../../res/strings.json' assert { type: 'json' };
-import { ModOwnerCheck } from '../Permissions';
+
+/**
+ * Cubemoji Moderation!
+ * This is a complicated section involving a lot of persistent state
+ * and user prompts. Additionally, there is currently an issue with Permissions
+ * that is being worked around through Guards. See https://gitlab.com/cubismod/cubemoji/-/issues/27
+ */
 
 @Discord()
-@Permission(false)
+// @Permission(false)
 // @Permission(await OwnerCheck())
-@Permission(await ModOwnerCheck())
+// @Permission(await ModOwnerCheck())
 @SlashGroup({ name: 'mod', description: 'moderation functionality for the bot' })
 @SlashGroup('mod')
 export abstract class Mod {
-  @Permission(false)
+  // @Permission(false)
   // @Permission(await OwnerCheck())
   // @Permission(await ModCheck())
   @Slash('help')
@@ -41,6 +47,9 @@ export abstract class Enrollment {
   serverAudit = container.resolve(CubeStorage).serverAuditInfo;
   serverOwnerMsg = 'Only server owners can modify this setting';
 
+  /**
+   * Only server owners can enroll/unenroll a server from the mode.
+   */
   @Slash('modify', { description: 'enroll/unenroll a new server into big server mode' })
   async modify(
     @SlashChoice('enroll', 'enroll')
@@ -68,6 +77,9 @@ export abstract class Enrollment {
     }
   }
 
+  /**
+   * limited to server owners
+   */
   @Slash('audit', { description: 'set a channel to log changes made to permissions' })
   async audit(
     @SlashOption('clear', { description: 'remove audit channel', type: 'BOOLEAN', required: false }) clear: boolean,
@@ -91,6 +103,9 @@ export abstract class Enrollment {
     }
   }
 
+  /**
+   * limited to server owners
+   */
   @Slash('rolemod', { description: 'grant/revoke a role moderation perms' })
   async roleMod(
     @SlashChoice('grant', 'grant')
@@ -121,6 +136,10 @@ export abstract class Enrollment {
     }
   }
 
+  /**
+   * displays servers that the user has access to as a server owner
+   * or being part of a moderation group
+   */
   @Slash('list', { description: 'list servers currently enrolled in big server mode as well as moderator roles' })
   async list(
     interaction: CommandInteraction
@@ -147,6 +166,9 @@ export abstract class blocklist {
   emoteCache = container.resolve(EmoteCache);
   storage = container.resolve(CubeStorage);
 
+  /**
+   * command only runs for those w/ mod or server owner perms
+   */
   @Slash('modify', { description: 'block/unblock emoji glob or channel' })
   async modify(
     @SlashChoice('block', 'block')
@@ -211,6 +233,9 @@ export abstract class blocklist {
     }
   }
 
+  /**
+   * only display permissions that user is scoped to see
+   */
   @Slash('list', { description: 'list blocked emoji and channels' })
   async list(
     interaction: CommandInteraction
@@ -222,6 +247,9 @@ export abstract class blocklist {
     ).send();
   }
 
+  /**
+   * checks in place to ensure that each bulk action can be performed by the user in question
+   */
   @Slash('bulk', { description: 'perform bulk blocking/unblocking of globs and channels' })
   async bulk(
     @SlashOption('listlink', {
@@ -235,4 +263,3 @@ export abstract class blocklist {
     await performBulkAction(interaction, listLink);
   }
 }
- */

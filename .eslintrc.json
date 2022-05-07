@@ -16,7 +16,6 @@
         "build/"
     ],
     "rules": {
-        "uvu/no-identical-titles": "error",
         "space-before-function-paren": "off",
         "semi": [
             "error",

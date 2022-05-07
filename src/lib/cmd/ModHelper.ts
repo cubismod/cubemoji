@@ -329,6 +329,12 @@ export async function bulkActionsEmbed(interaction: CommandInteraction, actions:
   }
 }
 
+/**
+ * Creates a list embed of moderation from namespaces.
+ * Namespaces are defined in Storage.ts
+ * Displayed options are scoped depending on what the user has access to as
+ * a guild owner or member of a moderation role
+ */
 export async function buildList(interaction: CommandInteraction, namespaces: string[]) {
   // max of 10 fields per embed for us
   const storage = container.resolve(CubeStorage);
