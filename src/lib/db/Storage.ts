@@ -31,6 +31,16 @@ export interface ValRaw {
   expires: null;
 }
 
+/**
+ * ends is a UTC timestamp for when the rate limit ends
+ * multiple is how many times the rate limit has been triggered,
+ * which is used to determine the next rate limit period
+ */
+export interface RateLimitVal {
+  ends: number,
+  multiple: number
+}
+
 /* database storage using https://github.com/zaaack/keyv-file
   we utilize a plain JSON file for blocked hosts list because it loads so quickly
   and SQLite for the other storage as its consistent
@@ -107,12 +117,8 @@ export class CubeStorage {
    */
   pendingModActions: Keyv<ModAction[]>;
 
-  // key is channelID_cm
-  // or channelID_all
-  // where CM values track timeouts between cubemoji messages and
-  // overall tracks the overall timeout of messages in a particular channel
-  // values are time values in milliseconds since Unix epoch
-  timeouts: Keyv<number>;
+  // key is channelID and value is a
+  timeouts: Keyv<RateLimitVal>;
 
   private logger = container.resolve(CubeLogger).storage;
   // in testing mode, we are saving data to data/test/
@@ -144,7 +150,7 @@ export class CubeStorage {
 
     this.pendingModActions = new Keyv<ModAction[]>(sqliteUri, { namespace: 'actions', ttl: Milliseconds.day });
 
-    this.timeouts = new Keyv<number>(sqliteUri, { namespace: 'timeouts', ttl: Milliseconds.fiveMin });
+    this.timeouts = new Keyv<RateLimitVal>(sqliteUri, { namespace: 'timeouts', ttl: Milliseconds.fiveMin });
   }
 
   /**
