@@ -52,8 +52,8 @@ build:
   image:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]
-  tags:
-    - kaniko
+  # tags:
+    # - kaniko
   script:
     - mkdir -p /kaniko/.docker
     - echo $QUAY_CONF > $KANIKO_AUTH
@@ -73,8 +73,8 @@ build:
 
 lint:
   stage: housekeeping
-  tags:
-    - cubemoji
+  # tags:
+    # - cubemoji
   image:
     name: ${CONTAINER_DEST}
   script:
@@ -85,8 +85,8 @@ lint:
 
 skopeo_copy:
   stage: housekeeping
-  tags:
-    - cubemoji
+  # tags:
+    # - cubemoji
   image:
     name: alpine
   before_script:
