@@ -83,13 +83,13 @@
     "@discordx/internal" "^1.0.2"
     tslib "^2.3.1"
 
-"@discordx/pagination@^2.1.1":
-  version "2.1.1"
-  resolved "https://registry.yarnpkg.com/@discordx/pagination/-/pagination-2.1.1.tgz#a2dd795daa45795df63bb7b7016fb6ed7c2926fc"
-  integrity sha512-0i/KJWZf8WN+QuOwtwL/WGsF43oaMfEqaNlFTtvvQ7xz9KufVQ2+Uf0Ufj8esLX/6CRN2BItLaD1poF0pzWosg==
+"@discordx/pagination@^2.1.2":
+  version "2.1.2"
+  resolved "https://registry.yarnpkg.com/@discordx/pagination/-/pagination-2.1.2.tgz#976020f637612476a346f144696b2ab32a7d4761"
+  integrity sha512-5xZ6VpapColNgaIu7tcv+tWPtbXiwr5bzG8PPy6oWzayqUIlAtADDvzmx7ZtAXofYSYn163DxSfGot25BZ8umg==
   dependencies:
     lodash "^4.17.21"
-    tslib "^2.3.1"
+    tslib "^2.4.0"
 
 "@discordx/utilities@4.2.4":
   version "4.2.4"
