@@ -36,7 +36,7 @@
     "@discordx/koa": "^1.0.8",
     "@discordx/pagination": "^2.2.0",
     "@discordx/utilities": "4.2.4",
-    "@keyv/sqlite": "^3.5.0",
+    "@keyv/sqlite": "^3.5.2",
     "@koa/router": "^10.1.1",
     "@types/koa": "^2.13.4",
     "better-sqlite3": "^7.5.1",
