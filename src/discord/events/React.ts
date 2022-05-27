@@ -18,7 +18,7 @@ export abstract class ReactEvents {
   async onMessageReactionAdd(
     [reaction]: ArgsOf<'messageReactionAdd'>,
     _client: Client,
-    data: BSGuardData
+    guardData: BSGuardData
   ) {
     const cubeMessageManager = container.resolve(CubeMessageManager);
     const reactionUsers = await reaction.users.fetch();
@@ -47,7 +47,7 @@ export abstract class ReactEvents {
             break;
           }
           case '📷': {
-            if (!data.enrolled) {
+            if (!guardData.enrolled) {
               // perform an edit
               const source = getMessageImage(msg);
               if (reaction instanceof MessageReaction) {
@@ -59,7 +59,7 @@ export abstract class ReactEvents {
           }
           case '📏': {
             // perform a rescale
-            if (!data.enrolled) {
+            if (!guardData.enrolled) {
               const source = getMessageImage(await reaction.message.fetch());
               if (reaction instanceof MessageReaction) {
                 const rsDiscord = new RescaleDiscord(reaction, source, user);
@@ -69,7 +69,7 @@ export abstract class ReactEvents {
             break;
           }
           case '🌟': {
-            if (!data.enrolled) {
+            if (!guardData.enrolled) {
               if (reaction.partial) {
                 reaction = await reaction.fetch();
               }

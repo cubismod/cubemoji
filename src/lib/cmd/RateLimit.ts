@@ -1,6 +1,8 @@
 // Rate limit spammy commands on channels/threads located in
 // Big Server Mode
 
+import dayjs from 'dayjs';
+import { Message } from 'discord.js';
 import { container } from 'tsyringe';
 import { Milliseconds } from '../constants/Units';
 import { CubeStorage } from '../db/Storage';
@@ -16,12 +18,16 @@ export class RateLimit {
    * which is used to determine whether to DM the rescale/edit or
    * send it in the channel
    * @param channelID discord channel ID
+   * @param message the discord message
    * @returns true if limit set, false if limit not set
    */
-  async limitCheck (channelID) {
+  async limitCheck (channelID: string, message: Message) {
     const limit = await this.getLimit(channelID);
     await this.setNewLimit(channelID);
-    if (limit && Date.now() < limit.ends) {
+    // this check ensures that the user can't just react to a super old message
+    // to spam the channel and produce a mystery edit
+    if (message.createdAt > dayjs().add(2, 'min').toDate() ||
+      (limit && Date.now() < limit.ends)) {
       return true;
     }
     return false;

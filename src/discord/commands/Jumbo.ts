@@ -16,10 +16,10 @@ export abstract class Jumbo {
       type: 'STRING',
       required: false
     })
-    emote: string,
+      emote: string,
     @SlashOption('member', { description: strings.memberSlash, required: false })
-    member: GuildMember,
-    interaction: CommandInteraction
+      member: GuildMember,
+      interaction: CommandInteraction
   ) {
     await interaction.deferReply();
     if (emote !== undefined) {
