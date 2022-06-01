@@ -1,6 +1,7 @@
 // Discord client events
 
 import { ArgsOf, Client, Discord, DIService, On, Once } from 'discordx';
+import { mkdir } from 'fs/promises';
 import { container } from 'tsyringe';
 import { CubeMessageManager } from '../../lib/cmd/MessageManager.js';
 import { Milliseconds } from '../../lib/constants/Units.js';
@@ -14,6 +15,14 @@ import { setStatus } from '../../lib/image/DiscordLogic.js';
 import { ImageQueue } from '../../lib/image/ImageQueue.js';
 import { WorkerPool } from '../../lib/image/WorkerPool.js';
 import { CubeLogger } from '../../lib/logger/CubeLogger.js';
+
+// create a directory and ignore if already exists
+async function createDir(dirName: string) {
+  try {
+    await mkdir(dirName, { recursive: true })
+  }
+  catch { }
+}
 
 @Discord()
 export abstract class ClientEvents {
@@ -29,6 +38,15 @@ export abstract class ClientEvents {
     client: Client
   ) {
     DIService.container = container;
+
+    // create required folders
+    await createDir('./download')
+    await createDir('./data')
+    await createDir('./static/list')
+    await createDir('./static/emotes')
+
+    const webServer = new CubeServer();
+
     // dependency injection initialization
     if (DIService.container !== undefined) {
       DIService.container.register(CubeLogger, { useValue: this.cubeLogger });
@@ -96,7 +114,7 @@ export abstract class ClientEvents {
       DIService.container.register(WorkerPool, { useValue: new WorkerPool(workers) });
       this.logger.info('registered WorkerPool');
 
-      await DIService.container.register(CubeServer, { useValue: new CubeServer() });
+      await DIService.container.register(CubeServer, { useValue: webServer });
 
       // every 30 min, refresh our cache of who the server owners are
       // and re-init permissions on Moderation commands as well as
@@ -144,7 +162,7 @@ export abstract class ClientEvents {
       );
     }
 
-    await DIService.container.resolve(CubeServer).start();
+    await webServer.start();
   }
 
   @On('warn')

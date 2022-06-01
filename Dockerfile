@@ -1,6 +1,8 @@
 FROM node:18.1.0-alpine
 WORKDIR /usr/src/cubemoji
 
+EXPOSE 7923
+
 # setup any requisite packages
 COPY scripts/ ./scripts/
 RUN scripts/imagemagick.sh

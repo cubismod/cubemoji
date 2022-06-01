@@ -1,4 +1,4 @@
-import { importx } from "@discordx/importer";
+import { dirname, importx } from "@discordx/importer";
 import { Koa } from "@discordx/koa";
 import { container, singleton } from "tsyringe";
 import { CubeLogger } from "../logger/CubeLogger";
@@ -11,7 +11,7 @@ export class CubeServer {
 
   // build and startup Koa service
   async start() {
-    await importx('./build/lib/http/koa/*.js');
+    await importx(dirname(import.meta.url) + '/koa/*.js');
     await this.server.build();
 
     this.server.listen(7923, () => {

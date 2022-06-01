@@ -7,5 +7,6 @@
         "js",
         "require"
     ],
-    "editor.formatOnSave": false
+    "editor.formatOnSave": true,
+    "debug.javascript.autoAttachFilter": "onlyWithFlag"
 }
