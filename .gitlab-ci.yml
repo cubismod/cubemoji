@@ -52,8 +52,6 @@ build:
   image:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]
-  # tags:
-    # - kaniko
   script:
     - mkdir -p /kaniko/.docker
     - echo $QUAY_CONF > $KANIKO_AUTH
@@ -73,8 +71,6 @@ build:
 
 lint:
   stage: housekeeping
-  # tags:
-    # - cubemoji
   image:
     name: ${CONTAINER_DEST}
   script:
@@ -85,8 +81,6 @@ lint:
 
 skopeo_copy:
   stage: housekeeping
-  # tags:
-    # - cubemoji
   image:
     name: alpine
   before_script:
@@ -98,8 +92,7 @@ skopeo_copy:
       docker://${CONTAINER_DEST} docker://${REPO_NAME}:latest
       --authfile ${SKOP_AUTH}
   rules:
-      - if: '$CI_COMMIT_BRANCH == "main"'
-      - if: '$CI_PIPELINE_SOURCE != "merge_request_event"'
+      - if: '$CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE != "merge_request_event"'
 
 sast:
   variables:

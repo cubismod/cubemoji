@@ -31,9 +31,31 @@ export interface ValRaw {
   expires: null;
 }
 
-// database storage using https://github.com/zaaack/keyv-file
-// we utilize a plain JSON file for blocked hosts list because it loads so quickly
-// and SQLite for the other storage as its consistent
+/**
+ * ends is a UTC timestamp for when the rate limit ends
+ * multiple is how many times the rate limit has been triggered,
+ * which is used to determine the next rate limit period
+ */
+export interface RateLimitVal {
+  ends: number,
+  multiple: number
+}
+
+/* database storage using https://github.com/zaaack/keyv-file
+  we utilize a plain JSON file for blocked hosts list because it loads so quickly
+  and SQLite for the other storage as its consistent
+
+  NAMESPACES
+  servers - Servers enrolled in Big Server mode
+  emoji - Blocked emojis in BSM
+  owners - Server owners
+  mods - Roles with moderation access in BSM
+  channels - Blocked channels in BSM
+  server-anon - Used in the emoji list webpage for persistent randomized server names
+  actions - lists of pending mod actions for BSM
+  timeouts - timeouts for big server mode, see https://gitlab.com/cubismod/cubemoji/-/issues/23#note_906825698
+
+*/
 @singleton()
 export class CubeStorage {
   /*
@@ -95,6 +117,9 @@ export class CubeStorage {
    */
   pendingModActions: Keyv<ModAction[]>;
 
+  // key is channelID and value is a
+  timeouts: Keyv<RateLimitVal>;
+
   private logger = container.resolve(CubeLogger).storage;
   // in testing mode, we are saving data to data/test/
   dbLocation = 'data/';
@@ -124,6 +149,8 @@ export class CubeStorage {
     this.serverAuditInfo = new Keyv<string>(sqliteUri, { namespace: 'audit' });
 
     this.pendingModActions = new Keyv<ModAction[]>(sqliteUri, { namespace: 'actions', ttl: Milliseconds.day });
+
+    this.timeouts = new Keyv<RateLimitVal>(sqliteUri, { namespace: 'timeouts', ttl: Milliseconds.fiveMin });
   }
 
   /**

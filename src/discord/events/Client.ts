@@ -106,7 +106,7 @@ export abstract class ClientEvents {
           await container.resolve(CubeStorage).loadServerOwners(client);
           // await client.initApplicationPermissions();
           await container.resolve(PugGenerator).emojiRender(client.guilds);
-          this.logger.info('permission sync & pug-regen completed');
+          this.logger.debug('Pug-regen completed');
         },
         Milliseconds.ninetyMin
       );

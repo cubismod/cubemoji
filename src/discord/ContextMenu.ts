@@ -31,4 +31,17 @@ export abstract class CubeMessageContext {
       await rsDiscord.run();
     }
   }
+
+  @ContextMenu('MESSAGE', 'Jumbofy this message')
+  async jumboHandler(
+    interaction: ContextMenuInteraction,
+    _client: Client,
+    data: BSGuardData) {
+    if (interaction.channel) {
+      await interaction.deferReply({ ephemeral: data.enrolled, fetchReply: !data.enrolled });
+      const source = getMessageImage(await interaction.channel.messages.fetch(interaction.targetId));
+      const edDiscord = new EditDiscord(interaction, 'magnify magnify', source, interaction.user);
+      await edDiscord.run();
+    }
+  }
 }

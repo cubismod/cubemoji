@@ -24,8 +24,16 @@ export async function emoteAutocomplete(interaction: AutocompleteInteraction) {
       const query = interaction.options.getFocused(true).value;
       if (typeof query === 'string' && query.length < 100) {
         const res = emoteCache.search(query);
+        let firstResult = query;
+        if (firstResult === '') {
+          // avoid causing a discord api error as query = ''
+          // when the user hasn't typed anything yet so instead
+          // we choose a random emote to send as the first one
+          firstResult = choice(emoteCache.emojis).name;
+        }
+        logger.debug(`First result: ${firstResult}`);
         if (res.length > 0) {
-          const suggestions: { name: string, value: string; }[] = [];
+          const suggestions: { name: string, value: string; }[] = [{ name: firstResult, value: firstResult }];
           // if we actually get some choices back we send to cubemoji
           for (const fuseRes of res) {
             if (!await emoteCache.isBlocked(fuseRes.item.name, interaction.guildId)) {
@@ -38,15 +46,10 @@ export async function emoteAutocomplete(interaction: AutocompleteInteraction) {
           // first option should be the query itself so if the
           // user is typing a URL or custom nitro emote
           // they still have an option to send that
-          let firstResult = query;
-          if (firstResult === '') {
-            // avoid causing a discord api error as query = ''
-            // when the user hasn't typed anything yet so instead
-            // we choose a random emote to send as the first one
-            firstResult = choice(emoteCache.emojis).name;
-          }
           let suggestions: Cmoji[] = [];
-          if (firstResult.length < 100) suggestions = [new Cmoji(null, firstResult, firstResult, Source.URL)];
+          if (firstResult.length < 100) {
+            suggestions = [new Cmoji(null, firstResult, firstResult, Source.URL)];
+          }
           const randomEmojis = await emoteCache.randomChoice(20, interaction.guildId);
           const res = suggestions.concat([...randomEmojis]);
           interaction.respond(res.map(result => {
