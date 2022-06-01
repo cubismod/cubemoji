@@ -83,10 +83,10 @@
     "@discordx/internal" "^1.0.2"
     tslib "^2.3.1"
 
-"@discordx/pagination@^2.1.2":
-  version "2.1.2"
-  resolved "https://registry.yarnpkg.com/@discordx/pagination/-/pagination-2.1.2.tgz#976020f637612476a346f144696b2ab32a7d4761"
-  integrity sha512-5xZ6VpapColNgaIu7tcv+tWPtbXiwr5bzG8PPy6oWzayqUIlAtADDvzmx7ZtAXofYSYn163DxSfGot25BZ8umg==
+"@discordx/pagination@^2.2.0":
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@discordx/pagination/-/pagination-2.2.0.tgz#825ba5be8773f32db512980ef848cb5ad0ba9475"
+  integrity sha512-uUd5ZEXAqJg/P1kjR21LmssTkbFZqcocGlq1BP7O1QpMgyf67aN09Y4SaN/KgsctgGXy7VD3Oklfc80N/Q2kEQ==
   dependencies:
     lodash "^4.17.21"
     tslib "^2.4.0"
@@ -132,12 +132,13 @@
   resolved "https://registry.npmjs.org/@humanwhocodes/object-schema/-/object-schema-1.2.1.tgz"
   integrity sha512-ZnQMnLV4e7hDlUvw8H+U8ASL02SS2Gn6+9Ac3wGGLIe7+je2AeAOxPY+izIPJDfFDb7eDjev0Us8MO1iFRN8hA==
 
-"@keyv/sqlite@^3.5.0":
-  version "3.5.0"
-  resolved "https://registry.yarnpkg.com/@keyv/sqlite/-/sqlite-3.5.0.tgz#ae15c901f027d543cded79618e0d91339ff4a7cb"
-  integrity sha512-3AwBFuuJtJinX5GRzO60UCqzkAQZflQUXwU7xPb0uXuMurINRLZOFRBiaX1AcJzaI/ltwyoSaxGgL6TlMhj30w==
+"@keyv/sqlite@^3.5.2":
+  version "3.5.2"
+  resolved "https://registry.yarnpkg.com/@keyv/sqlite/-/sqlite-3.5.2.tgz#6cc2a3e861172140b0fc6d43ca025e688be8c8c6"
+  integrity sha512-X6TjMHnnOKgRLClrS4RBynZ3GKPnSTz4bXTIE/0tPcDESMX0PxykEC04htd0dGmZrkn0c7Oxez/L4bOPGQrRrA==
   dependencies:
-    sqlite3 "^5.0.3"
+    pify "^5.0.0"
+    sqlite3 "^5.0.8"
 
 "@koa/router@^10.1.1":
   version "10.1.1"
@@ -434,10 +435,10 @@
     "@types/node" "*"
     form-data "^3.0.0"
 
-"@types/node@*", "@types/node@^17.0.32":
-  version "17.0.32"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-17.0.32.tgz#51d59d7a90ef2d0ae961791e0900cad2393a0149"
-  integrity sha512-eAIcfAvhf/BkHcf4pkLJ7ECpBAhh9kcxRBpip9cTiO+hf+aJrsxYxBeS6OXvOd9WqNAJmavXVpZvY1rBjNsXmw==
+"@types/node@*", "@types/node@^17.0.33":
+  version "17.0.33"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-17.0.33.tgz#3c1879b276dc63e73030bb91165e62a4509cd506"
+  integrity sha512-miWq2m2FiQZmaHfdZNcbpp9PuXg34W5JZ5CrJ/BaS70VuhoJENBEQybeiYSaPBRNq6KQGnjfEnc/F3PN++D+XQ==
 
 "@types/probe-image-size@^7.0.1":
   version "7.0.1"
@@ -800,13 +801,13 @@ base64-js@^1.3.1:
   resolved "https://registry.npmjs.org/base64-js/-/base64-js-1.5.1.tgz"
   integrity sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA==
 
-better-sqlite3@^7.5.1:
-  version "7.5.1"
-  resolved "https://registry.npmjs.org/better-sqlite3/-/better-sqlite3-7.5.1.tgz"
-  integrity sha512-+i6tH1y9KEIol1iYpZJrqDwBDQZGHioDENU49Rnidorp3bSXvw/QTYDjQGq9+TFF7RX4q0YV1sEOIRq4vDZdRg==
+better-sqlite3@^7.5.3:
+  version "7.5.3"
+  resolved "https://registry.yarnpkg.com/better-sqlite3/-/better-sqlite3-7.5.3.tgz#b42e02941f918cb8048971273abc458d937ab2b9"
+  integrity sha512-tNIrDsThpWT8j1mg+svI1pqCYROqNOWMbB2qXVg+TJqH9UR5XnbAHyRsLZoJagldGTTqJPj/sUPVOkW0GRpYqw==
   dependencies:
     bindings "^1.5.0"
-    prebuild-install "^7.0.0"
+    prebuild-install "^7.1.0"
 
 binary-extensions@^2.0.0:
   version "2.2.0"
@@ -2997,10 +2998,10 @@ pify@^5.0.0:
   resolved "https://registry.yarnpkg.com/pify/-/pify-5.0.0.tgz#1f5eca3f5e87ebec28cc6d54a0e4aaf00acc127f"
   integrity sha512-eW/gHNMlxdSP6dmG6uJip6FXN0EQBwm2clYYd8Wul42Cwu/DK8HEftzsapcNdYe2MfLiIwZqsDk2RDEsTE79hA==
 
-prebuild-install@^7.0.0:
-  version "7.0.1"
-  resolved "https://registry.npmjs.org/prebuild-install/-/prebuild-install-7.0.1.tgz"
-  integrity sha512-QBSab31WqkyxpnMWQxubYAHR5S9B2+r81ucocew34Fkl98FhvKIF50jIJnNOBmAZfyNV7vE5T6gd3hTVWgY6tg==
+prebuild-install@^7.1.0:
+  version "7.1.0"
+  resolved "https://registry.yarnpkg.com/prebuild-install/-/prebuild-install-7.1.0.tgz#991b6ac16c81591ba40a6d5de93fb33673ac1370"
+  integrity sha512-CNcMgI1xBypOyGqjp3wOc8AAo1nMhZS3Cwd3iHIxOdAUbb+YxdNuM4Z5iIrZ8RLvOsf3F3bl7b7xGq6DjQoNYA==
   dependencies:
     detect-libc "^2.0.0"
     expand-template "^2.0.3"
@@ -3461,10 +3462,10 @@ split@0.3:
   dependencies:
     through "2"
 
-sqlite3@^5.0.3:
-  version "5.0.4"
-  resolved "https://registry.yarnpkg.com/sqlite3/-/sqlite3-5.0.4.tgz#3ddff8d360dab3f17c596690d8663f353d876187"
-  integrity sha512-ATvAe7JutFv/d+KTbLS58KsKn/t1raL/WGn2qZfZxwsrL/oGSP+0OlbQ2tX5jISvyu6/7JuKze3WkaiP1JAH6A==
+sqlite3@^5.0.8:
+  version "5.0.8"
+  resolved "https://registry.yarnpkg.com/sqlite3/-/sqlite3-5.0.8.tgz#b4b7eab7156debec80866ef492e01165b4688272"
+  integrity sha512-f2ACsbSyb2D1qFFcqIXPfFscLtPVOWJr5GmUzYxf4W+0qelu5MWrR+FAQE1d5IUArEltBrzSDxDORG8P/IkqyQ==
   dependencies:
     "@mapbox/node-pre-gyp" "^1.0.0"
     node-addon-api "^4.2.0"
