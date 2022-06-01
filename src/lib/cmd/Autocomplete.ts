@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionChoice, AutocompleteInteraction } from 'discord.js';
+import { ApplicationCommandOptionChoiceData, ApplicationCommandOptionType, AutocompleteInteraction } from 'discord.js';
 import Fuse from 'fuse.js';
 import Qty from 'js-quantities';
 import { choice, geometricReservoirSample } from 'pandemonium';
@@ -128,7 +128,7 @@ export async function serverAutocomplete(interaction: AutocompleteInteraction) {
     try {
       const storage = container.resolve(CubeStorage);
       const guilds = await storage.serverOwners.get(interaction.user.id);
-      const responses: ApplicationCommandOptionChoice[] = [];
+      const responses: ApplicationCommandOptionChoiceData[] = [];
       if (guilds) {
         guilds.forEach(guild => {
           const name = guild.id + '-' + guild.name.slice(0, 60);

@@ -19,6 +19,6 @@ RUN corepack enable && yarn install --production=true
 COPY tsconfig.json .
 COPY src/ ./src/
 
-RUN npm run build
+RUN yarn build
 
-CMD npm start
+CMD yarn start

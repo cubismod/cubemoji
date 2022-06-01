@@ -1,7 +1,6 @@
 /* eslint-disable no-unused-vars */
 // various other classes used by cubemoji
-import { Snowflake } from 'discord-api-types';
-import { GuildEmoji, SnowflakeUtil } from 'discord.js';
+import { GuildEmoji, Snowflake, SnowflakeUtil } from 'discord.js';
 import { adjectives, names, uniqueNamesGenerator } from 'unique-names-generator';
 
 // the emoji can come from a few places
