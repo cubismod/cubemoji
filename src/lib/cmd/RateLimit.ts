@@ -26,7 +26,7 @@ export class RateLimit {
     await this.setNewLimit(channelID);
     // this check ensures that the user can't just react to a super old message
     // to spam the channel and produce a mystery edit
-    if (message.createdAt > dayjs().add(2, 'min').toDate() ||
+    if (message.createdAt > dayjs().add(2, 'minute').toDate() ||
       (limit && Date.now() < limit.ends)) {
       return true;
     }
