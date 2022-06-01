@@ -5,7 +5,10 @@ This bot uses TypeScript and Node.JS to perform fun image effects. Type / in cha
 
 Environment Setup
 -----------------
-We use [NVM](https://github.com/nvm-sh/nvm) for version management. Type `nvm use` to use the correct version of Node.
+- We use [NVM](https://github.com/nvm-sh/nvm) for version management. Type `nvm use` to use the correct version of Node. [.nvmrc](https://gitlab.com/cubismod/cubemoji/-/blob/main/.nvmrc) includes the latest version of Node.js we are targeting.
+- Yarn is used for package management. Type `corepack enable` to get yarn working. 
+- [Canvas](https://www.npmjs.com/package/canvas) may require additional system dependencies, please see that linked page for more information.
+
 
 Execution
 ---------
@@ -14,7 +17,8 @@ Execution
 - `npm run test` to run through unit tests
 - `npm run dev` to use the [tsc-watch](https://www.npmjs.com/package/tsc-watch) package to rebuild the software in real-time while testing features.
 
-## Fly.io
+Fly.io
+-------
 Cubemoji uses https://fly.io/ for cheap hosting.
 
 Backend Storage
