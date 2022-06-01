@@ -34,7 +34,7 @@ processes = []
 
    [[services.http_checks]]
     interval = 300000 # 5 min healtcheck
-    grace_period = "25s"
+    grace_period = "240s"
     method = "get"
     path = "/status"
     protocol = "http"
