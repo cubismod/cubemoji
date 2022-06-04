@@ -20,11 +20,12 @@ block content
       ) as well as basic unicode emojis in Discord like 🥺.
       
       //- Variable setup for commonly used terms in the list
-      - const sourceDesc = "[emote or url to image]"
+      - const sourceLabel = "[emote or url to image]"
       - const autoCStr = "[autocompleted string]"
       - const strLabel = "[string]"
       - const servMember = "[server member]"
       - const numLabel = "[number]"
+      - const boolLabel = "[boolean]"
 
       div(class='table-responsive')
         table(class='table table-striped')
@@ -45,7 +46,7 @@ block content
                 td Add silly faces to images 
                 td /addface 
                   b source: 
-                  i= sourceDesc
+                  i= sourceLabel
                   b face: 
                   i= autoCString
                 //- td 
@@ -73,11 +74,11 @@ block content
                 td Edit images 
                 td /edit
                   b source:
-                  i= sourceDesc
+                  i= sourceLabel
                   b member: 
                   i= servMember
                   b list: 
-                  i [boolean]
+                  i= boolLabel
                   b effects: 
                   i [list of effects, space separated]
                 td Choose either source or member or list. Effects param optional, if not specified then cubemoji will choose random effects to apply.
@@ -97,6 +98,50 @@ block content
                 td Information about an emote or user, can also help you create role colors using palette creation from images
                 td /info
                   b emote: 
-                  i= sourceDesc
+                  i= sourceLabel
                   b member: 
                   i= servMember
+              tr 
+                td jumbo 
+                td Blows up input option bigger than the /big command
+                td /jumbo
+                  b emote: 
+                  i= sourceLabel 
+                  b member:
+                  i= servMember
+                td Choose emote or member 
+              tr
+                td list 
+                td Get a full list of emoji 
+                td /list
+                  b subset:
+                  i [subset of emojis to grab such as only Discord, only Mutant emoji]
+              tr
+                td random 
+                td Insert random emoji
+                td /random
+                  b items: 
+                  i [number indicating how many random emoji to insert, max 25]
+              tr
+                td search 
+                td Search for a specific emoji
+                td /search
+                  b query: 
+                  i= strLabel
+              tr
+                td uptime 
+                td Display current bot uptime
+                td /uptime
+              tr
+                td rescale
+                td Rescale an image using Seam carving/content aware image scale
+                td /rescale
+                  b source: 
+                  i= sourceLabel
+                  b member
+                  i= servMember
+                td Choose source or member
+
+      h2 React commands
+      p You can use reacts on messages to trigger different bot actions.       
+
