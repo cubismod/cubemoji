@@ -42,7 +42,7 @@
     "better-sqlite3": "^7.5.3",
     "chokidar": "^3.5.3",
     "color-thief-node": "^1.0.4",
-    "dayjs": "^1.11.2",
+    "dayjs": "^1.11.3",
     "discord.js": "^13.6.0",
     "discordx": "9.5.3",
     "dotenv": "^16.0.1",
