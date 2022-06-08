@@ -225,9 +225,14 @@ block content
           |
           span(class="font-monospace")/mod enrollment audit
 
-      //- Variable setup for commonly used audit commands
+
       h3 Moderation  Commands 
-         div(class='table-responsive')  
+
+        - const ownerMod = "Server owner + mod roles"
+        = const owner = "Server owner only"
+        - const rolePick = "]role picker]"
+        
+        div(class='table-responsive')  
           table(class='table table-striped')
             thead 
               tr 
@@ -242,13 +247,120 @@ block content
                 td List servers currently enrolled in big server as well as moderator roles, you only see servers you own or are a moderator on.
                 td /mod enrollment list
                 td 
-                td Server owner + mod roles
+                td= ownerMod
               tr 
-                td mod blacklist modify
+                td mod blocklist modify
                 td
                   | Block/unblock emoji globs or channels. More info about
                   | 
                   a(href="https://github.com/micromatch/micromatch#matching-features") glob syntax here
                 td
-                  | /mod blacklist modify
-                  b action :
+                  | /mod blocklist modify
+                  | 
+                  b action:
+                  |
+                  i [block/unblock]
+                  |
+                  b server:
+                  |
+                  i [server to block/unblock]
+                  |
+                  b glob:
+                  |
+                  i [glob of emoji to block/unblock]
+                  |
+                  b channel:
+                  |
+                  i [channel to block/unblock]
+                td
+                  | Server parameter is optional and if not specified, defaults to current server. Globs must be less than 21 chars.
+                  | action is required, select glob or channel
+                td= ownerMod
+              tr
+                td mod blocklist list
+                td List blocked emoji and channels on this server.
+                td /mod blocklist list
+                td
+                td= ownerMod
+              tr
+                td mod enrollment rolemod
+                td Grant/revoke moderation permissions for a server role
+                td
+                  | /mod enrollment rolemod
+                  | 
+                  b action:
+                  |
+                  i [grant/revoke]
+                  |
+                  b role:
+                  |
+                  i= rolePick
+                td Both parameters are required
+                td= owner
+              tr
+                td mod enrollment audit
+                td Set a channel to log changes
+                td
+                  | /mod enrollment rolemod
+                  |
+                  b action:
+                  |
+                  i [grant/revoke]
+                  |
+                  b role:
+                  |
+                  i= rolePicker
+                td clear or channel
+                td= owner
+              tr
+                td mod enrollment modify
+                td Enroll/unenroll a server into big server mod
+                td 
+                  | /mod enrollment modify
+                  |
+                  b action:
+                  |
+                  i [unenroll/enroll]
+                  |
+                  b server:
+                  | 
+                  i [server picker of servers you own]
+                td Both params required
+                td= owner
+        
+      h3 Bulk Actions
+      p
+        | You can perform a bulk action by using the parameter
+        | 
+        span(class="font-monospace") bulk
+        |
+        | in 
+        |
+        span(class="font-monospace") mod blacklist modify.
+        | Point this parameter to a plain txt file somewhere publicly accessible on the internet and we will perform the actions specified in the file. Use this syntax:
+      
+      pre
+        code
+          | # for globs, you specify the server ID in the 3rd parameter
+          | + glob *scream* 803399148237488128   # block emojis matching this glob pattern
+          | - glob bl*bby 803399148237488128   # unblock emojis matching this glob pattern
+          |
+          | + channel 804140986556874782  # block cubemoji from interacting in a channel using ID
+          | - channel 829391892126629920  # unblock cubemoji from interacting in a channel
+      
+      p 
+        | You can host your file on a service like
+        |
+        a(href="https://pastebin.com/") Pastebin
+        |
+        |
+        | or
+        |
+        a(href="https://gist.github.com/") GitHub Gists
+        | .
+        | Just ensure you link a raw text file rather than the HTML render by default.
+
+      img(src="static/copyID.png" class="img-fluid" alt="right click a channel in Discord to copy its ID")
+
+      p To grab the channel ID, ensure you have Developer mode toggled on in Discord settings then right click to copy the ID. These results will be validated against your user ID to ensure you have the permissions to perform this action.
+
