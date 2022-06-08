@@ -6,18 +6,26 @@ block content
   div(class='row')
     div(class='col' id='content')
       h1 About cubemoji
-      p Welcome to cubemoji, a multi-purpose Discord bot written in JavaScript and separated into several modules with multiple commands. The bot is maintained by cubis and if you would like it on your server, please DM cubis on Discord (cubis#0024). The bot's Discord is available at 
-        a(href='https://discord.gg/Y6yzKwJUb3') https://discord.gg/Y6yzKwJUb3
-      p Cubemoji has access to emojis on all servers it is added to, in addition to the
+      p 
+        | Welcome to cubemoji, a multi-purpose Discord bot written in JavaScript and separated into several modules with multiple commands. The bot is maintained by cubis and if you would like it on your server, please DM cubis on Discord (cubis#0024). The bot's Discord is available at
+        |
+        a(href='https://discord.gg/Y6yzKwJUb3') https://discord.gg/Y6yzKwJUb3.
+        | Cubemoji has access to emojis on all servers it is added to, in addition to the
+        |
         a(href='https://mutant.tech/') Mutant emoji pack
 
       h2 Commands
-      p All commands are implemented using Discord's Slash commands feature which is accessible in chat via
+      p 
+        | All commands are implemented using Discord's Slash commands feature which is accessible in chat via
+        |
         span(class='font-monospace') /
       
-      p Note that any commands taking in strings for emotes or image do support Discord Nitro emojis (except for 
+      p 
+        | Note that any commands taking in strings for emotes or image do support Discord Nitro emojis except for
+        |
         span(class='font-monospace')/info
-      ) as well as basic unicode emojis in Discord like 🥺.
+        |
+        | as well as basic unicode emojis in Discord like 🥺.
       
       //- Variable setup for commonly used terms in the list
       - const sourceLabel = "[emote or url to image]"
@@ -34,7 +42,7 @@ block content
               th(scope='col' class='btn-dark') Command Name 
               th(scope='col' class='btn-dark') Description 
               th(scope='col' class='btn-dark') Syntax 
-              th(scope='col' class='btn-dark') Syntax Notes
+              th(scope='cole' class='btn-dark') Syntax Notes
             tbody
               tr
                 td about
@@ -44,7 +52,9 @@ block content
               tr 
                 td addface
                 td Add silly faces to images 
-                td /addface 
+                td 
+                  | /addface
+                  |
                   b source: 
                   i= sourceLabel
                   b face: 
@@ -53,7 +63,9 @@ block content
               tr 
                 td big 
                 td Enlarges emoji 
-                td /big 
+                td 
+                  | /big
+                  |
                   b emote: 
                   i #{strLabel} OR 
                   b member: 
@@ -62,7 +74,9 @@ block content
               tr 
                 td convert 
                 td Perform unit conversions in chat 
-                td /convert 
+                td 
+                  | /convert
+                  |
                   b fromval: 
                   i= numLabel
                   b fromunit: 
@@ -72,7 +86,9 @@ block content
               tr 
                 td edit 
                 td Edit images 
-                td /edit
+                td 
+                  | /edit
+                  |
                   b source:
                   i= sourceLabel
                   b member: 
@@ -85,7 +101,9 @@ block content
               tr
                 td emote 
                 td Insert an emote into chat 
-                td /emote
+                td 
+                  | /emote
+                  |
                   b emote: 
                   i= strLabel
                 //- td 
@@ -96,7 +114,9 @@ block content
               tr
                 td info
                 td Information about an emote or user, can also help you create role colors using palette creation from images
-                td /info
+                td 
+                  | /info
+                  |
                   b emote: 
                   i= sourceLabel
                   b member: 
@@ -104,7 +124,9 @@ block content
               tr 
                 td jumbo 
                 td Blows up input option bigger than the /big command
-                td /jumbo
+                td 
+                  | /jumbo
+                  |
                   b emote: 
                   i= sourceLabel 
                   b member:
@@ -113,19 +135,25 @@ block content
               tr
                 td list 
                 td Get a full list of emoji 
-                td /list
+                td 
+                  | /list
+                  |
                   b subset:
                   i [subset of emojis to grab such as only Discord, only Mutant emoji]
               tr
                 td random 
                 td Insert random emoji
-                td /random
+                td 
+                  | /random
+                  |
                   b items: 
                   i [number indicating how many random emoji to insert, max 25]
               tr
                 td search 
                 td Search for a specific emoji
-                td /search
+                td 
+                  | /search
+                  |
                   b query: 
                   i= strLabel
               tr
@@ -135,7 +163,9 @@ block content
               tr
                 td rescale
                 td Rescale an image using Seam carving/content aware image scale
-                td /rescale
+                td 
+                  | /rescale
+                  |
                   b source: 
                   i= sourceLabel
                   b member
@@ -143,5 +173,82 @@ block content
                 td Choose source or member
 
       h2 React commands
-      p You can use reacts on messages to trigger different bot actions.       
+      p You can use reacts on messages to trigger different bot actions.     
 
+      div(class='table-responsive')  
+        table(class='table table-striped')
+          thead 
+            tr 
+              th(scope='col' class='btn-dark') Emote
+              th(scope='col' class='btn-dark') Action 
+            tbody
+              tr 
+                td 📏
+                td Rescale emote or image in message
+              tr 
+                td 📷
+                td Apply random effects to emote or image in message.
+              tr 
+                td 🌟
+                td 
+                  | Save results of edit to
+                  |
+                  a(href="https://discord.gg/Y6yzKwJUb3") cubemoji best-of channel on cubemoji's Discord server.
+              tr
+                td 🗑
+                td Delete the results of a cubemoji command (if you were the one to initiate the command).
+
+      h2 Cubemoji DM Commands
+      p If you use a react or menu action on a larger server enrolled in big server mode, you will receive a DM from cubemoji containing your edited image. Included in that are instructions on how to opt out of messages with the dm_opt command.
+
+      h2 Context Menu Commands
+      p Right click a message to use context commands (only works on desktop Discord):
+      img(src="/static/context-menu.png" class="img-fluid" alt="Right clicking on Discord menu to show highlighted 'Apps' menu with the submenu item 'Apply edit to this message'")
+
+      h2 Moderation 
+      p 
+        | Cubemoji has built-in moderation features to cut down on spam in larger servers. By default, server owners are the only ones who can use moderation commands. However, they can delegate roles to make changes to blocked channels and emotes using the
+        |
+        span(class="font-monospace")/mod enrollment rolemod
+        |
+        | command.
+
+      h3 Channel Blocking 
+      p 
+        | Channel blocking is enabled irregardless of whether Big Server Mode is enabled. This disables cubemoji from responding to slash commands, menu commands, and reacts in blocked channels. Channels can be blocked and unblocked with
+        |
+        span(class='font-monospace') /mod blacklist modify action:block/unblock channel: channelname
+
+      h3 Audit Log 
+        p
+          | You can specify an audit channel to log changes made to moderation features using
+          |
+          span(class="font-monospace")/mod enrollment audit
+
+      //- Variable setup for commonly used audit commands
+      h3 Moderation  Commands 
+         div(class='table-responsive')  
+          table(class='table table-striped')
+            thead 
+              tr 
+                th(scope='col' class='btn-dark') Command Name
+                th(scope='col' class='btn-dark') Description 
+                th(scope='col' class='btn-dark') Syntax 
+                th(scope='col' class='btn-dark') Syntax Notes
+                th(scope='col' class='btn-dark') Permissions 
+            tbody 
+              tr
+                td mod enrollment list 
+                td List servers currently enrolled in big server as well as moderator roles, you only see servers you own or are a moderator on.
+                td /mod enrollment list
+                td 
+                td Server owner + mod roles
+              tr 
+                td mod blacklist modify
+                td
+                  | Block/unblock emoji globs or channels. More info about
+                  | 
+                  a(href="https://github.com/micromatch/micromatch#matching-features") glob syntax here
+                td
+                  | /mod blacklist modify
+                  b action :
