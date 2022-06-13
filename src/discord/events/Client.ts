@@ -19,9 +19,8 @@ import { CubeLogger } from '../../lib/logger/CubeLogger.js';
 // create a directory and ignore if already exists
 async function createDir(dirName: string) {
   try {
-    await mkdir(dirName, { recursive: true })
-  }
-  catch { }
+    await mkdir(dirName, { recursive: true });
+  } catch { }
 }
 
 @Discord()
@@ -40,10 +39,10 @@ export abstract class ClientEvents {
     DIService.container = container;
 
     // create required folders
-    await createDir('./download')
-    await createDir('./data')
-    await createDir('./static/list')
-    await createDir('./static/emotes')
+    await createDir('./download');
+    await createDir('./data');
+    await createDir('./static/list');
+    await createDir('./static/emotes');
 
     const webServer = new CubeServer();
 
@@ -106,7 +105,7 @@ export abstract class ClientEvents {
       const pugGenerator = new PugGenerator();
       DIService.container.register(PugGenerator, { useValue: pugGenerator });
       await pugGenerator.emojiRender(client.guilds);
-      await pugGenerator.unitRender();
+      await pugGenerator.staticRenders();
       this.logger.info('initialized PugGenerator');
 
       let workers = 4;
@@ -132,11 +131,10 @@ export abstract class ClientEvents {
       throw new Error('DIServer.container is undefined therefore cannot initialize dependency injection');
     }
 
+    await webServer.start();
+
     try {
-      await client.initApplicationCommands({
-        global: { log: true },
-        guild: { log: true }
-      });
+      await client.initApplicationCommands();
       // await client.initApplicationPermissions(true);
     } catch (err) {
       this.logger.error('Error initializing application commands and permissions!!!');
@@ -161,8 +159,6 @@ export abstract class ClientEvents {
       }, Milliseconds.thirtySec // 30 sec
       );
     }
-
-    await webServer.start();
   }
 
   @On('warn')

@@ -91,12 +91,12 @@
     lodash "^4.17.21"
     tslib "^2.4.0"
 
-"@discordx/utilities@4.2.4":
-  version "4.2.4"
-  resolved "https://registry.yarnpkg.com/@discordx/utilities/-/utilities-4.2.4.tgz#b429d2d548ce0d4146ca00cb25552681b0740d7b"
-  integrity sha512-YcTlIDDPhkf9n8e1xriWcR2Pg1wVovIb11/1Fqjny4yeK4jbOOZw+Gpk55Mhhury6dxdVMPgBLiTtaS8p1ZspA==
+"@discordx/utilities@4.3.3":
+  version "4.3.3"
+  resolved "https://registry.yarnpkg.com/@discordx/utilities/-/utilities-4.3.3.tgz#d6a8eeae1617ade6647dc976bc1276457a52f229"
+  integrity sha512-gOOnk/H76HxiMXM2lMZkgT0zEPPE0INUyA1Cu+/BGofscmQIGO8Hd0ggc2fyUOGBmAHBSjcebCkknr4nE61ePw==
   dependencies:
-    tslib "^2.3.1"
+    tslib "^2.4.0"
 
 "@eslint/eslintrc@^1.3.0":
   version "1.3.0"
@@ -1228,6 +1228,11 @@ discord-api-types@^0.31.1:
   resolved "https://registry.yarnpkg.com/discord-api-types/-/discord-api-types-0.31.2.tgz#8d131e25340bd695815af3bb77128a6993c1b516"
   integrity sha512-gpzXTvFVg7AjKVVJFH0oJGC0q0tO34iJGSHZNz9u3aqLxlD6LfxEs9wWVVikJqn9gra940oUTaPFizCkRDcEiA==
 
+discord-api-types@^0.33.3:
+  version "0.33.5"
+  resolved "https://registry.yarnpkg.com/discord-api-types/-/discord-api-types-0.33.5.tgz#6548b70520f7b944c60984dca4ab58654d664a12"
+  integrity sha512-dvO5M52v7m7Dy96+XUnzXNsQ/0npsYpU6dL205kAtEDueswoz3aU3bh1UMoK4cQmcGtB1YRyLKqp+DXi05lzFg==
+
 discord.js@^13.6.0:
   version "13.7.0"
   resolved "https://registry.yarnpkg.com/discord.js/-/discord.js-13.7.0.tgz#5172f7f5d816e2c7296015d335b54e46968d9c67"
@@ -1243,13 +1248,14 @@ discord.js@^13.6.0:
     node-fetch "^2.6.1"
     ws "^8.6.0"
 
-discordx@9.5.3:
-  version "9.5.3"
-  resolved "https://registry.yarnpkg.com/discordx/-/discordx-9.5.3.tgz#89fa2eb59fbf3fd509580d271e934c3a11147179"
-  integrity sha512-FAf2S7jUpSuzt2dTPcOzk66ghWwjr3A1cohRAK379jmfwCQfwCGULh3oAaKSxiTGTQaW1WJLNHVglPGO0mSylQ==
+discordx@9.7.3:
+  version "9.7.3"
+  resolved "https://registry.yarnpkg.com/discordx/-/discordx-9.7.3.tgz#386b6aeaaff4a7ea7cd49aa47d87aba0535356ea"
+  integrity sha512-Z29gtHU+f/7Bl5AmNGgq4gv9XLTuxzPEZzMLh7vVshP9JOdJtTiVEWepYSeZip6nwMtUlZsz0FUqwdi5s8Wy5g==
   dependencies:
     "@discordx/di" "^2.0.1"
     "@discordx/internal" "^1.0.2"
+    discord-api-types "^0.33.3"
     lodash "^4.17.21"
     reflect-metadata "^0.1.13"
     tslib "^2.4.0"

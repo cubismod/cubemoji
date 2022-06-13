@@ -1,7 +1,7 @@
 {
   "name": "cubemoji",
   "author": "cubis",
-  "version": "3.2.4",
+  "version": "3.3.0",
   "description": "A Discord emoji bot",
   "main": "Main.ts",
   "license": "MIT",
@@ -35,7 +35,7 @@
     "@discordx/importer": "^1.1.2",
     "@discordx/koa": "^1.0.8",
     "@discordx/pagination": "^2.2.2",
-    "@discordx/utilities": "4.2.4",
+    "@discordx/utilities": "4.3.3",
     "@keyv/sqlite": "^3.5.2",
     "@koa/router": "^10.1.1",
     "@types/koa": "^2.13.4",
@@ -44,7 +44,7 @@
     "color-thief-node": "^1.0.4",
     "dayjs": "^1.11.2",
     "discord.js": "^13.6.0",
-    "discordx": "9.5.3",
+    "discordx": "9.7.3",
     "dotenv": "^16.0.1",
     "file-type": "^17.1.1",
     "fuse.js": "^6.6.1",
@@ -69,11 +69,11 @@
     "tslib": "^2.4.0",
     "tsyringe": "^4.6.0",
     "twemoji-parser": "^14.0.0",
+    "typescript": "^4.6.4",
     "unique-names-generator": "^4.7.1",
     "uuid": "^8.3.2",
     "winston": "^3.7.2",
-    "winston-transport": "^4.5.0",
-    "typescript": "^4.6.4"
+    "winston-transport": "^4.5.0"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.5.0",
