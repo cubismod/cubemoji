@@ -1,6 +1,7 @@
 // Generate HTML from PUG template for use in static server
 import { GuildManager } from 'discord.js';
 import { writeFile } from 'fs/promises';
+import path from 'path';
 import { compileFile, compileTemplate } from 'pug';
 import { container, singleton } from 'tsyringe';
 import { adjectives, names, uniqueNamesGenerator } from 'unique-names-generator';
@@ -11,28 +12,44 @@ import { CubeLogger } from '../logger/CubeLogger.js';
 
 @singleton()
 export class PugGenerator {
-  private storage = container.resolve(CubeStorage);
+  templateDir = './assets/template';
+  // private storage = container.resolve(CubeStorage);
   emoteCache = container.resolve(EmoteCache);
   template: compileTemplate;
   private logger = container.resolve(CubeLogger).web;
   constructor() {
-    const source = './assets/template/EmojiList.pug';
+    const source = path.resolve(this.templateDir, 'EmojiList.pug');
     this.template = compileFile(source, {
       filename: source
     });
   }
 
-  async unitRender() {
+  private async simpleRender(pugFile: string, outputName: string) {
+    const template = compileFile(pugFile);
+    await writeFile(`./static/${outputName}`, template());
+  }
+
+  /**
+   * Render out content that will be static for the
+   * lifetime of the bot, like the homepage, and just
+   * call this function once to generate the resulting
+   * html files
+   */
+  async staticRenders() {
     const units = await generateList();
 
-    const source = './assets/template/UnitList.pug';
-    const template = compileFile(source, {
-      filename: source
+    const unitSrc = path.resolve(this.templateDir, 'UnitList.pug');
+
+    const unitTemp = compileFile(unitSrc, {
+      filename: unitSrc
     });
 
-    await writeFile('./static/list/unit.html', template({
+    await writeFile('./static/list/unit.html', unitTemp({
       units: units
     }));
+
+    await this.simpleRender(path.resolve(this.templateDir, 'Home.pug'), 'home.html');
+    await this.simpleRender(path.resolve(this.templateDir, '404.pug'), '404.html');
   }
 
   async emojiRender(guilds: GuildManager) {
@@ -54,7 +71,7 @@ export class PugGenerator {
       }
     }
 
-    await writeFile('./static/list/emoji.html', this.template({
+    await writeFile(path.resolve('./static/list/emoji.html'), this.template({
       emotes: this.emoteCache.discEmojis,
       servers: servers
 

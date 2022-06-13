@@ -8,5 +8,6 @@
         "require"
     ],
     "editor.formatOnSave": true,
-    "debug.javascript.autoAttachFilter": "onlyWithFlag"
+    "debug.javascript.autoAttachFilter": "onlyWithFlag",
+    "editor.renderWhitespace": "all"
 }
