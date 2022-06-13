@@ -5,11 +5,13 @@ block title
 block content
   div(class='row')
     div(class='col' id='content')
+      br
       h1 About cubemoji
       p 
         | Welcome to cubemoji, a multi-purpose Discord bot written in JavaScript and separated into several modules with multiple commands. The bot is maintained by cubis and if you would like it on your server, please DM cubis on Discord (cubis#0024). The bot's Discord is available at
         |
         a(href='https://discord.gg/Y6yzKwJUb3') https://discord.gg/Y6yzKwJUb3.
+        |
         | Cubemoji has access to emojis on all servers it is added to, in addition to the
         |
         a(href='https://mutant.tech/') Mutant emoji pack
@@ -23,7 +25,7 @@ block content
       p 
         | Note that any commands taking in strings for emotes or image do support Discord Nitro emojis except for
         |
-        span(class='font-monospace')/info
+        span(class='font-monospace') /info
         |
         | as well as basic unicode emojis in Discord like 🥺.
       
@@ -48,27 +50,39 @@ block content
                 td about
                 td Information about the bot
                 td /about
-                //- td 
+                td 
               tr 
                 td addface
                 td Add silly faces to images 
                 td 
                   | /addface
                   |
-                  b source: 
+                  b source:
+                  |
+                  |
                   i= sourceLabel
-                  b face: 
-                  i= autoCString
-                //- td 
+                  |
+                  |
+                  b face:
+                  |
+                  |
+                  i= autoCStr
+                td 
               tr 
                 td big 
                 td Enlarges emoji 
                 td 
                   | /big
                   |
-                  b emote: 
-                  i #{strLabel} OR 
-                  b member: 
+                  b emote:
+                  |
+                  |
+                  i #{strLabel} OR
+                  |
+                  |
+                  b member:
+                  |
+                  |
                   i= servMember
                 td Either input emote or member 
               tr 
@@ -77,12 +91,23 @@ block content
                 td 
                   | /convert
                   |
-                  b fromval: 
+                  b fromval:
+                  |
+                  |
                   i= numLabel
-                  b fromunit: 
+                  |
+                  |
+                  b fromunit:
+                  |
+                  |
                   i= autoCString
-                  b tounit: 
+                  |
+                  |
+                  b tounit:
+                  |
+                  |
                   i= autoCString
+                td
               tr 
                 td edit 
                 td Edit images 
@@ -90,12 +115,26 @@ block content
                   | /edit
                   |
                   b source:
+                  |
+                  |
                   i= sourceLabel
-                  b member: 
+                  |
+                  |
+                  b member:
+                  |
+                  |
                   i= servMember
-                  b list: 
+                  |
+                  |
+                  b list:
+                  |
+                  |
                   i= boolLabel
-                  b effects: 
+                  |
+                  |
+                  b effects:
+                  |
+                  |
                   i [list of effects, space separated]
                 td Choose either source or member or list. Effects param optional, if not specified then cubemoji will choose random effects to apply.
               tr
@@ -104,32 +143,48 @@ block content
                 td 
                   | /emote
                   |
-                  b emote: 
+                  b emote:
+                  |
+                  |
                   i= strLabel
-                //- td 
+                td 
               tr
-                td help 
+                td help
                 td Guide on cubemoji 
                 td /help
+                td
               tr
                 td info
                 td Information about an emote or user, can also help you create role colors using palette creation from images
                 td 
                   | /info
                   |
-                  b emote: 
+                  b emote:
+                  |
+                  |
                   i= sourceLabel
-                  b member: 
+                  |
+                  |
+                  b member:
+                  |
+                  |
                   i= servMember
+                td
               tr 
                 td jumbo 
                 td Blows up input option bigger than the /big command
                 td 
                   | /jumbo
                   |
-                  b emote: 
-                  i= sourceLabel 
+                  b emote:
+                  |
+                  |
+                  i= sourceLabel
+                  |
+                  |
                   b member:
+                  |
+                  |
                   i= servMember
                 td Choose emote or member 
               tr
@@ -139,36 +194,52 @@ block content
                   | /list
                   |
                   b subset:
+                  |
+                  |
                   i [subset of emojis to grab such as only Discord, only Mutant emoji]
+                td
               tr
                 td random 
                 td Insert random emoji
                 td 
                   | /random
                   |
-                  b items: 
+                  b items:
+                  |
+                  |
                   i [number indicating how many random emoji to insert, max 25]
+                td 
               tr
                 td search 
                 td Search for a specific emoji
                 td 
                   | /search
                   |
-                  b query: 
+                  b query:
+                  |
+                  |
                   i= strLabel
+                td
               tr
                 td uptime 
                 td Display current bot uptime
                 td /uptime
+                td
               tr
                 td rescale
                 td Rescale an image using Seam carving/content aware image scale
                 td 
                   | /rescale
                   |
-                  b source: 
+                  b source:
+                  |
+                  |
                   i= sourceLabel
+                  |
+                  |
                   b member
+                  |
+                  |
                   i= servMember
                 td Choose source or member
 
@@ -213,120 +284,136 @@ block content
         |
         | command.
 
-      h3 Channel Blocking 
+      h4 Channel Blocking 
       p 
         | Channel blocking is enabled irregardless of whether Big Server Mode is enabled. This disables cubemoji from responding to slash commands, menu commands, and reacts in blocked channels. Channels can be blocked and unblocked with
         |
         span(class='font-monospace') /mod blacklist modify action:block/unblock channel: channelname
 
-      h3 Audit Log 
-        p
-          | You can specify an audit channel to log changes made to moderation features using
-          |
-          span(class="font-monospace")/mod enrollment audit
+      h4 Audit Log 
+      p
+        | You can specify an audit channel to log changes made to moderation features using
+        |
+        span(class="font-monospace")/mod enrollment audit
 
 
       h3 Moderation  Commands 
 
-        - const ownerMod = "Server owner + mod roles"
-        = const owner = "Server owner only"
-        - const rolePick = "]role picker]"
-        
-        div(class='table-responsive')  
-          table(class='table table-striped')
-            thead 
-              tr 
-                th(scope='col' class='btn-dark') Command Name
-                th(scope='col' class='btn-dark') Description 
-                th(scope='col' class='btn-dark') Syntax 
-                th(scope='col' class='btn-dark') Syntax Notes
-                th(scope='col' class='btn-dark') Permissions 
-            tbody 
-              tr
-                td mod enrollment list 
-                td List servers currently enrolled in big server as well as moderator roles, you only see servers you own or are a moderator on.
-                td /mod enrollment list
-                td 
-                td= ownerMod
-              tr 
-                td mod blocklist modify
-                td
-                  | Block/unblock emoji globs or channels. More info about
-                  | 
-                  a(href="https://github.com/micromatch/micromatch#matching-features") glob syntax here
-                td
-                  | /mod blocklist modify
-                  | 
-                  b action:
-                  |
-                  i [block/unblock]
-                  |
-                  b server:
-                  |
-                  i [server to block/unblock]
-                  |
-                  b glob:
-                  |
-                  i [glob of emoji to block/unblock]
-                  |
-                  b channel:
-                  |
-                  i [channel to block/unblock]
-                td
-                  | Server parameter is optional and if not specified, defaults to current server. Globs must be less than 21 chars.
-                  | action is required, select glob or channel
-                td= ownerMod
-              tr
-                td mod blocklist list
-                td List blocked emoji and channels on this server.
-                td /mod blocklist list
-                td
-                td= ownerMod
-              tr
-                td mod enrollment rolemod
-                td Grant/revoke moderation permissions for a server role
-                td
-                  | /mod enrollment rolemod
-                  | 
-                  b action:
-                  |
-                  i [grant/revoke]
-                  |
-                  b role:
-                  |
-                  i= rolePick
-                td Both parameters are required
-                td= owner
-              tr
-                td mod enrollment audit
-                td Set a channel to log changes
-                td
-                  | /mod enrollment rolemod
-                  |
-                  b action:
-                  |
-                  i [grant/revoke]
-                  |
-                  b role:
-                  |
-                  i= rolePicker
-                td clear or channel
-                td= owner
-              tr
-                td mod enrollment modify
-                td Enroll/unenroll a server into big server mod
-                td 
-                  | /mod enrollment modify
-                  |
-                  b action:
-                  |
-                  i [unenroll/enroll]
-                  |
-                  b server:
-                  | 
-                  i [server picker of servers you own]
-                td Both params required
-                td= owner
+      - const ownerMod = "Server owner + mod roles"
+      - const owner = "Server owner only"
+      - const rolePick = "[role picker]"
+      
+      div(class='table-responsive')  
+        table(class='table table-striped')
+          thead 
+            tr 
+              th(scope='col' class='btn-dark') Command Name
+              th(scope='col' class='btn-dark') Description 
+              th(scope='col' class='btn-dark') Syntax 
+              th(scope='col' class='btn-dark') Syntax Notes
+              th(scope='col' class='btn-dark') Permissions 
+          tbody 
+            tr
+              td mod enrollment list 
+              td List servers currently enrolled in big server as well as moderator roles, you only see servers you own or are a moderator on.
+              td /mod enrollment list
+              td 
+              td= ownerMod
+            tr 
+              td mod blocklist modify
+              td
+                | Block/unblock emoji globs or channels. More info about
+                | 
+                a(href="https://github.com/micromatch/micromatch#matching-features") glob syntax here
+              td
+                | /mod blocklist modify
+                | 
+                b action:
+                |
+                |
+                i [block/unblock]
+                |
+                |
+                b server:
+                |
+                |
+                i [server to block/unblock]
+                |
+                |
+                b glob:
+                |
+                |
+                i [glob of emoji to block/unblock]
+                |
+                |
+                b channel:
+                |
+                |
+                i [channel to block/unblock]
+              td
+                | Server parameter is optional and if not specified, defaults to current server. Globs must be less than 21 chars.
+                | action is required, select glob or channel
+              td= ownerMod
+            tr
+              td mod blocklist list
+              td List blocked emoji and channels on this server.
+              td /mod blocklist list
+              td
+              td= ownerMod
+            tr
+              td mod enrollment rolemod
+              td Grant/revoke moderation permissions for a server role
+              td
+                | /mod enrollment rolemod
+                | 
+                b action:
+                |
+                |
+                i [grant/revoke]
+                |
+                |
+                b role:
+                |
+                |
+                i= rolePick
+              td Both parameters are required
+              td= owner
+            tr
+              td mod enrollment audit
+              td Set a channel to log changes
+              td
+                | /mod enrollment rolemod
+                |
+                b action:
+                |
+                |
+                i [grant/revoke]
+                |
+                |
+                b role:
+                |
+                |
+                i= rolePicker
+              td clear or channel
+              td= owner
+            tr
+              td mod enrollment modify
+              td Enroll/unenroll a server into big server mod
+              td 
+                | /mod enrollment modify
+                |
+                b action:
+                |
+                |
+                i [unenroll/enroll]
+                |
+                |
+                b server:
+                |
+                | 
+                i [server picker of servers you own]
+              td Both params required
+              td= owner
         
       h3 Bulk Actions
       p

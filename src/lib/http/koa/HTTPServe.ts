@@ -35,9 +35,8 @@ async function LogRequest(ctx: RouterContext, next: Next) {
 @Middleware(koaCompress())
 export class HTTPServe {
   @Get('/')
-  homeRedirect(context: Context) {
-    // redirect to list
-    context.redirect('/list');
+  async home(context: Context) {
+    await send(context, 'static/home.html');
   }
 
   @Get('/status')
@@ -57,6 +56,11 @@ export class HTTPServe {
     await send(context, 'static/list/unit.html');
   }
 
+  @Get(/\/img.*/)
+  async imageFiles(context: Context) {
+
+  }
+
   @Get(/\/emotes.*/)
   @Get(/\/favicon.*/)
   pass(context: Context) {
@@ -65,8 +69,8 @@ export class HTTPServe {
   }
 
   @Get(/.*/)
-  err(context: Context) {
-    context.body = '<html><head><title>404 Error!</title></head><body>404 error! Page not found!</br><img src="https://storage.googleapis.com/cubemoji.appspot.com/portalcoffee.svg" width=150 height =150></body></html>';
+  async err(context: Context) {
     context.status = 404;
+    await send(context, 'static/404.html');
   }
 }
