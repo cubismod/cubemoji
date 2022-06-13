@@ -1,6 +1,7 @@
 import { Get, Middleware, Router } from '@discordx/koa';
 import { RouterContext } from '@koa/router';
 import { randomUUID } from 'crypto';
+import { stat } from 'fs/promises';
 import { Context, Next } from 'koa';
 import koaCompress from 'koa-compress';
 import send from 'koa-send';
@@ -58,7 +59,14 @@ export class HTTPServe {
 
   @Get(/\/img.*/)
   async imageFiles(context: Context) {
-
+    // check if file exists
+    const fileName = context.path.slice(5);
+    const imgPath = `assets/img/${fileName}`;
+    if (await stat(imgPath)) {
+      await send(context, imgPath);
+    } else {
+      await this.err(context);
+    }
   }
 
   @Get(/\/emotes.*/)

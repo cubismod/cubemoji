@@ -274,7 +274,7 @@ block content
 
       h2 Context Menu Commands
       p Right click a message to use context commands (only works on desktop Discord):
-      img(src="/static/context-menu.png" class="img-fluid" alt="Right clicking on Discord menu to show highlighted 'Apps' menu with the submenu item 'Apply edit to this message'")
+      img(src="/img/context-menu.png" class="img-fluid" alt="Right clicking on Discord menu to show highlighted 'Apps' menu with the submenu item 'Apply edit to this message'")
 
       h2 Moderation 
       p 
@@ -288,7 +288,9 @@ block content
       p 
         | Channel blocking is enabled irregardless of whether Big Server Mode is enabled. This disables cubemoji from responding to slash commands, menu commands, and reacts in blocked channels. Channels can be blocked and unblocked with
         |
-        span(class='font-monospace') /mod blacklist modify action:block/unblock channel: channelname
+        span(class="font-monospace") /mod blacklist modify action:block/unblock channel: channelname
+      
+      img(src="img/channel-block.png", class="img-fluid", alt="Block channels via Slash commands as demonstrated here with a list of channels")
 
       h4 Audit Log 
       p
@@ -447,7 +449,7 @@ block content
         | .
         | Just ensure you link a raw text file rather than the HTML render by default.
 
-      img(src="static/copyID.png" class="img-fluid" alt="right click a channel in Discord to copy its ID")
+      img(src="img/copy-id.png" class="img-fluid" alt="right click a channel in Discord to copy its ID")
 
       p To grab the channel ID, ensure you have Developer mode toggled on in Discord settings then right click to copy the ID. These results will be validated against your user ID to ensure you have the permissions to perform this action.
 
