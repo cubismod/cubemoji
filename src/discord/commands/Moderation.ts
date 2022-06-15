@@ -24,9 +24,8 @@ import strings from '../../res/strings.json' assert { type: 'json' };
 @SlashGroup({ name: 'mod', description: 'moderation functionality for the bot' })
 @SlashGroup('mod')
 export abstract class Mod {
-  // @Permission(false)
-  // @Permission(await OwnerCheck())
-  // @Permission(await ModCheck())
+  private storage = container.resolve(CubeStorage);
+
   @Slash('help')
   async help(
     interaction: CommandInteraction
@@ -36,6 +35,25 @@ export abstract class Mod {
       .setDescription(strings.modIntro)
       .setColor('GOLD');
     await interaction.reply({ embeds: [helpEmbed], ephemeral: true });
+  }
+
+  @Slash('rolepicker', { description: 'Configure a role-picker for cubemoji' })
+  async rolePicker(
+    @SlashOption('server', {
+      description: 'name of server to change rolepicker settings for',
+      autocomplete: (interaction: AutocompleteInteraction) => serverAutocomplete(interaction),
+      type: 'STRING'
+    }) server: string,
+    @SlashOption('enabled', {
+      type: 'BOOLEAN'
+    }) enabled: boolean, interaction: CommandInteraction
+  ) {
+    await interaction.deferReply({ ephemeral: true });
+    const guildInfo = await validUser(interaction.user, server, interaction.client);
+    if (guildInfo) {
+      const roleSetup = await this.storage.rolePickers.get(guildInfo);
+      if (roleSetup) await this.storage.rolePickers.set(guildInfo[0], [enabled, roleSetup[1]]);
+    }
   }
 }
 
