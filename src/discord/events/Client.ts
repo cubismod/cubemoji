@@ -41,6 +41,8 @@ export abstract class ClientEvents {
     // create required folders
     await createDir('./download');
     await createDir('./data');
+    await createDir('./data/logs');
+    await createDir('./data/git');
     await createDir('./static/list');
     await createDir('./static/emotes');
 

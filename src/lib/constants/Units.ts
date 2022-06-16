@@ -9,6 +9,7 @@ export namespace Milliseconds {
   export const ninetyMin = 5.4e+6;
   export const fiveSec = 5000;
   export const sec = 1000;
+  export const min = 60000;
 }
 
 export namespace Bytes {
