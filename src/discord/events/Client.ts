@@ -3,6 +3,7 @@
 import { ArgsOf, Client, Discord, DIService, On, Once } from 'discordx';
 import { mkdir } from 'fs/promises';
 import { container } from 'tsyringe';
+import { GitClient } from '../../lib/cd/GitClient.js';
 import { CubeMessageManager } from '../../lib/cmd/MessageManager.js';
 import { Milliseconds } from '../../lib/constants/Units.js';
 import { scheduleBackup } from '../../lib/db/DatabaseMgmt.js';
@@ -115,9 +116,15 @@ export abstract class ClientEvents {
       DIService.container.register(WorkerPool, { useValue: new WorkerPool(workers) });
       this.logger.info('registered WorkerPool');
 
-      await DIService.container.register(CubeServer, { useValue: webServer });
+      DIService.container.register(CubeServer, { useValue: webServer });
 
-      // every 30 min, refresh our cache of who the server owners are
+      const gitClient = new GitClient();
+      await gitClient.clone();
+      DIService.container.register(GitClient, { useValue: gitClient });
+      this.logger.info('registered GitClient')
+
+
+      // every 90 min, refresh our cache of who the server owners are
       // and re-init permissions on Moderation commands as well as
       // regen pug
       setInterval(
@@ -126,6 +133,7 @@ export abstract class ClientEvents {
           // await client.initApplicationPermissions();
           await container.resolve(PugGenerator).emojiRender(client.guilds);
           this.logger.debug('Pug-regen completed');
+          await gitClient.pull();
         },
         Milliseconds.ninetyMin
       );

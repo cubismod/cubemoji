@@ -2,6 +2,7 @@ import simpleGit, { SimpleGit, SimpleGitOptions } from 'simple-git';
 import { container, singleton } from 'tsyringe';
 import { Milliseconds } from '../constants/Units';
 import { CubeLogger } from '../logger/CubeLogger';
+import { rolePickerParse } from './Parser';
 
 @singleton()
 export class GitClient {
@@ -28,7 +29,10 @@ export class GitClient {
 
   async clone() {
     try {
-      await this.git.clone(this.remoteUrl);
+      if (!await this.git.checkIsRepo())
+        await this.git.clone(this.remoteUrl);
+
+      await rolePickerParse();
     } catch (err) {
       this.logger.error(err);
     }
@@ -36,9 +40,17 @@ export class GitClient {
 
   async pull() {
     try {
+      const preSHA = await this.git.revparse('HEAD');
       await this.git.pull();
+      const postSHA = await this.git.revparse('HEAD');
+
+      if (preSHA !== postSHA) {
+        // process and save to DB
+        this.logger.info(`Loaded new changes from ${this.git.remote}. ${postSHA}`);
+        await rolePickerParse();
+      }
     } catch (err) {
-      this.logger.error(err);
+      this.logger.error('Failed pulling Git changes\n' + err);
     }
   }
 }
