@@ -3,16 +3,21 @@
 // webpages for Discord users
 
 import { randomUUID } from 'crypto';
+import dayjs from 'dayjs';
 import { container } from 'tsyringe';
 import { CubeStorage } from '../db/Storage';
 
 const storage = container.resolve(CubeStorage);
 
+/**
+ * expires is in epoch seconds
+ */
 export interface ephemeralLink {
   id: string,
   userID: string,
   serverID: string,
-  url: string
+  url: string,
+  expires: number
 }
 
 /**
@@ -28,19 +33,27 @@ export async function rolesCommand(userID: string, serverID: string) {
   if (serverConfig) {
     // check user config
     const userLink = await storage.ephemeralLinks.get(ephemKey);
-    if (userLink) return userLink;
-    else {
+
+    if (!userLink) {
       // generate new ephemeral link
       const id = randomUUID().slice(0, 10);
       const newLink: ephemeralLink = {
         id,
         serverID,
         url: `${process.env.CM_URL}/roles/${id}`,
-        userID
+        userID,
+        expires: dayjs().add(20, 'minute').unix()
       };
       await storage.ephemeralLinks.set(ephemKey, newLink);
     }
+
+    const link = await storage.ephemeralLinks.get(ephemKey);
+    return `You can access your profile to edit roles at: ${link?.url}. This expires <t:${link?.expires}:R>`;
   } else {
     return 'This server is not enrolled in the roles feature. Ask the administrator to enable it.';
   }
+}
+
+export async function clearPage(userID: string, serverID: string) {
+  await storage.ephemeralLinks.delete(`${serverID}-${userID}`);
 }

@@ -162,7 +162,7 @@ export class CubeStorage {
 
     this.rolePickers = new Keyv<[boolean, RolePicker]>(sqliteUri, { namespace: 'rolepicker' });
 
-    this.ephemeralLinks = new Keyv<ephemeralLink>(sqliteUri, { namespace: 'eph' });
+    this.ephemeralLinks = new Keyv<ephemeralLink>(sqliteUri, { namespace: 'eph', ttl: Milliseconds.twentyMin });
   }
 
   /**

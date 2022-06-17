@@ -2,6 +2,7 @@
 export namespace Milliseconds {
   export const week = 6.048e+8;
   export const thirtyMin = 1.8e+6;
+  export const twentyMin = 1.2e+6;
   export const fiveMin = 300000;
   export const thirtySec = 30000;
   export const tenSec = 10000;
