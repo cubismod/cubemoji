@@ -4,6 +4,7 @@ import Keyv from 'keyv';
 import { container, singleton } from 'tsyringe';
 import { ModAction, RolePicker } from '../cmd/ModHelper.js';
 import { Milliseconds } from '../constants/Units.js';
+import { ephemeralLink } from '../http/RoleManager.js';
 import { CubeLogger } from '../logger/CubeLogger.js';
 
 export interface ServerOwner {
@@ -124,6 +125,9 @@ export class CubeStorage {
   // role picker in a JSON equivalent format
   rolePickers: Keyv<[boolean, RolePicker]>;
 
+  // key is serverID-userID and value
+  ephemeralLinks: Keyv<ephemeralLink>;
+
   private logger = container.resolve(CubeLogger).storage;
   // in testing mode, we are saving data to data/test/
   dbLocation = 'data/';
@@ -157,6 +161,8 @@ export class CubeStorage {
     this.timeouts = new Keyv<RateLimitVal>(sqliteUri, { namespace: 'timeouts', ttl: Milliseconds.fiveMin });
 
     this.rolePickers = new Keyv<[boolean, RolePicker]>(sqliteUri, { namespace: 'rolepicker' });
+
+    this.ephemeralLinks = new Keyv<ephemeralLink>(sqliteUri, { namespace: 'eph' });
   }
 
   /**

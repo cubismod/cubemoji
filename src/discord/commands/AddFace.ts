@@ -14,7 +14,7 @@ export abstract class AddFace {
       autocomplete: (interaction: AutocompleteInteraction) => emoteAutocomplete(interaction),
       type: 'STRING'
     })
-    source: string,
+      source: string,
     @SlashChoice('joy')
     @SlashChoice('pensive')
     @SlashChoice('plead')
@@ -24,10 +24,10 @@ export abstract class AddFace {
     @SlashChoice('zany')
     @SlashChoice('flushed')
     @SlashOption('face', { description: 'face to composite on an image' })
-    face: string,
-    interaction: CommandInteraction,
-    _client: Client,
-    data: BSGuardData
+      face: string,
+      interaction: CommandInteraction,
+      _client: Client,
+      data: BSGuardData
   ) {
     await interaction.deferReply({ ephemeral: data.enrolled, fetchReply: !data.enrolled });
     if (interaction.guildId) {

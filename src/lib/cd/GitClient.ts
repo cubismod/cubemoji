@@ -29,8 +29,7 @@ export class GitClient {
 
   async clone() {
     try {
-      if (!await this.git.checkIsRepo())
-        await this.git.clone(this.remoteUrl);
+      if (!await this.git.checkIsRepo()) { await this.git.clone(this.remoteUrl); }
 
       await rolePickerParse();
     } catch (err) {
@@ -48,9 +47,9 @@ export class GitClient {
         // process and save to DB
         this.logger.info(`Loaded new changes from ${this.git.remote}. SHA hash: ${postSHA}`);
         await rolePickerParse();
-        return `New change loaded for Role Picker config, SHA hash: ${preSHA}➡️${postSHA}.`
+        return `New change loaded for Role Picker config, SHA hash: ${preSHA}➡️${postSHA}.`;
       }
-      return `No update to Role Picker config, SHA hash: ${postSHA}`
+      return `No update to Role Picker config, SHA hash: ${postSHA}`;
     } catch (err) {
       this.logger.error('Failed pulling Git changes\n' + err);
     }

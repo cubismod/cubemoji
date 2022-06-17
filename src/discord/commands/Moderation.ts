@@ -25,7 +25,7 @@ import strings from '../../res/strings.json' assert { type: 'json' };
 @SlashGroup({ name: 'mod', description: 'moderation functionality for the bot' })
 @SlashGroup('mod')
 export abstract class Mod {
-  private git = container.resolve(GitClient)
+  private git = container.resolve(GitClient);
 
   @Slash('help')
   async help(
