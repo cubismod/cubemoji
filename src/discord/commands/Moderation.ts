@@ -4,6 +4,7 @@ import { Pagination } from '@discordx/pagination';
 import { AutocompleteInteraction, CommandInteraction, MessageEmbed, Role, TextChannel, VoiceChannel } from 'discord.js';
 import { Discord, Slash, SlashChoice, SlashGroup, SlashOption } from 'discordx';
 import { container } from 'tsyringe';
+import { GitClient } from '../../lib/cd/GitClient';
 import { serverAutocomplete } from '../../lib/cmd/Autocomplete';
 import { buildList, guildOwnersCheck, modReply, performBulkAction, validUser } from '../../lib/cmd/ModHelper';
 import { CubeStorage } from '../../lib/db/Storage.js';
@@ -24,7 +25,7 @@ import strings from '../../res/strings.json' assert { type: 'json' };
 @SlashGroup({ name: 'mod', description: 'moderation functionality for the bot' })
 @SlashGroup('mod')
 export abstract class Mod {
-  private storage = container.resolve(CubeStorage);
+  private git = container.resolve(GitClient)
 
   @Slash('help')
   async help(
@@ -37,22 +38,19 @@ export abstract class Mod {
     await interaction.reply({ embeds: [helpEmbed], ephemeral: true });
   }
 
-  @Slash('rolepicker', { description: 'Configure a role-picker for cubemoji' })
-  async rolePicker(
-    @SlashOption('server', {
-      description: 'name of server to change rolepicker settings for',
-      autocomplete: (interaction: AutocompleteInteraction) => serverAutocomplete(interaction),
-      type: 'STRING'
-    }) server: string,
-    @SlashOption('enabled', {
-      type: 'BOOLEAN'
-    }) enabled: boolean, interaction: CommandInteraction
-  ) {
+  @Slash('rolereload', { description: 'Reload Role Picker configuration' })
+  async roleReload(interaction: CommandInteraction) {
     await interaction.deferReply({ ephemeral: true });
-    const guildInfo = await validUser(interaction.user, server, interaction.client);
+    const guildInfo = await validUser(interaction.user, interaction.guildId, interaction.client);
     if (guildInfo) {
-      const roleSetup = await this.storage.rolePickers.get(guildInfo);
-      if (roleSetup) await this.storage.rolePickers.set(guildInfo[0], [enabled, roleSetup[1]]);
+      const res = await this.git.pull();
+      if (res) {
+        await interaction.editReply({
+          embeds: [
+            new MessageEmbed({ description: res, color: 'AQUA' })
+          ]
+        });
+      }
     }
   }
 }

@@ -46,9 +46,11 @@ export class GitClient {
 
       if (preSHA !== postSHA) {
         // process and save to DB
-        this.logger.info(`Loaded new changes from ${this.git.remote}. ${postSHA}`);
+        this.logger.info(`Loaded new changes from ${this.git.remote}. SHA hash: ${postSHA}`);
         await rolePickerParse();
+        return `New change loaded for Role Picker config, SHA hash: ${preSHA}➡️${postSHA}.`
       }
+      return `No update to Role Picker config, SHA hash: ${postSHA}`
     } catch (err) {
       this.logger.error('Failed pulling Git changes\n' + err);
     }
