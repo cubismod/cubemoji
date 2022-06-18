@@ -45,7 +45,7 @@ export class PugGenerator {
     });
 
     await writeFile('./static/list/unit.html', unitTemp({
-      units: units
+      units
     }));
 
     await this.simpleRender(path.resolve(this.templateDir, 'Home.pug'), 'home.html');
@@ -73,7 +73,7 @@ export class PugGenerator {
 
     await writeFile(path.resolve('./static/list/emoji.html'), this.template({
       emotes: this.emoteCache.discEmojis,
-      servers: servers
+      servers
 
     })).catch(err => this.logger.error(err));
   }

@@ -55,4 +55,6 @@ export class GitClient {
       this.logger.error('Failed pulling Git changes\n' + err);
     }
   }
+
+  async parse() { await rolePickerParse(); }
 }

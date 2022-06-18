@@ -120,7 +120,10 @@ export abstract class ClientEvents {
 
       const gitClient = new GitClient();
       if (!await gitClient.git.checkIsRepo()) await gitClient.clone();
-      else await gitClient.pull();
+      else {
+        await gitClient.pull();
+        await gitClient.parse();
+      }
 
       DIService.container.register(GitClient, { useValue: gitClient });
       this.logger.info('registered GitClient');
@@ -153,8 +156,11 @@ export abstract class ClientEvents {
       throw new Error('exiting application as commands can\'t init properly');
     }
 
+    DIService.container.register(Client, { useValue: client });
+
     this.logger.info(`cubemoji ${process.env.npm_package_version} is now running...`);
     this.logger.info(`It took ${process.uptime()}s to startup this time`);
+    this.logger.info(`Access the web server at ${process.env.CM_URL}`);
     // set a new status msg every 5 min
     setStatus(client);
     setInterval(setStatus, Milliseconds.fiveMin, client);

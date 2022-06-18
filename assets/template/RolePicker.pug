@@ -6,48 +6,45 @@ block head-extra
 block title 
   h1(class='display-2') Role Picker 
 
-block content 
-  // server icon and name card
-  div(class='row')
-    div(class='col', id='title')
-      div(class='card')
-        div(class="row g-0")
-          div(class="col-md-4")
-            img(src=serverIcon class="img-fluid rounded-start" alt="Server Icon")
-          div(class='col-md-8')
-            div(class='card-body')
-              h5(class='card-title')=serverName
-              p(class='card-text') Select your roles below and then click submit at the bottom of the page. This page expires after 20 minutes of its generation. See the amount of time left by going back to Discord and typing /roles
-  
-  form(class='row' action='/role_submit', method='POST')
-    // used to validate the POST request
-    input(type='hidden' id='serverID' name='serverID' value=serverID)
-    input(type='hidden' id='userID' name='userID' value=userID)
-    input(type='hidden' id='uniqueID' name='uniqueID' value=uniqueID)
-
-    each category in roleCategories
-      div(class='row')
-        div(class='col')
-          // category card
-          div(class='card')
-            div(class='row g-0')
-              if category.image
-                div(class='col-md-4')
-                  img(src=category.image class='img-fluid rounded-start' alt="Category Icon")
-            div(class='col-md-8')
-              div(class='card-body')
-                h5(class='card-title')=category.name
-                p(class='card-text')=category.description
-          
-          div(class='row gy-2 gx-3 align-items-center')
-            each role in category.roles
-              div(class='col-auto')
-                div(class='form-check form-switch')
-                  input(class='form-check-input', type='checkbox' role='switch' id=role)
-                  //- use a RoleManager collection here
-                  label(class='form-check-label' for=role)=roleManager.get(role).name
+block content
+  div(class='container d-grid gap-3')
+    // server icon and name card
     div(class='row')
-      div(class='col')
-        button(type='submit' class='btn btn-primary btn-large') Submit
+      div(class='col', id='title')
+        div(class='card')
+          div(class="row g-0")
+            div(class="col-md-auto")
+              img(src=serverIcon class="img-fluid rounded-start" alt="Server Icon")
+            div(class='col-md')
+              div(class='card-body')
+                h5(class='card-title')=serverName
+                p(class='card-text') Select your roles below and then click submit at the bottom of the page. This page expires after 20 minutes of its generation. See the amount of time left by going back to Discord and typing /roles
+    div(class='row')
+      form(action='/role_submit', method='POST')
+        // used to validate the POST request
+        input(type='hidden' id='serverID' name='serverID' value=serverID)
+        input(type='hidden' id='userID' name='userID' value=userID)
+        input(type='hidden' id='uniqueID' name='uniqueID' value=uniqueID)
+
+        each category in roleCategories
+          div(class='row p-2 rounded border')
+            div(class='col')
+              // category
+              h5=category.name
+              p=category.description
+              if category.image
+                img(src=category.image style='max-width:40%;height:auto' class='img-fluid' alt="Category Icon")
+              
+              div(class='row gy-2 gx-3 align-items-center')
+                each role in category.roles
+                  div(class='col-auto')
+                    div(class='form-check form-switch')
+                      input(class='form-check-input', type='checkbox' role='switch' id=role)
+                      //- use a RoleManager collection here
+                      label(class='form-check-label' for=role)=roleManager.get(role).name
+        div(class='row p-2')
+          div(class='col')
+            div(class='d-grid')
+              button(type='submit' class='btn btn-primary btn-large') Submit
               
 

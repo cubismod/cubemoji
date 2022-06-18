@@ -45,6 +45,7 @@ export async function rolesCommand(userID: string, serverID: string) {
         expires: dayjs().add(20, 'minute').unix()
       };
       await storage.ephemeralLinks.set(ephemKey, newLink);
+      await storage.uniqueIDLookup.set(id, ephemKey);
     }
 
     const link = await storage.ephemeralLinks.get(ephemKey);

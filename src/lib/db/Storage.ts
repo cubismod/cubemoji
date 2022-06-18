@@ -128,6 +128,10 @@ export class CubeStorage {
   // key is serverID-userID and value
   ephemeralLinks: Keyv<ephemeralLink>;
 
+  // key is the link name and value is the corresponding key in
+  // the ephemeralLinks namespace
+  uniqueIDLookup: Keyv<string>;
+
   private logger = container.resolve(CubeLogger).storage;
   // in testing mode, we are saving data to data/test/
   dbLocation = 'data/';
@@ -163,6 +167,8 @@ export class CubeStorage {
     this.rolePickers = new Keyv<[boolean, RolePicker]>(sqliteUri, { namespace: 'rolepicker' });
 
     this.ephemeralLinks = new Keyv<ephemeralLink>(sqliteUri, { namespace: 'eph', ttl: Milliseconds.twentyMin });
+
+    this.uniqueIDLookup = new Keyv<string>(sqliteUri, { namespace: 'idlookup', ttl: Milliseconds.twentyMin });
   }
 
   /**
