@@ -2,8 +2,8 @@
 // Handles generating and tracking role management
 // webpages for Discord users
 
-import { randomUUID } from 'crypto';
 import dayjs from 'dayjs';
+import { randomString } from 'pandemonium';
 import { container } from 'tsyringe';
 import { CubeStorage } from '../db/Storage';
 
@@ -36,7 +36,7 @@ export async function rolesCommand(userID: string, serverID: string) {
 
     if (!userLink) {
       // generate new ephemeral link
-      const id = randomUUID().slice(0, 10);
+      const id = randomString(10, 12);
       const newLink: ephemeralLink = {
         id,
         serverID,
@@ -48,7 +48,7 @@ export async function rolesCommand(userID: string, serverID: string) {
     }
 
     const link = await storage.ephemeralLinks.get(ephemKey);
-    return `You can access your profile to edit roles at: ${link?.url}. This expires <t:${link?.expires}:R>`;
+    return `You can access your profile to edit roles at: ${link?.url}. This expires <t:${link?.expires}:R> , although you can click the button below to delete it early (your roles will not be deleted, just the temporary page).`;
   } else {
     return 'This server is not enrolled in the roles feature. Ask the administrator to enable it.';
   }

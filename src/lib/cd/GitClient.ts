@@ -40,7 +40,8 @@ export class GitClient {
   async pull() {
     try {
       const preSHA = await this.git.revparse('HEAD');
-      await this.git.pull();
+      await this.git.fetch();
+      await this.git.pull('origin');
       const postSHA = await this.git.revparse('HEAD');
 
       if (preSHA !== postSHA) {

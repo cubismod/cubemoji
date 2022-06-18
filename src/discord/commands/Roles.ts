@@ -23,7 +23,7 @@ export abstract class Roles {
       const res = await rolesCommand(interaction.user.id, interaction.guildId);
       await interaction.editReply({
         embeds: [
-          new MessageEmbed({ title: 'Role Profile', description: res, color: 'DARK_VIVID_PINK' })
+          new MessageEmbed({ title: 'Roles Profile', description: res, color: 'DARK_VIVID_PINK' })
         ],
         components: [actionRow]
       });
