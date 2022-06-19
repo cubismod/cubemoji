@@ -9,6 +9,7 @@ import { serverAutocomplete } from '../../lib/cmd/Autocomplete';
 import { buildList, guildOwnersCheck, modReply, performBulkAction, validUser } from '../../lib/cmd/ModHelper';
 import { CubeStorage } from '../../lib/db/Storage.js';
 import { EmoteCache } from '../../lib/emote/EmoteCache.js';
+import { rolePermissionCheck } from '../../lib/http/RoleManager';
 import strings from '../../res/strings.json' assert { type: 'json' };
 
 /**
@@ -42,12 +43,19 @@ export abstract class Mod {
   async roleReload(interaction: CommandInteraction) {
     await interaction.deferReply({ ephemeral: true });
     const guildInfo = await validUser(interaction.user, interaction.guildId, interaction.client);
-    if (guildInfo) {
+    if (guildInfo && interaction.guildId) {
       const res = await this.git.pull();
-      if (res) {
+      const rolePermission = await rolePermissionCheck(interaction.guildId, interaction.client);
+      if (res && rolePermission) {
         await interaction.editReply({
           embeds: [
             new MessageEmbed({ description: res, color: 'AQUA' })
+          ]
+        });
+      } else {
+        await interaction.editReply({
+          embeds: [
+            new MessageEmbed({ description: 'Bot may not have permissions to edit roles on this server. Ensure that it has the MANAGE ROLES permission on this server.', color: 'RED' })
           ]
         });
       }

@@ -3,11 +3,14 @@
 // webpages for Discord users
 
 import dayjs from 'dayjs';
+import { Client } from 'discord.js';
 import { randomString } from 'pandemonium';
 import { container } from 'tsyringe';
 import { CubeStorage } from '../db/Storage';
+import { CubeLogger } from '../logger/CubeLogger';
 
 const storage = container.resolve(CubeStorage);
+const logger = container.resolve(CubeLogger).discordLogic;
 
 /**
  * expires is in epoch seconds
@@ -57,4 +60,49 @@ export async function rolesCommand(userID: string, serverID: string) {
 
 export async function clearPage(userID: string, serverID: string) {
   await storage.ephemeralLinks.delete(`${serverID}-${userID}`);
+}
+
+/**
+ * check whether the bot has the permissions to manage roles
+ * in the requested server
+ * @param serverID server to check
+ * @param client Discord client
+ * @returns true if can change perm, false if can't
+ */
+export async function rolePermissionCheck(serverID: string, client: Client) {
+  const guild = client.guilds.resolve(serverID);
+  if (guild && client.user) {
+    if (guild.members.resolve(client.user.id)?.permissions.has('MANAGE_ROLES')) return true;
+  }
+  logger.error(`Cubemoji is missing manage role permissions on server ID: ${guild?.id}, name: ${guild?.name}`);
+  return false;
+}
+
+/**
+ * Generates a list of user modifiable roles available
+ * to the Role Picker webpage on a particular server
+ * @param serverID server to check
+ * @returns list of role IDs or undefined if no config exists
+ */
+export async function genRolesList(serverID: string) {
+  const rolePicker = await storage.rolePickers.get(serverID);
+  if (rolePicker) {
+    const roles: string[] = [];
+    for (const category of rolePicker[1].categories) {
+      for (const role of category.roles) {
+        roles.push(role);
+      }
+    }
+    return roles;
+  }
+}
+
+/**
+ * take form data from HTML submission and then
+ * perform an update if possible
+ * @param roleID
+ * @param checkValue
+ */
+export async function performRoleUpdates(roleID: string, checkValue: string) {
+
 }

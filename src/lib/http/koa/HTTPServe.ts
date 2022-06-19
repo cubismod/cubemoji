@@ -1,15 +1,17 @@
-import { Get, Middleware, Router } from '@discordx/koa';
+import { Get, Middleware, Post, Router } from '@discordx/koa';
 import { RouterContext } from '@koa/router';
 import { randomUUID } from 'crypto';
 import { Client } from 'discordx';
 import { stat } from 'fs/promises';
 import { Context, Next } from 'koa';
+import koaBody from 'koa-body';
 import koaCompress from 'koa-compress';
 import send from 'koa-send';
 import { compileFile } from 'pug';
 import { container } from 'tsyringe';
 import { CubeStorage } from '../../db/Storage';
 import { CubeLogger } from '../../logger/CubeLogger';
+import { genRolesList } from '../RoleManager';
 
 async function LogRequest(ctx: RouterContext, next: Next) {
   const logger = container.resolve(CubeLogger).web;
@@ -74,50 +76,95 @@ export class HTTPServe {
     }
   }
 
+  /**
+   * validate that a unique ID corresponds to
+   * an open user role picking session in DB
+   * @param id random string of characters and numbers
+   * @returns undefined if validation fails or context about
+   *          the request if it succeeds
+   */
+  private async uniqueIDValidation(id: string) {
+    const serverUserIDKey = await this.storage.uniqueIDLookup.get(id);
+    if (serverUserIDKey) {
+      const ephemeralLink = await this.storage.ephemeralLinks.get(serverUserIDKey);
+      if (ephemeralLink) {
+        const roleBody = await this.storage.rolePickers.get(ephemeralLink.serverID);
+        return { roleBody, serverUserIDKey, ephemeralLink };
+      }
+    }
+  }
+
   @Get(/\/roles\/.+/)
   async rolePickerWeb(context: Context) {
     const client = container.resolve(Client);
-
     const split = context.path.split('/');
     if (split.length > 2) {
       const id = split[2];
 
-      // check if it is a valid Role Request
-      const ephemKey = await this.storage.uniqueIDLookup.get(id);
-      if (ephemKey) {
-        const link = await this.storage.ephemeralLinks.get(ephemKey);
-        if (link) {
-          const roleBody = await this.storage.rolePickers.get(link.serverID);
-          if (roleBody) {
-            // now we finally have found the role information so time to generate a Pug page
-            const serverAndUserID = ephemKey.split('-');
-            const guild = client.guilds.resolve(serverAndUserID[0]);
-            await guild?.fetch();
+      const res = await this.uniqueIDValidation(id);
 
-            const serverName = guild?.name;
-            const serverIcon = guild?.iconURL();
-            const userRoles = guild?.members.cache.get(link.userID)?.roles.cache;
-            const userNickname = guild?.members.cache.get(link.userID)?.displayName;
+      if (res && res.roleBody) {
+        // now we finally have found the role information so time to generate a Pug page
+        const serverAndUserID = res.serverUserIDKey.split('-');
+        const guild = client.guilds.resolve(serverAndUserID[0]);
+        await guild?.fetch();
 
-            if (serverAndUserID.length > 1 && serverName && serverIcon && guild && userRoles && userNickname) {
-              const template = compileFile('./assets/template/RolePicker.pug');
-              const body = template({
-                serverIcon,
-                serverName,
-                roleCategories: roleBody[1].categories,
-                roleManager: guild.roles.cache,
-                userRoles,
-                userNickname
-              });
+        const serverName = guild?.name;
+        const serverIcon = guild?.iconURL();
+        const userRoles = guild?.members.cache.get(res.ephemeralLink.userID)?.roles.cache;
+        const userNickname = guild?.members.cache.get(res.ephemeralLink.userID)?.displayName;
 
-              context.body = body;
-              return;
-            }
-          }
+        if (serverAndUserID.length > 1 && serverName && serverIcon && guild && userRoles && userNickname) {
+          const template = compileFile('./assets/template/RolePicker.pug');
+          const body = template({
+            serverIcon,
+            serverID: res.roleBody[1].serverID,
+            serverName,
+            roleCategories: res.roleBody[1].categories,
+            roleManager: guild.roles.cache,
+            userRoles,
+            userNickname,
+            userID: res.ephemeralLink.userID,
+            uniqueID: res.ephemeralLink.id
+          });
+
+          context.body = body;
+          return;
         }
       }
     }
     context.status = 500;
+  }
+
+  @Post('/submitroles')
+  @Middleware(koaBody({
+    multipart: true,
+    urlencoded: true
+  }))
+  async submitRoles(context: Context) {
+    // now we have to extract details from the request
+    console.log(context.request.body);
+  }
+
+  private async parseFormBody (body: any) {
+    const uniqueID: string | undefined = body.uniqueID;
+    const serverID: string | undefined = body.serverID;
+    const userID: string | undefined = body.userID;
+
+    if (uniqueID && serverID && userID) {
+      // track down the corresponding database entry for this link
+      const res = await this.uniqueIDValidation(uniqueID);
+
+      if (res && res.roleBody) {
+        const roleslist = await genRolesList(serverID);
+        if (roleslist) {
+          // for (const role of roleslist) {
+          //   // check against the body to determine checked/unchecked roles
+          //   const checkValue: string | undefined = body.role;
+          // }
+        }
+      }
+    }
   }
 
   @Get(/\/emotes.*/)

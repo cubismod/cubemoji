@@ -55,6 +55,7 @@
     "js-quantities": "^1.7.6",
     "keyv": "^4.2.2",
     "koa": "^2.13.4",
+    "koa-body": "^5.0.0",
     "koa-compress": "^5.1.0",
     "koa-send": "^5.0.1",
     "micromatch": "^4.0.4",
