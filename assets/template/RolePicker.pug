@@ -39,11 +39,11 @@ block content
             h5=category.name
             p=category.description
             if category.image
-              img(src=category.image style='max-width:40%;height:auto' class='img-fluid img-thumbnail' alt="Category Icon")
+              img(src=category.image style='max-width:40%;height:auto' class='img-fluid img-thumbnail mb-5' alt="Category Icon")
             
-            div(class='row gy-2 gx-3 align-items-center')
+            div(class='row gy-5 gx-5 align-items-center')
               each role in category.roles
-                div(class='col-auto')
+                div( class='col-auto')
                   div(class='form-check form-switch')
                     //- figure out if the user has the role to autocheck the box
                     if userRoles.get(role)
@@ -62,7 +62,11 @@ block content
                         id=role
                       )
                     //- use a RoleManager collection here
-                    label(class='form-check-label' for=role)=roleManager.get(role).name
+                    label(
+                      class='form-check-label'
+                      for=role
+                      style=`text-decoration:underline;text-decoration-color:${roleManager.get(role).hexColor}`
+                      )=roleManager.get(role).name
       div(class='row p-3')
         div(class='col')
           div(class='d-grid')
