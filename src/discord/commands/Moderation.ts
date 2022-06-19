@@ -1,15 +1,16 @@
 // Various server configuration commands
 
 import { Pagination } from '@discordx/pagination';
-import { AutocompleteInteraction, CommandInteraction, MessageEmbed, Role, TextChannel, VoiceChannel } from 'discord.js';
+import { AutocompleteInteraction, CommandInteraction, MessageAttachment, MessageEmbed, Role, TextChannel, VoiceChannel } from 'discord.js';
 import { Discord, Slash, SlashChoice, SlashGroup, SlashOption } from 'discordx';
+import { rm } from 'fs/promises';
 import { container } from 'tsyringe';
 import { GitClient } from '../../lib/cd/GitClient';
 import { serverAutocomplete } from '../../lib/cmd/Autocomplete';
 import { buildList, guildOwnersCheck, modReply, performBulkAction, validUser } from '../../lib/cmd/ModHelper';
 import { CubeStorage } from '../../lib/db/Storage.js';
 import { EmoteCache } from '../../lib/emote/EmoteCache.js';
-import { rolePermissionCheck } from '../../lib/http/RoleManager';
+import { allRoles, rolePermissionCheck } from '../../lib/http/RoleManager';
 import strings from '../../res/strings.json' assert { type: 'json' };
 
 /**
@@ -38,6 +39,24 @@ export abstract class Mod {
       .setDescription(strings.modIntro)
       .setColor('GOLD');
     await interaction.reply({ embeds: [helpEmbed], ephemeral: true });
+  }
+
+  @Slash('allroles', { description: 'Get a list of all roles on this server!' })
+  async allRolesCmd(
+    interaction: CommandInteraction
+  ) {
+    await interaction.deferReply();
+    if (interaction.guildId) {
+      const tempFile = await allRoles(interaction.guildId);
+      if (tempFile) {
+        await interaction.editReply({
+          files: [
+            new MessageAttachment(tempFile)
+          ]
+        });
+        await rm(tempFile);
+      }
+    }
   }
 
   @Slash('rolepickstatus', { description: 'Enable or disable Role Picker' })

@@ -2,10 +2,13 @@
 // Handles generating and tracking role management
 // webpages for Discord users
 
+import { randomUUID } from 'crypto';
 import dayjs from 'dayjs';
 import { Client as jsClient } from 'discord.js';
 import { Client } from 'discordx';
+import { appendFile } from 'fs/promises';
 import { randomString } from 'pandemonium';
+import path from 'path';
 import { container } from 'tsyringe';
 import { CubeStorage } from '../db/Storage';
 import { CubeLogger } from '../logger/CubeLogger';
@@ -98,6 +101,23 @@ export async function genRolesList(serverID: string) {
       }
     }
     return roles;
+  }
+}
+
+/**
+ * Create a text file of all server roles and names
+ * @param serverID server id
+ */
+export async function allRoles(serverID: string) {
+  const fileName = path.join('./download', randomUUID() + '.txt');
+
+  const client = container.resolve(Client);
+  const roles = client.guilds.resolve(serverID)?.roles;
+  if (roles) {
+    for (const role of roles.cache) {
+      await appendFile(fileName, `${role[1].id} : ${role[1].name} \n`);
+    }
+    return fileName;
   }
 }
 
