@@ -3,7 +3,8 @@
 // webpages for Discord users
 
 import dayjs from 'dayjs';
-import { Client } from 'discord.js';
+import { Client as jsClient } from 'discord.js';
+import { Client } from 'discordx';
 import { randomString } from 'pandemonium';
 import { container } from 'tsyringe';
 import { CubeStorage } from '../db/Storage';
@@ -69,7 +70,7 @@ export async function clearPage(userID: string, serverID: string) {
  * @param client Discord client
  * @returns true if can change perm, false if can't
  */
-export async function rolePermissionCheck(serverID: string, client: Client) {
+export async function rolePermissionCheck(serverID: string, client: Client | jsClient) {
   const guild = client.guilds.resolve(serverID);
   if (guild && client.user) {
     if (guild.members.resolve(client.user.id)?.permissions.has('MANAGE_ROLES')) return true;
@@ -103,6 +104,27 @@ export async function genRolesList(serverID: string) {
  * @param roleID
  * @param checkValue
  */
-export async function performRoleUpdates(roleID: string, checkValue: string) {
+export async function performRoleUpdates(roleID: string, checkValue: string | undefined, userID: string, serverID: string) {
+  const client = container.resolve(Client);
 
+  const member = await client.guilds.resolve(serverID)?.members.resolve(userID);
+  const existingState = member?.roles.resolve(roleID);
+  const reason = 'cubemoji role picker';
+  try {
+    if (existingState) {
+      // user has the role
+      if (!checkValue) {
+        // removing the role
+        logger.info(`Removing role: ${roleID} from user: ${userID} in guild: ${serverID}`);
+        await member?.roles.remove(roleID, reason);
+      }
+    } else {
+      if (checkValue) {
+        logger.info(`Adding role: ${roleID} to user: ${userID} in guild: ${serverID}`);
+        await member?.roles.add(roleID, reason);
+      }
+    }
+  } catch (err) {
+    logger.error(err);
+  }
 }

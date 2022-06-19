@@ -1,6 +1,5 @@
 import { Get, Middleware, Post, Router } from '@discordx/koa';
 import { RouterContext } from '@koa/router';
-import { randomUUID } from 'crypto';
 import { Client } from 'discordx';
 import { stat } from 'fs/promises';
 import { Context, Next } from 'koa';
@@ -11,17 +10,17 @@ import { compileFile } from 'pug';
 import { container } from 'tsyringe';
 import { CubeStorage } from '../../db/Storage';
 import { CubeLogger } from '../../logger/CubeLogger';
-import { genRolesList } from '../RoleManager';
+import { genRolesList, performRoleUpdates } from '../RoleManager';
 
 async function LogRequest(ctx: RouterContext, next: Next) {
   const logger = container.resolve(CubeLogger).web;
-  const trxId = randomUUID();
-  logger.info({
-    type: 'request',
-    trxId,
-    headers: ctx.headers,
-    url: ctx.URL.pathname
-  });
+  // const trxId = randomUUID();
+  // logger.info({
+  //   type: 'request',
+  //   trxId,
+  //   headers: ctx.headers,
+  //   url: ctx.URL.pathname
+  // });
 
   await next();
 
@@ -29,8 +28,8 @@ async function LogRequest(ctx: RouterContext, next: Next) {
     // don't log what will be passed off to Fly
     logger.info({
       type: 'response',
-      trxId,
       url: ctx.URL.pathname,
+      headers: ctx.headers,
       status: ctx.response.status
     });
   }
@@ -133,6 +132,7 @@ export class HTTPServe {
         }
       }
     }
+    context.body = compileFile('./assets/template/500.pug')();
     context.status = 500;
   }
 
@@ -143,9 +143,27 @@ export class HTTPServe {
   }))
   async submitRoles(context: Context) {
     // now we have to extract details from the request
-    console.log(context.request.body);
+    const parseResult = await this.parseFormBody(context.request.body);
+    const template = compileFile('./assets/template/RoleResult.pug');
+
+    if (parseResult) {
+      context.body = template({ success: true });
+
+      // clear up all traces in database
+      const lookup = await this.storage.uniqueIDLookup.get(context.request.body.uniqueID);
+      await this.storage.uniqueIDLookup.delete(context.request.body.uniqueID);
+      if (lookup) await this.storage.ephemeralLinks.delete(lookup);
+    } else {
+      context.body = template({ success: false });
+    }
   }
 
+  /**
+   * parse an html form body
+   * @param body object of form items with
+   * role ids corresponding with checked buttons
+   * @returns true if completely parsed, false if not
+   */
   private async parseFormBody (body: any) {
     const uniqueID: string | undefined = body.uniqueID;
     const serverID: string | undefined = body.serverID;
@@ -158,13 +176,18 @@ export class HTTPServe {
       if (res && res.roleBody) {
         const roleslist = await genRolesList(serverID);
         if (roleslist) {
-          // for (const role of roleslist) {
-          //   // check against the body to determine checked/unchecked roles
-          //   const checkValue: string | undefined = body.role;
-          // }
+          for (const role of roleslist) {
+            // check against the body to determine checked/unchecked roles
+            const checkValue: string | undefined = body[role];
+
+            await performRoleUpdates(role, checkValue, userID, serverID);
+          }
+          // success state
+          return true;
         }
       }
     }
+    return false;
   }
 
   @Get(/\/emotes.*/)

@@ -1,0 +1,12 @@
+extends ParentTemplate.pug 
+
+block head-extra
+  title 500 Error: Internal Server Error
+
+block title 
+  h1(class='display-2') 500 Error
+
+block content
+  div(class='row')
+    div(class='col' id='content')
+      p An internal server error ocurred on our end. Try again later.
