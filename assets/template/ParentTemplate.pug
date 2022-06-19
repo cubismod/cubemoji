@@ -15,30 +15,38 @@ html(lang='en')
     link(rel='icon', type='image/x-icon' href='/favicon/favicon.ico')
     link(rel='manifest' href='/favicon/site.webmanifest')
 
+    // font
+    link(rel='stylesheet' href='https://fonts.googleapis.com/css?family=Rubik')
+
     block head-extra
       title cubemoji
 
   block scripts
     script(src='https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js' integrity='sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p' crossorigin='anonymous')
   
-  body(style='background-image:url(\'/img/papyrus-dark.webp\');')
+  body(style='background-image:url(\'/img/papyrus-dark.webp\');font-family:\'Rubik\';')
+    block navbar
+      nav(class='navbar navbar-expand-lg navbar-dark sticky-top' style='background:black')
+        div(class='container-fluid')
+          a(class='navbar-brand' href='/')
+            img(src='/img/icon.png' alt='cubemoji icon' width='30', height='30')
+          button(class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation")
+            span(class='navbar-toggler-icon')
+          div(class='collapse navbar-collapse' id='navbarNav')
+            div(class='navbar-nav text-white')
+              a(class='nav-link' href='/') Home
+              a(class='nav-link' href='/list') Emojis
+              a(class='nav-link' href='/units') Units
+              a(target='_blank' class='nav-link' href='https://gitlab.com/cubismod/cubemoji') GitLab
+              a(target='_blank' class='nav-link' href='https://discord.gg/rQZVTpEyuG') Discord Server
+              a(target='_blank' class='nav-link' href='https://www.buymeacoffee.com/cubis') Buy Me a Coffee
+
     block menu  
       div(class='container')
         div(class='row')
-          div(class='col-2 align-self-center justify-content-center')
-            img(src='https://gitlab.com/cubismod/cubemoji/-/raw/main/assets/icon.svg', class='img-fluid', alt='cubemoji logo' width=130, height=130)
-          div(class='col-9')
+          div(class='col')
             block title 
               h1(class='display-2') Insert Text Here!
-            
-            block social
-              div(class='btn-group', role='group', aria-label='links')
-                a(class='btn btn-outline-light' href='/') Home
-                a(class='btn btn-outline-light' href='/list') Emojis
-                a(class='btn btn-outline-light' href='/units') Units
-                a(target='_blank' class='btn btn-outline-success' href='https://gitlab.com/cubismod/cubemoji') GitLab
-                a(target='_blank' class='btn btn-outline-success' href='https://discord.gg/rQZVTpEyuG') Discord Server
-                a(target='_blank' class='btn btn-outline-success' href='https://www.buymeacoffee.com/cubis') Buy Me a Coffee
                 
     
         block content
@@ -57,4 +65,8 @@ html(lang='en')
                     |
                     | and licensed under Creative Commons.
                     |
-                    | This website is 100% tracker free because screw that.
+                    | This website is 100% tracker free.
+                    |
+                    | The font used is
+                    |
+                    a(href='https://fonts.google.com/specimen/Rubik') Rubik.

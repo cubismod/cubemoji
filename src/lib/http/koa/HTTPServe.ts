@@ -96,22 +96,28 @@ export class HTTPServe {
 
             const serverName = guild?.name;
             const serverIcon = guild?.iconURL();
+            const userRoles = guild?.members.cache.get(link.userID)?.roles.cache;
+            const userNickname = guild?.members.cache.get(link.userID)?.displayName;
 
-            if (serverAndUserID.length > 1 && serverName && serverIcon && guild) {
+            if (serverAndUserID.length > 1 && serverName && serverIcon && guild && userRoles && userNickname) {
               const template = compileFile('./assets/template/RolePicker.pug');
               const body = template({
                 serverIcon,
                 serverName,
                 roleCategories: roleBody[1].categories,
-                roleManager: guild.roles.cache
+                roleManager: guild.roles.cache,
+                userRoles,
+                userNickname
               });
 
               context.body = body;
+              return;
             }
           }
         }
       }
     }
+    context.status = 500;
   }
 
   @Get(/\/emotes.*/)
