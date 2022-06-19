@@ -27,6 +27,9 @@ export interface ephemeralLink {
 /**
  * Response from when a user types the
  * /roles command into Discord
+ * This will fail if the Role Picker feature is disabled on that
+ * server by an administrator or if there is no config defined for
+ * that server on Git.
  * @param userID user who triggers the command
  * @param serverID server in which that command is triggered
  * @returns false if server is not enrolled in roles system
@@ -34,7 +37,7 @@ export interface ephemeralLink {
 export async function rolesCommand(userID: string, serverID: string) {
   const ephemKey = `${serverID}-${userID}`;
   const serverConfig = await storage.rolePickers.get(serverID);
-  if (serverConfig) {
+  if (serverConfig && serverConfig[0]) {
     // check user config
     const userLink = await storage.ephemeralLinks.get(ephemKey);
 

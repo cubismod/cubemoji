@@ -27,6 +27,7 @@ import strings from '../../res/strings.json' assert { type: 'json' };
 @SlashGroup('mod')
 export abstract class Mod {
   private git = container.resolve(GitClient);
+  private storage = container.resolve(CubeStorage);
 
   @Slash('help')
   async help(
@@ -37,6 +38,47 @@ export abstract class Mod {
       .setDescription(strings.modIntro)
       .setColor('GOLD');
     await interaction.reply({ embeds: [helpEmbed], ephemeral: true });
+  }
+
+  @Slash('rolepickstatus', { description: 'Enable or disable Role Picker' })
+  async rolePickStatus(
+    @SlashOption('server', {
+      description: 'server of which to enable/disable for',
+      autocomplete: (interaction: AutocompleteInteraction) => serverAutocomplete(interaction),
+      type: 'STRING'
+    }) server: string,
+    @SlashOption('setstatus', {
+      description: 'enable or disable the Role Picker on this server',
+      type: 'BOOLEAN'
+    }) setStatus,
+      interaction: CommandInteraction) {
+    await interaction.deferReply({ ephemeral: true });
+    const guildInfo = await validUser(interaction.user, server, interaction.client);
+
+    if (guildInfo && interaction.guildId) {
+      // perform action
+      const curVal = await this.storage.rolePickers.get(guildInfo[0]);
+      if (curVal) {
+        await this.storage.rolePickers.set(guildInfo[0], [setStatus, curVal[1]]);
+        await interaction.editReply({
+          embeds: [
+            new MessageEmbed({
+              description: `Role Picker State for ${guildInfo[1]} is now ${setStatus}`,
+              color: 'BLUE'
+            })
+          ]
+        });
+      } else {
+        await interaction.editReply({
+          embeds: [
+            new MessageEmbed({
+              description: 'No Role Picker is defined for this server. Please refer to the docs at https://cubemoji.art',
+              color: 'RED'
+            })
+          ]
+        });
+      }
+    }
   }
 
   @Slash('rolereload', { description: 'Reload Role Picker configuration' })
