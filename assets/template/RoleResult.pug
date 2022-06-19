@@ -1,0 +1,17 @@
+extends ParentTemplate.pug 
+
+block head-extra 
+  title Thanks for using Role Picker
+
+block title 
+  h1(class='display-2') Thanks for using Role Picker
+
+block content
+  div(class='row')
+    div(class='col' id='content')
+      if success 
+        p Thanks for using cubemoji Role Picker, your results have been saved and your temporary link has expired.
+      else
+        p There was an error submitting your cubemoji Role Picker submission. Check that the link you are using was not expired and valid. We apologize for the error and it has been logged to the administrators of the bot.
+      br
+      p You may close this page now.

@@ -8,8 +8,9 @@ block title
 
 block content
   div(class='row')
-    div(class='col' id='content')
-      br
+    div(class='col-lg-2')
+      nav(class='toc')
+    div(class='col-lg-8 toc-content')
       h1 About cubemoji
       p 
         | Welcome to cubemoji, a multi-purpose Discord bot written in JavaScript and separated into several modules with multiple commands. The bot is maintained by cubis and if you would like it on your server, please DM cubis on Discord (cubis#0024). The bot's Discord is available at
@@ -246,6 +247,11 @@ block content
                   |
                   i= servMember
                 td Choose source or member
+              tr
+                td roles
+                td Generate a link to setup your roles on a supported server
+                td /roles
+                td
 
       h2(id='react') React commands
       p You can use reacts on messages to trigger different bot actions.     
@@ -423,6 +429,36 @@ block content
                 i [server picker of servers you own]
               td Both params required
               td= owner
+            tr
+              td mod allroles
+              td Get a list of all roles on the current server and their names for easy config of Role Picker
+              td /mod allroles
+              td
+              td= ownerMod
+            tr
+              td mod rolereload
+              td Reload role configuration from Git
+              td /mod rolereload
+              td
+              td= ownerMod
+            tr
+              td mod rolepickstatus
+              td Enable or disable the role picker for a particular server
+              td
+                | /mod rolepickstatus
+                |
+                b server:
+                |
+                |
+                i [server to modify status on]
+                |
+                |
+                b setstatus:
+                |
+                |
+                i=boolLabel
+              td
+              td Anyone
         
       h3(id='bulk') Bulk Actions
       p
@@ -459,3 +495,50 @@ block content
       img(src='img/copy-id.png' class='img-fluid' alt='right click a channel in Discord to copy its ID'  style='max-width:20%;height:auto')
 
       p To grab the channel ID, ensure you have Developer mode toggled on in Discord settings then right click to copy the ID. These results will be validated against your user ID to ensure you have the permissions to perform this action.
+
+      h2(id='rolepicker') Role Picker
+      img(src='/img/role-picker.png' style='max-width:70%;height:auto' class='mx-auto d-block img-thumbnail' alt='Role Picker webpage screenshot')
+      br
+      p Cubemoji is offering a great new feature enabling a web interface role picker! The Role Picker allows users to self-assign roles through a quick web interface.
+
+      h3(id='roleuserflow') User Flow 
+      p 
+        | Here's how role assignment looks for users. The first step is that users type
+        |
+        span(class='font-monospace') /roles
+        |
+        | in chat which generates a unique URL for them that exists for 20 minutes. From there, the user is presented with a webpage of checkboxes for different roles to select/unselect. They press the submit button. Cubemoji grants/removes the requested roles according to their selection.
+      
+      h3(id='roleconfig') Configuration
+      p
+        | This feature is using a
+        |
+        a(target='_blank' href='https://www.redhat.com/en/topics/devops/what-is-gitops') GitOps Framework
+        | .
+        | Meaning that the role picker webpage configuration is stored in a Git repository.
+        |
+        a(target='_blank' href='https://gitlab.com/cubismod/cubemoji-roles') That repository is available on GitLab.
+        |
+        | The configuration is outlined in the README.md file at the root of that repository. Basically, the JSON files in that repository define the configuration in cubemoji.
+        |
+        | You can use the
+        |
+        span(class='font-monospace') /mod allroles
+        | 
+        | command to get a list of all the roles and role names in your current server. Additionally, you can enable or disable the feature in your server with the
+        |
+        span(class='font-monospace') /mod rolepickstatus
+        |
+        | slash command.
+        
+    
+  
+  script(src='https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.11.1/tocbot.min.js')
+  script.
+    tocbot.init({
+      tocSelector: '.toc',
+      contentSelector: '.toc-content',
+      headingSelector: 'h2, h3, h4',
+      hasInnerContainers: true,
+      orderedList: false
+    })

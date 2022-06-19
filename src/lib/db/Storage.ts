@@ -2,8 +2,9 @@ import Database from 'better-sqlite3';
 import { Client } from 'discordx';
 import Keyv from 'keyv';
 import { container, singleton } from 'tsyringe';
-import { ModAction } from '../cmd/ModHelper.js';
+import { ModAction, RolePicker } from '../cmd/ModHelper.js';
 import { Milliseconds } from '../constants/Units.js';
+import { ephemeralLink } from '../http/RoleManager.js';
 import { CubeLogger } from '../logger/CubeLogger.js';
 
 export interface ServerOwner {
@@ -120,6 +121,17 @@ export class CubeStorage {
   // key is channelID and value is a
   timeouts: Keyv<RateLimitVal>;
 
+  // key is serverID and value boolean indicating if enabled and
+  // role picker in a JSON equivalent format
+  rolePickers: Keyv<[boolean, RolePicker]>;
+
+  // key is serverID-userID and value
+  ephemeralLinks: Keyv<ephemeralLink>;
+
+  // key is the link name and value is the corresponding key in
+  // the ephemeralLinks namespace
+  uniqueIDLookup: Keyv<string>;
+
   private logger = container.resolve(CubeLogger).storage;
   // in testing mode, we are saving data to data/test/
   dbLocation = 'data/';
@@ -151,6 +163,12 @@ export class CubeStorage {
     this.pendingModActions = new Keyv<ModAction[]>(sqliteUri, { namespace: 'actions', ttl: Milliseconds.day });
 
     this.timeouts = new Keyv<RateLimitVal>(sqliteUri, { namespace: 'timeouts', ttl: Milliseconds.fiveMin });
+
+    this.rolePickers = new Keyv<[boolean, RolePicker]>(sqliteUri, { namespace: 'rolepicker' });
+
+    this.ephemeralLinks = new Keyv<ephemeralLink>(sqliteUri, { namespace: 'eph', ttl: Milliseconds.twentyMin });
+
+    this.uniqueIDLookup = new Keyv<string>(sqliteUri, { namespace: 'idlookup', ttl: Milliseconds.twentyMin });
   }
 
   /**

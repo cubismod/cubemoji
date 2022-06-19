@@ -174,6 +174,19 @@ export async function modReply(interaction: CommandInteraction | ButtonInteracti
   return embed;
 }
 
+interface RoleCategory {
+  name: string;
+  description: string;
+  image?: string;
+  roles: string[];
+}
+
+// json representation of role picker
+export interface RolePicker {
+  serverID: string,
+  categories: RoleCategory[];
+}
+
 export interface ModAction {
   blocked: boolean;
   type: string; // glob or channel valid options

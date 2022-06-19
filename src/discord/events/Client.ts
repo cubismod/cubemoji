@@ -3,6 +3,7 @@
 import { ArgsOf, Client, Discord, DIService, On, Once } from 'discordx';
 import { mkdir } from 'fs/promises';
 import { container } from 'tsyringe';
+import { GitClient } from '../../lib/cd/GitClient.js';
 import { CubeMessageManager } from '../../lib/cmd/MessageManager.js';
 import { Milliseconds } from '../../lib/constants/Units.js';
 import { scheduleBackup } from '../../lib/db/DatabaseMgmt.js';
@@ -41,6 +42,8 @@ export abstract class ClientEvents {
     // create required folders
     await createDir('./download');
     await createDir('./data');
+    await createDir('./data/logs');
+    await createDir('./data/git');
     await createDir('./static/list');
     await createDir('./static/emotes');
 
@@ -113,9 +116,19 @@ export abstract class ClientEvents {
       DIService.container.register(WorkerPool, { useValue: new WorkerPool(workers) });
       this.logger.info('registered WorkerPool');
 
-      await DIService.container.register(CubeServer, { useValue: webServer });
+      DIService.container.register(CubeServer, { useValue: webServer });
 
-      // every 30 min, refresh our cache of who the server owners are
+      const gitClient = new GitClient();
+      if (!await gitClient.git.checkIsRepo()) await gitClient.clone();
+      else {
+        await gitClient.pull();
+        await gitClient.parse();
+      }
+
+      DIService.container.register(GitClient, { useValue: gitClient });
+      this.logger.info('registered GitClient');
+
+      // every 90 min, refresh our cache of who the server owners are
       // and re-init permissions on Moderation commands as well as
       // regen pug
       setInterval(
@@ -124,6 +137,7 @@ export abstract class ClientEvents {
           // await client.initApplicationPermissions();
           await container.resolve(PugGenerator).emojiRender(client.guilds);
           this.logger.debug('Pug-regen completed');
+          await gitClient.pull();
         },
         Milliseconds.ninetyMin
       );
@@ -142,8 +156,11 @@ export abstract class ClientEvents {
       throw new Error('exiting application as commands can\'t init properly');
     }
 
+    DIService.container.register(Client, { useValue: client });
+
     this.logger.info(`cubemoji ${process.env.npm_package_version} is now running...`);
     this.logger.info(`It took ${process.uptime()}s to startup this time`);
+    this.logger.info(`Access the web server at ${process.env.CM_URL}`);
     // set a new status msg every 5 min
     setStatus(client);
     setInterval(setStatus, Milliseconds.fiveMin, client);

@@ -1,13 +1,16 @@
 // Various server configuration commands
 
 import { Pagination } from '@discordx/pagination';
-import { AutocompleteInteraction, CommandInteraction, MessageEmbed, Role, TextChannel, VoiceChannel } from 'discord.js';
+import { AutocompleteInteraction, CommandInteraction, MessageAttachment, MessageEmbed, Role, TextChannel, VoiceChannel } from 'discord.js';
 import { Discord, Slash, SlashChoice, SlashGroup, SlashOption } from 'discordx';
+import { rm } from 'fs/promises';
 import { container } from 'tsyringe';
+import { GitClient } from '../../lib/cd/GitClient';
 import { serverAutocomplete } from '../../lib/cmd/Autocomplete';
 import { buildList, guildOwnersCheck, modReply, performBulkAction, validUser } from '../../lib/cmd/ModHelper';
 import { CubeStorage } from '../../lib/db/Storage.js';
 import { EmoteCache } from '../../lib/emote/EmoteCache.js';
+import { allRoles, rolePermissionCheck } from '../../lib/http/RoleManager';
 import strings from '../../res/strings.json' assert { type: 'json' };
 
 /**
@@ -24,9 +27,9 @@ import strings from '../../res/strings.json' assert { type: 'json' };
 @SlashGroup({ name: 'mod', description: 'moderation functionality for the bot' })
 @SlashGroup('mod')
 export abstract class Mod {
-  // @Permission(false)
-  // @Permission(await OwnerCheck())
-  // @Permission(await ModCheck())
+  private git = container.resolve(GitClient);
+  private storage = container.resolve(CubeStorage);
+
   @Slash('help')
   async help(
     interaction: CommandInteraction
@@ -36,6 +39,88 @@ export abstract class Mod {
       .setDescription(strings.modIntro)
       .setColor('GOLD');
     await interaction.reply({ embeds: [helpEmbed], ephemeral: true });
+  }
+
+  @Slash('allroles', { description: 'Get a list of all roles on this server!' })
+  async allRolesCmd(
+    interaction: CommandInteraction
+  ) {
+    await interaction.deferReply();
+    if (interaction.guildId) {
+      const tempFile = await allRoles(interaction.guildId);
+      if (tempFile) {
+        await interaction.editReply({
+          files: [
+            new MessageAttachment(tempFile)
+          ]
+        });
+        await rm(tempFile);
+      }
+    }
+  }
+
+  @Slash('rolepickstatus', { description: 'Enable or disable Role Picker' })
+  async rolePickStatus(
+    @SlashOption('server', {
+      description: 'server of which to enable/disable for',
+      autocomplete: (interaction: AutocompleteInteraction) => serverAutocomplete(interaction),
+      type: 'STRING'
+    }) server: string,
+    @SlashOption('setstatus', {
+      description: 'enable or disable the Role Picker on this server',
+      type: 'BOOLEAN'
+    }) setStatus,
+      interaction: CommandInteraction) {
+    await interaction.deferReply({ ephemeral: true });
+    const guildInfo = await validUser(interaction.user, server, interaction.client);
+
+    if (guildInfo && interaction.guildId) {
+      // perform action
+      const curVal = await this.storage.rolePickers.get(guildInfo[0]);
+      if (curVal) {
+        await this.storage.rolePickers.set(guildInfo[0], [setStatus, curVal[1]]);
+        await interaction.editReply({
+          embeds: [
+            new MessageEmbed({
+              description: `Role Picker State for ${guildInfo[1]} is now ${setStatus}`,
+              color: 'BLUE'
+            })
+          ]
+        });
+      } else {
+        await interaction.editReply({
+          embeds: [
+            new MessageEmbed({
+              description: 'No Role Picker is defined for this server. Please refer to the docs at https://cubemoji.art',
+              color: 'RED'
+            })
+          ]
+        });
+      }
+    }
+  }
+
+  @Slash('rolereload', { description: 'Reload Role Picker configuration' })
+  async roleReload(interaction: CommandInteraction) {
+    await interaction.deferReply({ ephemeral: true });
+    const guildInfo = await validUser(interaction.user, interaction.guildId, interaction.client);
+    if (guildInfo && interaction.guildId) {
+      const res = await this.git.pull();
+      const rolePermission = await rolePermissionCheck(interaction.guildId, interaction.client);
+      if (res && rolePermission) {
+        await interaction.editReply({
+          embeds: [
+            new MessageEmbed({ description: res, color: 'AQUA' })
+          ]
+        });
+      } else {
+        await interaction.editReply({
+          embeds: [
+            new MessageEmbed({ description: 'Bot may not have permissions to edit roles on this server. Ensure that it has the MANAGE ROLES permission on this server.', color: 'RED' })
+          ]
+        });
+      }
+    }
   }
 }
 

@@ -188,6 +188,9 @@ export async function isUrl(url: string, urlType = 'image') {
       // check headers
       const headers = await got.head(url);
       if (headers.headers['content-type']?.startsWith('text/plain')) return true;
+    } else if (urlType === 'json') {
+      const headers = await got.head(url);
+      if (headers.headers['content-type']?.startsWith('application/json')) return true;
     }
     return false;
   } catch (e) {

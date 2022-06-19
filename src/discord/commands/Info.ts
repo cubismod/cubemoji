@@ -26,10 +26,10 @@ export abstract class Info {
       type: 'STRING',
       required: false
     })
-    emote: string,
+      emote: string,
     @SlashOption('member', { description: strings.memberSlash, required: false })
-    member: GuildMember,
-    interaction: CommandInteraction
+      member: GuildMember,
+      interaction: CommandInteraction
   ) {
     if (this.emoteCache !== undefined) {
       // check our args
@@ -134,12 +134,12 @@ export abstract class Info {
         if (i < 9) {
           const embed = new MessageEmbed({
             description: `RGB: \`${color}\`\nHex: \`#${rgbHex(color[0], color[1], color[2])}\``,
-            color: color
+            color
           });
           embeds.push(embed);
         }
       });
-      interaction.editReply({ embeds: embeds });
+      interaction.editReply({ embeds });
     } else {
       interaction.editReply('colors could not be determined');
     }
