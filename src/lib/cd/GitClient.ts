@@ -1,3 +1,6 @@
+import { mkdtemp } from 'fs/promises';
+import { tmpdir } from 'os';
+import path from 'path';
 import simpleGit, { SimpleGit, SimpleGitOptions } from 'simple-git';
 import { container, singleton } from 'tsyringe';
 import { Milliseconds } from '../constants/Units';
@@ -6,7 +9,7 @@ import { rolePickerParse } from './Parser';
 
 @singleton()
 export class GitClient {
-  readonly directory = './data/git/';
+  directory = '';
   private remoteUrl;
   private logger = container.resolve(CubeLogger).git;
 
@@ -27,13 +30,15 @@ export class GitClient {
     this.git = simpleGit(this.options);
   }
 
-  async clone() {
+  async init() {
+    this.directory = await mkdtemp(path.join(tmpdir(), 'git'));
     try {
-      if (!await this.git.checkIsRepo()) { await this.git.clone(this.remoteUrl); } else { this.pull(); }
-      await rolePickerParse();
+      await this.git.clone(this.remoteUrl, path.join(this.directory, 'roles'));
+      await this.parse();
     } catch (err) {
       this.logger.error(err);
     }
+    await this.pull();
   }
 
   async pull() {
@@ -46,7 +51,7 @@ export class GitClient {
       if (preSHA !== postSHA) {
         // process and save to DB
         this.logger.info(`Loaded new changes from ${this.git.remote}. SHA hash: ${postSHA}`);
-        await rolePickerParse();
+        await this.parse();
         return `New change loaded for Role Picker config, SHA hash: ${preSHA}➡️${postSHA}.`;
       }
       return `No update to Role Picker config, SHA hash: ${postSHA}`;
@@ -55,5 +60,5 @@ export class GitClient {
     }
   }
 
-  async parse() { await rolePickerParse(); }
+  async parse() { await rolePickerParse(path.join(this.directory, 'roles', 'data')); }
 }

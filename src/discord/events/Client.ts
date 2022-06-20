@@ -1,7 +1,6 @@
 // Discord client events
 
 import { ArgsOf, Client, Discord, DIService, On, Once } from 'discordx';
-import { mkdir } from 'fs/promises';
 import { container } from 'tsyringe';
 import { GitClient } from '../../lib/cd/GitClient.js';
 import { CubeMessageManager } from '../../lib/cmd/MessageManager.js';
@@ -17,13 +16,6 @@ import { ImageQueue } from '../../lib/image/ImageQueue.js';
 import { WorkerPool } from '../../lib/image/WorkerPool.js';
 import { CubeLogger } from '../../lib/logger/CubeLogger.js';
 
-// create a directory and ignore if already exists
-async function createDir(dirName: string) {
-  try {
-    await mkdir(dirName, { recursive: true });
-  } catch { }
-}
-
 @Discord()
 export abstract class ClientEvents {
   private cubeLogger = new CubeLogger();
@@ -38,14 +30,6 @@ export abstract class ClientEvents {
     client: Client
   ) {
     DIService.container = container;
-
-    // create required folders
-    await createDir('./download');
-    await createDir('./data');
-    await createDir('./data/logs');
-    await createDir('./data/git');
-    await createDir('./static/list');
-    await createDir('./static/emotes');
 
     const webServer = new CubeServer();
 
@@ -118,14 +102,8 @@ export abstract class ClientEvents {
 
       DIService.container.register(CubeServer, { useValue: webServer });
 
-      const gitClient = new GitClient();
-      if (!await gitClient.git.checkIsRepo()) await gitClient.clone();
-      else {
-        await gitClient.pull();
-        await gitClient.parse();
-      }
-
-      DIService.container.register(GitClient, { useValue: gitClient });
+      DIService.container.register(GitClient, { useValue: new GitClient() });
+      await DIService.container.resolve(GitClient).init();
       this.logger.info('registered GitClient');
 
       // every 90 min, refresh our cache of who the server owners are
@@ -137,7 +115,7 @@ export abstract class ClientEvents {
           // await client.initApplicationPermissions();
           await container.resolve(PugGenerator).emojiRender(client.guilds);
           this.logger.debug('Pug-regen completed');
-          await gitClient.pull();
+          await container.resolve(GitClient).pull();
         },
         Milliseconds.ninetyMin
       );
