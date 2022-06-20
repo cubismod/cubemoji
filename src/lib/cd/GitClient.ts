@@ -31,9 +31,9 @@ export class GitClient {
   }
 
   async init() {
-    this.directory = await mkdtemp(path.join(tmpdir(), 'git'));
+    this.directory = path.join(tmpdir(), await mkdtemp('git'));
     try {
-      await this.git.clone(this.remoteUrl, path.join(this.directory, 'roles'));
+      await this.git.clone(this.remoteUrl, this.directory);
       await this.parse();
     } catch (err) {
       this.logger.error(err);
@@ -60,5 +60,5 @@ export class GitClient {
     }
   }
 
-  async parse() { await rolePickerParse(path.join(this.directory, 'roles', 'data')); }
+  async parse() { await rolePickerParse(path.join(this.directory, 'data')); }
 }
