@@ -118,9 +118,6 @@ export class CubeStorage {
    */
   pendingModActions: Keyv<ModAction[]>;
 
-  // key is channelID and value is a
-  timeouts: Keyv<RateLimitVal>;
-
   // key is serverID and value boolean indicating if enabled and
   // role picker in a JSON equivalent format
   rolePickers: Keyv<[boolean, RolePicker]>;
@@ -161,8 +158,6 @@ export class CubeStorage {
     this.serverAuditInfo = new Keyv<string>(sqliteUri, { namespace: 'audit' });
 
     this.pendingModActions = new Keyv<ModAction[]>(sqliteUri, { namespace: 'actions', ttl: Milliseconds.day });
-
-    this.timeouts = new Keyv<RateLimitVal>(sqliteUri, { namespace: 'timeouts', ttl: Milliseconds.fiveMin });
 
     this.rolePickers = new Keyv<[boolean, RolePicker]>(sqliteUri, { namespace: 'rolepicker' });
 

@@ -10,6 +10,7 @@ import { container } from 'tsyringe';
 import { URL } from 'url';
 import { CubeMessageManager } from '../cmd/MessageManager.js';
 import { Milliseconds } from '../constants/Units.js';
+import { CubeStorage } from '../db/Storage.js';
 import { Cmoji, Source } from '../emote/Cmoji.js';
 import { EmoteCache } from '../emote/EmoteCache.js';
 import { BadHosts } from '../http/BadHosts.js';
@@ -323,7 +324,7 @@ export async function sendPagination(interaction: CommandInteraction, type: Sour
       // ephemeral: true, have a feeling this is causing api errors
       pageText: menuText,
       showStartEnd: false,
-      ephemeral: ephemeral
+      ephemeral
     }).send();
 
     await interaction.followUp({ content: `Web list is available at ${process.env.CM_URL}`, ephemeral: true });
@@ -366,32 +367,59 @@ function newPage(embed: MessageEmbed, type: Source) {
   return embed;
 }
 
+async function dmReply (context: MessageReaction) {
+  if (context.message.guildId ^^
+    )
+}
+
 // do a different reply depending on the context we have
 export async function reply(context: MsgContext, content: MessageAttachment | string) {
   let msg: Message | undefined;
-  if (content instanceof MessageAttachment) {
-    // different logic depending on which context we are passing in
-    if (context instanceof CommandInteraction) {
-      const repMsg = await context.editReply({ files: [content] });
-      if (repMsg instanceof Message) msg = repMsg;
+  // check Big Server Enrollment Status
+  // for reaction messages
+  const storage = container.resolve(CubeStorage).serverEnrollment;
+  const logger = container.resolve(CubeLogger).discordLogic;
+
+  try {
+    if (content instanceof MessageAttachment) {
+      // different logic depending on which context we are passing in
+      if (context instanceof CommandInteraction) {
+        const repMsg = await context.editReply({ files: [content] });
+        if (repMsg instanceof Message) msg = repMsg;
+      }
+      if (context instanceof ContextMenuInteraction) {
+        const repMsg = await context.editReply({ files: [content] });
+        if (repMsg instanceof Message) msg = repMsg;
+      }
+      if (context instanceof MessageReaction) {
+        if (context.message.guildId &&
+          await storage.get(context.message.guildId)) {
+          msg = await (await context.users.fetch()).last()?.send(
+
+          );
+        } else {
+          msg = await context.message.reply(
+            {
+              files: [content],
+              allowedMentions: { repliedUser: false }
+            });
+        }
+      }
+    } else {
+      if (context instanceof CommandInteraction) {
+        const repMsg = await context.editReply(content);
+        if (repMsg instanceof Message) msg = repMsg;
+      }
+      if (context instanceof ContextMenuInteraction) {
+        const repMsg = await context.editReply({ content });
+        if (repMsg instanceof Message) msg = repMsg;
+      }
+      if (context instanceof MessageReaction) msg = await context.message.reply({ content, allowedMentions: { repliedUser: false } });
     }
-    if (context instanceof ContextMenuInteraction) {
-      const repMsg = await context.editReply({ files: [content] });
-      if (repMsg instanceof Message) msg = repMsg;
-    }
-    if (context instanceof MessageReaction) msg = await context.message.reply({ files: [content], allowedMentions: { repliedUser: false } });
-  } else {
-    if (context instanceof CommandInteraction) {
-      const repMsg = await context.editReply(content);
-      if (repMsg instanceof Message) msg = repMsg;
-    }
-    if (context instanceof ContextMenuInteraction) {
-      const repMsg = await context.editReply({ content: content });
-      if (repMsg instanceof Message) msg = repMsg;
-    }
-    if (context instanceof MessageReaction) msg = await context.message.reply({ content: content, allowedMentions: { repliedUser: false } });
+    return msg;
+  } catch (err) {
+    logger.error(err);
   }
-  return msg;
 }
 
 // get the guild id from context obj

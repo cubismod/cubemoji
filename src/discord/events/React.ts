@@ -47,24 +47,20 @@ export abstract class ReactEvents {
             break;
           }
           case '📷': {
-            if (!guardData.enrolled) {
-              // perform an edit
-              const source = getMessageImage(msg);
-              if (reaction instanceof MessageReaction) {
-                const edDiscord = new EditDiscord(reaction, '', source, user);
-                await edDiscord.run();
-              }
+            // perform an edit
+            const source = getMessageImage(msg);
+            if (reaction instanceof MessageReaction) {
+              const edDiscord = new EditDiscord(reaction, '', source, user);
+              await edDiscord.run();
             }
             break;
           }
           case '📏': {
             // perform a rescale
-            if (!guardData.enrolled) {
-              const source = getMessageImage(await reaction.message.fetch());
-              if (reaction instanceof MessageReaction) {
-                const rsDiscord = new RescaleDiscord(reaction, source, user);
-                await rsDiscord.run();
-              }
+            const source = getMessageImage(await reaction.message.fetch());
+            if (reaction instanceof MessageReaction) {
+              const rsDiscord = new RescaleDiscord(reaction, source, user);
+              await rsDiscord.run();
             }
             break;
           }
@@ -109,8 +105,9 @@ export abstract class ReactEvents {
                       }
                       bestOfEmbed.setTitle(creationName);
                       bestOfEmbed.setColor('RANDOM');
-                      bestOfEmbed.setFooter('You can save an image to best of by reacting 🌟 to a cubemoji image.');
+                      bestOfEmbed.footer = { text: 'You can save an image to best of by reacting 🌟 to a cubemoji image.' };
                       bestOfEmbed.setURL(msg.url);
+
                       msg.react('🌟');
                       const sentMsg = await bestOfChannel.send({ embeds: [bestOfEmbed] });
 
