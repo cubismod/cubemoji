@@ -6,7 +6,7 @@ import { rolePickerParse } from './Parser';
 
 @singleton()
 export class GitClient {
-  readonly directory = 'data/git';
+  readonly directory = './data/git/';
   private remoteUrl;
   private logger = container.resolve(CubeLogger).git;
 
@@ -29,8 +29,7 @@ export class GitClient {
 
   async clone() {
     try {
-      if (!await this.git.checkIsRepo()) { await this.git.clone(this.remoteUrl); }
-
+      if (!await this.git.checkIsRepo()) { await this.git.clone(this.remoteUrl); } else { this.pull(); }
       await rolePickerParse();
     } catch (err) {
       this.logger.error(err);
