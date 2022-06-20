@@ -38,11 +38,14 @@ export class GitClient {
     } catch (err) {
       this.logger.error(err);
     }
+    this.options.baseDir = this.directory;
+    this.git = simpleGit(this.options);
     await this.pull();
   }
 
   async pull() {
     try {
+      this.logger.debug(this.git);
       const preSHA = await this.git.revparse('HEAD');
       await this.git.fetch();
       await this.git.pull('origin');
