@@ -20,6 +20,8 @@ import { ImageQueue } from './ImageQueue.js';
 import { WorkerPool } from './WorkerPool.js';
 const { got } = await import('got');
 
+const logger = container.resolve(CubeLogger).discordLogic;
+
 /**
  * Discord logic for performing an image operation
  * Steps:
@@ -79,7 +81,7 @@ export class RescaleDiscord {
           try {
             const msg = await reply(this.context, new MessageAttachment(filename));
             if (!msg) {
-              this.logger.error('could not get a message during image operation, not proceeding with adding trash react');
+              this.logger.debug('could not get a message during image operation, not proceeding with adding trash react');
             } else if (msg instanceof Message && !msg.flags.has('EPHEMERAL')) {
               // check if ephemeral to avoid discord API errors (can't react to an ephermeral message)
               await cubeMessageManager.registerTrashReact(this.context, msg, this.user.id);
@@ -367,59 +369,69 @@ function newPage(embed: MessageEmbed, type: Source) {
   return embed;
 }
 
-async function dmReply (context: MessageReaction) {
-  if (context.message.guildId ^^
-    )
+/**
+ * different reply behavior for reactions
+ * such as DMing people if they are in a big server
+ * @param context MessageReaction object
+ * @param content actual message to send
+ * @returns undefined if DM message sent or a message object if a message was
+ * sent in channel
+ */
+async function reactReply(context: MessageReaction, content: MessageAttachment | string) {
+  const enrollment = container.resolve(CubeStorage).serverEnrollment;
+
+  if (context.message.guildId && await enrollment.get(context.message.guildId)) {
+    // send a DM as the server is enrolled
+    if (content instanceof MessageAttachment) {
+      // send rescale results in an embed
+      const embed = new MessageEmbed({
+        color: 'LIGHT_GREY',
+        description: `Here are the results of your image edit in ${context.message.guild?.name}, done by reacting with an emoji. See https://cubemoji.art/#react for more information. [Link to original](${context.message.url})`
+      });
+
+      try {
+        await context.message.author?.send({
+          files: [content],
+          embeds: [embed]
+        });
+      } catch (err) {
+        logger.error(err);
+      }
+    }
+  } else {
+    // reply in channel without a ping reply
+    if (content instanceof MessageAttachment) return await context.message.reply({ files: [content], allowedMentions: { repliedUser: false } });
+    else return await context.message.reply({ content, allowedMentions: { repliedUser: false } });
+  }
 }
 
 // do a different reply depending on the context we have
 export async function reply(context: MsgContext, content: MessageAttachment | string) {
   let msg: Message | undefined;
-  // check Big Server Enrollment Status
-  // for reaction messages
-  const storage = container.resolve(CubeStorage).serverEnrollment;
-  const logger = container.resolve(CubeLogger).discordLogic;
-
-  try {
-    if (content instanceof MessageAttachment) {
-      // different logic depending on which context we are passing in
-      if (context instanceof CommandInteraction) {
-        const repMsg = await context.editReply({ files: [content] });
-        if (repMsg instanceof Message) msg = repMsg;
-      }
-      if (context instanceof ContextMenuInteraction) {
-        const repMsg = await context.editReply({ files: [content] });
-        if (repMsg instanceof Message) msg = repMsg;
-      }
-      if (context instanceof MessageReaction) {
-        if (context.message.guildId &&
-          await storage.get(context.message.guildId)) {
-          msg = await (await context.users.fetch()).last()?.send(
-
-          );
-        } else {
-          msg = await context.message.reply(
-            {
-              files: [content],
-              allowedMentions: { repliedUser: false }
-            });
-        }
-      }
-    } else {
-      if (context instanceof CommandInteraction) {
-        const repMsg = await context.editReply(content);
-        if (repMsg instanceof Message) msg = repMsg;
-      }
-      if (context instanceof ContextMenuInteraction) {
-        const repMsg = await context.editReply({ content });
-        if (repMsg instanceof Message) msg = repMsg;
-      }
-      if (context instanceof MessageReaction) msg = await context.message.reply({ content, allowedMentions: { repliedUser: false } });
+  if (content instanceof MessageAttachment) {
+    // different logic depending on which context we are passing in
+    if (context instanceof CommandInteraction) {
+      const repMsg = await context.editReply({ files: [content] });
+      if (repMsg instanceof Message) msg = repMsg;
     }
-    return msg;
-  } catch (err) {
-    logger.error(err);
+    if (context instanceof ContextMenuInteraction) {
+      const repMsg = await context.editReply({ files: [content] });
+      if (repMsg instanceof Message) msg = repMsg;
+    }
+  } else {
+    if (context instanceof CommandInteraction) {
+      const repMsg = await context.editReply(content);
+      if (repMsg instanceof Message) msg = repMsg;
+    }
+    if (context instanceof ContextMenuInteraction) {
+      const repMsg = await context.editReply({ content });
+      if (repMsg instanceof Message) msg = repMsg;
+    }
   }
+  if (context instanceof MessageReaction) {
+    msg = await reactReply(context, content);
+  }
+  return msg;
 }
 
 // get the guild id from context obj
@@ -438,8 +450,6 @@ function getContextGuild(context: MsgContext) {
   * @param context either a message or interaction
   */
 async function reactErr(context: MsgContext) {
-  const logger = container.resolve(CubeLogger).discordLogic;
-
   // TODO: add ephermal followup explaining error details
   const cubeMessageManager = container.resolve(CubeMessageManager);
   let errEmote = '😰';

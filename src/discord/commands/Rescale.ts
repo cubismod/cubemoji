@@ -15,12 +15,12 @@ export abstract class Rescale {
       type: 'STRING',
       required: false
     })
-    emote: string,
+      emote: string,
     @SlashOption('member', { description: 'a user', required: false })
-    user: GuildMember,
-    interaction: CommandInteraction,
-    _client: Client,
-    data: BSGuardData
+      user: GuildMember,
+      interaction: CommandInteraction,
+      _client: Client,
+      data: BSGuardData
   ) {
     const deferOptions = {
       ephemeral: data.enrolled,
