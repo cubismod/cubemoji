@@ -1,17 +1,15 @@
-import { readdir, readFile } from "fs/promises";
-import path from "path";
-import { container } from "tsyringe";
-import { RolePicker } from "../cmd/ModHelper";
-import { CubeStorage } from "../db/Storage";
-import { CubeLogger } from "../logger/CubeLogger";
+import { readdir, readFile } from 'fs/promises';
+import path from 'path';
+import { container } from 'tsyringe';
+import { RolePicker } from '../cmd/ModHelper';
+import { CubeStorage } from '../db/Storage';
+import { CubeLogger } from '../logger/CubeLogger';
 
 const logger = container.resolve(CubeLogger).git;
 const storage = container.resolve(CubeStorage).rolePickers;
 
 // Parses JSON file
-export async function rolePickerParse() {
-  const dataDir = './data/git/cubemoji-roles/data';
-
+export async function rolePickerParse(dataDir: string) {
   const contents = await readdir(dataDir);
   for (const filename of contents) {
     try {

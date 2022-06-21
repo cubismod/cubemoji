@@ -1,14 +1,21 @@
-/* eslint-disable node/no-path-concat */
 import { dirname, importx } from '@discordx/importer';
 import { Intents } from 'discord.js';
 import { Client } from 'discordx';
 import { config } from 'dotenv';
+import { mkdir } from 'fs/promises';
 import 'reflect-metadata';
 import { bigServerDetect, blockedChannelDetect } from './discord/Guards.js';
 import { CubeLogger } from './lib/logger/CubeLogger.js';
 
 // load dotenv file if exists
 config();
+
+// create a directory and ignore if already exists
+async function createDir(dirName: string) {
+  try {
+    await mkdir(dirName, { recursive: true });
+  } catch { }
+}
 
 export class Main {
   private static _client: Client;
@@ -18,6 +25,12 @@ export class Main {
   }
 
   static async start() {
+    // create required folders
+    await createDir('./download');
+    await createDir('./data');
+    await createDir('./data/logs');
+    await createDir('./static/list');
+    await createDir('./static/emotes');
     const logger = new CubeLogger().main;
 
     await importx(dirname(import.meta.url) + '/discord/**/*.js');
@@ -42,7 +55,7 @@ export class Main {
       ],
       partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
       // for testing purposes in cubemoji server
-      silent: silent,
+      silent,
       guards: [blockedChannelDetect, bigServerDetect]
     });
 
