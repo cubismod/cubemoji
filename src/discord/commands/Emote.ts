@@ -1,12 +1,12 @@
-import { AutocompleteInteraction, CommandInteraction, Message } from 'discord.js'
-import { Discord, Slash, SlashOption } from 'discordx'
-import { container } from 'tsyringe'
-import { emoteAutocomplete } from '../../lib/cmd/Autocomplete'
-import { CubeMessageManager } from '../../lib/cmd/MessageManager.js'
-import { Source } from '../../lib/emote/Cmoji.js'
-import { EmoteCache } from '../../lib/emote/EmoteCache.js'
-import { autoDeleteMsg, reply } from '../../lib/image/DiscordLogic.js'
-import strings from '../../res/strings.json' assert { type: 'json' }
+import { AutocompleteInteraction, CommandInteraction, Message } from 'discord.js';
+import { Discord, Slash, SlashOption } from 'discordx';
+import { container } from 'tsyringe';
+import { emoteAutocomplete } from '../../lib/cmd/Autocomplete';
+import { CubeMessageManager } from '../../lib/cmd/MessageManager.js';
+import { Source } from '../../lib/emote/Cmoji.js';
+import { EmoteCache } from '../../lib/emote/EmoteCache.js';
+import { autoDeleteMsg, reply } from '../../lib/image/DiscordLogic.js';
+import strings from '../../res/strings.json' assert { type: 'json' };
 
 @Discord()
 export abstract class Emote {
@@ -22,30 +22,30 @@ export abstract class Emote {
       emote: string,
       interaction: CommandInteraction
   ) {
-    await interaction.deferReply()
-    let rep: Message|undefined
-    const emoteCache = container.resolve(EmoteCache)
+    await interaction.deferReply();
+    let rep: Message|undefined;
+    const emoteCache = container.resolve(EmoteCache);
     if (emoteCache !== undefined && interaction.guild) {
-      const retrievedEmoji = await emoteCache.retrieve(emote, interaction.guild.id)
+      const retrievedEmoji = await emoteCache.retrieve(emote, interaction.guild.id);
       if (retrievedEmoji !== undefined) {
-        let msg = ''
+        let msg = '';
         // now send a different obj depending on what type of emote we are sending
         switch (retrievedEmoji.source) {
           case Source.Discord: {
-            if (retrievedEmoji.guildEmoji != null) msg = retrievedEmoji.guildEmoji.toString()
-            break
+            if (retrievedEmoji.guildEmoji != null) msg = retrievedEmoji.guildEmoji.toString();
+            break;
           }
           case Source.Mutant:
           case Source.URL:
-            msg = retrievedEmoji.url
+            msg = retrievedEmoji.url;
         }
-        rep = await reply(interaction, msg)
+        rep = await reply(interaction, msg);
       } else {
-        rep = await reply(interaction, strings.noEmoteFound)
-        autoDeleteMsg(rep)
+        rep = await reply(interaction, strings.noEmoteFound);
+        autoDeleteMsg(rep);
       }
-      const cubeMessageManager = container.resolve(CubeMessageManager)
-      if (rep) cubeMessageManager.registerTrashReact(interaction, rep, interaction.user.id)
+      const cubeMessageManager = container.resolve(CubeMessageManager);
+      if (rep) cubeMessageManager.registerTrashReact(interaction, rep, interaction.user.id);
     }
   }
 }
