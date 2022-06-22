@@ -67,7 +67,7 @@
     "pug": "^3.0.2",
     "reflect-metadata": "^0.1.13",
     "rgb-hex": "^4.0.0",
-    "simple-git": "^3.7.1",
+    "simple-git": "^3.9.0",
     "tslib": "^2.4.0",
     "tsyringe": "^4.6.0",
     "twemoji-parser": "^14.0.0",
