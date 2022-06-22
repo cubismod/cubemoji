@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionChoiceData, ApplicationCommandOptionType, AutocompleteInteraction } from 'discord.js';
+import { ApplicationCommandOptionChoiceData, AutocompleteInteraction } from 'discord.js';
 import Fuse from 'fuse.js';
 import Qty from 'js-quantities';
 import { choice, geometricReservoirSample } from 'pandemonium';
@@ -138,7 +138,7 @@ export async function serverAutocomplete(interaction: AutocompleteInteraction) {
           // try not to go over autocomplete limits
           if (responses.length < 10) {
             responses.push({
-              name: name,
+              name,
               value: name
             });
           }

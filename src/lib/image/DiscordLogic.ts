@@ -148,7 +148,9 @@ export function setStatus(client: Client) {
       'Type / in chat to use my slash commands!',
       'React 📏 to a message to rescale that message content!',
       'React 📷 to a message to randomly edit that message content!',
-      'React 🌟 on a generated image to save to best of!'
+      'React 🌟 on a generated image to save to best of!',
+      'https://cubemoji.art',
+      'Type /roles to get your roles!'
     ]);
     client.user?.setActivity(status, { type: 'PLAYING' });
   } else {

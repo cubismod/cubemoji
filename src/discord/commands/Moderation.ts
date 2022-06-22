@@ -69,7 +69,7 @@ export abstract class Mod {
     @SlashOption('setstatus', {
       description: 'enable or disable the Role Picker on this server',
       type: 'BOOLEAN'
-    }) setStatus,
+    }) setStatus: boolean,
       interaction: CommandInteraction) {
     await interaction.deferReply({ ephemeral: true });
     const guildInfo = await validUser(interaction.user, server, interaction.client);
@@ -137,8 +137,8 @@ export abstract class Enrollment {
    */
   @Slash('modify', { description: 'enroll/unenroll a new server into big server mode' })
   async modify(
-    @SlashChoice('enroll', 'enroll')
-    @SlashChoice('unenroll', 'unenroll')
+    @SlashChoice('enroll')
+    @SlashChoice('unenroll')
     @SlashOption('action') action: string,
     @SlashOption('server', {
       description: 'name of server you want to enroll/unenroll',
@@ -193,8 +193,8 @@ export abstract class Enrollment {
    */
   @Slash('rolemod', { description: 'grant/revoke a role moderation perms' })
   async roleMod(
-    @SlashChoice('grant', 'grant')
-    @SlashChoice('revoke', 'revoke')
+    @SlashChoice('grant')
+    @SlashChoice('revoke')
     @SlashOption('action') action: string,
     @SlashOption('role', {
       description: 'role to grant/remove mod permissions',
@@ -256,8 +256,8 @@ export abstract class blocklist {
    */
   @Slash('modify', { description: 'block/unblock emoji glob or channel' })
   async modify(
-    @SlashChoice('block', 'block')
-    @SlashChoice('unblock', 'unblock')
+    @SlashChoice('block')
+    @SlashChoice('unblock')
     @SlashOption('action') action: string,
     @SlashOption('server', {
       description: 'name of server you want to block emoji on, not req for channel',

@@ -7,6 +7,9 @@ import { Milliseconds } from '../constants/Units.js';
 import { ephemeralLink } from '../http/RoleManager.js';
 import { CubeLogger } from '../logger/CubeLogger.js';
 
+/**
+ * server ID and name
+ */
 export interface ServerOwner {
   id: string,
   name: string;
@@ -174,11 +177,21 @@ export class CubeStorage {
     // reset each time
     await this.serverOwners.clear();
 
-    client.guilds.cache.forEach(async (guild) => {
-      const resolved = await guild.fetch();
+    const botOwner = process.env.CM_BOTOWNER;
+    const botOwnerGuilds: ServerOwner[] = [];
+
+    for (const guild of client.guilds.cache) {
+      const resolved = await guild[1].fetch();
       const owner = resolved.ownerId;
 
       const guildsOwned = await this.serverOwners.get(owner);
+      if (botOwner) {
+        botOwnerGuilds.push({
+          id: resolved.id,
+          name: resolved.name
+        });
+      }
+
       if (guildsOwned) {
         // server owner has changed
         guildsOwned.push({
@@ -195,7 +208,10 @@ export class CubeStorage {
         ];
         await this.serverOwners.set(owner, newArr);
       }
-    });
+    }
+    if (botOwner) {
+      await this.serverOwners.set(botOwner, botOwnerGuilds);
+    }
     this.logger.info('Successfully refreshed guild owners');
   }
 
