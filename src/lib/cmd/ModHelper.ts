@@ -14,6 +14,8 @@ import { CubeLogger } from '../logger/CubeLogger.js';
 const logger = container.resolve(CubeLogger).discordLogic;
 
 /**
+ * takes an autocomplete formatted text string and extracts the
+ * guild ID
  * @param guildIdentifier guild id from autocomplete
  * @returns regular expression result including the snowflake id
  */
@@ -42,7 +44,9 @@ export async function guildOwnersCheck(userId: string, guildIdentifier: string |
       const snowflake = matches[1];
       const resolvedGuild = client.guilds.resolve(snowflake);
       // verify that the guild owner matches the user who invoked the command
-      if (resolvedGuild && resolvedGuild.ownerId === userId) {
+      // also a workaround to enable admin perms for the bot owner
+      if (resolvedGuild &&
+        (resolvedGuild.ownerId === userId || userId === process.env.CM_BOTOWNER)) {
         return [resolvedGuild.id, resolvedGuild.name];
       }
     }
@@ -163,10 +167,10 @@ export async function modReply(interaction: CommandInteraction | ButtonInteracti
   // try to send an audit message
   if (success) {
     await auditMsg(interaction, {
-      action: action,
-      guildId: guildId,
-      guildName: guildName,
-      notes: notes
+      action,
+      guildId,
+      guildName,
+      notes
     });
   }
 
@@ -266,11 +270,11 @@ export async function performBulkAction(interaction: CommandInteraction, fileLin
             if (guildInfo) {
               // save this action
               actions.push({
-                blocked: blocked,
+                blocked,
                 channelId: chanId,
-                type: type,
-                glob: glob,
-                guildId: guildId,
+                type,
+                glob,
+                guildId,
                 guildName: guildInfo[1]
               });
             }
@@ -355,7 +359,7 @@ export async function buildList(interaction: CommandInteraction, namespaces: str
   const pages: MessageEmbed[] = [];
   // fune color
   const color = (choice(namespaces).length * 1000000) % 16777215;
-  let curEmbed = new MessageEmbed({ title: 'Moderation List', color: color });
+  let curEmbed = new MessageEmbed({ title: 'Moderation List', color });
   // first get all values from a namespace
   for (const ns of namespaces) {
     const items = storage.getNamespace(ns);
@@ -364,7 +368,7 @@ export async function buildList(interaction: CommandInteraction, namespaces: str
         if (elements % 10 === 0 && elements !== 0) {
           // new page
           pages.push(curEmbed);
-          curEmbed = new MessageEmbed({ title: 'Moderation List', color: color });
+          curEmbed = new MessageEmbed({ title: 'Moderation List', color });
         }
         // lists are used for several different purposes
         switch (ns) {

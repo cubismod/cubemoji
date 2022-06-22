@@ -10,6 +10,7 @@ import { container } from 'tsyringe';
 import { URL } from 'url';
 import { CubeMessageManager } from '../cmd/MessageManager.js';
 import { Milliseconds } from '../constants/Units.js';
+import { CubeStorage } from '../db/Storage.js';
 import { Cmoji, Source } from '../emote/Cmoji.js';
 import { EmoteCache } from '../emote/EmoteCache.js';
 import { BadHosts } from '../http/BadHosts.js';
@@ -18,6 +19,8 @@ import { EditOperation, FaceOperation, MsgContext, RescaleOperation, splitEffect
 import { ImageQueue } from './ImageQueue.js';
 import { WorkerPool } from './WorkerPool.js';
 const { got } = await import('got');
+
+const logger = container.resolve(CubeLogger).discordLogic;
 
 /**
  * Discord logic for performing an image operation
@@ -78,7 +81,7 @@ export class RescaleDiscord {
           try {
             const msg = await reply(this.context, new MessageAttachment(filename));
             if (!msg) {
-              this.logger.error('could not get a message during image operation, not proceeding with adding trash react');
+              this.logger.debug('could not get a message during image operation, not proceeding with adding trash react');
             } else if (msg instanceof Message && !msg.flags.has('EPHEMERAL')) {
               // check if ephemeral to avoid discord API errors (can't react to an ephermeral message)
               await cubeMessageManager.registerTrashReact(this.context, msg, this.user.id);
@@ -145,7 +148,9 @@ export function setStatus(client: Client) {
       'Type / in chat to use my slash commands!',
       'React 📏 to a message to rescale that message content!',
       'React 📷 to a message to randomly edit that message content!',
-      'React 🌟 on a generated image to save to best of!'
+      'React 🌟 on a generated image to save to best of!',
+      'https://cubemoji.art',
+      'Type /roles to get your roles!'
     ]);
     client.user?.setActivity(status, { type: 'PLAYING' });
   } else {
@@ -323,7 +328,7 @@ export async function sendPagination(interaction: CommandInteraction, type: Sour
       // ephemeral: true, have a feeling this is causing api errors
       pageText: menuText,
       showStartEnd: false,
-      ephemeral: ephemeral
+      ephemeral
     }).send();
 
     await interaction.followUp({ content: `Web list is available at ${process.env.CM_URL}`, ephemeral: true });
@@ -366,6 +371,42 @@ function newPage(embed: MessageEmbed, type: Source) {
   return embed;
 }
 
+/**
+ * different reply behavior for reactions
+ * such as DMing people if they are in a big server
+ * @param context MessageReaction object
+ * @param content actual message to send
+ * @returns undefined if DM message sent or a message object if a message was
+ * sent in channel
+ */
+async function reactReply(context: MessageReaction, content: MessageAttachment | string) {
+  const enrollment = container.resolve(CubeStorage).serverEnrollment;
+
+  if (context.message.guildId && await enrollment.get(context.message.guildId)) {
+    // send a DM as the server is enrolled
+    if (content instanceof MessageAttachment) {
+      // send rescale results in an embed
+      const embed = new MessageEmbed({
+        color: 'LIGHT_GREY',
+        description: `Here are the results of your image edit in ${context.message.guild?.name}, done by reacting with an emoji. See https://cubemoji.art/#react for more information. [Link to original](${context.message.url})`
+      });
+
+      try {
+        await context.message.author?.send({
+          files: [content],
+          embeds: [embed]
+        });
+      } catch (err) {
+        logger.error(err);
+      }
+    }
+  } else {
+    // reply in channel without a ping reply
+    if (content instanceof MessageAttachment) return await context.message.reply({ files: [content], allowedMentions: { repliedUser: false } });
+    else return await context.message.reply({ content, allowedMentions: { repliedUser: false } });
+  }
+}
+
 // do a different reply depending on the context we have
 export async function reply(context: MsgContext, content: MessageAttachment | string) {
   let msg: Message | undefined;
@@ -379,17 +420,18 @@ export async function reply(context: MsgContext, content: MessageAttachment | st
       const repMsg = await context.editReply({ files: [content] });
       if (repMsg instanceof Message) msg = repMsg;
     }
-    if (context instanceof MessageReaction) msg = await context.message.reply({ files: [content], allowedMentions: { repliedUser: false } });
   } else {
     if (context instanceof CommandInteraction) {
       const repMsg = await context.editReply(content);
       if (repMsg instanceof Message) msg = repMsg;
     }
     if (context instanceof ContextMenuInteraction) {
-      const repMsg = await context.editReply({ content: content });
+      const repMsg = await context.editReply({ content });
       if (repMsg instanceof Message) msg = repMsg;
     }
-    if (context instanceof MessageReaction) msg = await context.message.reply({ content: content, allowedMentions: { repliedUser: false } });
+  }
+  if (context instanceof MessageReaction) {
+    msg = await reactReply(context, content);
   }
   return msg;
 }
@@ -410,8 +452,6 @@ function getContextGuild(context: MsgContext) {
   * @param context either a message or interaction
   */
 async function reactErr(context: MsgContext) {
-  const logger = container.resolve(CubeLogger).discordLogic;
-
   // TODO: add ephermal followup explaining error details
   const cubeMessageManager = container.resolve(CubeMessageManager);
   let errEmote = '😰';
