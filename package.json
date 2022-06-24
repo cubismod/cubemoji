@@ -13,7 +13,7 @@
     "profile": "clinic doctor -- node --es-module-specifier-resolution=node build/Main.js",
     "test": "tsc && export CM_TEST=true && node --es-module-specifier-resolution=node build/tests/Tests.js",
     "dev": "tsc-watch --noClear -p ./tsconfig.json --onSuccess \"node --es-module-specifier-resolution=node --trace-warnings --inspect build/Main.js\"",
-    "clean": "rm -rf build/",
+    "clean": "rm -r build/ && rm -r git*/",
     "lint": "eslint",
     "audit": "yarn install --audit"
   },

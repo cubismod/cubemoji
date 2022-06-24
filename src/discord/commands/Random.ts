@@ -1,8 +1,15 @@
+import { RateLimit, TIME_UNIT } from '@discordx/utilities';
 import { CommandInteraction } from 'discord.js';
-import { Discord, Slash, SlashOption } from 'discordx';
+import { Discord, Guard, Slash, SlashOption } from 'discordx';
 import { container } from 'tsyringe';
 import { EmoteCache } from '../../lib/emote/EmoteCache.js';
 
+@Guard(
+  RateLimit(TIME_UNIT.seconds, 10, {
+    ephemeral: true,
+    rateValue: 3
+  })
+)
 @Discord()
 export abstract class Random {
   @Slash('random', {
@@ -10,8 +17,8 @@ export abstract class Random {
   })
   async random(
     @SlashOption('items', { description: 'how many emotes would you like in the chat, max 25', required: false })
-    items: number,
-    interaction: CommandInteraction
+      items: number,
+      interaction: CommandInteraction
   ) {
     const emoteCache = container.resolve(EmoteCache);
     await interaction.deferReply();

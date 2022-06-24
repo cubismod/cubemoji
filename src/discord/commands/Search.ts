@@ -11,8 +11,8 @@ export abstract class Search {
   })
   async search(
     @SlashOption('query', { description: 'you can search based on name or Discord ID (snowflake)' })
-    query: string,
-    interaction: CommandInteraction
+      query: string,
+      interaction: CommandInteraction
   ) {
     await interaction.deferReply({ ephemeral: true }); // ephemeral to avoid spam
 
@@ -50,7 +50,7 @@ export abstract class Search {
           .setColor('BLUE')
           .addField('Mutant Emojis', 'Below there may be emotes from the [Mutant emote pack](https://mutant.tech/) that you can use with Cubemoji as well with their names!');
         embeds.unshift(discEmbed);
-        await interaction.editReply({ embeds: embeds });
+        await interaction.editReply({ embeds });
       } else {
         await interaction.editReply(strings.noEmoteFound);
       }

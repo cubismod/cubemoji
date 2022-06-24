@@ -1,9 +1,16 @@
+import { RateLimit, TIME_UNIT } from '@discordx/utilities';
 import { AutocompleteInteraction, CommandInteraction, GuildMember } from 'discord.js';
-import { Discord, Slash, SlashOption } from 'discordx';
+import { Discord, Guard, Slash, SlashOption } from 'discordx';
 import { emoteAutocomplete } from '../../lib/cmd/Autocomplete';
 import { EditDiscord, parseForEmote } from '../../lib/image/DiscordLogic.js';
 import strings from '../../res/strings.json' assert { type: 'json' };
 
+@Guard(
+  RateLimit(TIME_UNIT.seconds, 10, {
+    ephemeral: true,
+    rateValue: 3
+  })
+)
 @Discord()
 export abstract class Jumbo {
   @Slash('jumbo', {
