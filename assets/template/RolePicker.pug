@@ -7,10 +7,37 @@ block head-extra
 block title 
   h1(class='display-2') Role Picker 
 
+mixin radio-button(name, category, checked)
+  - let val = false
+  if checked
+    - const val = true 
+  div(class='form-check')
+    input(
+      class='form-check-input'
+      type='radio'
+      name= category
+      id= name
+      checked= val
+    )
+
+mixin switch-button(name, checked)
+  - let val = false
+  if checked
+    - val = true 
+  div(class='form-check form-switch')
+    input(
+      class='form-check-input'
+      type='checkbox'
+      role='switch'
+      value= name 
+      id= name
+      checked= val
+    )
+
 block content
   // server icon and name card
   div(class='row mt-4')
-    div(class='col', id='title')
+    div(class='col' id='title')
       div(class='card text-bg-secondary mb-3')
         div(class="row g-0")
           div(class="col-md-auto")
@@ -27,7 +54,7 @@ block content
                 | Select your roles below and then click submit at the bottom of the page. This page expires after 20 minutes of its generation. See the amount of time left by going back to Discord and typing /roles
 
   div(class='row m-2')
-    form(action='/submitroles', method='POST')
+    form(action='/submitroles' method='POST')
       // used to validate the POST request
       input(type='hidden' id='serverID' name='serverID' value=serverID)
       input(type='hidden' id='userID' name='userID' value=userID)
@@ -41,39 +68,29 @@ block content
             p=category.description
             if category.image
               img(src=category.image style='max-width:40%;height:auto' class='img-fluid img-thumbnail mb-5' alt="Category Icon")
-            
+
             div(class='row gy-5 gx-5 align-items-center')
               each role in category.roles
-                div( class='col-auto')
+                div(class='col-auto')
+                  //- figure out if the user has the role to autocheck the box
+                  - const checked = userRoles.get(role)
+
+                  if category.radio
+                    +radio-button(role, category.name, checked)
+                  else
+                    +switch-button(role, checked)                     
+
+                  label(
+                    class='form-check-label'
+                    for=role
+                    style=`text-decoration:underline;text-decoration-color:${roleManager.get(role).hexColor}`
+                    )=roleManager.get(role).name
                   div(class='form-check form-switch')
-                    //- figure out if the user has the role to autocheck the box
-                    if userRoles.get(role)
-                      input(
-                        class='form-check-input'
-                        type='checkbox'
-                        role='switch'
-                        name=role 
-                        id=role
-                        checked 
-                      )
-                    else
-                      input(
-                        class='form-check-input'
-                        type='checkbox'
-                        role='switch'
-                        name=role 
-                        id=role
-                      )
-                    //- use a RoleManager collection here
-                    label(
-                      class='form-check-label'
-                      for=role
-                      style=`text-decoration:underline;text-decoration-color:${roleManager.get(role).hexColor}`
-                      )=roleManager.get(role).name
+
       div(class='row p-3')
         div(class='col')
           div(class='d-grid')
             button(type='submit' class='btn btn-primary btn-large') Submit
 
-              
+
 

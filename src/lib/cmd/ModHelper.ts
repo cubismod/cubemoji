@@ -178,19 +178,27 @@ export async function modReply(interaction: CommandInteraction | ButtonInteracti
   return embed;
 }
 
+/**
+ * These interfaces model
+ * https://gitlab.com/cubismod/cubemoji-roles/-/blob/main/schema/roles.json
+ */
 interface RoleCategory {
   name: string;
   description: string;
   image?: string;
   roles: string[];
+  alertOnChange?: boolean;
+  radio?: boolean;
 }
 
-// json representation of role picker
 export interface RolePicker {
   serverID: string,
   categories: RoleCategory[];
 }
 
+/**
+ * moderation actions to apply
+ */
 export interface ModAction {
   blocked: boolean;
   type: string; // glob or channel valid options

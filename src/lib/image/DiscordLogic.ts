@@ -141,23 +141,16 @@ export class FaceDiscord extends RescaleDiscord {
 
 // display a random status message for the bot
 export function setStatus(client: Client) {
-  if (choice([true, false])) {
-    // useful help text
-    const status = choice([
-      'Type /help to learn more about me!',
-      'Type / in chat to use my slash commands!',
-      'React 📏 to a message to rescale that message content!',
-      'React 📷 to a message to randomly edit that message content!',
-      'React 🌟 on a generated image to save to best of!',
-      'https://cubemoji.art',
-      'Type /roles to get your roles!'
-    ]);
-    client.user?.setActivity(status, { type: 'PLAYING' });
-  } else {
-    // display an emote status
-    const emoteCache = container.resolve(EmoteCache);
-    if (emoteCache) client.user?.setActivity(`:${choice(emoteCache.discEmojis).name}:`, { type: 'WATCHING' });
-  }
+  // useful help text
+  const status = choice([
+    'Type /help to learn more about me!',
+    'Type / in chat to use my slash commands!',
+    'React 📏 to a message to rescale that message content!',
+    'React 📷 to a message to randomly edit that message content!',
+    'https://cubemoji.art',
+    'Type /roles to get your roles!'
+  ]);
+  client.user?.setActivity(status, { type: 'PLAYING' });
 }
 
 /**
