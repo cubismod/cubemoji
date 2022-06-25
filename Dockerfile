@@ -11,7 +11,7 @@ RUN scripts/setup-image.sh
 COPY assets/ ./assets/
 
 ENV TZ=America/New_York CMG_DEST=/usr/src/cubemoji/static CMG_FAV_SRC=/usr/src/cubemoji/assets/favicon
-RUN ["python3", "scripts/gen-images/gen.py"]
+RUN ["python3", "scripts/gen_images/gen.py"]
 
 COPY yarn.lock .
 COPY package.json .
