@@ -309,7 +309,7 @@ block content
       p
         | You can specify an audit channel to log changes made to moderation features using
         |
-        span(class='font-monospace')/mod enrollment audit
+        span(class='font-monospace') /mod enrollment audit
 
 
       h3(id='mod-command') Moderation  Commands 
@@ -520,7 +520,16 @@ block content
         a(target='_blank' href='https://gitlab.com/cubismod/cubemoji-roles') That repository is available on GitLab.
         |
         | The configuration is outlined in the README.md file at the root of that repository. Basically, the JSON files in that repository define the configuration in cubemoji.
+        br
+        br
+        | You can also set radio buttons per category. This means that the user can only select one option out of the category Additionally, you can setup alerting
         |
+        a(href='#audit') to an audit channel.
+        br
+        br
+        | These features are documented in
+        |
+        a(target='_blank' href='https://gitlab.com/cubismod/cubemoji/-/merge_requests/122') this merge request for cubemoji.
         | You can use the
         |
         span(class='font-monospace') /mod allroles
@@ -530,6 +539,7 @@ block content
         span(class='font-monospace') /mod rolepickstatus
         |
         | slash command.
+        | 
         
     
   
