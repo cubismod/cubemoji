@@ -108,23 +108,45 @@ export async function validUser(user: User, guildIdentifier: string | null, clie
 /**
  * log an audit message to the channel as set in the database
  */
-export async function auditMsg(interaction: CommandInteraction | ButtonInteraction, message: {
+export async function auditMsg(message: {
   action: string,
   notes: string;
   guildId: string,
-  guildName: string;
-}) {
+}, interaction?: CommandInteraction | ButtonInteraction, client?: Client) {
   const auditInfo = container.resolve(CubeStorage).serverAuditInfo;
   // check audit channel first
   const auditChannel = await auditInfo.get(message.guildId);
   if (auditChannel) {
     // try to post to channel and handle any permission errors
     try {
-      const channel = await interaction.client.channels.fetch(auditChannel);
+      const channel =
+      await interaction?.client.channels.fetch(auditChannel) ??
+      await client?.channels.fetch(auditChannel);
       if (channel?.isText()) {
-        channel.send(
-          `<t:${Math.round(Date.now() / 1000)}>\n**Action**: ${message.action}\n**Invoker**: ${interaction.user.tag} (${interaction.user.id})\n${message.notes}`
-        );
+        if (interaction) {
+          channel.send(
+            {
+              embeds: [
+                new MessageEmbed({
+                  color: 'FUCHSIA',
+                  description: `**Action**: ${message.action}\n**Invoker**: ${interaction.user.tag} (${interaction.user.id})\n${message.notes}`,
+                  timestamp: Date.now()
+                })
+              ]
+            });
+        } else if (client) {
+          channel.send(
+            {
+              embeds: [
+                new MessageEmbed({
+                  color: 'FUCHSIA',
+                  description: `**Action**: ${message.action}\n${message.notes}`,
+                  timestamp: Date.now()
+                })
+              ]
+            }
+          );
+        }
       }
     } catch (err) {
       logger.error(err);
@@ -166,12 +188,11 @@ export async function modReply(interaction: CommandInteraction | ButtonInteracti
   logger.info(`Action: ${action}| Success: ${success} | Guild: ${guildName}/${guildId} | Invoker: ${interaction.user.tag}`);
   // try to send an audit message
   if (success) {
-    await auditMsg(interaction, {
+    await auditMsg({
       action,
       guildId,
-      guildName,
       notes
-    });
+    }, interaction);
   }
 
   if (msg) await interaction.editReply({ embeds: [embed] });

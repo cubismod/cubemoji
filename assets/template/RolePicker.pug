@@ -7,31 +7,29 @@ block head-extra
 block title 
   h1(class='display-2') Role Picker 
 
-mixin radio-button(name, category, checked)
-  - let val = false
-  if checked
-    - const val = true 
-  div(class='form-check')
+
+mixin radio-button(id, category, checked)
+  //- base64 encode the gategory name
+  div(class='form-check d-flex justify-content-center')
     input(
       class='form-check-input'
       type='radio'
-      name= category
-      id= name
-      checked= val
+      name= Buffer.from(category).toString('base64')
+      id= id
+      value= id
+      checked= checked
     )
 
-mixin switch-button(name, checked)
-  - let val = false
-  if checked
-    - val = true 
-  div(class='form-check form-switch')
+mixin switch-button(id, checked)
+  div(class='form-check form-switch d-flex justify-content-center')
     input(
       class='form-check-input'
       type='checkbox'
       role='switch'
-      value= name 
-      id= name
-      checked= val
+      value= id
+      name= id
+      id= id
+      checked= checked
     )
 
 block content
@@ -61,7 +59,7 @@ block content
       input(type='hidden' id='uniqueID' name='uniqueID' value=uniqueID)
 
       each category in roleCategories
-        div(class='row p-2 rounded border')
+        div(class='row p-2 rounded border mx-auto')
           div(class='col')
             // category
             h5=category.name
@@ -73,7 +71,7 @@ block content
               each role in category.roles
                 div(class='col-auto')
                   //- figure out if the user has the role to autocheck the box
-                  - const checked = userRoles.get(role)
+                  - const checked = checklist.get(role)
 
                   if category.radio
                     +radio-button(role, category.name, checked)
@@ -85,7 +83,6 @@ block content
                     for=role
                     style=`text-decoration:underline;text-decoration-color:${roleManager.get(role).hexColor}`
                     )=roleManager.get(role).name
-                  div(class='form-check form-switch')
 
       div(class='row p-3')
         div(class='col')

@@ -4,12 +4,13 @@
 
 import { randomUUID } from 'crypto';
 import dayjs from 'dayjs';
-import { Client as jsClient } from 'discord.js';
+import { Client as jsClient, Collection, Role } from 'discord.js';
 import { Client } from 'discordx';
 import { appendFile } from 'fs/promises';
 import { randomString } from 'pandemonium';
 import path from 'path';
 import { container } from 'tsyringe';
+import { auditMsg } from '../cmd/ModHelper';
 import { CubeStorage } from '../db/Storage';
 import { CubeLogger } from '../logger/CubeLogger';
 
@@ -104,6 +105,21 @@ export async function genRolesList(serverID: string) {
   }
 }
 
+export async function checkedRoles(serverID: string, userRoles: Collection<string, Role> | undefined) {
+  const roles = await genRolesList(serverID);
+
+  if (roles && userRoles) {
+    const checklist: Map<string, boolean> = new Map();
+
+    for (const role of roles) {
+      if (userRoles.has(role)) checklist.set(role, true);
+      else checklist.set(role, false);
+    }
+
+    return checklist;
+  }
+}
+
 /**
  * Create a text file of all server roles and names
  * @param serverID server id
@@ -121,18 +137,40 @@ export async function allRoles(serverID: string) {
   }
 }
 
-// async function alertOnChange(serverID: string, checkValue)
+async function alertOnChange(serverID: string, oldRole: string | undefined, newRole: string, userID: string) {
+  let action: string = `**Role change for** <@${userID}>\n`;
+  if (oldRole) {
+    action += `Removed role: <@&${oldRole}>\n`;
+  }
+  action += `Added role: <@&${newRole}>\n`;
+  // get audit channel ID
+  await auditMsg({
+    action,
+    notes: '',
+    guildId: serverID
+  },
+  undefined,
+  container.resolve(Client)
+  );
+}
+
+async function getMember(userID: string, serverID: string) {
+  const client = container.resolve(Client);
+
+  return await client.guilds.resolve(serverID)?.members.resolve(userID);
+}
 
 /**
  * take form data from HTML submission and then
- * perform an update if possible
- * @param roleID
- * @param checkValue
+ * perform an update if possible (switch buttons)
+ * @param roleID the role to add/remove
+ * @param checkValue false to remove, otherwise add
+ * @param userID user's Discord ID
+ * @param serverID guild ID
+ * @param alert whether to alert on this change
  */
-export async function performRoleUpdates(roleID: string, checkValue: string | undefined, userID: string, serverID: string) {
-  const client = container.resolve(Client);
-
-  const member = await client.guilds.resolve(serverID)?.members.resolve(userID);
+export async function roleUpdatesSwitch(roleID: string, checkValue: string | undefined, userID: string, serverID: string, alert: boolean) {
+  const member = await getMember(userID, serverID);
   const existingState = member?.roles.resolve(roleID);
   const reason = 'cubemoji role picker';
   try {
@@ -147,7 +185,45 @@ export async function performRoleUpdates(roleID: string, checkValue: string | un
       if (checkValue) {
         logger.info(`Adding role: ${roleID} to user: ${userID} in guild: ${serverID}`);
         await member?.roles.add(roleID, reason);
+        if (alert) {
+          await alertOnChange(serverID, undefined, roleID, userID);
+        }
       }
+    }
+  } catch (err) {
+    logger.error(err);
+  }
+}
+
+/**
+ * take form data from an HTML submission
+ * and perform an update (radio buttons)
+ * @param roles list of role IDs for the category
+ * @param roleID newly selected role
+ * @param userID user's Discord ID
+ * @param serverID guild ID
+ * @param alert whether to alert on change
+ */
+export async function roleUpdateRadio(roles: string[], roleID: string, userID: string, serverID: string, alert: boolean) {
+  const member = await getMember(userID, serverID);
+
+  // get current role (if there's one assigned)
+  let currentAssignedRole: string | undefined;
+  for (const role of roles) {
+    if (member?.roles.cache.has(role)) currentAssignedRole = role;
+  }
+
+  try {
+    if (currentAssignedRole && roleID !== currentAssignedRole) {
+      // remove old role
+      await member?.roles.remove(currentAssignedRole);
+    }
+    // add new role
+    await member?.roles.add(roleID);
+    // if we don't this the alert will state that the same role has been removed
+    // and added
+    if (alert && currentAssignedRole !== roleID) {
+      await alertOnChange(serverID, currentAssignedRole, roleID, userID);
     }
   } catch (err) {
     logger.error(err);
