@@ -1,5 +1,6 @@
+import { RateLimit, TIME_UNIT } from '@discordx/utilities';
 import { AutocompleteInteraction, CommandInteraction, GuildMember, Message } from 'discord.js';
-import { Discord, Slash, SlashOption } from 'discordx';
+import { Discord, Guard, Slash, SlashOption } from 'discordx';
 import { container } from 'tsyringe';
 import { emoteAutocomplete } from '../../lib/cmd/Autocomplete';
 import { CubeMessageManager } from '../../lib/cmd/MessageManager.js';
@@ -7,6 +8,12 @@ import { autoDeleteMsg, parseForEmote, reply } from '../../lib/image/DiscordLogi
 import strings from '../../res/strings.json' assert { type: 'json' };
 
 @Discord()
+@Guard(
+  RateLimit(TIME_UNIT.seconds, 10, {
+    ephemeral: true,
+    rateValue: 3
+  })
+)
 export abstract class Big {
   @Slash('big', {
     description: 'enlarges the input object'
@@ -18,10 +25,10 @@ export abstract class Big {
       type: 'STRING',
       required: false
     })
-    emote: string,
+      emote: string,
     @SlashOption('member', { description: strings.memberSlash, required: false })
-    member: GuildMember,
-    interaction: CommandInteraction
+      member: GuildMember,
+      interaction: CommandInteraction
   ) {
     await interaction.deferReply();
     let msg: Message | undefined;

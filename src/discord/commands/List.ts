@@ -18,10 +18,10 @@ export abstract class List {
     @SlashChoice('This Server', 'thisserver')
     @SlashChoice('Web', 'web')
     @SlashOption('subset', { description: 'Which subset of emotes would you like to choose from?' })
-    subset: string,
-    interaction: CommandInteraction,
-    _client: Client,
-    data: BSGuardData) {
+      subset: string,
+      interaction: CommandInteraction,
+      _client: Client,
+      data: BSGuardData) {
     const emoteCache = container.resolve(EmoteCache);
     let type = Source.Any;
 

@@ -10,17 +10,10 @@ import { compileFile } from 'pug';
 import { container } from 'tsyringe';
 import { CubeStorage } from '../../db/Storage';
 import { CubeLogger } from '../../logger/CubeLogger';
-import { genRolesList, performRoleUpdates } from '../RoleManager';
+import { checkedRoles, genRolesList, roleUpdateRadio, roleUpdatesSwitch as roleUpdateSwitch } from '../RoleManager';
 
 async function LogRequest(ctx: RouterContext, next: Next) {
   const logger = container.resolve(CubeLogger).web;
-  // const trxId = randomUUID();
-  // logger.info({
-  //   type: 'request',
-  //   trxId,
-  //   headers: ctx.headers,
-  //   url: ctx.URL.pathname
-  // });
 
   await next();
 
@@ -32,6 +25,8 @@ async function LogRequest(ctx: RouterContext, next: Next) {
       headers: ctx.headers,
       status: ctx.response.status
     });
+
+    logger.debug(ctx.request.body);
   }
 }
 
@@ -108,20 +103,24 @@ export class HTTPServe {
         const guild = client.guilds.resolve(serverAndUserID[0]);
         await guild?.fetch();
 
+        const serverID = res.roleBody[1].serverID;
         const serverName = guild?.name;
         const serverIcon = guild?.iconURL();
         const userRoles = guild?.members.cache.get(res.ephemeralLink.userID)?.roles.cache;
+
+        // get a checklist of roles that are formatted for easy use in Pug
+        const checklist = await checkedRoles(serverID, userRoles);
         const userNickname = guild?.members.cache.get(res.ephemeralLink.userID)?.displayName;
 
-        if (serverAndUserID.length > 1 && serverName && serverIcon && guild && userRoles && userNickname) {
+        if (serverAndUserID.length > 1 && serverName && serverIcon && guild && userRoles && userNickname && checklist) {
           const template = compileFile('./assets/template/RolePicker.pug');
           const body = template({
             serverIcon,
-            serverID: res.roleBody[1].serverID,
+            serverID,
             serverName,
             roleCategories: res.roleBody[1].categories,
             roleManager: guild.roles.cache,
-            userRoles,
+            checklist,
             userNickname,
             userID: res.ephemeralLink.userID,
             uniqueID: res.ephemeralLink.id
@@ -165,6 +164,23 @@ export class HTTPServe {
    * @returns true if completely parsed, false if not
    */
   private async parseFormBody (body: any) {
+    /**
+     * form body should look like this
+     * {
+     *   serverID: '944712909492224061',
+     *   userID: '170358606590377984',
+     *   uniqueID: 'CzCHdSZmbZUX',
+     *  '987164429068156999': '987164429068156999',
+     *  '987165147426590750': '987165147426590750',
+     *  '987164371732008962': '987164371732008962',
+     *  QWdl: '990040568488919061'
+     * }
+     *
+     * wherein the Snowflake ID represent checked role
+     * options in the form and the base64 encoded text at the
+     * bottom match to a radio picker wherein the value is the
+     * selected role from the picker
+     */
     const uniqueID: string | undefined = body.uniqueID;
     const serverID: string | undefined = body.serverID;
     const userID: string | undefined = body.userID;
@@ -176,13 +192,46 @@ export class HTTPServe {
       if (res && res.roleBody) {
         const roleslist = await genRolesList(serverID);
         if (roleslist) {
-          for (const role of roleslist) {
-            // check against the body to determine checked/unchecked roles
-            const checkValue: string | undefined = body[role];
+          // parse through category list to handle radio button entries
+          // as well as determine which roles need to be alerted on change
+          const categories = await this.storage.rolePickers.get(serverID);
+          if (categories) {
+            let alertingRoles: string[] = [];
+            let radioRoles: string[] = [];
 
-            await performRoleUpdates(role, checkValue, userID, serverID);
+            for (const category of categories[1].categories) {
+              if (category.alertOnChange) {
+                alertingRoles = alertingRoles.concat(category.roles);
+              }
+              if (category.radio) {
+                // radio values are base64 encoded
+                // in html body return values
+                const checkValue: string | undefined = body[
+                  Buffer.from(category.name).toString('base64')
+                ];
+
+                radioRoles = radioRoles.concat(category.roles);
+
+                if (checkValue) {
+                  const shouldAlert = alertingRoles.includes(checkValue);
+
+                  await roleUpdateRadio(category.roles, checkValue, userID, serverID, shouldAlert);
+                }
+              }
+            }
+            for (const role of roleslist) {
+              // check against the body to determine checked/unchecked roles
+              // via switch buttons
+              if (!radioRoles.includes(role)) {
+                const checkValue: string | undefined = body[role];
+
+                const shouldAlert = alertingRoles.includes(checkValue ?? '');
+
+                await roleUpdateSwitch(role, checkValue, userID, serverID, shouldAlert);
+              }
+            }
           }
-          // success state
+
           return true;
         }
       }
