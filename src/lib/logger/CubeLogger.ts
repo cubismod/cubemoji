@@ -1,8 +1,8 @@
 import { singleton } from 'tsyringe';
 import { createLogger, format, Logger, transports } from 'winston';
+import Sentry from 'winston-sentry-log';
 import { Bytes } from '../constants/Units.js';
 import { LokiTransport } from './LokiTransport.js';
-
 /**
  * cubemoji logging using Winston
  * https://www.npmjs.com/package/winston
@@ -89,6 +89,7 @@ export class CubeLogger {
         process.env.CM_HTTP_HOST) {
         this.parent.add(lokiTransport);
       }
+      this.addSentry();
     }
 
     // now setup child loggers
@@ -108,32 +109,16 @@ export class CubeLogger {
     this.web = this.parent.child({ module: 'Web' });
     this.errors = this.parent.child({ module: 'Errors' });
     this.git = this.parent.child({ module: 'Git' });
+  }
 
-    /* // exceptions/rejections log to separate file
-    const exReFileTransport = new transports.File({
-      filename: 'data/logs/exceptions.log',
-      maxsize: Bytes.oneMB,
-      maxFiles: 20
-    })
-
-    const exReConsoleTransport = new transports.Console()
-
-    const exReLogger = createLogger({
-      exceptionHandlers: [
-        exReFileTransport, exReConsoleTransport
-      ],
-      rejectionHandlers: [
-        exReFileTransport, exReConsoleTransport
-      ]
-    })
-
-    if (process.env.CM_HTTP_LOG === 'true' &&
-    process.env.CM_HTTP_PORT &&
-    process.env.CM_HTTP_HOST) {
-      exReLogger.exceptions.handle(lokiTransport)
-      exReLogger.rejections.handle(lokiTransport)
+  private addSentry() {
+    if (process.env.CM_TRACING) {
+      const options = {
+        config: {
+          dsn: process.env.CM_DSN
+        }
+      };
+      this.parent.add(new Sentry(options));
     }
-
-    // handle exceptions and errors with logger */
   }
 }

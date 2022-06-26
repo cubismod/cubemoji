@@ -65,3 +65,9 @@ export class GitClient {
 
   async parse() { await rolePickerParse(path.join(this.directory, 'data')); }
 }
+
+// get cubemoji's Git SHA
+export async function gitSHA() {
+  const git = simpleGit(process.cwd());
+  return await git.revparse();
+}

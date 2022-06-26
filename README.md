@@ -11,6 +11,11 @@ Environment Setup
 - Yarn is used for package management. Type `corepack enable` to get yarn working. 
 - [Canvas](https://www.npmjs.com/package/canvas) may require additional system dependencies, please see that linked page for more information.
 
+Monitoring
+----------
+- Logs and metrics are shipped to an [optional Promtail instance](https://grafana.com/docs/loki/latest/clients/promtail/) defined via the `CM_HTTP_HOST` environment variable. Set `CM_HTTP_LOG` = `true` to enable HTTP logging. See [.env](example.env) for more environment info.
+- [GlitchTip](https://glitchtip.com) is utilized for monitoring and tracing.
+
 Execution
 ---------
 - `npm run build` to build the JS from TypeScript in the `build/` subdirectory

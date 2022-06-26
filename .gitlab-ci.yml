@@ -33,6 +33,7 @@ variables:
   # CM_WORKERS: $CM_WORKERS
   FLY_API_TOKEN: $FLY_API_TOKEN
   QUAY_CONF: $QUAY_CONF
+  SENTRY_TOKEN: $SENTRY_TOKEN
   REPO_NAME: "quay.io/cubismod/cubemoji"
   CACHE_REPO: "quay.io/cubismod/cubemoji-cache"
   SETTINGS__GITLAB_ACCESS_TOKEN: $SETTINGS__GITLAB_ACCESS_TOKEN
@@ -40,6 +41,7 @@ variables:
   CONTAINER_DEST: $REPO_NAME:$CI_COMMIT_REF_SLUG$CI_COMMIT_SHORT_SHA
   KANIKO_AUTH: /kaniko/.docker/config.json
   SKOP_AUTH: /tmp/skopeo.json
+  CM_DOCKER_DIR: /usr/src/cubemoji
 
 stages:
   - build
@@ -69,15 +71,26 @@ build:
   rules:
     - if: '$CI_PIPELINE_SOURCE != "schedule"'
 
-lint:
+lint_and_sentry:
   stage: housekeeping
   image:
     name: ${CONTAINER_DEST}
   script:
-    - cd /usr/src/cubemoji
+    - cd ${CM_DOCKER_DIR}
     - yarn install  # install dev deps as well
     - npm run lint
     - npm run audit
+    # upload sourcemaps to sentry/glitchtip
+    - yarn add @sentry/cli
+    - npx sentry-cli --auth-token ${SENTRY_TOKEN}
+    # get git hash and set as version
+    - VERSION=`npx sentry-cli releases propose-version`
+    - npx sentry-cli releases new ${VERSION}
+    # now upload sourcemaps
+    - >-
+      npx sentry-cli releases files ${VERSION}
+      upload-sourcemaps --ext ts --ext map ${CM_DOCKER_DIR}
+    - npx sentry-cli releases finalize ${VERSION}
 
 skopeo_copy:
   stage: housekeeping

@@ -1,10 +1,14 @@
 import { dirname, importx } from '@discordx/importer';
+import { RewriteFrames } from '@sentry/integrations';
+import * as Sentry from '@sentry/node';
+import '@sentry/tracing';
 import { Intents } from 'discord.js';
 import { Client } from 'discordx';
 import { config } from 'dotenv';
 import { mkdir } from 'fs/promises';
 import 'reflect-metadata';
 import { bigServerDetect, blockedChannelDetect } from './discord/Guards.js';
+import { gitSHA } from './lib/cd/GitClient.js';
 import { CubeLogger } from './lib/logger/CubeLogger.js';
 
 // load dotenv file if exists
@@ -16,6 +20,18 @@ async function createDir(dirName: string) {
     await mkdir(dirName, { recursive: true });
   } catch { }
 }
+
+declare global {
+  // eslint-disable-next-line no-unused-vars
+  namespace NodeJS {
+    // eslint-disable-next-line no-unused-vars
+    interface Global {
+      __rootdir__: string;
+    }
+  }
+}
+
+global.__rootdir__ = process.cwd();
 
 export class Main {
   private static _client: Client;
@@ -31,6 +47,23 @@ export class Main {
     await createDir('./data/logs');
     await createDir('./static/list');
     await createDir('./static/emotes');
+
+    // tracing setup
+    if (process.env.CM_TRACING === 'true' && process.env.CM_DSN) {
+      Sentry.init({
+        dsn: process.env.CM_DSN,
+        attachStacktrace: true,
+        environment: process.env.CM_ENVIRONMENT,
+        release: await gitSHA(),
+        tracesSampleRate: 0.4,
+        integrations: [
+          new RewriteFrames({
+            root: global.__rootdir__
+          })
+        ]
+      });
+    }
+
     const logger = new CubeLogger().main;
 
     await importx(dirname(import.meta.url) + '/discord/**/*.js');

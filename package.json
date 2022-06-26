@@ -38,6 +38,9 @@
     "@discordx/utilities": "4.3.3",
     "@keyv/sqlite": "^3.5.2",
     "@koa/router": "^10.1.1",
+    "@sentry/integrations": "^7.3.0",
+    "@sentry/node": "^7.3.0",
+    "@sentry/tracing": "^7.3.0",
     "@types/koa": "^2.13.4",
     "better-sqlite3": "^7.5.3",
     "chokidar": "^3.5.3",
@@ -75,6 +78,7 @@
     "unique-names-generator": "^4.7.1",
     "uuid": "^8.3.2",
     "winston": "^3.7.2",
+    "winston-sentry-log": "^1.0.26",
     "winston-transport": "^4.5.0"
   },
   "devDependencies": {
