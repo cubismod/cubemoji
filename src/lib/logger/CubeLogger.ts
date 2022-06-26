@@ -3,6 +3,7 @@ import { createLogger, format, Logger, transports } from 'winston';
 import Sentry from 'winston-sentry-log';
 import { Bytes } from '../constants/Units.js';
 import { LokiTransport } from './LokiTransport.js';
+
 /**
  * cubemoji logging using Winston
  * https://www.npmjs.com/package/winston
@@ -89,8 +90,9 @@ export class CubeLogger {
         process.env.CM_HTTP_HOST) {
         this.parent.add(lokiTransport);
       }
-      this.addSentry();
     }
+
+    this.addSentry();
 
     // now setup child loggers
     this.main = this.parent.child({ module: 'Main' });

@@ -1,5 +1,4 @@
 import { dirname, importx } from '@discordx/importer';
-import { RewriteFrames } from '@sentry/integrations';
 import * as Sentry from '@sentry/node';
 import '@sentry/tracing';
 import { Intents } from 'discord.js';
@@ -8,7 +7,6 @@ import { config } from 'dotenv';
 import { mkdir } from 'fs/promises';
 import 'reflect-metadata';
 import { bigServerDetect, blockedChannelDetect } from './discord/Guards.js';
-import { gitSHA } from './lib/cd/GitClient.js';
 import { CubeLogger } from './lib/logger/CubeLogger.js';
 
 // load dotenv file if exists
@@ -50,17 +48,14 @@ export class Main {
 
     // tracing setup
     if (process.env.CM_TRACING === 'true' && process.env.CM_DSN) {
+      let debug = false;
+      if (process.env.CM_ENVIRONMENT === 'npr') debug = true;
       Sentry.init({
         dsn: process.env.CM_DSN,
-        attachStacktrace: true,
         environment: process.env.CM_ENVIRONMENT,
-        release: await gitSHA(),
-        tracesSampleRate: 0.4,
-        integrations: [
-          new RewriteFrames({
-            root: global.__rootdir__
-          })
-        ]
+        release: process.env.npm_package_version,
+        tracesSampleRate: 0.7,
+        debug
       });
     }
 

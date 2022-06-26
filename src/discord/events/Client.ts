@@ -1,5 +1,7 @@
 // Discord client events
 
+import * as Sentry from '@sentry/node';
+import { CommandInteraction, ContextMenuInteraction, MessageReaction } from 'discord.js';
 import { ArgsOf, Client, Discord, DIService, On, Once } from 'discordx';
 import { container } from 'tsyringe';
 import { GitClient } from '../../lib/cd/GitClient.js';
@@ -185,7 +187,38 @@ export abstract class ClientEvents {
       }
     }
     try {
-      await client.executeInteraction(interaction);
+      if (process.env.CM_TRACING === 'true') {
+        let transactionName = interaction.id;
+        // determine name
+        if (interaction instanceof CommandInteraction ||
+          interaction instanceof ContextMenuInteraction) {
+          transactionName = interaction.commandName;
+        } else if (interaction instanceof MessageReaction) {
+          transactionName = interaction.emoji.toString();
+        }
+
+        // tracing
+        const transaction = Sentry.startTransaction({
+          op: transactionName,
+          name: transactionName
+        });
+
+        Sentry.configureScope(scope => {
+          scope.setTags({
+            guild: interaction.guildId,
+            commandType: interaction.type,
+            channel: interaction.channelId
+          });
+          scope.setUser({ id: interaction.user.id, username: interaction.user.username });
+          scope.setSpan(transaction);
+        });
+
+        await client.executeInteraction(interaction);
+
+        transaction.finish();
+      } else {
+        await client.executeInteraction(interaction);
+      }
     } catch (err: unknown) {
       this.logger.error('INTERACTION FAILURE');
       this.logger.error(`Type: ${interaction.type}\nTimestamp: ${Date()}\nGuild: ${interaction.guild}\nUser: ${interaction.user.tag}\nChannel: ${interaction.channel}`);
