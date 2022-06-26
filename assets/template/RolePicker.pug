@@ -85,10 +85,10 @@ block content
                     )=roleManager.get(role).name
 
       div(class='row p-3')
-        div(class='col')
+        div(class='col mx-5')
           div(class='btn-group d-flex justify-content-center')
-            button(type='submit' class='btn btn-primary btn-large') Submit
-            button(type='button' class='btn btn-danger btn-large' onclick="reset()") Reset
+            button(type='submit' class='btn btn-primary') Submit
+            button(type='button' class='btn btn-danger' onclick="reset()") Reset to Current Roles
 
   script.
     function reset() {
