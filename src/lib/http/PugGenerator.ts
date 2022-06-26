@@ -15,12 +15,35 @@ export class PugGenerator {
   templateDir = './assets/template';
   // private storage = container.resolve(CubeStorage);
   emoteCache = container.resolve(EmoteCache);
-  template: compileTemplate;
+  emojiListTemplate: compileTemplate;
+
+  private rolePickerPath = path.resolve(this.templateDir, 'RolePicker.pug');
+
+  rolePickerTemplate = compileFile(this.rolePickerPath, {
+    filename: this.rolePickerPath,
+    cache: true
+  });
+
+  private fiveHundredPath = path.resolve(this.templateDir, '500.pug');
+
+  fiveHundredError = compileFile(this.fiveHundredPath, {
+    filename: this.fiveHundredPath,
+    cache: true
+  });
+
+  private roleResultPath = path.resolve(this.templateDir, 'RoleResult.pug');
+
+  roleResult = compileFile(this.roleResultPath, {
+    filename: this.roleResultPath,
+    cache: true
+  });
+
   private logger = container.resolve(CubeLogger).web;
   constructor() {
     const source = path.resolve(this.templateDir, 'EmojiList.pug');
-    this.template = compileFile(source, {
-      filename: source
+    this.emojiListTemplate = compileFile(source, {
+      filename: source,
+      cache: true
     });
   }
 
@@ -71,7 +94,7 @@ export class PugGenerator {
       }
     }
 
-    await writeFile(path.resolve('./static/list/emoji.html'), this.template({
+    await writeFile(path.resolve('./static/list/emoji.html'), this.emojiListTemplate({
       emotes: this.emoteCache.discEmojis,
       servers
 

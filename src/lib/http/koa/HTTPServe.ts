@@ -6,10 +6,10 @@ import { Context, Next } from 'koa';
 import koaBody from 'koa-body';
 import koaCompress from 'koa-compress';
 import send from 'koa-send';
-import { compileFile } from 'pug';
 import { container } from 'tsyringe';
 import { CubeStorage } from '../../db/Storage';
 import { CubeLogger } from '../../logger/CubeLogger';
+import { PugGenerator } from '../PugGenerator';
 import { checkedRoles, genRolesList, roleUpdateRadio, roleUpdatesSwitch as roleUpdateSwitch } from '../RoleManager';
 
 async function LogRequest(ctx: RouterContext, next: Next) {
@@ -34,6 +34,7 @@ async function LogRequest(ctx: RouterContext, next: Next) {
 @Middleware(LogRequest)
 @Middleware(koaCompress())
 export class HTTPServe {
+  private pugGenerator = container.resolve(PugGenerator);
   private storage = container.resolve(CubeStorage);
 
   @Get('/')
@@ -113,8 +114,7 @@ export class HTTPServe {
         const userNickname = guild?.members.cache.get(res.ephemeralLink.userID)?.displayName;
 
         if (serverAndUserID.length > 1 && serverName && serverIcon && guild && userRoles && userNickname && checklist) {
-          const template = compileFile('./assets/template/RolePicker.pug');
-          const body = template({
+          const body = this.pugGenerator.rolePickerTemplate({
             serverIcon,
             serverID,
             serverName,
@@ -131,7 +131,7 @@ export class HTTPServe {
         }
       }
     }
-    context.body = compileFile('./assets/template/500.pug')();
+    context.body = this.pugGenerator.fiveHundredError();
     context.status = 500;
   }
 
@@ -143,17 +143,16 @@ export class HTTPServe {
   async submitRoles(context: Context) {
     // now we have to extract details from the request
     const parseResult = await this.parseFormBody(context.request.body);
-    const template = compileFile('./assets/template/RoleResult.pug');
 
     if (parseResult) {
-      context.body = template({ success: true });
+      context.body = this.pugGenerator.roleResult({ success: true });
 
       // clear up all traces in database
       const lookup = await this.storage.uniqueIDLookup.get(context.request.body.uniqueID);
       await this.storage.uniqueIDLookup.delete(context.request.body.uniqueID);
       if (lookup) await this.storage.ephemeralLinks.delete(lookup);
     } else {
-      context.body = template({ success: false });
+      context.body = this.pugGenerator.roleResult({ success: false });
     }
   }
 
