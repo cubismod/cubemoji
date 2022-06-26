@@ -34,7 +34,7 @@ variables:
   FLY_API_TOKEN: $FLY_API_TOKEN
   QUAY_CONF: $QUAY_CONF
   SENTRY_AUTH_TOKEN: $SENTRY_AUTH_TOKEN
-  SENTRY_URL: $SENTRY_URL
+  SENTRY_URL: https://app.glitchtip.com
   REPO_NAME: "quay.io/cubismod/cubemoji"
   CACHE_REPO: "quay.io/cubismod/cubemoji-cache"
   SETTINGS__GITLAB_ACCESS_TOKEN: $SETTINGS__GITLAB_ACCESS_TOKEN
