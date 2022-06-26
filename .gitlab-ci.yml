@@ -84,7 +84,7 @@ lint_and_sentry:
     # upload sourcemaps to sentry/glitchtip
     - yarn add @sentry/cli
     # get git hash and set as version
-    - VERSION=`npx sentry-cli releases propose-version`
+    - VERSION=`git rev-parse HEAD`
     - npx sentry-cli releases new ${VERSION}
     # now upload sourcemaps
     - >-
