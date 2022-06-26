@@ -83,7 +83,7 @@ lint_and_sentry:
     - npm run audit
     # upload sourcemaps to sentry/glitchtip
     - yarn add @sentry/cli
-    - npx sentry-cli --url ${SENTRY_URL} login
+    - npx sentry-cli login
     # get git hash and set as version
     - VERSION=`npx sentry-cli releases propose-version`
     - npx sentry-cli releases new ${VERSION}
