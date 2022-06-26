@@ -83,14 +83,12 @@ lint_and_sentry:
     - npm run audit
     # upload sourcemaps to sentry/glitchtip
     - yarn add @sentry/cli
-    # get git hash and set as version
-    - VERSION=`git rev-parse HEAD`
-    - npx sentry-cli releases new ${VERSION}
+    - npx sentry-cli releases new ${CI_COMMIT_SHA}
     # now upload sourcemaps
     - >-
-      npx sentry-cli releases files ${VERSION}
+      npx sentry-cli releases files ${CI_COMMIT_SHA}
       upload-sourcemaps --ext ts --ext map ${CM_DOCKER_DIR}
-    - npx sentry-cli releases finalize ${VERSION}
+    - npx sentry-cli releases finalize ${CI_COMMIT_SHA}
 
 skopeo_copy:
   stage: housekeeping
