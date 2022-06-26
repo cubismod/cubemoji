@@ -33,7 +33,8 @@ variables:
   # CM_WORKERS: $CM_WORKERS
   FLY_API_TOKEN: $FLY_API_TOKEN
   QUAY_CONF: $QUAY_CONF
-  SENTRY_TOKEN: $SENTRY_TOKEN
+  SENTRY_AUTH_TOKEN: $SENTRY_AUTH_TOKEN
+  SENTRY_URL: $SENTRY_URL
   REPO_NAME: "quay.io/cubismod/cubemoji"
   CACHE_REPO: "quay.io/cubismod/cubemoji-cache"
   SETTINGS__GITLAB_ACCESS_TOKEN: $SETTINGS__GITLAB_ACCESS_TOKEN
@@ -82,7 +83,7 @@ lint_and_sentry:
     - npm run audit
     # upload sourcemaps to sentry/glitchtip
     - yarn add @sentry/cli
-    - npx sentry-cli --auth-token ${SENTRY_TOKEN}
+    - npx sentry-cli --url ${SENTRY_URL} login
     # get git hash and set as version
     - VERSION=`npx sentry-cli releases propose-version`
     - npx sentry-cli releases new ${VERSION}
