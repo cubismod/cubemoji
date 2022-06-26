@@ -43,7 +43,7 @@ variables:
   KANIKO_AUTH: /kaniko/.docker/config.json
   SKOP_AUTH: /tmp/skopeo.json
   CM_DOCKER_DIR: /usr/src/cubemoji
-  SENTRY_ORG: cubis-org
+  SENTRY_ORG: personal-projects
   SENTRY_PROJECT: cubemoji
 
 stages:
