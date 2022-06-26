@@ -222,7 +222,7 @@ export async function roleUpdateRadio(roles: string[], roleID: string, userID: s
     await member?.roles.add(roleID);
     // if we don't this the alert will state that the same role has been removed
     // and added
-    if (alert && currentAssignedRole !== roleID) {
+    if (alert && currentAssignedRole && currentAssignedRole !== roleID) {
       await alertOnChange(serverID, currentAssignedRole, roleID, userID);
     }
   } catch (err) {

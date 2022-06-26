@@ -52,7 +52,7 @@ block content
                 | Select your roles below and then click submit at the bottom of the page. This page expires after 20 minutes of its generation. See the amount of time left by going back to Discord and typing /roles
 
   div(class='row m-2')
-    form(action='/submitroles' method='POST')
+    form(action='/submitroles' method='POST' id='rolePicker')
       // used to validate the POST request
       input(type='hidden' id='serverID' name='serverID' value=serverID)
       input(type='hidden' id='userID' name='userID' value=userID)
@@ -86,8 +86,16 @@ block content
 
       div(class='row p-3')
         div(class='col')
-          div(class='d-grid')
+          div(class='btn-group d-flex justify-content-center')
             button(type='submit' class='btn btn-primary btn-large') Submit
+            button(type='button' class='btn btn-danger btn-large' onclick="reset()") Reset
 
+  script.
+    function reset() {
+      const items = document.querySelectorAll('form-check-input');
+      for (const item of items) {
+        item.checked = false;
+      }
+    }
 
 
