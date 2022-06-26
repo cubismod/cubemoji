@@ -45,6 +45,7 @@ variables:
   CM_DOCKER_DIR: /usr/src/cubemoji
   SENTRY_ORG: personal-projects
   SENTRY_PROJECT: cubemoji
+  SENTRY_LOG_LEVEL: debug
 
 stages:
   - build
@@ -87,9 +88,9 @@ lint_and_sentry:
     - yarn add @sentry/cli
     - npx sentry-cli releases new ${CI_COMMIT_SHA}
     # now upload sourcemaps (not working currently with glitchtip)
-    # - >-
-    #  npx sentry-cli releases files ${CI_COMMIT_SHA}
-    #  upload-sourcemaps --ext ts --ext map ${CM_DOCKER_DIR}
+    - >-
+     npx sentry-cli releases files ${CI_COMMIT_SHA}
+     upload-sourcemaps --ext ts --ext map ${CM_DOCKER_DIR}
     - npx sentry-cli releases finalize ${CI_COMMIT_SHA}
 
 skopeo_copy:
