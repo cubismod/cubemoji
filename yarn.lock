@@ -1262,10 +1262,10 @@ discord.js@^13.6.0:
     node-fetch "^2.6.1"
     ws "^8.7.0"
 
-discordx@9.7.3:
-  version "9.7.3"
-  resolved "https://registry.yarnpkg.com/discordx/-/discordx-9.7.3.tgz#386b6aeaaff4a7ea7cd49aa47d87aba0535356ea"
-  integrity sha512-Z29gtHU+f/7Bl5AmNGgq4gv9XLTuxzPEZzMLh7vVshP9JOdJtTiVEWepYSeZip6nwMtUlZsz0FUqwdi5s8Wy5g==
+discordx@9.8.0:
+  version "9.8.0"
+  resolved "https://registry.yarnpkg.com/discordx/-/discordx-9.8.0.tgz#122db1b2a4a8db06c35de63c943f56586c8654a4"
+  integrity sha512-uZYQvGK69q2rCAvNvudtDMRCeoY3sYnGCj5/X191oL11b42tnU1Okh2Zc14n55ZmdFjVjmfjsX+jzqsxTEhNAg==
   dependencies:
     "@discordx/di" "^2.0.1"
     "@discordx/internal" "^1.0.2"
