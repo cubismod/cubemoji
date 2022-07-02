@@ -301,7 +301,7 @@ export class S3Client {
             Body: content
           }).promise();
 
-          this.logger.debug(res2);
+          this.logger.info(JSON.stringify(res2));
           break;
         }
       }
