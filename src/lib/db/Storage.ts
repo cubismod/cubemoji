@@ -301,7 +301,7 @@ export class S3Client {
             Body: content
           }).promise();
 
-          this.logger.info(JSON.stringify(res2));
+          this.logger.info(`Uploaded to S3: ${JSON.stringify(res2)}.\nBucket: ${bucket}, Path: ${bucketPath}`);
           break;
         }
       }
