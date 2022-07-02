@@ -23,4 +23,4 @@ COPY src/ ./src/
 
 RUN yarn build
 
-CMD yarn start
+CMD ["yarn", "start"]

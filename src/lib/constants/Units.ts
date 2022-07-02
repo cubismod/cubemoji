@@ -4,6 +4,7 @@ export namespace Milliseconds {
   export const thirtyMin = 1.8e+6;
   export const twentyMin = 1.2e+6;
   export const fiveMin = 300000;
+  export const threeMin = 180000;
   export const thirtySec = 30000;
   export const tenSec = 10000;
   export const day = 8.64e+7;

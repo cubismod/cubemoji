@@ -31,6 +31,7 @@ export class Main {
     await createDir('./data/logs');
     await createDir('./static/list');
     await createDir('./static/emotes');
+    await createDir('./data/backups');
     const logger = new CubeLogger().main;
 
     await importx(dirname(import.meta.url) + '/discord/**/*.js');

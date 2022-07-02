@@ -6,6 +6,14 @@ import { ModAction, RolePicker } from '../cmd/ModHelper.js';
 import { Milliseconds } from '../constants/Units.js';
 import { ephemeralLink } from '../http/RoleManager.js';
 import { CubeLogger } from '../logger/CubeLogger.js';
+import AWS from 'aws-sdk';
+import path from 'path';
+import { readFile } from 'fs/promises';
+
+export enum BucketContentType {
+  Path,
+  Text
+}
 
 /**
  * server ID and name
@@ -50,14 +58,7 @@ export interface RateLimitVal {
   and SQLite for the other storage as its consistent
 
   NAMESPACES
-  servers - Servers enrolled in Big Server mode
-  emoji - Blocked emojis in BSM
-  owners - Server owners
-  mods - Roles with moderation access in BSM
-  channels - Blocked channels in BSM
-  server-anon - Used in the emoji list webpage for persistent randomized server names
-  actions - lists of pending mod actions for BSM
-  timeouts - timeouts for big server mode, see https://gitlab.com/cubismod/cubemoji/-/issues/23#note_906825698
+  see below
 
 */
 @singleton()
@@ -242,5 +243,70 @@ export class CubeStorage {
       this.logger.error(err);
     }
     db.close();
+  }
+}
+
+/**
+ * Connect to an S3 client for backups and some storage.
+ * Put only client, no other functionality available.
+ * Several environment variables required, which are described
+ * in .example.env
+ */
+@singleton()
+export class S3Client {
+  private s3?:AWS.S3;
+  private logger = container.resolve(CubeLogger).storage;
+
+  constructor() {
+    if (
+      process.env.CM_ACCESS_KEY_ID &&
+      process.env.CM_SECRET_ACCESS_KEY &&
+      process.env.CM_REGION &&
+      process.env.CM_S3_ENDPOINT
+    ) {
+      AWS.config.credentials = {
+        accessKeyId: process.env.CM_ACCESS_KEY_ID,
+        secretAccessKey: process.env.CM_SECRET_ACCESS_KEY
+      };
+
+      AWS.config.region = process.env.CM_REGION;
+
+      const ep = new AWS.Endpoint(process.env.CM_S3_ENDPOINT);
+      this.s3 = new AWS.S3({
+        endpoint: ep
+      });
+    } else {
+      throw (new Error('Missing S3 secrets in environment variables! See example.env for description of required variables'));
+    }
+  }
+
+  async put(bucketPath: string, bucket: string, content: string, type:BucketContentType) {
+    try {
+      switch (type) {
+        case BucketContentType.Path: {
+          const file = await readFile(path.resolve(content));
+
+          const res = await this.s3?.putObject({
+            Bucket: bucket,
+            Key: bucketPath,
+            Body: file
+          }).promise();
+          this.logger.debug(res);
+          break;
+        }
+        case BucketContentType.Text: {
+          const res2 = await this.s3?.putObject({
+            Bucket: bucket,
+            Key: bucketPath,
+            Body: content
+          }).promise();
+
+          this.logger.debug(res2);
+          break;
+        }
+      }
+    } catch (err) {
+      this.logger.error(err);
+    }
   }
 }

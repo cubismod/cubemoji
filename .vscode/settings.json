@@ -9,5 +9,8 @@
     ],
     "editor.formatOnSave": false,
     "debug.javascript.autoAttachFilter": "onlyWithFlag",
-    "editor.renderWhitespace": "all"
+    "editor.renderWhitespace": "all",
+    "eslint.format.enable": true,
+    "eslint.lintTask.enable": true,
+    "typescript.preferences.quoteStyle": "single"
 }

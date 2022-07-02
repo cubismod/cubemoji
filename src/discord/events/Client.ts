@@ -6,7 +6,7 @@ import { GitClient } from '../../lib/cd/GitClient.js';
 import { CubeMessageManager } from '../../lib/cmd/MessageManager.js';
 import { Milliseconds } from '../../lib/constants/Units.js';
 import { scheduleBackup } from '../../lib/db/DatabaseMgmt.js';
-import { CubeStorage } from '../../lib/db/Storage.js';
+import { CubeStorage, S3Client } from '../../lib/db/Storage.js';
 import { EmoteCache } from '../../lib/emote/EmoteCache.js';
 import { BadHosts } from '../../lib/http/BadHosts.js';
 import { CubeServer } from '../../lib/http/CubeServer.js';
@@ -15,6 +15,7 @@ import { setStatus } from '../../lib/image/DiscordLogic.js';
 import { ImageQueue } from '../../lib/image/ImageQueue.js';
 import { WorkerPool } from '../../lib/image/WorkerPool.js';
 import { CubeLogger } from '../../lib/logger/CubeLogger.js';
+import { InspectorWrapper } from '../../lib/perf/InspectorWrapper.js';
 
 @Discord()
 export abstract class ClientEvents {
@@ -79,6 +80,12 @@ export abstract class ClientEvents {
       );
 
       await container.resolve(CubeStorage).loadServerOwners(client);
+
+      const s3Client = new S3Client();
+      DIService.container.register(S3Client, { useValue: s3Client });
+      this.logger.info('registered S3Client');
+
+      DIService.container.register(InspectorWrapper, { useValue: new InspectorWrapper() });
 
       // schedule a backup for 2am EST
       scheduleBackup();

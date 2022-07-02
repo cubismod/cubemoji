@@ -40,6 +40,12 @@ export const bigServerDetect: GuardFunction<
     await next();
   };
 
+export const botOwnerDetect: GuardFunction<CommandInteraction> = async(
+  arg, _client, next
+) => {
+  if (arg.user.id === process.env.CM_BOTOWNER) await next();
+};
+
 /**
  * ignores commands in blocked channels except for moderation commands
  * so that a user does not lock themselves out from the bot
