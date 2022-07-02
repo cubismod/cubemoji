@@ -27,6 +27,7 @@ export class CubeLogger {
   readonly web: Logger;
   readonly errors: Logger;
   readonly git: Logger;
+  readonly inspector: Logger;
 
   constructor() {
     const lokiTransport = new LokiTransport({
@@ -108,6 +109,7 @@ export class CubeLogger {
     this.web = this.parent.child({ module: 'Web' });
     this.errors = this.parent.child({ module: 'Errors' });
     this.git = this.parent.child({ module: 'Git' });
+    this.inspector = this.parent.child({ module: 'InspectorWrapper' });
 
     /* // exceptions/rejections log to separate file
     const exReFileTransport = new transports.File({

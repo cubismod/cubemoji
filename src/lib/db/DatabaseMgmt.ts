@@ -16,7 +16,7 @@ import { promisify } from 'util';
 import { createGzip } from 'zlib';
 import { Milliseconds } from '../constants/Units.js';
 import { CubeLogger } from '../logger/CubeLogger.js';
-import { CubeStorage } from './Storage.js';
+import { BucketContentType, CubeStorage, S3Client } from './Storage.js';
 
 /**
  * runs SQL database backups using dump and then performs backup rotations
@@ -27,6 +27,7 @@ import { CubeStorage } from './Storage.js';
 export async function runBackups(firstRun = true) {
   const logger = container.resolve(CubeLogger).databaseMgmt;
   const dbLocation = container.resolve(CubeStorage).dbLocation;
+  const s3Client = container.resolve(S3Client);
 
   logger.info('Running database backups');
   await mkdir(dbLocation, { recursive: true });
@@ -46,6 +47,14 @@ export async function runBackups(firstRun = true) {
         // backup throws err if failed
         await db.backup(backupName);
         db.close();
+
+        await s3Client.put(
+          backupName,
+          'cubemoji-backups',
+          backupName,
+          BucketContentType.Path
+        );
+
         // assuming backup succeeded, we compress
         await compress(backupName);
         paths.push(backupName + '.gz');
@@ -104,7 +113,8 @@ export function scheduleBackup() {
     runBackups();
   } else {
     // schedule backup for tomorrow
-    const backupTime = cur.add(1, 'day').set('hour', 2).set('minute', 0);
+    // const backupTime = cur.add(1, 'day').set('hour', 2).set('minute', 0);
+    const backupTime = cur.add(3, 'second');
     logger.info(`Backup scheduled for ${backupTime.toDate().toLocaleString('en-US', {
       timeZoneName: 'long'
     })}`);

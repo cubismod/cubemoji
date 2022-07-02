@@ -1,13 +1,11 @@
-import { ButtonInteraction, CommandInteraction, Guild, MessageActionRow, MessageButton } from 'discord.js';
-import { ButtonComponent, Discord, Permission, Slash, SlashOption } from 'discordx';
-
-let botOwner = '0';
-
-if (process.env.CM_BOTOWNER) botOwner = process.env.CM_BOTOWNER;
+import { CommandInteraction, Guild, MessageActionRow, MessageButton } from 'discord.js';
+import { ButtonComponent, Discord, Guard, Slash, SlashOption } from 'discordx';
+import { container } from 'tsyringe';
+import { InspectorWrapper } from '../../lib/perf/InspectorWrapper';
+import { botOwnerDetect } from '../Guards';
 
 @Discord()
-@Permission(false)
-@Permission({ id: botOwner, type: 'USER', permission: true })
+@Guard(botOwnerDetect)
 export abstract class LeaveGuild {
   resolved: Guild | null = null;
 
@@ -51,9 +49,30 @@ export abstract class LeaveGuild {
 
   // handler for button
   @ButtonComponent('yes-btn')
-  async yesBtn(interaction: ButtonInteraction) {
+  async yesBtn() {
     if (this.resolved) {
       await this.resolved.leave();
     }
+  }
+}
+
+@Discord()
+@Guard(botOwnerDetect)
+export abstract class PerformanceTest {
+  private inspector = container.resolve(InspectorWrapper);
+  @Slash('performancetest', { description: 'Run a CPU performance test' })
+  async performanceTest(interaction: CommandInteraction) {
+    switch (this.inspector.status) {
+      case true:
+        interaction.reply({
+          content: 'Ending the currently running performance test. Results are saved to bucket.'
+        });
+        break;
+      case false:
+        interaction.reply({
+          content: 'Starting new performance test every min. Results are saved to bucket.'
+        });
+    }
+    await this.inspector.toggleSession();
   }
 }
