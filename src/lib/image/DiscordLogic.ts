@@ -15,8 +15,8 @@ import { Cmoji, Source } from '../emote/Cmoji.js';
 import { EmoteCache } from '../emote/EmoteCache.js';
 import { BadHosts } from '../http/BadHosts.js';
 import { CubeLogger } from '../logger/CubeLogger.js';
+import { FileQueue } from './FileQueue.js';
 import { EditOperation, FaceOperation, MsgContext, RescaleOperation, splitEffects } from './ImageLogic.js';
-import { ImageQueue } from './ImageQueue.js';
 import { WorkerPool } from './WorkerPool.js';
 const { got } = await import('got');
 
@@ -74,7 +74,7 @@ export class RescaleDiscord {
         // here is where we actually perform the reply with the finished image
         watcher.on('add', async () => {
           const cubeMessageManager = container.resolve(CubeMessageManager);
-          const imageQueue = container.resolve(ImageQueue);
+          const imageQueue = container.resolve(FileQueue);
           const workerPool = container.resolve(WorkerPool);
 
           // now we send out the rescaled message
@@ -94,7 +94,7 @@ export class RescaleDiscord {
               if (attach !== undefined) {
                 imageQueue.enqueue({
                   localPath: filename,
-                  url: attach.url
+                  id: attach.url
                 });
               }
             }

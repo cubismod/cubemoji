@@ -1,23 +1,32 @@
-import { unlink } from 'fs';
-import { readdir } from 'fs/promises';
+import { readdir, unlink } from 'fs/promises';
 import Fuse from 'fuse.js';
 import { container, singleton } from 'tsyringe';
 import { CubeLogger } from '../logger/CubeLogger.js';
 
-export interface Image {
+export interface TempFile {
   // url as saved in discord cdn
-  // or on the web
-  url: string,
+  // or on the web, or the unique ID
+  id: string,
   // local filename
   localPath: string,
 }
 
 @singleton()
-export class ImageQueue {
-  private images: Image[];
+export class FileQueue {
+  private fuseOpts = {
+    keys: ['id'],
+    minMatchCharLength: 3,
+    threshold: 0.0,
+    fieldNormWeight: 1
+  };
+
+  private files: TempFile[];
+
+  private fuse: Fuse<TempFile>;
+
   private logger = container.resolve(CubeLogger).imageQueue;
   /**
-  * Used to keep track of images saved on disk
+  * Used to keep track of files saved on disk
   * basically we just add another image to the queue
   * and when we hit 40 images, we delete the last one so that we aren't
   * filling the disk.
@@ -28,24 +37,29 @@ export class ImageQueue {
   * the array.
   */
   constructor() {
-    this.images = [];
+    this.files = [];
+    this.fuse = new Fuse(this.files, this.fuseOpts);
   }
 
   /**
    * enqueue a new image and delete
    * an old one if there are more than
    * 40 images being stored right now
-   * @param image new image to push in
+   * @param file new image to push in
    */
-  async enqueue(image: Image) {
-    if (this.images.length >= 40) {
+  async enqueue(file: TempFile) {
+    if (this.files.length >= 40) {
       // delete first item
-      const first = this.images.shift();
+      const first = this.files.shift();
       if (first) {
-        await unlink(first.localPath, (_) => { });
+        await unlink(first.localPath);
+        this.fuse.remove((doc) => {
+          return doc === first;
+        });
       }
     }
-    this.images.push(image);
+    this.files.push(file);
+    this.fuse.add(file);
   }
 
   /**
@@ -58,20 +72,13 @@ export class ImageQueue {
    * to see is downloaded locally
    */
   async search(url: string) {
-    const options = {
-      keys: ['url'],
-      minMatchCharLength: 3,
-      threshold: 0.0,
-      fieldNormWeight: 1
-    };
-    const search = new Fuse(this.images, options);
-    const res = search.search(url);
-    if (res.length > 0 && res[0].item.url === url) {
+    const res = this.fuse.search(url);
+    if (res.length > 0 && res[0].item.id === url) {
       // promote this item to the end of the queue
       // so it stays around for longer and doesnt get deleted
       const i = res[0].refIndex;
-      this.images.splice(i, 1);
-      this.images.push(res[0].item);
+      this.files.splice(i, 1);
+      this.files.push(res[0].item);
       // return the first item
       return res[0].item;
     } else { return undefined; }
@@ -79,14 +86,14 @@ export class ImageQueue {
 
   // clear downloads folder
   async clear() {
-    await readdir('download/').then(
-      async (dir) => {
-        dir.map(file => unlink(`download/${file}`, (err) => {
-          if (err) {
-            this.logger.error(err);
-          }
-        }));
-      }
-    );
+    try {
+      await readdir('download/').then(
+        async (dir) => {
+          dir.map(async file => await unlink(`download/${file}`));
+        }
+      );
+    } catch (err) {
+      this.logger.error(err);
+    }
   }
 }

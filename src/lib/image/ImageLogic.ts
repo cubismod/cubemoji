@@ -15,7 +15,7 @@ import { container } from 'tsyringe';
 import imgEffects from '../../res/imgEffects.json' assert { type: 'json' };
 import { gotOptions } from '../emote/Cmoji.js';
 import { CubeLogger } from '../logger/CubeLogger.js';
-import { ImageQueue } from './ImageQueue.js';
+import { FileQueue } from './FileQueue.js';
 import { WorkerPool } from './WorkerPool.js';
 const { got } = await import('got');
 
@@ -116,7 +116,7 @@ abstract class ImageOperation {
    * @returns path of resulting file or '' if failure ocurred
    */
   async run() {
-    const imageQueue = container.resolve(ImageQueue);
+    const imageQueue = container.resolve(FileQueue);
     const workerPool = container.resolve(WorkerPool);
 
     if (await this.download()) {
@@ -129,7 +129,7 @@ abstract class ImageOperation {
         // in another operation
         await imageQueue.enqueue({
           localPath: this.localPath,
-          url: this.externalUrl
+          id: this.externalUrl
         });
         return output.outPath;
       }
@@ -342,7 +342,7 @@ export function splitEffects(effects: string) {
 */
 export async function downloadFile(url: string) {
   // check cache
-  const queue = container.resolve(ImageQueue);
+  const queue = container.resolve(FileQueue);
   const res = await queue.search(url);
   if (res) return res.localPath;
   // otherwise we download

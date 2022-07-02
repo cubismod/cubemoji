@@ -1,4 +1,5 @@
 import { State } from 'gm';
+import PQueue from 'p-queue';
 import { container, singleton } from 'tsyringe';
 import { Milliseconds } from '../constants/Units.js';
 import { CubeLogger } from '../logger/CubeLogger.js';
@@ -15,6 +16,7 @@ export class WorkerPool {
   limit: number;
   runningWorkers: Map<string, State>;
   waitingWorkers: Map<string, State>;
+  pQueue = new PQueue({ concurrency: 4 });
   private logger = container.resolve(CubeLogger).workerPool;
 
   constructor(limit: number) {

@@ -7,7 +7,10 @@ import koaBody from 'koa-body';
 import koaCompress from 'koa-compress';
 import send from 'koa-send';
 import { container } from 'tsyringe';
+import { Milliseconds } from '../../constants/Units';
 import { CubeStorage } from '../../db/Storage';
+import { FileQueue } from '../../image/FileQueue';
+import { WorkerPool } from '../../image/WorkerPool';
 import { CubeLogger } from '../../logger/CubeLogger';
 import { PugGenerator } from '../PugGenerator';
 import { checkedRoles, genRolesList, roleUpdateRadio, roleUpdatesSwitch as roleUpdateSwitch } from '../RoleManager';
@@ -34,6 +37,8 @@ async function LogRequest(ctx: RouterContext, next: Next) {
 @Middleware(LogRequest)
 @Middleware(koaCompress())
 export class HTTPServe {
+  private workerPool = container.resolve(WorkerPool);
+  private fileQueue = container.resolve(FileQueue);
   private pugGenerator = container.resolve(PugGenerator);
   private storage = container.resolve(CubeStorage);
 
@@ -99,35 +104,50 @@ export class HTTPServe {
       const res = await this.uniqueIDValidation(id);
 
       if (res && res.roleBody) {
-        // now we finally have found the role information so time to generate a Pug page
-        const serverAndUserID = res.serverUserIDKey.split('-');
-        const guild = client.guilds.resolve(serverAndUserID[0]);
-        await guild?.fetch();
-
-        const serverID = res.roleBody[1].serverID;
-        const serverName = guild?.name;
-        const serverIcon = guild?.iconURL();
-        const userRoles = guild?.members.cache.get(res.ephemeralLink.userID)?.roles.cache;
-
-        // get a checklist of roles that are formatted for easy use in Pug
-        const checklist = await checkedRoles(serverID, userRoles);
-        const userNickname = guild?.members.cache.get(res.ephemeralLink.userID)?.displayName;
-
-        if (serverAndUserID.length > 1 && serverName && serverIcon && guild && userRoles && userNickname && checklist) {
-          const body = this.pugGenerator.rolePickerTemplate({
-            serverIcon,
-            serverID,
-            serverName,
-            roleCategories: res.roleBody[1].categories,
-            roleManager: guild.roles.cache,
-            checklist,
-            userNickname,
-            userID: res.ephemeralLink.userID,
-            uniqueID: res.ephemeralLink.id
-          });
-
-          context.body = body;
+        // check if in cache
+        const result = await this.fileQueue.search(id);
+        if (result) {
+          await send(context, result.localPath, { gzip: true });
           return;
+        } else {
+        // now we finally have found the role information so time to generate a Pug page
+          const serverAndUserID = res.serverUserIDKey.split('-');
+          const guild = client.guilds.resolve(serverAndUserID[0]);
+          await guild?.fetch();
+
+          const serverID = res.roleBody[1].serverID;
+          const serverName = guild?.name;
+          const serverIcon = guild?.iconURL();
+          const userRoles = guild?.members.cache.get(res.ephemeralLink.userID)?.roles.cache;
+
+          // get a checklist of roles that are formatted for easy use in Pug
+          const checklist = await checkedRoles(serverID, userRoles);
+          const userNickname = guild?.members.cache.get(res.ephemeralLink.userID)?.displayName;
+
+          if (serverAndUserID.length > 1 && serverName && serverIcon && guild && userRoles && userNickname && checklist) {
+            const body = this.pugGenerator.rolePickerTemplate({
+              serverIcon,
+              serverID,
+              serverName,
+              roleCategories: res.roleBody[1].categories,
+              roleManager: guild.roles.cache,
+              checklist,
+              userNickname,
+              userID: res.ephemeralLink.userID,
+              uniqueID: res.ephemeralLink.id
+            });
+
+            context.body = body;
+            // save for caching
+            const filename = await this.pugGenerator.saveCache(body, id);
+            if (filename) {
+              await this.fileQueue.enqueue({
+                localPath: filename,
+                id
+              });
+            }
+            return;
+          }
         }
       }
     }
@@ -141,16 +161,24 @@ export class HTTPServe {
     urlencoded: true
   }))
   async submitRoles(context: Context) {
-    // now we have to extract details from the request
-    const parseResult = await this.parseFormBody(context.request.body);
+    const uniqueID = context.request.body.uniqueID;
 
-    if (parseResult) {
+    if (uniqueID) {
+      // queue up some work
+      await this.workerPool.pQueue.add(
+        () => {
+          setTimeout(
+            async () => {
+              const parseResult = await this.parseFormBody(context.request.body);
+              if (parseResult) {
+                const lookup = await this.storage.uniqueIDLookup.get(context.request.body.uniqueID);
+                await this.storage.uniqueIDLookup.delete(context.request.body.uniqueID);
+                if (lookup) await this.storage.ephemeralLinks.delete(lookup);
+              }
+            }, Milliseconds.twoSec);
+        });
+
       context.body = this.pugGenerator.roleResult({ success: true });
-
-      // clear up all traces in database
-      const lookup = await this.storage.uniqueIDLookup.get(context.request.body.uniqueID);
-      await this.storage.uniqueIDLookup.delete(context.request.body.uniqueID);
-      if (lookup) await this.storage.ephemeralLinks.delete(lookup);
     } else {
       context.body = this.pugGenerator.roleResult({ success: false });
     }

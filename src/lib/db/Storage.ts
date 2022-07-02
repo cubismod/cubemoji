@@ -1,14 +1,15 @@
+import AWS from 'aws-sdk';
 import Database from 'better-sqlite3';
+import { GuildMember } from 'discord.js';
 import { Client } from 'discordx';
+import { readFile } from 'fs/promises';
 import Keyv from 'keyv';
+import path from 'path';
 import { container, singleton } from 'tsyringe';
 import { ModAction, RolePicker } from '../cmd/ModHelper.js';
 import { Milliseconds } from '../constants/Units.js';
 import { ephemeralLink } from '../http/RoleManager.js';
 import { CubeLogger } from '../logger/CubeLogger.js';
-import AWS from 'aws-sdk';
-import path from 'path';
-import { readFile } from 'fs/promises';
 
 export enum BucketContentType {
   Path,
@@ -133,6 +134,8 @@ export class CubeStorage {
   // the ephemeralLinks namespace
   uniqueIDLookup: Keyv<string>;
 
+  members: Map<string, GuildMember>;
+
   private logger = container.resolve(CubeLogger).storage;
   // in testing mode, we are saving data to data/test/
   dbLocation = 'data/';
@@ -149,25 +152,27 @@ export class CubeStorage {
       }
     );
 
-    const sqliteUri = 'sqlite://' + this.serverInfoPath;
+    const serverInfoPath = 'sqlite://' + this.serverInfoPath;
 
-    this.serverEnrollment = new Keyv<string>(sqliteUri, { namespace: 'servers' });
-    this.emojiBlocked = new Keyv<string>(sqliteUri, { namespace: 'emoji' });
+    this.serverEnrollment = new Keyv<string>(serverInfoPath, { namespace: 'servers' });
+    this.emojiBlocked = new Keyv<string>(serverInfoPath, { namespace: 'emoji' });
 
-    this.serverOwners = new Keyv<ServerOwner[]>(sqliteUri, { namespace: 'owners' });
-    this.modEnrollment = new Keyv<string>(sqliteUri, { namespace: 'mods' });
-    this.blockedChannels = new Keyv<ChannelInfo>(sqliteUri, { namespace: 'channels' });
-    this.serverAnonNames = new Keyv<string>(sqliteUri, { namespace: 'server-anon' });
+    this.serverOwners = new Keyv<ServerOwner[]>(serverInfoPath, { namespace: 'owners' });
+    this.modEnrollment = new Keyv<string>(serverInfoPath, { namespace: 'mods' });
+    this.blockedChannels = new Keyv<ChannelInfo>(serverInfoPath, { namespace: 'channels' });
+    this.serverAnonNames = new Keyv<string>(serverInfoPath, { namespace: 'server-anon' });
 
-    this.serverAuditInfo = new Keyv<string>(sqliteUri, { namespace: 'audit' });
+    this.serverAuditInfo = new Keyv<string>(serverInfoPath, { namespace: 'audit' });
 
-    this.pendingModActions = new Keyv<ModAction[]>(sqliteUri, { namespace: 'actions', ttl: Milliseconds.day });
+    this.pendingModActions = new Keyv<ModAction[]>(serverInfoPath, { namespace: 'actions', ttl: Milliseconds.day });
 
-    this.rolePickers = new Keyv<[boolean, RolePicker]>(sqliteUri, { namespace: 'rolepicker' });
+    this.rolePickers = new Keyv<[boolean, RolePicker]>(serverInfoPath, { namespace: 'rolepicker' });
 
-    this.ephemeralLinks = new Keyv<ephemeralLink>(sqliteUri, { namespace: 'eph', ttl: Milliseconds.twentyMin });
+    this.ephemeralLinks = new Keyv<ephemeralLink>(serverInfoPath, { namespace: 'eph', ttl: Milliseconds.twentyMin });
 
-    this.uniqueIDLookup = new Keyv<string>(sqliteUri, { namespace: 'idlookup', ttl: Milliseconds.twentyMin });
+    this.uniqueIDLookup = new Keyv<string>(serverInfoPath, { namespace: 'idlookup', ttl: Milliseconds.twentyMin });
+
+    this.members = new Map<string, GuildMember>();
   }
 
   /**

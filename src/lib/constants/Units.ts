@@ -10,6 +10,7 @@ export namespace Milliseconds {
   export const day = 8.64e+7;
   export const ninetyMin = 5.4e+6;
   export const fiveSec = 5000;
+  export const twoSec = 2000;
   export const sec = 1000;
   export const min = 60000;
 }
