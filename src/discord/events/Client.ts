@@ -12,7 +12,7 @@ import { BadHosts } from '../../lib/http/BadHosts.js';
 import { CubeServer } from '../../lib/http/CubeServer.js';
 import { PugGenerator } from '../../lib/http/PugGenerator.js';
 import { setStatus } from '../../lib/image/DiscordLogic.js';
-import { ImageQueue } from '../../lib/image/ImageQueue.js';
+import { FileQueue } from '../../lib/image/FileQueue.js';
 import { WorkerPool } from '../../lib/image/WorkerPool.js';
 import { CubeLogger } from '../../lib/logger/CubeLogger.js';
 import { InspectorWrapper } from '../../lib/perf/InspectorWrapper.js';
@@ -54,10 +54,10 @@ export abstract class ClientEvents {
         process.exit(1);
       });
 
-      DIService.container.register(ImageQueue, { useValue: new ImageQueue() });
+      DIService.container.register(FileQueue, { useValue: new FileQueue() });
       this.logger.info('registered ImageQueue');
 
-      const imageQueue = container.resolve(ImageQueue);
+      const imageQueue = container.resolve(FileQueue);
       await imageQueue.clear();
       this.logger.info('cleared download directory');
 

@@ -11,6 +11,7 @@ import { randomString } from 'pandemonium';
 import path from 'path';
 import { container } from 'tsyringe';
 import { auditMsg } from '../cmd/ModHelper';
+import { Milliseconds } from '../constants/Units';
 import { CubeStorage } from '../db/Storage';
 import { CubeLogger } from '../logger/CubeLogger';
 
@@ -41,6 +42,7 @@ export interface ephemeralLink {
 export async function rolesCommand(userID: string, serverID: string) {
   const ephemKey = `${serverID}-${userID}`;
   const serverConfig = await storage.rolePickers.get(serverID);
+  const client = container.resolve(Client);
   if (serverConfig && serverConfig[0]) {
     // check user config
     const userLink = await storage.ephemeralLinks.get(ephemKey);
@@ -57,6 +59,16 @@ export async function rolesCommand(userID: string, serverID: string) {
       };
       await storage.ephemeralLinks.set(ephemKey, newLink);
       await storage.uniqueIDLookup.set(id, ephemKey);
+      const guildMemberInfo = await client.guilds.resolve(serverID)?.members.resolve(userID)?.fetch();
+      if (guildMemberInfo) {
+        // save to cache of local users
+        storage.members.set(`${userID}-${serverID}`, guildMemberInfo);
+
+        // and set timeout to delete that entry in 20 min
+        setTimeout(() => {
+          storage.members.delete(`${userID}-${serverID}`);
+        }, Milliseconds.twentyMin);
+      }
     }
 
     const link = await storage.ephemeralLinks.get(ephemKey);
@@ -155,9 +167,7 @@ async function alertOnChange(serverID: string, oldRole: string | undefined, newR
 }
 
 async function getMember(userID: string, serverID: string) {
-  const client = container.resolve(Client);
-
-  return await client.guilds.resolve(serverID)?.members.resolve(userID);
+  return storage.members.get(`${userID}-${serverID}`);
 }
 
 /**
@@ -210,7 +220,7 @@ export async function roleUpdateRadio(roles: string[], roleID: string, userID: s
   // get current role (if there's one assigned)
   let currentAssignedRole: string | undefined;
   for (const role of roles) {
-    if (member?.roles.cache.has(role)) currentAssignedRole = role;
+    if (member?.roles.resolve(role)) currentAssignedRole = role;
   }
 
   try {
