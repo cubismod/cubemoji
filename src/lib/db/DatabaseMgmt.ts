@@ -92,17 +92,21 @@ export async function runBackups(firstRun = true) {
   } return undefined;
 }
 
-async function compress(sourcePath: string) {
+// returns new filename
+export async function compress(sourcePath: string) {
   // https://nodejs.org/api/zlib.html
   const gzip = createGzip();
   const source = createReadStream(sourcePath);
-  const dest = createWriteStream(sourcePath + '.gz');
+  const newPath = sourcePath + '.gz';
+  const dest = createWriteStream(newPath);
   const pipe = promisify(pipeline);
 
   await pipe(source, gzip, dest);
 
   // delete og file upon compression
   await unlink(sourcePath);
+
+  return newPath;
 }
 
 export function scheduleBackup() {

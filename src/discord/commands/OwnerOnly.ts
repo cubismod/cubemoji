@@ -65,12 +65,12 @@ export abstract class PerformanceTest {
     switch (this.inspector.status) {
       case true:
         interaction.reply({
-          content: 'Ending the currently running performance test. Results are saved to bucket.'
+          content: '💬 Ending the currently running performance test. Results are saved to bucket.'
         });
         break;
       case false:
         interaction.reply({
-          content: 'Starting new performance test every min. Results are saved to bucket.'
+          content: '💭 Starting new performance test every min. Heap dump is being run now and repeatedly. Results are saved to bucket.'
         });
     }
     await this.inspector.toggleSession();
