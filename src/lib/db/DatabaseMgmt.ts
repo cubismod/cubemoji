@@ -113,8 +113,8 @@ export function scheduleBackup() {
     runBackups();
   } else {
     // schedule backup for tomorrow
-    // const backupTime = cur.add(1, 'day').set('hour', 2).set('minute', 0);
-    const backupTime = cur.add(3, 'second');
+    const backupTime = cur.add(1, 'day').set('hour', 2).set('minute', 0);
+    // const backupTime = cur.add(3, 'second');
     logger.info(`Backup scheduled for ${backupTime.toDate().toLocaleString('en-US', {
       timeZoneName: 'long'
     })}`);
