@@ -68,9 +68,9 @@ block content
             // unbuffered code here! Ensure that the upstream repo is correctly sanitized
             p!=category.description
 
-            div(class='row gy-5 gx-5 align-items-center')
+            div(class='row row-cols-auto gy-5 gx-5 align-items-center')
               each role in category.roles
-                div(class='col-auto')
+                div(class='col')
                   //- figure out if the user has the role to autocheck the box
                   - const checked = checklist.get(role)
 
