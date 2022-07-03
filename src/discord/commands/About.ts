@@ -50,8 +50,8 @@ export abstract class About {
           value: 'https://gitlab.com/cubismod/cubemoji/-/issues'
         },
         {
-          name: 'Guide',
-          value: 'https://gitlab.com/cubismod/cubemoji/-/wikis/home'
+          name: 'Website and Help',
+          value: 'https://cubemoji.art'
         }
       ]);
       // ephemeral replies when in an enrolled server
