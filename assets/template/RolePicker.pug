@@ -21,7 +21,7 @@ mixin radio-button(id, category, checked)
     )
 
 mixin switch-button(id, checked)
-  div(class='form-check form-switch d-flex justify-content-center')
+  div(class='form-check form-switch d-flex')
     input(
       class='form-check-input'
       type='checkbox'
@@ -62,10 +62,11 @@ block content
         div(class='row p-2 rounded border mx-auto')
           div(class='col')
             // category
-            h5=category.name
-            p=category.description
             if category.image
-              img(src=category.image style='max-width:40%;height:auto' class='img-fluid img-thumbnail mb-5' alt="Category Icon")
+              img(src=category.image style='max-width:65%;height:auto' class='img-fluid img-thumbnail mb-2' alt="Category Icon")
+            h5=category.name
+            // unbuffered code here! Ensure that the upstream repo is correctly sanitized
+            p!=category.description
 
             div(class='row gy-5 gx-5 align-items-center')
               each role in category.roles
