@@ -63,12 +63,12 @@ block content
           div(class='col')
             // category
             if category.image
-              img(src=category.image style='max-width:65%;height:auto' class='img-fluid img-thumbnail mb-2' alt="Category Icon")
+              img(src=category.image style='max-width:65%;height:auto' class='img-fluid img-thumbnail my-3' alt="Category Icon")
             h5=category.name
             // unbuffered code here! Ensure that the upstream repo is correctly sanitized
             p!=category.description
 
-            div(class='row row-cols-xl-3 gy-5 gx-5 align-items-center p-3')
+            div(class='row row-cols-xl-4 gy-5 gx-5 align-items-center p-3')
               each role in category.roles
                 div(class='col')
                   //- figure out if the user has the role to autocheck the box
