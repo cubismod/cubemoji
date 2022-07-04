@@ -33,9 +33,9 @@ processes = []
     port = "443"
 
    [[services.http_checks]]
-    interval = 300000 # 5 min healtcheck
+    interval = 60000 # 1 min healtcheck
     # increase grace period for troubleshooting
-    grace_period = "600s"
+    grace_period = "100s"
     method = "get"
     path = "/status"
     protocol = "http"

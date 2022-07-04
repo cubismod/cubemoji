@@ -20,6 +20,7 @@ RUN corepack enable && yarn install --production=true
 
 COPY tsconfig.json .
 COPY src/ ./src/
+COPY PRIVACY.md .
 
 RUN yarn build
 
