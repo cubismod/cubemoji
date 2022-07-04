@@ -52,6 +52,10 @@ export abstract class About {
         {
           name: 'Website and Help',
           value: 'https://cubemoji.art'
+        },
+        {
+          name: 'Privacy Policy',
+          value: 'https://cubemoji.art/privacy'
         }
       ]);
       // ephemeral replies when in an enrolled server

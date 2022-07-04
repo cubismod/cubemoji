@@ -73,6 +73,7 @@ export class PugGenerator {
 
     await this.simpleRender(path.resolve(this.templateDir, 'Home.pug'), 'home.html');
     await this.simpleRender(path.resolve(this.templateDir, '404.pug'), '404.html');
+    await this.simpleRender(path.resolve(this.templateDir, 'Privacy.pug'), 'privacy.html');
   }
 
   async emojiRender(guilds: GuildManager) {
