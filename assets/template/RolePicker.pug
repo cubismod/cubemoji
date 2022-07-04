@@ -51,7 +51,7 @@ block content
                 |
                 | Select your roles below and then click submit at the bottom of the page. This page expires after 20 minutes of its generation. See the amount of time left by going back to Discord and typing /roles
 
-  div(class='row m-2')
+  div(class='row m-3')
     form(action='/submitroles' method='POST' id='rolePicker')
       // used to validate the POST request
       input(type='hidden' id='serverID' name='serverID' value=serverID)
@@ -68,7 +68,7 @@ block content
             // unbuffered code here! Ensure that the upstream repo is correctly sanitized
             p!=category.description
 
-            div(class='row row-cols-3 gy-5 gx-5 align-items-center')
+            div(class='row row-cols-xl-3 gy-5 gx-5 align-items-center p-3')
               each role in category.roles
                 div(class='col')
                   //- figure out if the user has the role to autocheck the box
