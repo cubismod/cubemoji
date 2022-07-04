@@ -273,6 +273,11 @@ export class HTTPServe {
     context.respond = false;
   }
 
+  @Get('/privacy')
+  async privacy(context: Context) {
+    await send(context, 'static/privacy.html');
+  }
+
   @Get(/.*/)
   async err(context: Context) {
     context.status = 404;

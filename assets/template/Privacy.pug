@@ -1,0 +1,11 @@
+extends ParentTemplate.pug 
+
+block head-extra
+  title Privacy Policy
+
+block title 
+
+block content
+  div(class='row')
+    div(class='col' id='content')
+      include:marked ../../PRIVACY.md
