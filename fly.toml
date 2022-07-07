@@ -33,15 +33,15 @@ processes = []
     port = "443"
 
    [[services.http_checks]]
-    interval = 60000 # 1 min healtcheck
+    interval = "20s"
     # increase grace period for troubleshooting
     grace_period = "100s"
     method = "get"
     path = "/status"
     protocol = "http"
-    timeout = 2000
+    timeout = "10s"
     tls_skip_verify = false
-    restart_limit = 4
+    restart_limit = 2
 
 [mounts]
 source="cm_data"
