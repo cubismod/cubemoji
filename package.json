@@ -39,7 +39,7 @@
     "@keyv/sqlite": "^3.5.2",
     "@koa/router": "^10.1.1",
     "@types/koa": "^2.13.4",
-    "aws-sdk": "^2.1167.0",
+    "aws-sdk": "^2.1169.0",
     "better-sqlite3": "^7.5.3",
     "chokidar": "^3.5.3",
     "color-thief-node": "^1.0.4",
