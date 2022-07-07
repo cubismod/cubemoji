@@ -67,6 +67,7 @@
     "pandemonium": "^2.3.0",
     "pify": "^6.0.0",
     "probe-image-size": "^7.2.3",
+    "prom-client": "^14.0.1",
     "pug": "^3.0.2",
     "reflect-metadata": "^0.1.13",
     "rgb-hex": "^4.0.0",

@@ -9,7 +9,7 @@ import { container, singleton } from 'tsyringe';
 import { ModAction, RolePicker } from '../cmd/ModHelper.js';
 import { Milliseconds } from '../constants/Units.js';
 import { ephemeralLink } from '../http/RoleManager.js';
-import { CubeLogger } from '../logger/CubeLogger.js';
+import { CubeLogger } from '../observability/CubeLogger.js';
 
 export enum BucketContentType {
   Path,

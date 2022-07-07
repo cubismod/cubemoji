@@ -7,7 +7,7 @@ import { emoteAutocomplete } from '../../lib/cmd/Autocomplete';
 import { Source } from '../../lib/emote/Cmoji.js';
 import { EmoteCache } from '../../lib/emote/EmoteCache.js';
 import { getColors } from '../../lib/image/ColorExtract';
-import { CubeLogger } from '../../lib/logger/CubeLogger.js';
+import { CubeLogger } from '../../lib/observability/CubeLogger.js';
 import strings from '../../res/strings.json' assert { type: 'json' };
 
 @Discord()

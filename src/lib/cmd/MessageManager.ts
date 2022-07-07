@@ -2,7 +2,7 @@ import { CommandInteraction, ContextMenuInteraction, Message, MessageReaction, S
 import { container, singleton } from 'tsyringe';
 import { CubeStorage } from '../db/Storage.js';
 import { MsgContext } from '../image/ImageLogic.js';
-import { CubeLogger } from '../logger/CubeLogger.js';
+import { CubeLogger } from '../observability/CubeLogger.js';
 
 @singleton()
 // used to keep track of cubemoji sent messages

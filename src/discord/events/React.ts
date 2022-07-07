@@ -7,7 +7,7 @@ import { container } from 'tsyringe';
 import { adjectives, animals, colors, names, uniqueNamesGenerator } from 'unique-names-generator';
 import { CubeMessageManager } from '../../lib/cmd/MessageManager.js';
 import { EditDiscord, getMessageImage, isUrl, RescaleDiscord } from '../../lib/image/DiscordLogic.js';
-import { CubeLogger } from '../../lib/logger/CubeLogger.js';
+import { CubeLogger } from '../../lib/observability/CubeLogger.js';
 import { BSGuardData } from '../Guards.js';
 
 @Discord()

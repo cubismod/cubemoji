@@ -14,7 +14,7 @@ import { PugGenerator } from '../../lib/http/PugGenerator.js';
 import { setStatus } from '../../lib/image/DiscordLogic.js';
 import { FileQueue } from '../../lib/image/FileQueue.js';
 import { WorkerPool } from '../../lib/image/WorkerPool.js';
-import { CubeLogger } from '../../lib/logger/CubeLogger.js';
+import { CubeLogger } from '../../lib/observability/CubeLogger.js';
 import { InspectorWrapper } from '../../lib/perf/InspectorWrapper.js';
 
 @Discord()

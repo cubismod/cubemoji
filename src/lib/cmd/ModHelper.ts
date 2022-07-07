@@ -9,7 +9,7 @@ import { container } from 'tsyringe';
 import { ChannelInfo, CubeStorage, ValRaw } from '../db/Storage.js';
 import { isUrl } from '../image/DiscordLogic.js';
 import { downloadFile } from '../image/ImageLogic.js';
-import { CubeLogger } from '../logger/CubeLogger.js';
+import { CubeLogger } from '../observability/CubeLogger.js';
 
 const logger = container.resolve(CubeLogger).discordLogic;
 

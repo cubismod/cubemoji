@@ -3,7 +3,7 @@ import path from 'path';
 import { container } from 'tsyringe';
 import { RolePicker } from '../cmd/ModHelper';
 import { CubeStorage } from '../db/Storage';
-import { CubeLogger } from '../logger/CubeLogger';
+import { CubeLogger } from '../observability/CubeLogger';
 
 const logger = container.resolve(CubeLogger).git;
 const storage = container.resolve(CubeStorage).rolePickers;

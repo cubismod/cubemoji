@@ -11,7 +11,7 @@ import { Milliseconds } from '../../constants/Units';
 import { CubeStorage } from '../../db/Storage';
 import { FileQueue } from '../../image/FileQueue';
 import { WorkerPool } from '../../image/WorkerPool';
-import { CubeLogger } from '../../logger/CubeLogger';
+import { CubeLogger } from '../../observability/CubeLogger';
 import { PugGenerator } from '../PugGenerator';
 import { checkedRoles, genRolesList, roleUpdateRadio, roleUpdatesSwitch as roleUpdateSwitch } from '../RoleManager';
 

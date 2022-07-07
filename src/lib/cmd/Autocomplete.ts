@@ -8,7 +8,7 @@ import { generateList } from '../conversion/UnitList';
 import { CubeStorage } from '../db/Storage.js';
 import { Cmoji, Source } from '../emote/Cmoji.js';
 import { EmoteCache } from '../emote/EmoteCache.js';
-import { CubeLogger } from '../logger/CubeLogger.js';
+import { CubeLogger } from '../observability/CubeLogger.js';
 
 const logger = container.resolve(CubeLogger).autocomplete;
 

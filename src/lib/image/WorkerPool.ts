@@ -2,7 +2,7 @@ import { State } from 'gm';
 import PQueue from 'p-queue';
 import { container, singleton } from 'tsyringe';
 import { Milliseconds } from '../constants/Units.js';
-import { CubeLogger } from '../logger/CubeLogger.js';
+import { CubeLogger } from '../observability/CubeLogger.js';
 
 /**
  * workers here aren't actually tracked in any meaningful way by the program

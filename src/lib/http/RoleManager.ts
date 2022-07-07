@@ -13,7 +13,7 @@ import { container } from 'tsyringe';
 import { auditMsg } from '../cmd/ModHelper';
 import { Milliseconds } from '../constants/Units';
 import { CubeStorage } from '../db/Storage';
-import { CubeLogger } from '../logger/CubeLogger';
+import { CubeLogger } from '../observability/CubeLogger';
 
 const storage = container.resolve(CubeStorage);
 const logger = container.resolve(CubeLogger).discordLogic;

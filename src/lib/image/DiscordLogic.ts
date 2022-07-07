@@ -14,7 +14,7 @@ import { CubeStorage } from '../db/Storage.js';
 import { Cmoji, Source } from '../emote/Cmoji.js';
 import { EmoteCache } from '../emote/EmoteCache.js';
 import { BadHosts } from '../http/BadHosts.js';
-import { CubeLogger } from '../logger/CubeLogger.js';
+import { CubeLogger } from '../observability/CubeLogger.js';
 import { FileQueue } from './FileQueue.js';
 import { EditOperation, FaceOperation, MsgContext, RescaleOperation, splitEffects } from './ImageLogic.js';
 import { WorkerPool } from './WorkerPool.js';
