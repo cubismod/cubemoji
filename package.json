@@ -54,7 +54,7 @@
     "image-downloader": "^4.3.0",
     "isbinaryfile": "^5.0.0",
     "js-quantities": "^1.7.6",
-    "jstransformer-marked": "^1.1.0",
+    "jstransformer-marked": "^1.2.0",
     "keyv": "^4.2.2",
     "koa": "^2.13.4",
     "koa-body": "^5.0.0",
