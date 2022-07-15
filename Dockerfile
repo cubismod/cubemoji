@@ -1,4 +1,4 @@
-FROM node:18.4.0-alpine
+FROM node:18.6.0-alpine
 WORKDIR /usr/src/cubemoji
 
 EXPOSE 7923
