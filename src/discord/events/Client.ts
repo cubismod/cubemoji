@@ -1,5 +1,13 @@
 // Discord client events
 
+import { diag, DiagConsoleLogger, DiagLogLevel, trace } from '@opentelemetry/api';
+import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
+import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
+import { registerInstrumentations } from '@opentelemetry/instrumentation';
+import { Resource } from '@opentelemetry/resources';
+import { BatchSpanProcessor, Tracer } from '@opentelemetry/sdk-trace-base';
+import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
+import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 import { ArgsOf, Client, Discord, DIService, On, Once } from 'discordx';
 import { container } from 'tsyringe';
 import { GitClient } from '../../lib/cd/GitClient.js';
@@ -21,6 +29,39 @@ import { InspectorWrapper } from '../../lib/perf/InspectorWrapper.js';
 export abstract class ClientEvents {
   private cubeLogger = new CubeLogger();
   private logger = this.cubeLogger.client;
+
+  private configTrace() {
+    diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.INFO);
+
+    const resource = Resource.default().merge(
+      new Resource({
+        [SemanticResourceAttributes.SERVICE_NAME]: 'cubemoji',
+        [SemanticResourceAttributes.SERVICE_VERSION]: process.env.npm_package_version
+      })
+    );
+
+    const provider = new NodeTracerProvider({
+      resource
+    });
+    const exporter = new OTLPTraceExporter({
+      // no auth as these calls will be running on fly's network
+      url: process.env.CM_TRACE_URL
+    });
+
+    provider.addSpanProcessor(new BatchSpanProcessor(exporter, {
+      maxQueueSize: 2000,
+      scheduledDelayMillis: 30000
+    }));
+
+    provider.register();
+
+    registerInstrumentations({
+      instrumentations: [getNodeAutoInstrumentations()]
+    });
+
+    return trace.getTracer('cubemoji');
+  }
+
   /**
    * core setup of the bot including dependency init
    * and command init
@@ -36,6 +77,12 @@ export abstract class ClientEvents {
 
     // dependency injection initialization
     if (DIService.container !== undefined) {
+      if (process.env.CM_ENABLE_TRACING === 'true') {
+        const res = this.configTrace();
+        DIService.container.register(Tracer, { useValue: res });
+        this.logger.info('Tracing started');
+      }
+
       DIService.container.register(CubeLogger, { useValue: this.cubeLogger });
       this.logger.info('registered CubeLogger');
 

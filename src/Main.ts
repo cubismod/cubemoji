@@ -1,9 +1,4 @@
 import { dirname, importx } from '@discordx/importer';
-import { diag, DiagConsoleLogger, DiagLogLevel } from '@opentelemetry/api';
-import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
-import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
-import { NodeSDK, tracing } from '@opentelemetry/sdk-node';
-import { BasicTracerProvider, BatchSpanProcessor } from '@opentelemetry/sdk-trace-base';
 import { Intents } from 'discord.js';
 import { Client } from 'discordx';
 import { config } from 'dotenv';
@@ -29,49 +24,9 @@ export class Main {
     return this._client;
   }
 
-  static trace () {
-    if (process.env.CM_ENABLE_TRACING === 'true') {
-      diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.INFO);
-
-      const sdk = new NodeSDK({
-        traceExporter: new tracing.ConsoleSpanExporter(),
-        instrumentations: [getNodeAutoInstrumentations()]
-      });
-
-      if (process.env.CM_TRACE_PASSWORD) {
-        const buffer = Buffer.from(process.env.CM_TRACE_PASSWORD);
-        const password = buffer.toString('base64');
-
-        const provider = new BasicTracerProvider();
-        const exporter = new OTLPTraceExporter({
-          url: process.env.CM_TRACE_URL,
-          headers: {
-            Authorization: `${process.env.CM_TRACE_USER} ${password}`
-          }
-        });
-
-        provider.addSpanProcessor(new BatchSpanProcessor(exporter, {
-          maxQueueSize: 2000,
-          scheduledDelayMillis: 30000
-        }));
-
-        provider.register();
-
-        sdk.start();
-
-        return true;
-      }
-    }
-  }
-
   static async start() {
     const logger = new CubeLogger().main;
 
-    const tracing = this.trace();
-
-    if (tracing) {
-      logger.info('Tracing enabled');
-    }
     // create required folders
     await createDir('./download');
     await createDir('./data');
