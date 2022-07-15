@@ -27,7 +27,7 @@ export abstract class Convert {
       type: 'STRING',
       autocomplete: (interaction: AutocompleteInteraction) => unitAutocomplete(interaction)
     }) tounit: string,
-    interaction: CommandInteraction
+      interaction: CommandInteraction
   ) {
     try {
       const qty = Qty(fromval, fromunit);

@@ -11,10 +11,12 @@ import { Milliseconds } from '../constants/Units.js';
 import { ephemeralLink } from '../http/RoleManager.js';
 import { CubeLogger } from '../logger/CubeLogger.js';
 
+/* eslint-disable no-unused-vars */
 export enum BucketContentType {
   Path,
   Text
 }
+/* eslint-enable */
 
 /**
  * server ID and name

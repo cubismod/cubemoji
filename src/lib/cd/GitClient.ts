@@ -31,9 +31,11 @@ export class GitClient {
   }
 
   async init() {
-    this.directory = path.join(tmpdir(), await mkdtemp('git'));
+    this.directory = await mkdtemp(path.join(tmpdir(), 'git'));
     try {
-      await this.git.clone(this.remoteUrl, this.directory);
+      await this.git.clone(this.remoteUrl, this.directory, {
+
+      });
       await this.parse();
     } catch (err) {
       this.logger.error(err);
