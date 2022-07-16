@@ -1,5 +1,7 @@
 import { Get, Middleware, Post, Router } from '@discordx/koa';
 import { RouterContext } from '@koa/router';
+import { Tracer } from '@opentelemetry/sdk-trace-base';
+import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 import { Client } from 'discordx';
 import { stat } from 'fs/promises';
 import { Context, Next } from 'koa';
@@ -16,21 +18,35 @@ import { PugGenerator } from '../PugGenerator';
 import { checkedRoles, genRolesList, roleUpdateRadio, roleUpdatesSwitch as roleUpdateSwitch } from '../RoleManager';
 
 async function LogRequest(ctx: RouterContext, next: Next) {
+  const tracer = container.resolve(Tracer);
   const logger = container.resolve(CubeLogger).web;
+
+  const startTime = Date.now();
 
   await next();
 
-  if (!ctx.URL.pathname.startsWith('/emotes' || !ctx.URL.pathname.startsWith('/favicon'))) {
-    // don't log what will be passed off to Fly
-    logger.info({
-      type: 'response',
-      url: ctx.URL.pathname,
-      headers: ctx.headers,
-      status: ctx.response.status
-    });
+  tracer.startActiveSpan(`web - ${ctx.URL.pathname}`, { startTime }, async span => {
+    if (!ctx.URL.pathname.startsWith('/emotes' || !ctx.URL.pathname.startsWith('/favicon'))) {
+      // don't log what will be passed off to Fly
+      logger.info({
+        type: 'response',
+        url: ctx.URL.pathname,
+        headers: ctx.headers,
+        status: ctx.response.status
+      });
 
-    logger.debug(ctx.request.body);
-  }
+      logger.debug(ctx.request.body);
+    }
+
+    span.setAttribute(SemanticAttributes.HTTP_CLIENT_IP, ctx.ip);
+    span.setAttribute(SemanticAttributes.HTTP_METHOD, ctx.method);
+    span.setAttribute(SemanticAttributes.HTTP_ROUTE, ctx.URL.pathname);
+    span.setAttribute(SemanticAttributes.HTTP_STATUS_CODE, ctx.response.status);
+    span.setAttribute(SemanticAttributes.HTTP_USER_AGENT, ctx.headers['user-agent'] ?? '');
+    span.setAttribute(SemanticAttributes.HTTP_SERVER_NAME, ctx.URL.hostname);
+
+    span.end();
+  });
 }
 
 @Router()

@@ -1,13 +1,13 @@
 // Discord client events
 
-import { diag, DiagConsoleLogger, DiagLogLevel, trace } from '@opentelemetry/api';
-import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
-import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
-import { registerInstrumentations } from '@opentelemetry/instrumentation';
+import { diag, DiagLogLevel, trace } from '@opentelemetry/api';
+import { TraceIdRatioBasedSampler } from '@opentelemetry/core';
+import { ZipkinExporter } from '@opentelemetry/exporter-zipkin';
 import { Resource } from '@opentelemetry/resources';
-import { BatchSpanProcessor, Tracer } from '@opentelemetry/sdk-trace-base';
+import { BatchSpanProcessor, InMemorySpanExporter, SpanExporter, Tracer } from '@opentelemetry/sdk-trace-base';
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
+import { CommandInteraction, ContextMenuInteraction } from 'discord.js';
 import { ArgsOf, Client, Discord, DIService, On, Once } from 'discordx';
 import { container } from 'tsyringe';
 import { GitClient } from '../../lib/cd/GitClient.js';
@@ -30,8 +30,12 @@ export abstract class ClientEvents {
   private cubeLogger = new CubeLogger();
   private logger = this.cubeLogger.client;
 
+  /**
+   * creates an OpenTelemetry Tracer
+   * @returns new Tracer
+   */
   private configTrace() {
-    diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.INFO);
+    diag.setLogger(this.logger, DiagLogLevel.DEBUG);
 
     const resource = Resource.default().merge(
       new Resource({
@@ -41,12 +45,17 @@ export abstract class ClientEvents {
     );
 
     const provider = new NodeTracerProvider({
-      resource
+      resource,
+      sampler: new TraceIdRatioBasedSampler(0.6)
     });
-    const exporter = new OTLPTraceExporter({
-      // no auth as these calls will be running on fly's network
-      url: process.env.CM_TRACE_URL
-    });
+
+    let exporter: SpanExporter = new InMemorySpanExporter();
+    // enable exporting if this flag is set
+    if (process.env.CM_ENABLE_TRACING) {
+      exporter = new ZipkinExporter({
+        url: process.env.CM_TRACE_URL
+      });
+    }
 
     provider.addSpanProcessor(new BatchSpanProcessor(exporter, {
       maxQueueSize: 2000,
@@ -54,10 +63,6 @@ export abstract class ClientEvents {
     }));
 
     provider.register();
-
-    registerInstrumentations({
-      instrumentations: [getNodeAutoInstrumentations()]
-    });
 
     return trace.getTracer('cubemoji');
   }
@@ -77,11 +82,9 @@ export abstract class ClientEvents {
 
     // dependency injection initialization
     if (DIService.container !== undefined) {
-      if (process.env.CM_ENABLE_TRACING === 'true') {
-        const res = this.configTrace();
-        DIService.container.register(Tracer, { useValue: res });
-        this.logger.info('Tracing started');
-      }
+      const res = this.configTrace();
+      DIService.container.register(Tracer, { useValue: res });
+      this.logger.info('Tracing started');
 
       DIService.container.register(CubeLogger, { useValue: this.cubeLogger });
       this.logger.info('registered CubeLogger');
@@ -238,13 +241,32 @@ export abstract class ClientEvents {
         return;
       }
     }
-    try {
-      await client.executeInteraction(interaction);
-    } catch (err: unknown) {
-      this.logger.error('INTERACTION FAILURE');
-      this.logger.error(`Type: ${interaction.type}\nTimestamp: ${Date()}\nGuild: ${interaction.guild}\nUser: ${interaction.user.tag}\nChannel: ${interaction.channel}`);
-      this.logger.error(err);
+    const tracer = container.resolve(Tracer);
+
+    // determine command name
+    let name = interaction.id;
+
+    if (interaction instanceof CommandInteraction || interaction instanceof ContextMenuInteraction) {
+      name = `command - ${interaction.commandName}`;
     }
+    tracer.startActiveSpan(name, async span => {
+      try {
+        await client.executeInteraction(interaction);
+      } catch (err: unknown) {
+        this.logger.error('INTERACTION FAILURE');
+        this.logger.error(`Type: ${interaction.type}\nTimestamp: ${Date()}\nGuild: ${interaction.guild}\nUser: ${interaction.user.tag}\nChannel: ${interaction.channel}`);
+        this.logger.error(err);
+      }
+
+      span.setAttributes({
+        userID: interaction.user.id,
+        username: interaction.user.username,
+        channelId: interaction.channel?.id ?? '',
+        guildId: interaction.guildId ?? '',
+        guildName: interaction.guild?.name
+      });
+      span.end();
+    });
   }
 
   /**
