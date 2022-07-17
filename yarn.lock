@@ -132,13 +132,13 @@
   resolved "https://registry.yarnpkg.com/@humanwhocodes/object-schema/-/object-schema-1.2.1.tgz#b520529ec21d8e5945a1851dfd1c32e94e39ff45"
   integrity sha512-ZnQMnLV4e7hDlUvw8H+U8ASL02SS2Gn6+9Ac3wGGLIe7+je2AeAOxPY+izIPJDfFDb7eDjev0Us8MO1iFRN8hA==
 
-"@keyv/sqlite@^3.5.2":
-  version "3.5.2"
-  resolved "https://registry.yarnpkg.com/@keyv/sqlite/-/sqlite-3.5.2.tgz#6cc2a3e861172140b0fc6d43ca025e688be8c8c6"
-  integrity sha512-X6TjMHnnOKgRLClrS4RBynZ3GKPnSTz4bXTIE/0tPcDESMX0PxykEC04htd0dGmZrkn0c7Oxez/L4bOPGQrRrA==
+"@keyv/sqlite@^3.5.3":
+  version "3.5.3"
+  resolved "https://registry.yarnpkg.com/@keyv/sqlite/-/sqlite-3.5.3.tgz#107db164fc86728b8a2e6da7746ab9d87b06f3dd"
+  integrity sha512-lw6we8MVW9RvpET4cDvGT2MEmGRlqaeu+aiQz2zWonHbw4VdnayXOigbdqVlV+NWFCEQ64mNIj/3wAQye0LMLQ==
   dependencies:
     pify "^5.0.0"
-    sqlite3 "^5.0.8"
+    sqlite3 "^5.0.9"
 
 "@koa/router@^10.1.1":
   version "10.1.1"
@@ -3608,10 +3608,10 @@ split@0.3:
   dependencies:
     through "2"
 
-sqlite3@^5.0.8:
-  version "5.0.8"
-  resolved "https://registry.yarnpkg.com/sqlite3/-/sqlite3-5.0.8.tgz#b4b7eab7156debec80866ef492e01165b4688272"
-  integrity sha512-f2ACsbSyb2D1qFFcqIXPfFscLtPVOWJr5GmUzYxf4W+0qelu5MWrR+FAQE1d5IUArEltBrzSDxDORG8P/IkqyQ==
+sqlite3@^5.0.9:
+  version "5.0.9"
+  resolved "https://registry.yarnpkg.com/sqlite3/-/sqlite3-5.0.9.tgz#421b9c065480f1c589f89cabd6d0ea9575a69855"
+  integrity sha512-e2lEKevUF65UJu4IIuuFytgW7yNMkmCkfyn66jXWeb7OcdHvRo7nXhF+IQ25iW6x2grB0DyKdGCpx8Rd8EkA2Q==
   dependencies:
     "@mapbox/node-pre-gyp" "^1.0.0"
     node-addon-api "^4.2.0"
