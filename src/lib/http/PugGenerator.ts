@@ -8,7 +8,7 @@ import { adjectives, names, uniqueNamesGenerator } from 'unique-names-generator'
 import { generateList } from '../conversion/UnitList.js';
 import { CubeStorage } from '../db/Storage.js';
 import { EmoteCache } from '../emote/EmoteCache.js';
-import { CubeLogger } from '../logger/CubeLogger.js';
+import { CubeLogger } from '../observability/CubeLogger.js';
 
 @singleton()
 export class PugGenerator {

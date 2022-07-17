@@ -19,6 +19,7 @@ COPY package.json .
 RUN corepack enable && yarn install --production=true
 
 COPY tsconfig.json .
+COPY .eslintrc.json .
 COPY src/ ./src/
 COPY PRIVACY.md .
 

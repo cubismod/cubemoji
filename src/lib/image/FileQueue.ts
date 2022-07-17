@@ -1,7 +1,7 @@
 import { readdir, unlink } from 'fs/promises';
 import Fuse from 'fuse.js';
 import { container, singleton } from 'tsyringe';
-import { CubeLogger } from '../logger/CubeLogger.js';
+import { CubeLogger } from '../observability/CubeLogger.js';
 
 export interface TempFile {
   // url as saved in discord cdn

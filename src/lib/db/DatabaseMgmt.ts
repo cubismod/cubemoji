@@ -15,7 +15,7 @@ import { container } from 'tsyringe';
 import { promisify } from 'util';
 import { createGzip } from 'zlib';
 import { Milliseconds } from '../constants/Units.js';
-import { CubeLogger } from '../logger/CubeLogger.js';
+import { CubeLogger } from '../observability/CubeLogger.js';
 import { BucketContentType, CubeStorage, S3Client } from './Storage.js';
 
 /**

@@ -1,7 +1,7 @@
 // Discord client events
 
-import { diag, DiagLogLevel, trace } from '@opentelemetry/api';
-import { TraceIdRatioBasedSampler } from '@opentelemetry/core';
+import { diag, DiagLogLevel, Sampler, SpanStatusCode, trace } from '@opentelemetry/api';
+import { AlwaysOnSampler, TraceIdRatioBasedSampler } from '@opentelemetry/core';
 import { ZipkinExporter } from '@opentelemetry/exporter-zipkin';
 import { Resource } from '@opentelemetry/resources';
 import { BatchSpanProcessor, InMemorySpanExporter, SpanExporter, Tracer } from '@opentelemetry/sdk-trace-base';
@@ -22,7 +22,7 @@ import { PugGenerator } from '../../lib/http/PugGenerator.js';
 import { setStatus } from '../../lib/image/DiscordLogic.js';
 import { FileQueue } from '../../lib/image/FileQueue.js';
 import { WorkerPool } from '../../lib/image/WorkerPool.js';
-import { CubeLogger } from '../../lib/logger/CubeLogger.js';
+import { CubeLogger } from '../../lib/observability/CubeLogger.js';
 import { InspectorWrapper } from '../../lib/perf/InspectorWrapper.js';
 
 @Discord()
@@ -32,7 +32,7 @@ export abstract class ClientEvents {
 
   /**
    * creates an OpenTelemetry Tracer
-   * @returns new Tracer
+   * @returns new Tracer object
    */
   private configTrace() {
     diag.setLogger(this.logger, DiagLogLevel.DEBUG);
@@ -40,13 +40,19 @@ export abstract class ClientEvents {
     const resource = Resource.default().merge(
       new Resource({
         [SemanticResourceAttributes.SERVICE_NAME]: 'cubemoji',
-        [SemanticResourceAttributes.SERVICE_VERSION]: process.env.npm_package_version
+        [SemanticResourceAttributes.SERVICE_VERSION]: process.env.npm_package_version,
+        [SemanticResourceAttributes.SERVICE_NAMESPACE]: process.env.CM_ENVIRONMENT
       })
     );
 
+    let sampler: Sampler = new AlwaysOnSampler();
+    if (process.env.CM_ENVIRONMENT === 'prd') {
+      sampler = new TraceIdRatioBasedSampler(0.6);
+    }
+
     const provider = new NodeTracerProvider({
       resource,
-      sampler: new TraceIdRatioBasedSampler(0.6)
+      sampler
     });
 
     let exporter: SpanExporter = new InMemorySpanExporter();
@@ -249,13 +255,19 @@ export abstract class ClientEvents {
     if (interaction instanceof CommandInteraction || interaction instanceof ContextMenuInteraction) {
       name = `command - ${interaction.commandName}`;
     }
-    tracer.startActiveSpan(name, async span => {
+    await tracer.startActiveSpan(name, async span => {
       try {
         await client.executeInteraction(interaction);
       } catch (err: unknown) {
         this.logger.error('INTERACTION FAILURE');
         this.logger.error(`Type: ${interaction.type}\nTimestamp: ${Date()}\nGuild: ${interaction.guild}\nUser: ${interaction.user.tag}\nChannel: ${interaction.channel}`);
         this.logger.error(err);
+
+        if (err instanceof Error) {
+          span.recordException(err);
+          span.setStatus({ code: SpanStatusCode.ERROR });
+          span.end();
+        }
       }
 
       span.setAttributes({
@@ -263,7 +275,8 @@ export abstract class ClientEvents {
         username: interaction.user.username,
         channelId: interaction.channel?.id ?? '',
         guildId: interaction.guildId ?? '',
-        guildName: interaction.guild?.name
+        guildName: interaction.guild?.name,
+        type: interaction.type
       });
       span.end();
     });

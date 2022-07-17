@@ -14,7 +14,7 @@ import { pipeline } from 'stream/promises';
 import { container } from 'tsyringe';
 import imgEffects from '../../res/imgEffects.json' assert { type: 'json' };
 import { gotOptions } from '../emote/Cmoji.js';
-import { CubeLogger } from '../logger/CubeLogger.js';
+import { CubeLogger } from '../observability/CubeLogger.js';
 import { FileQueue } from './FileQueue.js';
 import { WorkerPool } from './WorkerPool.js';
 const { got } = await import('got');

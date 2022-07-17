@@ -4,7 +4,7 @@ import path from 'path';
 import simpleGit, { SimpleGit, SimpleGitOptions } from 'simple-git';
 import { container, singleton } from 'tsyringe';
 import { Milliseconds } from '../constants/Units';
-import { CubeLogger } from '../logger/CubeLogger';
+import { CubeLogger } from '../observability/CubeLogger';
 import { rolePickerParse } from './Parser';
 
 @singleton()

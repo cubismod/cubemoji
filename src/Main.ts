@@ -5,7 +5,7 @@ import { config } from 'dotenv';
 import { mkdir } from 'fs/promises';
 import 'reflect-metadata';
 import { bigServerDetect, blockedChannelDetect } from './discord/Guards.js';
-import { CubeLogger } from './lib/logger/CubeLogger.js';
+import { CubeLogger } from './lib/observability/CubeLogger.js';
 
 // load dotenv file if exists
 config();

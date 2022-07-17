@@ -13,7 +13,7 @@ import { Milliseconds } from '../../constants/Units';
 import { CubeStorage } from '../../db/Storage';
 import { FileQueue } from '../../image/FileQueue';
 import { WorkerPool } from '../../image/WorkerPool';
-import { CubeLogger } from '../../logger/CubeLogger';
+import { CubeLogger } from '../../observability/CubeLogger';
 import { PugGenerator } from '../PugGenerator';
 import { checkedRoles, genRolesList, roleUpdateRadio, roleUpdatesSwitch as roleUpdateSwitch } from '../RoleManager';
 
@@ -25,28 +25,32 @@ async function LogRequest(ctx: RouterContext, next: Next) {
 
   await next();
 
-  tracer.startActiveSpan(`web - ${ctx.URL.pathname}`, { startTime }, async span => {
-    if (!ctx.URL.pathname.startsWith('/emotes' || !ctx.URL.pathname.startsWith('/favicon'))) {
-      // don't log what will be passed off to Fly
-      logger.info({
-        type: 'response',
-        url: ctx.URL.pathname,
-        headers: ctx.headers,
-        status: ctx.response.status
-      });
+  if (!ctx.URL.pathname.startsWith('/emotes' || !ctx.URL.pathname.startsWith('/favicon'))) {
+    // don't log what will be passed off to Fly
+    logger.info({
+      type: 'response',
+      url: ctx.URL.pathname,
+      headers: ctx.headers,
+      status: ctx.response.status
+    });
 
-      logger.debug(ctx.request.body);
-    }
+    logger.debug(ctx.request.body);
+  }
 
-    span.setAttribute(SemanticAttributes.HTTP_CLIENT_IP, ctx.ip);
-    span.setAttribute(SemanticAttributes.HTTP_METHOD, ctx.method);
-    span.setAttribute(SemanticAttributes.HTTP_ROUTE, ctx.URL.pathname);
-    span.setAttribute(SemanticAttributes.HTTP_STATUS_CODE, ctx.response.status);
-    span.setAttribute(SemanticAttributes.HTTP_USER_AGENT, ctx.headers['user-agent'] ?? '');
-    span.setAttribute(SemanticAttributes.HTTP_SERVER_NAME, ctx.URL.hostname);
+  // ignore status requests as health checks add additional
+  // noise that's already recorded with logs
+  if (!ctx.URL.pathname.startsWith('/status')) {
+    await tracer.startActiveSpan(`web - ${ctx.URL.pathname}`, { startTime }, async span => {
+      span.setAttribute(SemanticAttributes.HTTP_CLIENT_IP, ctx.ip);
+      span.setAttribute(SemanticAttributes.HTTP_METHOD, ctx.method);
+      span.setAttribute(SemanticAttributes.HTTP_ROUTE, ctx.URL.pathname);
+      span.setAttribute(SemanticAttributes.HTTP_STATUS_CODE, ctx.response.status);
+      span.setAttribute(SemanticAttributes.HTTP_USER_AGENT, ctx.headers['user-agent'] ?? '');
+      span.setAttribute(SemanticAttributes.HTTP_SERVER_NAME, ctx.URL.hostname);
 
-    span.end();
-  });
+      span.end();
+    });
+  }
 }
 
 @Router()
