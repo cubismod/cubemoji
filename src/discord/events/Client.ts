@@ -1,12 +1,7 @@
 // Discord client events
 
-import { diag, DiagLogLevel, Sampler, SpanStatusCode, trace } from '@opentelemetry/api';
-import { AlwaysOnSampler, TraceIdRatioBasedSampler } from '@opentelemetry/core';
-import { ZipkinExporter } from '@opentelemetry/exporter-zipkin';
-import { Resource } from '@opentelemetry/resources';
-import { BatchSpanProcessor, InMemorySpanExporter, SpanExporter, Tracer } from '@opentelemetry/sdk-trace-base';
-import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
-import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
+import { SpanStatusCode } from '@opentelemetry/api';
+import { Tracer } from '@opentelemetry/sdk-trace-base';
 import { CommandInteraction, ContextMenuInteraction } from 'discord.js';
 import { ArgsOf, Client, Discord, DIService, On, Once } from 'discordx';
 import { container } from 'tsyringe';
@@ -23,56 +18,13 @@ import { setStatus } from '../../lib/image/DiscordLogic.js';
 import { FileQueue } from '../../lib/image/FileQueue.js';
 import { WorkerPool } from '../../lib/image/WorkerPool.js';
 import { CubeLogger } from '../../lib/observability/CubeLogger.js';
+import { configureTracer } from '../../lib/observability/Tracing.js';
 import { InspectorWrapper } from '../../lib/perf/InspectorWrapper.js';
 
 @Discord()
 export abstract class ClientEvents {
   private cubeLogger = new CubeLogger();
   private logger = this.cubeLogger.client;
-
-  /**
-   * creates an OpenTelemetry Tracer
-   * @returns new Tracer object
-   */
-  private configTrace() {
-    diag.setLogger(this.logger, DiagLogLevel.DEBUG);
-
-    const resource = Resource.default().merge(
-      new Resource({
-        [SemanticResourceAttributes.SERVICE_NAME]: 'cubemoji',
-        [SemanticResourceAttributes.SERVICE_VERSION]: process.env.npm_package_version,
-        [SemanticResourceAttributes.SERVICE_NAMESPACE]: process.env.CM_ENVIRONMENT
-      })
-    );
-
-    let sampler: Sampler = new AlwaysOnSampler();
-    if (process.env.CM_ENVIRONMENT === 'prd') {
-      sampler = new TraceIdRatioBasedSampler(0.6);
-    }
-
-    const provider = new NodeTracerProvider({
-      resource,
-      sampler
-    });
-
-    let exporter: SpanExporter = new InMemorySpanExporter();
-    // enable exporting if this flag is set
-    if (process.env.CM_ENABLE_TRACING) {
-      exporter = new ZipkinExporter({
-        url: process.env.CM_TRACE_URL
-      });
-    }
-
-    provider.addSpanProcessor(new BatchSpanProcessor(exporter, {
-      maxQueueSize: 2000,
-      scheduledDelayMillis: 30000
-    }));
-
-    provider.register();
-
-    return trace.getTracer('cubemoji');
-  }
-
   /**
    * core setup of the bot including dependency init
    * and command init
@@ -88,7 +40,7 @@ export abstract class ClientEvents {
 
     // dependency injection initialization
     if (DIService.container !== undefined) {
-      const res = this.configTrace();
+      const res = configureTracer();
       DIService.container.register(Tracer, { useValue: res });
       this.logger.info('Tracing started');
 

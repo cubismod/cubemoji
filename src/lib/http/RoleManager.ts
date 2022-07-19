@@ -21,9 +21,13 @@ const storage = container.resolve(CubeStorage);
 const logger = container.resolve(CubeLogger).discordLogic;
 
 /**
- * expires is in epoch seconds
+ * id: unique random string
+ * userID: discord user id
+ * serverID: server id
+ * url: actual URL including webhost
+ * expires: ephoch seconds
  */
-export interface ephemeralLink {
+export interface EphemeralLink {
   id: string,
   userID: string,
   serverID: string,
@@ -55,7 +59,7 @@ export async function rolesCommand(userID: string, serverID: string) {
       const res = await tracer.startActiveSpan(`role link setup for ${userID} in ${serverID}`, async span => {
         // generate new ephemeral link
         const id = randomString(10, 12);
-        const newLink: ephemeralLink = {
+        const newLink: EphemeralLink = {
           id,
           serverID,
           url: `${process.env.CM_URL}/roles/${id}`,
