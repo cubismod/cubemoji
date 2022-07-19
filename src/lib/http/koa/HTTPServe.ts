@@ -138,6 +138,7 @@ export class HTTPServe {
           const serverID = res.roleBody[1].serverID;
           const serverName = guild?.name;
           const serverIcon = guild?.iconURL();
+          await guild?.members.fetch();
           const userRoles = guild?.members.cache.get(res.ephemeralLink.userID)?.roles.cache;
 
           // get a checklist of roles that are formatted for easy use in Pug
