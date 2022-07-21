@@ -59,6 +59,14 @@
     tsyringe "^4.6.0"
     typedi "^0.10.0"
 
+"@discordx/di@^3.0.1":
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/@discordx/di/-/di-3.0.1.tgz#c017515aab83d0904265ff1ca75da0ef3ad9dfc3"
+  integrity sha512-YVDWZQ/9Usq6Gi6olnhwIYBUtjK4/VLf70xXixdmDqiPRBXW/72lnn9KoEpRhKdoz3ReP3wF/de6kYY7vPBOvg==
+  dependencies:
+    tsyringe "^4.7.0"
+    typedi "^0.10.0"
+
 "@discordx/importer@^1.1.10":
   version "1.1.10"
   resolved "https://registry.yarnpkg.com/@discordx/importer/-/importer-1.1.10.tgz#82370c36ad09796e35bd080b36f053bfe0e7c744"
@@ -74,12 +82,12 @@
   dependencies:
     tslib "^2.3.1"
 
-"@discordx/koa@^1.0.8":
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/@discordx/koa/-/koa-1.1.0.tgz#e067753bb66b59440ced2872a27292f4cc0d2c33"
-  integrity sha512-3Y9EbhYvMXT1SjKowWOJzhMI2z0p1ZhxIC0WFPO12C4VMXUUJmg4lDyK9DN4piRxaF/u+NBToz+HRJGJMbbe2w==
+"@discordx/koa@^1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@discordx/koa/-/koa-1.1.1.tgz#2c56d23136dad732a47ad840c38903fc7b3c8f7b"
+  integrity sha512-CzxEF4vgFzpLcPShMUyZ7G8IJ7GUQs0KLVlaEjK9nS7q09GHCxHsApGOzEo/yXlFo5bwQcVcqVAlZMcD0AWl+A==
   dependencies:
-    "@discordx/di" "^2.0.1"
+    "@discordx/di" "^3.0.1"
     "@discordx/internal" "^1.0.2"
     tslib "^2.4.0"
 
@@ -3872,7 +3880,7 @@ tsutils@^3.21.0:
   dependencies:
     tslib "^1.8.1"
 
-tsyringe@^4.6.0:
+tsyringe@^4.6.0, tsyringe@^4.7.0:
   version "4.7.0"
   resolved "https://registry.yarnpkg.com/tsyringe/-/tsyringe-4.7.0.tgz#aea0a9d565385deebb6def60cda342b15016f283"
   integrity sha512-ncFDM1jTLsok4ejMvSW5jN1VGPQD48y2tfAR0pdptWRKYX4bkbqPt92k7KJ5RFJ1KV36JEs/+TMh7I6OUgj74g==
