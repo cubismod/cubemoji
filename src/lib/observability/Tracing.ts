@@ -15,12 +15,6 @@ import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions'
 import { container } from 'tsyringe';
 import { CubeLogger } from './CubeLogger';
 
-function setupContext() {
-  const contextManager = new AsyncHooksContextManager();
-  contextManager.enable();
-  api.context.setGlobalContextManager(contextManager);
-}
-
 /**
  * creates an OpenTelemetry Tracer
  * @returns new Tracer object
@@ -62,8 +56,6 @@ export function configureTracer() {
   }));
 
   provider.register();
-
-  setupContext();
 
   return trace.getTracer('cubemoji');
 }
