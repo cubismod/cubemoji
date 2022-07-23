@@ -4,11 +4,9 @@
  */
 
 import { diag, DiagLogLevel, Sampler, trace } from '@opentelemetry/api';
-import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 import { AlwaysOnSampler, TraceIdRatioBasedSampler } from '@opentelemetry/core';
 import { ZipkinExporter } from '@opentelemetry/exporter-zipkin';
 import { Resource } from '@opentelemetry/resources';
-import { api } from '@opentelemetry/sdk-node';
 import { BatchSpanProcessor, InMemorySpanExporter, SpanExporter } from '@opentelemetry/sdk-trace-base';
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
