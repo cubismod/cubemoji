@@ -5,7 +5,7 @@ import { config } from 'dotenv';
 import { mkdir } from 'fs/promises';
 import 'reflect-metadata';
 import { bigServerDetect, blockedChannelDetect } from './discord/Guards.js';
-import { CubeLogger } from './lib/logger/CubeLogger.js';
+import { CubeLogger } from './lib/observability/CubeLogger.js';
 
 // load dotenv file if exists
 config();
@@ -25,6 +25,8 @@ export class Main {
   }
 
   static async start() {
+    const logger = new CubeLogger().main;
+
     // create required folders
     await createDir('./download');
     await createDir('./data');
@@ -32,7 +34,6 @@ export class Main {
     await createDir('./static/list');
     await createDir('./static/emotes');
     await createDir('./data/backups');
-    const logger = new CubeLogger().main;
 
     await importx(dirname(import.meta.url) + '/discord/**/*.js');
     logger.info('🅲🆄🅱🅴🅼🅾🅹🅸');

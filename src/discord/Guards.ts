@@ -1,3 +1,4 @@
+/* eslint-disable no-prototype-builtins */
 import { ButtonInteraction, CommandInteraction, ContextMenuInteraction } from 'discord.js';
 import { ArgsOf, GuardFunction } from 'discordx';
 import { container } from 'tsyringe';

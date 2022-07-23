@@ -4,7 +4,7 @@ import path from 'path';
 import simpleGit, { SimpleGit, SimpleGitOptions } from 'simple-git';
 import { container, singleton } from 'tsyringe';
 import { Milliseconds } from '../constants/Units';
-import { CubeLogger } from '../logger/CubeLogger';
+import { CubeLogger } from '../observability/CubeLogger';
 import { rolePickerParse } from './Parser';
 
 @singleton()
@@ -31,9 +31,11 @@ export class GitClient {
   }
 
   async init() {
-    this.directory = path.join(tmpdir(), await mkdtemp('git'));
+    this.directory = await mkdtemp(path.join(tmpdir(), 'git'));
     try {
-      await this.git.clone(this.remoteUrl, this.directory);
+      await this.git.clone(this.remoteUrl, this.directory, {
+
+      });
       await this.parse();
     } catch (err) {
       this.logger.error(err);

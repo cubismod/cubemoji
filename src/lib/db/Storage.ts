@@ -8,13 +8,15 @@ import path from 'path';
 import { container, singleton } from 'tsyringe';
 import { ModAction, RolePicker } from '../cmd/ModHelper.js';
 import { Milliseconds } from '../constants/Units.js';
-import { ephemeralLink } from '../http/RoleManager.js';
-import { CubeLogger } from '../logger/CubeLogger.js';
+import { EphemeralLink } from '../http/RoleManager.js';
+import { CubeLogger } from '../observability/CubeLogger.js';
 
+/* eslint-disable no-unused-vars */
 export enum BucketContentType {
   Path,
   Text
 }
+/* eslint-enable */
 
 /**
  * server ID and name
@@ -128,7 +130,7 @@ export class CubeStorage {
   rolePickers: Keyv<[boolean, RolePicker]>;
 
   // key is serverID-userID and value
-  ephemeralLinks: Keyv<ephemeralLink>;
+  ephemeralLinks: Keyv<EphemeralLink>;
 
   // key is the link name and value is the corresponding key in
   // the ephemeralLinks namespace
@@ -168,7 +170,7 @@ export class CubeStorage {
 
     this.rolePickers = new Keyv<[boolean, RolePicker]>(serverInfoPath, { namespace: 'rolepicker' });
 
-    this.ephemeralLinks = new Keyv<ephemeralLink>(serverInfoPath, { namespace: 'eph', ttl: Milliseconds.twentyMin });
+    this.ephemeralLinks = new Keyv<EphemeralLink>(serverInfoPath, { namespace: 'eph', ttl: Milliseconds.twentyMin });
 
     this.uniqueIDLookup = new Keyv<string>(serverInfoPath, { namespace: 'idlookup', ttl: Milliseconds.twentyMin });
 

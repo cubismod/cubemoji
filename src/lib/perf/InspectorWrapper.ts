@@ -7,7 +7,7 @@ import { container, singleton } from 'tsyringe';
 import { Milliseconds } from '../constants/Units';
 import { compress } from '../db/DatabaseMgmt';
 import { BucketContentType, S3Client } from '../db/Storage';
-import { CubeLogger } from '../logger/CubeLogger';
+import { CubeLogger } from '../observability/CubeLogger';
 
 @singleton()
 export class InspectorWrapper {

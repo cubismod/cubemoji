@@ -1,2 +1,13 @@
 node_modules
 npm-debug.log
+.gitlab/
+.vscode/
+scripts/.vscode/
+gitlab-runner/
+grafana-agent/
+promtail/
+statping/
+.gitignore
+.gitlab-ci.yml
+.python-version
+

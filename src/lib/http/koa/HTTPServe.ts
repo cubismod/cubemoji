@@ -1,5 +1,7 @@
 import { Get, Middleware, Post, Router } from '@discordx/koa';
 import { RouterContext } from '@koa/router';
+import { Tracer } from '@opentelemetry/sdk-trace-base';
+import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 import { Client } from 'discordx';
 import { stat } from 'fs/promises';
 import { Context, Next } from 'koa';
@@ -11,12 +13,15 @@ import { Milliseconds } from '../../constants/Units';
 import { CubeStorage } from '../../db/Storage';
 import { FileQueue } from '../../image/FileQueue';
 import { WorkerPool } from '../../image/WorkerPool';
-import { CubeLogger } from '../../logger/CubeLogger';
+import { CubeLogger } from '../../observability/CubeLogger';
 import { PugGenerator } from '../PugGenerator';
 import { checkedRoles, genRolesList, roleUpdateRadio, roleUpdatesSwitch as roleUpdateSwitch } from '../RoleManager';
 
 async function LogRequest(ctx: RouterContext, next: Next) {
+  const tracer = container.resolve(Tracer);
   const logger = container.resolve(CubeLogger).web;
+
+  const startTime = Date.now();
 
   await next();
 
@@ -30,6 +35,21 @@ async function LogRequest(ctx: RouterContext, next: Next) {
     });
 
     logger.debug(ctx.request.body);
+  }
+
+  // ignore status requests as health checks add additional
+  // noise that's already recorded with logs
+  if (!ctx.URL.pathname.startsWith('/status')) {
+    await tracer.startActiveSpan(`web - ${ctx.URL.pathname}`, { startTime }, async span => {
+      span.setAttribute(SemanticAttributes.HTTP_CLIENT_IP, ctx.ip);
+      span.setAttribute(SemanticAttributes.HTTP_METHOD, ctx.method);
+      span.setAttribute(SemanticAttributes.HTTP_ROUTE, ctx.URL.pathname);
+      span.setAttribute(SemanticAttributes.HTTP_STATUS_CODE, ctx.response.status);
+      span.setAttribute(SemanticAttributes.HTTP_USER_AGENT, ctx.headers['user-agent'] ?? '');
+      span.setAttribute(SemanticAttributes.HTTP_SERVER_NAME, ctx.URL.hostname);
+
+      span.end();
+    });
   }
 }
 
@@ -118,6 +138,7 @@ export class HTTPServe {
           const serverID = res.roleBody[1].serverID;
           const serverName = guild?.name;
           const serverIcon = guild?.iconURL();
+          await guild?.members.fetch();
           const userRoles = guild?.members.cache.get(res.ephemeralLink.userID)?.roles.cache;
 
           // get a checklist of roles that are formatted for easy use in Pug

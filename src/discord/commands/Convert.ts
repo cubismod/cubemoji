@@ -3,7 +3,7 @@ import { Discord, Slash, SlashOption } from 'discordx';
 import Qty from 'js-quantities';
 import { container } from 'tsyringe';
 import { unitAutocomplete } from '../../lib/cmd/Autocomplete.js';
-import { CubeLogger } from '../../lib/logger/CubeLogger.js';
+import { CubeLogger } from '../../lib/observability/CubeLogger.js';
 
 @Discord()
 export abstract class Convert {
@@ -27,7 +27,7 @@ export abstract class Convert {
       type: 'STRING',
       autocomplete: (interaction: AutocompleteInteraction) => unitAutocomplete(interaction)
     }) tounit: string,
-    interaction: CommandInteraction
+      interaction: CommandInteraction
   ) {
     try {
       const qty = Qty(fromval, fromunit);
