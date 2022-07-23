@@ -21,8 +21,6 @@ async function LogRequest(ctx: RouterContext, next: Next) {
   const tracer = container.resolve(Tracer);
   const logger = container.resolve(CubeLogger).web;
 
-  const startTime = Date.now();
-
   await next();
 
   if (!ctx.URL.pathname.startsWith('/emotes' || !ctx.URL.pathname.startsWith('/favicon'))) {
@@ -40,7 +38,7 @@ async function LogRequest(ctx: RouterContext, next: Next) {
   // ignore status requests as health checks add additional
   // noise that's already recorded with logs
   if (!ctx.URL.pathname.startsWith('/status')) {
-    await tracer.startActiveSpan(`web - ${ctx.URL.pathname}`, { startTime }, async span => {
+    await tracer.startActiveSpan(`web - ${ctx.URL.pathname}`, async span => {
       span.setAttribute(SemanticAttributes.HTTP_CLIENT_IP, ctx.ip);
       span.setAttribute(SemanticAttributes.HTTP_METHOD, ctx.method);
       span.setAttribute(SemanticAttributes.HTTP_ROUTE, ctx.URL.pathname);
