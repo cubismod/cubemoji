@@ -10,7 +10,7 @@ Environment Setup
 - We use [NVM](https://github.com/nvm-sh/nvm) for version management. Type `nvm use` to use the correct version of Node. [.nvmrc](https://gitlab.com/cubismod/cubemoji/-/blob/main/.nvmrc) includes the latest version of Node.js we are targeting. I use [vsc-nvm](https://marketplace.visualstudio.com/items?itemName=henrynguyen5-vsc.vsc-nvm) in VSCode to auto load the correct version of Node in new terminals.
 - Yarn is used for package management. Type `corepack enable` to get yarn working. 
 - [Canvas](https://www.npmjs.com/package/canvas) may require additional system dependencies, please see that linked page for more information.
-
+  - On macOS, you need to install some additional packages: `brew install pkg-config cairo pango libpng jpeg giflib librsvg`.
 Execution
 ---------
 - `npm run build` to build the JS from TypeScript in the `build/` subdirectory
