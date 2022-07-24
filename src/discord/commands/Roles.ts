@@ -1,4 +1,4 @@
-import { ButtonInteraction, CommandInteraction, MessageActionRow, MessageButton, MessageEmbed } from 'discord.js';
+import { ButtonInteraction, CommandInteraction, MessageActionRow, MessageButton, EmbedBuilder } from 'discord.js';
 import { ButtonComponent, Discord, Slash } from 'discordx';
 import { clearPage, rolePermissionCheck, rolesCommand } from '../../lib/http/RoleManager';
 
@@ -25,14 +25,14 @@ export abstract class Roles {
       if (manageRolesPerm) {
         await interaction.editReply({
           embeds: [
-            new MessageEmbed({ title: 'Roles Profile', description: res, color: 'DARK_VIVID_PINK' })
+            new EmbedBuilder({ title: 'Roles Profile', description: res, color: 'DARK_VIVID_PINK' })
           ],
           components: [actionRow]
         });
       } else {
         await interaction.editReply({
           embeds: [
-            new MessageEmbed({ description: 'Cubemoji does not have permissions to edit roles on this server therefore the Role Picker feature is disabled. Please contact a server moderator or administrator to ensure they enable the permission.', color: 'RED' })
+            new EmbedBuilder({ description: 'Cubemoji does not have permissions to edit roles on this server therefore the Role Picker feature is disabled. Please contact a server moderator or administrator to ensure they enable the permission.', color: 'RED' })
           ]
         });
       }

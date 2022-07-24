@@ -1,5 +1,5 @@
 // https://github.com/oceanroleplay/discord.ts-example/blob/main/src/commands/slashes.ts
-import { AutocompleteInteraction, ButtonInteraction, CommandInteraction, GuildMember, MessageActionRow, MessageButton, MessageEmbed } from 'discord.js';
+import { AutocompleteInteraction, ButtonInteraction, CommandInteraction, GuildMember, MessageActionRow, MessageButton, EmbedBuilder } from 'discord.js';
 import { ButtonComponent, Discord, Slash, SlashOption } from 'discordx';
 import rgbHex from 'rgb-hex';
 import { container } from 'tsyringe';
@@ -40,7 +40,7 @@ export abstract class Info {
         if (res !== undefined) {
           await interaction.deferReply();
 
-          let embed = new MessageEmbed();
+          let embed = new EmbedBuilder();
           embed = await this.setColors(embed, res.url);
           embed.setImage(res.url);
           embed.setTitle(res.name);
@@ -73,7 +73,7 @@ export abstract class Info {
       } else if (member !== undefined) {
         // user code
         const avatarURL = member.user.displayAvatarURL({ format: 'png', dynamic: true, size: 256 });
-        let embed = new MessageEmbed();
+        let embed = new EmbedBuilder();
 
         // button setup
         this.imgUrl = avatarURL;
@@ -98,7 +98,7 @@ export abstract class Info {
     }
   }
 
-  private async setColors(embed: MessageEmbed, url: string) {
+  private async setColors(embed: EmbedBuilder, url: string) {
     const colors = await getColors(url);
     const dominant = colors[0];
     if (colors) {
@@ -128,11 +128,11 @@ export abstract class Info {
       }
     }
     const colors = await getColors(this.imgUrl);
-    const embeds: MessageEmbed[] = [];
+    const embeds: EmbedBuilder[] = [];
     if (colors && this.imgUrl !== '') {
       colors.forEach((color, i) => {
         if (i < 9) {
-          const embed = new MessageEmbed({
+          const embed = new EmbedBuilder({
             description: `RGB: \`${color}\`\nHex: \`#${rgbHex(color[0], color[1], color[2])}\``,
             color
           });

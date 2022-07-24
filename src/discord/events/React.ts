@@ -1,6 +1,6 @@
 // responses to message reacts
 
-import { MessageEmbed, MessageReaction, TextChannel } from 'discord.js';
+import { EmbedBuilder, MessageReaction, TextChannel } from 'discord.js';
 import { ArgsOf, Client, Discord, On } from 'discordx';
 import { choice } from 'pandemonium';
 import { container } from 'tsyringe';
@@ -83,7 +83,7 @@ export abstract class ReactEvents {
                     if (bestOfChannel && bestOfChannel instanceof TextChannel &&
                       msg.author.id === '792878401589477377' && await isUrl(imgSrc) &&
                       msg.channel.id !== '901600718404862012') {
-                      const bestOfEmbed = new MessageEmbed();
+                      const bestOfEmbed = new EmbedBuilder();
                       bestOfEmbed.setImage(imgSrc);
                       // generate a unique name for each image
                       const creationName = uniqueNamesGenerator({ dictionaries: [adjectives, animals, colors, names], style: 'capital', separator: ' ' });
@@ -112,7 +112,7 @@ export abstract class ReactEvents {
                       const sentMsg = await bestOfChannel.send({ embeds: [bestOfEmbed] });
 
                       // now  we send the message to the user that it's been added to best of
-                      const respEmbed = new MessageEmbed();
+                      const respEmbed = new EmbedBuilder();
                       respEmbed.setTitle('This image has been added to best of in the cubemoji server');
                       respEmbed.setDescription('You can also join the cubemoji server at https://discord.gg/Y59XVpx if you have not already! Use 🌟 as a react to add an image to best of.');
                       respEmbed.setURL(sentMsg.url);

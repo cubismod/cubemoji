@@ -1,4 +1,4 @@
-import { ButtonInteraction, MessageEmbed, TextChannel } from 'discord.js';
+import { ButtonInteraction, EmbedBuilder, TextChannel } from 'discord.js';
 import { ButtonComponent, Discord } from 'discordx';
 import { container } from 'tsyringe';
 import { modReply } from '../../lib/cmd/ModHelper';
@@ -19,7 +19,7 @@ export abstract class ButtonResponder {
 
     if (msgActions) {
       // perform the actions
-      const embeds : MessageEmbed[] = [];
+      const embeds : EmbedBuilder[] = [];
 
       for (const action of msgActions) {
         if (action.glob) {

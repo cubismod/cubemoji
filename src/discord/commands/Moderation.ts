@@ -1,7 +1,7 @@
 // Various server configuration commands
 
 import { Pagination } from '@discordx/pagination';
-import { AutocompleteInteraction, CommandInteraction, MessageAttachment, MessageEmbed, Role, TextChannel, VoiceChannel } from 'discord.js';
+import { AutocompleteInteraction, CommandInteraction, MessageAttachment, EmbedBuilder, Role, TextChannel, VoiceChannel } from 'discord.js';
 import { Discord, Slash, SlashChoice, SlashGroup, SlashOption } from 'discordx';
 import { rm } from 'fs/promises';
 import { container } from 'tsyringe';
@@ -34,7 +34,7 @@ export abstract class Mod {
   async help(
     interaction: CommandInteraction
   ) {
-    const helpEmbed = new MessageEmbed()
+    const helpEmbed = new EmbedBuilder()
       .setTitle('Moderation Help')
       .setDescription(strings.modIntro)
       .setColor('GOLD');
@@ -81,7 +81,7 @@ export abstract class Mod {
         await this.storage.rolePickers.set(guildInfo[0], [setStatus, curVal[1]]);
         await interaction.editReply({
           embeds: [
-            new MessageEmbed({
+            new EmbedBuilder({
               description: `Role Picker State for ${guildInfo[1]} is now ${setStatus}`,
               color: 'BLUE'
             })
@@ -90,7 +90,7 @@ export abstract class Mod {
       } else {
         await interaction.editReply({
           embeds: [
-            new MessageEmbed({
+            new EmbedBuilder({
               description: 'No Role Picker is defined for this server. Please refer to the docs at https://cubemoji.art',
               color: 'RED'
             })
@@ -110,13 +110,13 @@ export abstract class Mod {
       if (res && rolePermission) {
         await interaction.editReply({
           embeds: [
-            new MessageEmbed({ description: res, color: 'AQUA' })
+            new EmbedBuilder({ description: res, color: 'AQUA' })
           ]
         });
       } else {
         await interaction.editReply({
           embeds: [
-            new MessageEmbed({ description: 'Bot may not have permissions to edit roles on this server. Ensure that it has the MANAGE ROLES permission on this server.', color: 'RED' })
+            new EmbedBuilder({ description: 'Bot may not have permissions to edit roles on this server. Ensure that it has the MANAGE ROLES permission on this server.', color: 'RED' })
           ]
         });
       }

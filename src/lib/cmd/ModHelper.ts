@@ -1,6 +1,6 @@
 // helper commands for Moderation group
 
-import { ButtonInteraction, Client, CommandInteraction, MessageActionRow, MessageButton, MessageEmbed, TextChannel, User } from 'discord.js';
+import { ButtonInteraction, Client, CommandInteraction, MessageActionRow, MessageButton, EmbedBuilder, TextChannel, User } from 'discord.js';
 import { createReadStream } from 'fs';
 import { isBinaryFile } from 'isbinaryfile';
 import { choice } from 'pandemonium';
@@ -127,7 +127,7 @@ export async function auditMsg(message: {
           channel.send(
             {
               embeds: [
-                new MessageEmbed({
+                new EmbedBuilder({
                   color: 'FUCHSIA',
                   description: `**Action**: ${message.action}\n**Invoker**: ${interaction.user.tag} (${interaction.user.id})\n${message.notes}`,
                   timestamp: Date.now()
@@ -138,7 +138,7 @@ export async function auditMsg(message: {
           channel.send(
             {
               embeds: [
-                new MessageEmbed({
+                new EmbedBuilder({
                   color: 'FUCHSIA',
                   description: `**Action**: ${message.action}\n${message.notes}`,
                   timestamp: Date.now()
@@ -167,7 +167,7 @@ export async function auditMsg(message: {
  * @param msg send a message in discord, default true
  */
 export async function modReply(interaction: CommandInteraction | ButtonInteraction, guildName = '', success: boolean, action: string, notes = '', guildId = '', msg = true) {
-  const embed = new MessageEmbed({
+  const embed = new EmbedBuilder({
     title: `Action: ${action}`,
     fields: [
       {
@@ -344,7 +344,7 @@ export async function bulkActionsEmbed(interaction: CommandInteraction, actions:
       humanReadableActions.push(` in server **${action.guildName}**\n`);
     }
 
-    const embed = new MessageEmbed({
+    const embed = new EmbedBuilder({
       title: 'Please confirm you want to perform the below mod actions:',
       description: humanReadableActions.join(''),
       footer: {
@@ -385,10 +385,10 @@ export async function buildList(interaction: CommandInteraction, namespaces: str
   // max of 10 fields per embed for us
   const storage = container.resolve(CubeStorage);
   let elements = 0;
-  const pages: MessageEmbed[] = [];
+  const pages: EmbedBuilder[] = [];
   // fune color
   const color = (choice(namespaces).length * 1000000) % 16777215;
-  let curEmbed = new MessageEmbed({ title: 'Moderation List', color });
+  let curEmbed = new EmbedBuilder({ title: 'Moderation List', color });
   // first get all values from a namespace
   for (const ns of namespaces) {
     const items = storage.getNamespace(ns);
@@ -397,7 +397,7 @@ export async function buildList(interaction: CommandInteraction, namespaces: str
         if (elements % 10 === 0 && elements !== 0) {
           // new page
           pages.push(curEmbed);
-          curEmbed = new MessageEmbed({ title: 'Moderation List', color });
+          curEmbed = new EmbedBuilder({ title: 'Moderation List', color });
         }
         // lists are used for several different purposes
         switch (ns) {

@@ -1,4 +1,4 @@
-import { CommandInteraction, MessageEmbed } from 'discord.js';
+import { CommandInteraction, EmbedBuilder } from 'discord.js';
 import { Discord, Slash, SlashOption } from 'discordx';
 import { container } from 'tsyringe';
 import { EmoteCache } from '../../lib/emote/EmoteCache.js';
@@ -22,7 +22,7 @@ export abstract class Search {
       if (results.length > 0) {
         // we send results as up to 50 Discord emotes
         // and up to 9 Mutant emotes
-        const embeds: MessageEmbed[] = [];
+        const embeds: EmbedBuilder[] = [];
         // first embed i[0] for discord emojis
         // one embed for each Mutant emote
         const discEmotes: string[] = [];
@@ -35,7 +35,7 @@ export abstract class Search {
               discEmotes.push(result.item.guildEmoji.toString());
               ++discCount;
             } else {
-              embeds.push(new MessageEmbed()
+              embeds.push(new EmbedBuilder()
                 .setTitle(result.item.name)
                 .setImage(result.item.url)
                 .setColor('PURPLE'));
@@ -44,7 +44,7 @@ export abstract class Search {
           }
         }
         // then we create an embed for the discord emotes and put them at the beginning of the embeds array
-        const discEmbed = new MessageEmbed()
+        const discEmbed = new EmbedBuilder()
           .setTitle(`Search for ${query} (${results.length})`)
           .setDescription(discEmotes.join('').slice(0, 2047)) // avoid api error of going over char count
           .setColor('BLUE')

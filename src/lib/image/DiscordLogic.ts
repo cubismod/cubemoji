@@ -2,7 +2,7 @@
 // commands when doing image effects
 import { Pagination, PaginationType } from '@discordx/pagination';
 import { watch } from 'chokidar';
-import { CommandInteraction, ContextMenuCommandInteraction, Message, MessageAttachment, MessageEmbed, MessageReaction, PartialUser, User } from 'discord.js';
+import { CommandInteraction, ContextMenuCommandInteraction, Message, MessageAttachment, EmbedBuilder, MessageReaction, PartialUser, User } from 'discord.js';
 import { Client } from 'discordx';
 import { fileTypeFromStream } from 'file-type';
 import { choice } from 'pandemonium';
@@ -231,11 +231,11 @@ export function getMessageImage(message: Message) {
   */
 export async function sendPagination(interaction: CommandInteraction, type: Source, emoteCache: EmoteCache, ephemeral: boolean) {
   // first setup embeds
-  const embeds: MessageEmbed[] = [];
+  const embeds: EmbedBuilder[] = [];
   const menuText: string[] = []; // page markers like alphabet-bean for example
   let menuItem = '';
   let embedBody = '';
-  let curEmotePage = newPage(new MessageEmbed(), type);
+  let curEmotePage = newPage(new EmbedBuilder(), type);
   let emotesPerPage = 0;
   let emoteSource: Cmoji[] = []; // list of emojis we're pulling from to display
   if (curEmotePage) {
@@ -301,7 +301,7 @@ export async function sendPagination(interaction: CommandInteraction, type: Sour
           embeds.push(curEmotePage);
           menuText.push(menuItem);
           // clear working page, menu item
-          curEmotePage = newPage(new MessageEmbed(), type);
+          curEmotePage = newPage(new EmbedBuilder(), type);
           menuItem = '';
           embedBody = '';
         } else if (i === emoteSource.length - 1) {
@@ -343,7 +343,7 @@ export async function parseForEmote(interaction: CommandInteraction, emote: stri
 /**
   * Initializes a new page
   */
-function newPage(embed: MessageEmbed, type: Source) {
+function newPage(embed: EmbedBuilder, type: Source) {
   const mutantAttr = 'This bot uses Mutant Standard emoji (https://mutant.tech) which are licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License (https://creativecommons.org/licenses/by-nc-sa/4.0/)';
   switch (type) {
     case Source.Discord:
@@ -379,7 +379,7 @@ async function reactReply(context: MessageReaction, content: MessageAttachment |
     // send a DM as the server is enrolled
     if (content instanceof MessageAttachment) {
       // send rescale results in an embed
-      const embed = new MessageEmbed({
+      const embed = new EmbedBuilder({
         color: 'LIGHT_GREY',
         description: `Here are the results of your image edit in ${context.message.guild?.name}, done by reacting with an emoji. See https://cubemoji.art/#react for more information. [Link to original](${context.message.url})`
       });

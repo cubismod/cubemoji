@@ -1,4 +1,4 @@
-import { CommandInteraction, MessageEmbed } from 'discord.js';
+import { CommandInteraction, EmbedBuilder } from 'discord.js';
 import { Discord, Slash } from 'discordx';
 import strings from '../../res/strings.json' assert { type: 'json' };
 
@@ -6,7 +6,7 @@ import strings from '../../res/strings.json' assert { type: 'json' };
 export abstract class Help {
   @Slash('help', { description: 'A guide on how to use cubemoji' })
   async help(interaction: CommandInteraction) {
-    const helpEmbed = new MessageEmbed()
+    const helpEmbed = new EmbedBuilder()
       .setTitle('cubemoji Help')
       .setThumbnail('https://storage.googleapis.com/cubemoji.appspot.com/icon.png')
       .setDescription(strings.helpDescription)
