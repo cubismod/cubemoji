@@ -1,5 +1,5 @@
 /* eslint-disable no-prototype-builtins */
-import { ButtonInteraction, CommandInteraction, ContextMenuInteraction } from 'discord.js';
+import { ButtonInteraction, CommandInteraction, ContextMenuCommandInteraction } from 'discord.js';
 import { ArgsOf, GuardFunction } from 'discordx';
 import { container } from 'tsyringe';
 import { CubeStorage } from '../lib/db/Storage.js';
@@ -20,10 +20,10 @@ export interface BSGuardData {
 export const bigServerDetect: GuardFunction<
   | ArgsOf<'messageReactionAdd'>
   | CommandInteraction
-  | ContextMenuInteraction> = async (arg, _client, next, data: BSGuardData) => {
+  | ContextMenuCommandInteraction> = async (arg, _client, next, data: BSGuardData) => {
     const enrollment = container.resolve(CubeStorage).serverEnrollment;
     data.enrolled = false;
-    if (arg instanceof CommandInteraction || arg instanceof ContextMenuInteraction) {
+    if (arg instanceof CommandInteraction || arg instanceof ContextMenuCommandInteraction) {
       if (arg.guildId) {
         const status = await enrollment.get(arg.guildId);
         if (status) data.enrolled = true;
@@ -55,7 +55,7 @@ export const blockedChannelDetect: GuardFunction<
   | ArgsOf<'messageReactionAdd'>
   | CommandInteraction
   | ButtonInteraction
-  | ContextMenuInteraction> = async (arg, _client, next) => {
+  | ContextMenuCommandInteraction> = async (arg, _client, next) => {
     const blockedChannels = container.resolve(CubeStorage).blockedChannels;
     if (arg instanceof CommandInteraction) {
       // for Slash commands, we allow moderation commands no matter what
@@ -63,7 +63,7 @@ export const blockedChannelDetect: GuardFunction<
       // if the database check returns undefined, it means that the channel is not blocked
       if (arg.commandName.includes('mod')) await next();
       else if (!await blockedChannels.get(arg.channelId)) await next();
-    } else if (arg instanceof ContextMenuInteraction) {
+    } else if (arg instanceof ContextMenuCommandInteraction) {
       if (!await blockedChannels.get(arg.channelId)) await next();
     } else if (arg[0] && arg[0] instanceof ButtonInteraction) {
       if (!await blockedChannels.get(arg[0].channelId)) await next();

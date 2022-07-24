@@ -1,4 +1,4 @@
-import { CommandInteraction, ContextMenuInteraction, Message, MessageReaction, Snowflake } from 'discord.js';
+import { CommandInteraction, ContextMenuCommandInteraction, Message, MessageReaction, Snowflake } from 'discord.js';
 import { container, singleton } from 'tsyringe';
 import { CubeStorage } from '../db/Storage.js';
 import { MsgContext } from '../image/ImageLogic.js';
@@ -17,7 +17,7 @@ export class CubeMessageManager {
   // register a new trash react to save to our list of reacts
   async registerTrashReact(context: MsgContext, msg: Message, sender: Snowflake) {
     try {
-      if (context instanceof ContextMenuInteraction || context instanceof CommandInteraction) {
+      if (context instanceof ContextMenuCommandInteraction || context instanceof CommandInteraction) {
         if (context.guild &&
           context.guild.me &&
           context.channel &&

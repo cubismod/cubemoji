@@ -2,7 +2,7 @@
 
 import { SpanStatusCode } from '@opentelemetry/api';
 import { Tracer } from '@opentelemetry/sdk-trace-base';
-import { CommandInteraction, ContextMenuInteraction } from 'discord.js';
+import { CommandInteraction, ContextMenuCommandInteraction } from 'discord.js';
 import { ArgsOf, Client, Discord, DIService, On, Once } from 'discordx';
 import { container } from 'tsyringe';
 import { GitClient } from '../../lib/cd/GitClient.js';
@@ -204,7 +204,7 @@ export abstract class ClientEvents {
     // determine command name
     let name = interaction.id;
 
-    if (interaction instanceof CommandInteraction || interaction instanceof ContextMenuInteraction) {
+    if (interaction instanceof CommandInteraction || interaction instanceof ContextMenuCommandInteraction) {
       name = `command - ${interaction.commandName}`;
     }
     await tracer.startActiveSpan(name, async span => {

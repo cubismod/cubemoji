@@ -2,7 +2,7 @@
 // all these functions produce files and the calling function is responsible for removing those
 // from the fs once done
 import { randomUUID } from 'crypto';
-import { CommandInteraction, ContextMenuInteraction, MessageReaction } from 'discord.js';
+import { CommandInteraction, ContextMenuCommandInteraction, MessageReaction } from 'discord.js';
 import { fileTypeFromFile, FileTypeResult } from 'file-type';
 import { createReadStream, createWriteStream } from 'fs';
 import { stat } from 'fs/promises';
@@ -19,7 +19,7 @@ import { FileQueue } from './FileQueue.js';
 import { WorkerPool } from './WorkerPool.js';
 const { got } = await import('got');
 
-export type MsgContext = ContextMenuInteraction | CommandInteraction | MessageReaction;
+export type MsgContext = ContextMenuCommandInteraction | CommandInteraction | MessageReaction;
 
 const logger = container.resolve(CubeLogger).imageLogic;
 

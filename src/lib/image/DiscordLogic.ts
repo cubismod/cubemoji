@@ -2,7 +2,7 @@
 // commands when doing image effects
 import { Pagination, PaginationType } from '@discordx/pagination';
 import { watch } from 'chokidar';
-import { CommandInteraction, ContextMenuInteraction, Message, MessageAttachment, MessageEmbed, MessageReaction, PartialUser, User } from 'discord.js';
+import { CommandInteraction, ContextMenuCommandInteraction, Message, MessageAttachment, MessageEmbed, MessageReaction, PartialUser, User } from 'discord.js';
 import { Client } from 'discordx';
 import { fileTypeFromStream } from 'file-type';
 import { choice } from 'pandemonium';
@@ -409,7 +409,7 @@ export async function reply(context: MsgContext, content: MessageAttachment | st
       const repMsg = await context.editReply({ files: [content] });
       if (repMsg instanceof Message) msg = repMsg;
     }
-    if (context instanceof ContextMenuInteraction) {
+    if (context instanceof ContextMenuCommandInteraction) {
       const repMsg = await context.editReply({ files: [content] });
       if (repMsg instanceof Message) msg = repMsg;
     }
@@ -418,7 +418,7 @@ export async function reply(context: MsgContext, content: MessageAttachment | st
       const repMsg = await context.editReply(content);
       if (repMsg instanceof Message) msg = repMsg;
     }
-    if (context instanceof ContextMenuInteraction) {
+    if (context instanceof ContextMenuCommandInteraction) {
       const repMsg = await context.editReply({ content });
       if (repMsg instanceof Message) msg = repMsg;
     }
@@ -457,7 +457,7 @@ async function reactErr(context: MsgContext) {
       await cubeMessageManager.registerTrashReact(context, reply, context.user.id);
     }
   }
-  if (context instanceof ContextMenuInteraction) {
+  if (context instanceof ContextMenuCommandInteraction) {
     logger.error(`Context menu failure on channel id: ${context.channelId}, guild id: ${context.guildId}`);
     const msg = await context.channel?.messages.fetch(context.targetId);
     if (msg) {
