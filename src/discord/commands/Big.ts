@@ -1,5 +1,5 @@
 import { RateLimit, TIME_UNIT } from '@discordx/utilities';
-import { AutocompleteInteraction, CommandInteraction, GuildMember, Message } from 'discord.js';
+import { ApplicationCommandOptionType, AutocompleteInteraction, CommandInteraction, GuildMember, Message } from 'discord.js';
 import { Discord, Guard, Slash, SlashOption } from 'discordx';
 import { container } from 'tsyringe';
 import { emoteAutocomplete } from '../../lib/cmd/Autocomplete';
@@ -22,7 +22,7 @@ export abstract class Big {
     @SlashOption('emote', {
       description: strings.emoteSlash,
       autocomplete: (interaction: AutocompleteInteraction) => emoteAutocomplete(interaction),
-      type: 'STRING',
+      type: ApplicationCommandOptionType.String,
       required: false
     })
       emote: string,
@@ -43,7 +43,7 @@ export abstract class Big {
     } else if (member !== undefined) {
       // user code
       // no need to defer a reply since we don't have to search through the emote cache
-      msg = await reply(interaction, member.user.displayAvatarURL({ dynamic: true, size: 256 }));
+      msg = await reply(interaction, member.user.displayAvatarURL({ size: 256 }));
     }
     if ((member === undefined) && (emote === undefined)) {
       msg = await reply(interaction, strings.noArgs);

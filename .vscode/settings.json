@@ -12,5 +12,10 @@
     "editor.renderWhitespace": "all",
     "eslint.format.enable": true,
     "eslint.lintTask.enable": true,
-    "typescript.preferences.quoteStyle": "single"
+    "typescript.preferences.quoteStyle": "single",
+    "editor.wordWrap": "on",
+    "editor.codeActionsOnSave": {
+        "source.fixAll": true,
+        "source.organizeImports": true
+    }
 }

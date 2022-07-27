@@ -1,4 +1,4 @@
-import { AutocompleteInteraction, CommandInteraction } from 'discord.js';
+import { ApplicationCommandOptionType, AutocompleteInteraction, CommandInteraction } from 'discord.js';
 import { Client, Discord, Slash, SlashChoice, SlashOption } from 'discordx';
 import { emoteAutocomplete } from '../../lib/cmd/Autocomplete';
 import { FaceDiscord, getUrl } from '../../lib/image/DiscordLogic.js';
@@ -12,7 +12,7 @@ export abstract class AddFace {
     @SlashOption('source', {
       description: strings.sourceSlash,
       autocomplete: (interaction: AutocompleteInteraction) => emoteAutocomplete(interaction),
-      type: 'STRING'
+      type: ApplicationCommandOptionType.String
     })
       source: string,
     @SlashChoice('joy')
