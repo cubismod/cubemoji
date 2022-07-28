@@ -1,6 +1,6 @@
 // responses to message reacts
 
-import { EmbedBuilder, MessageReaction, TextChannel } from 'discord.js';
+import { Colors, EmbedBuilder, MessageReaction, TextChannel } from 'discord.js';
 import { ArgsOf, Client, Discord, On } from 'discordx';
 import { choice } from 'pandemonium';
 import { container } from 'tsyringe';
@@ -104,8 +104,8 @@ export abstract class ReactEvents {
                         bestOfEmbed.setDescription(`This image was created in the server, ${msg.guild.name}`);
                       }
                       bestOfEmbed.setTitle(creationName);
-                      bestOfEmbed.setColor('RANDOM');
-                      bestOfEmbed.footer = { text: 'You can save an image to best of by reacting 🌟 to a cubemoji image.' };
+                      bestOfEmbed.setColor(Colors.Fuchsia);
+                      bestOfEmbed.setFooter({ text: 'You can save an image to best of by reacting 🌟 to a cubemoji image.' });
                       bestOfEmbed.setURL(msg.url);
 
                       msg.react('🌟');
@@ -116,7 +116,7 @@ export abstract class ReactEvents {
                       respEmbed.setTitle('This image has been added to best of in the cubemoji server');
                       respEmbed.setDescription('You can also join the cubemoji server at https://discord.gg/Y59XVpx if you have not already! Use 🌟 as a react to add an image to best of.');
                       respEmbed.setURL(sentMsg.url);
-                      respEmbed.setColor('RANDOM');
+                      respEmbed.setColor(Colors.DarkOrange);
                       msg.reply({ embeds: [respEmbed], allowedMentions: { repliedUser: false } });
                     }
                   } else {

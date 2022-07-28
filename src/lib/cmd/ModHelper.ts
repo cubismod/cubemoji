@@ -1,6 +1,6 @@
 // helper commands for Moderation group
 
-import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, Client, CommandInteraction, EmbedBuilder, TextChannel, User } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, Client, Colors, CommandInteraction, EmbedBuilder, TextChannel, User } from 'discord.js';
 import { createReadStream } from 'fs';
 import { isBinaryFile } from 'isbinaryfile';
 import { choice } from 'pandemonium';
@@ -122,13 +122,13 @@ export async function auditMsg(message: {
       const channel =
       await interaction?.client.channels.fetch(auditChannel) ??
       await client?.channels.fetch(auditChannel);
-      if (channel?.isText()) {
+      if (channel?.isTextBased()) {
         if (interaction) {
           channel.send(
             {
               embeds: [
                 new EmbedBuilder({
-                  color: 'FUCHSIA',
+                  color: Colors.Fuchsia,
                   description: `**Action**: ${message.action}\n**Invoker**: ${interaction.user.tag} (${interaction.user.id})\n${message.notes}`,
                   timestamp: Date.now()
                 })
@@ -139,7 +139,7 @@ export async function auditMsg(message: {
             {
               embeds: [
                 new EmbedBuilder({
-                  color: 'FUCHSIA',
+                  color: Colors.Fuchsia,
                   description: `**Action**: ${message.action}\n${message.notes}`,
                   timestamp: Date.now()
                 })
@@ -179,12 +179,16 @@ export async function modReply(interaction: CommandInteraction | ButtonInteracti
         value: success ? 'Success' : `${process.env.CM_BROKEN} Failure`
       }
     ],
-    color: success ? 'GREEN' : 'RED',
+    color: success ? Colors.Green : Colors.Red,
     footer: {
       text: 'cubemoji moderation tools'
     }
   });
-  if (notes !== '') embed.addField('Notes', notes);
+  if (notes !== '') {
+    embed.addFields([
+      { name: 'Notes', value: notes }
+    ]);
+  }
   logger.info(`Action: ${action}| Success: ${success} | Guild: ${guildName}/${guildId} | Invoker: ${interaction.user.tag}`);
   // try to send an audit message
   if (success) {
@@ -353,20 +357,20 @@ export async function bulkActionsEmbed(interaction: CommandInteraction, actions:
       fields: [
         { name: 'File Link', value: sourceUrl }
       ],
-      color: 'GREYPLE'
+      color: Colors.Greyple
     });
 
     const performActions = new ButtonBuilder()
       .setLabel('Perform Actions')
       .setEmoji('👍')
       .setCustomId('mod-action-confirm')
-      .setStyle('PRIMARY');
+      .setStyle(ButtonStyle.Primary);
 
     const modStorage = container.resolve(CubeStorage).pendingModActions;
 
     const repId = await interaction.editReply({
       embeds: [embed],
-      components: [new ActionRowBuilder().addComponents(performActions)]
+      components: [new ActionRowBuilder<ButtonBuilder>().addComponents(performActions)]
     });
 
     await modStorage.set(repId.id, actions);
@@ -409,11 +413,13 @@ export async function buildList(interaction: CommandInteraction, namespaces: str
               const auditChannel = await storage.serverAuditInfo.get(info[0]);
               let auditInfo = '';
               if (auditChannel) auditInfo = `Audit Channel: <#${auditChannel}>`;
-              curEmbed = curEmbed.addField(
-                'Enrolled Server',
-                `*${info[1]}*\nOwner: <@${interaction.client.guilds.resolve(info[0])?.ownerId}>\n${auditInfo}`,
-                true
-              );
+              curEmbed = curEmbed.addFields([
+                {
+                  name: 'Enrolled Server',
+                  value: `*${info[1]}*\nOwner: <@${interaction.client.guilds.resolve(info[0])?.ownerId}>\n${auditInfo}`
+                }
+
+              ]);
             }
             break;
           }
@@ -428,11 +434,12 @@ export async function buildList(interaction: CommandInteraction, namespaces: str
               interaction.client
             );
             if (info) {
-              curEmbed = curEmbed.addField(
-                'Blocked Glob',
-                `Glob: \`${glob}\`\nServer: *${info[1]}*`,
-                true
-              );
+              curEmbed = curEmbed.addFields([
+                {
+                  name: 'Blocked Glob',
+                  value: `Glob: \`${glob}\`\nServer: *${info[1]}*`
+                }
+              ]);
             }
             break;
           }
@@ -444,11 +451,12 @@ export async function buildList(interaction: CommandInteraction, namespaces: str
               interaction.client
             );
             if (info) {
-              curEmbed = curEmbed.addField(
-                'Blocked Channel',
-                `Channel: <#${item.key.replace('channels:', '')}>\nServer: *${info[1]}*`,
-                true
-              );
+              curEmbed = curEmbed.addFields([
+                {
+                  name: 'Blocked Channel',
+                  value: `Channel: <#${item.key.replace('channels:', '')}>\nServer: *${info[1]}*`
+                }
+              ]);
             }
             break;
           }
@@ -459,12 +467,13 @@ export async function buildList(interaction: CommandInteraction, namespaces: str
               interaction.client
             );
             if (info) {
-              curEmbed = curEmbed.addField(
-                'Moderator Role',
-                // remove namespace tag and server ID in key
-                `Role: <@&${item.key.replace(/(.*?-)/, '')}>\nServer: *${info[1]}*`,
-                true
-              );
+              curEmbed = curEmbed.addFields([
+                {
+                  name: 'Moderator Role',
+                  // remove namespace tag and server ID in key
+                  value: `Role: <@&${item.key.replace(/(.*?-)/, '')}>\nServer: *${info[1]}*`
+                }
+              ]);
             }
           }
         }
