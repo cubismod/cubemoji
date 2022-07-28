@@ -1,4 +1,4 @@
-import { ButtonInteraction, CommandInteraction, MessageActionRow, MessageButton, EmbedBuilder } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, CommandInteraction, EmbedBuilder } from 'discord.js';
 import { ButtonComponent, Discord, Slash } from 'discordx';
 import { clearPage, rolePermissionCheck, rolesCommand } from '../../lib/http/RoleManager';
 
@@ -11,13 +11,13 @@ export abstract class Roles {
     await interaction.deferReply({ ephemeral: true });
 
     // button to clear temporary page
-    const button = new MessageButton()
+    const button = new ButtonBuilder()
       .setLabel('Delete roles profile')
       .setEmoji('🗑️')
       .setStyle('DANGER')
       .setCustomId('delete-button');
 
-    const actionRow = new MessageActionRow().addComponents(button);
+    const actionRow = new ActionRowBuilder().addComponents(button);
 
     if (interaction.guildId) {
       const res = await rolesCommand(interaction.user.id, interaction.guildId);

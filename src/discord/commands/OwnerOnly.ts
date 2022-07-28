@@ -1,4 +1,4 @@
-import { CommandInteraction, Guild, MessageActionRow, MessageButton } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, CommandInteraction, Guild } from 'discord.js';
 import { ButtonComponent, Discord, Guard, Slash, SlashOption } from 'discordx';
 import { container } from 'tsyringe';
 import { InspectorWrapper } from '../../lib/perf/InspectorWrapper';
@@ -32,11 +32,11 @@ export abstract class LeaveGuild {
       this.resolved = await interaction.client.guilds.resolve(id);
       if (this.resolved) {
         // create button components
-        const yesBtn = new MessageButton()
+        const yesBtn = new ButtonBuilder()
           .setLabel('Yes')
           .setStyle('DANGER')
           .setCustomId('yes-btn');
-        const row = new MessageActionRow().addComponents(yesBtn);
+        const row = new ActionRowBuilder().addComponents(yesBtn);
         interaction.editReply({
           content: `are you sure that you want to leave the guild ${this.resolved.name}?`,
           components: [row]

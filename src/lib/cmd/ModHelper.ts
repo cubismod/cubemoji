@@ -1,6 +1,6 @@
 // helper commands for Moderation group
 
-import { ButtonInteraction, Client, CommandInteraction, MessageActionRow, MessageButton, EmbedBuilder, TextChannel, User } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, Client, CommandInteraction, EmbedBuilder, TextChannel, User } from 'discord.js';
 import { createReadStream } from 'fs';
 import { isBinaryFile } from 'isbinaryfile';
 import { choice } from 'pandemonium';
@@ -356,7 +356,7 @@ export async function bulkActionsEmbed(interaction: CommandInteraction, actions:
       color: 'GREYPLE'
     });
 
-    const performActions = new MessageButton()
+    const performActions = new ButtonBuilder()
       .setLabel('Perform Actions')
       .setEmoji('👍')
       .setCustomId('mod-action-confirm')
@@ -366,7 +366,7 @@ export async function bulkActionsEmbed(interaction: CommandInteraction, actions:
 
     const repId = await interaction.editReply({
       embeds: [embed],
-      components: [new MessageActionRow().addComponents(performActions)]
+      components: [new ActionRowBuilder().addComponents(performActions)]
     });
 
     await modStorage.set(repId.id, actions);

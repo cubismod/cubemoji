@@ -2,7 +2,7 @@
 // commands when doing image effects
 import { Pagination, PaginationType } from '@discordx/pagination';
 import { watch } from 'chokidar';
-import { CommandInteraction, ContextMenuCommandInteraction, Message, MessageAttachment, EmbedBuilder, MessageReaction, PartialUser, User } from 'discord.js';
+import { CommandInteraction, ContextMenuCommandInteraction, EmbedBuilder, Message, MessageAttachment, MessageReaction, PartialUser, User } from 'discord.js';
 import { Client } from 'discordx';
 import { fileTypeFromStream } from 'file-type';
 import { choice } from 'pandemonium';
@@ -178,7 +178,7 @@ export async function isUrl(url: string, urlType = 'image') {
     let validTypes: string[] = [];
     if (urlType === 'image') {
       // check image file
-      validTypes = ['jpg', 'jpeg', 'gif', 'png'];
+      validTypes = ['jpg', 'jpeg', 'gif', 'png', 'webp'];
       const stream = await got.stream(url);
       const type = await fileTypeFromStream(stream);
       if (type !== undefined && validTypes.includes(type.ext)) return true;

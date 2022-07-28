@@ -40,7 +40,7 @@ export abstract class Jumbo {
     } else if (member !== undefined) {
       // user code
       // no need to defer a reply since we don't have to search through the emote cache
-      const edDiscord = new EditDiscord(interaction, 'magnify magnify', member.displayAvatarURL({ format: 'png', dynamic: true, size: 256 }), interaction.user);
+      const edDiscord = new EditDiscord(interaction, 'magnify magnify', member.displayAvatarURL({ size: 256 }), interaction.user);
       await edDiscord.run();
     }
     if ((member === undefined) && (emote === undefined)) {
