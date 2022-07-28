@@ -6,7 +6,7 @@ import { SpanStatusCode } from '@opentelemetry/api';
 import { Tracer } from '@opentelemetry/sdk-trace-base';
 import { randomUUID } from 'crypto';
 import dayjs from 'dayjs';
-import { Client as jsClient, Collection, Role } from 'discord.js';
+import { Client as jsClient, Collection, PermissionFlagsBits, Role } from 'discord.js';
 import { Client } from 'discordx';
 import { appendFile } from 'fs/promises';
 import { randomString } from 'pandemonium';
@@ -110,7 +110,7 @@ export async function clearPage(userID: string, serverID: string) {
 export async function rolePermissionCheck(serverID: string, client: Client | jsClient) {
   const guild = client.guilds.resolve(serverID);
   if (guild && client.user) {
-    if (guild.members.resolve(client.user.id)?.permissions.has('MANAGE_ROLES')) return true;
+    if (guild.members.resolve(client.user.id)?.permissions.has(PermissionFlagsBits.ManageRoles)) return true;
   }
   logger.error(`Cubemoji is missing manage role permissions on server ID: ${guild?.id}, name: ${guild?.name}`);
   return false;

@@ -2,7 +2,7 @@
 // commands when doing image effects
 import { Pagination, PaginationType } from '@discordx/pagination';
 import { watch } from 'chokidar';
-import { CommandInteraction, ContextMenuCommandInteraction, EmbedBuilder, Message, MessageAttachment, MessageReaction, PartialUser, User } from 'discord.js';
+import { ActivityType, AttachmentBuilder, Colors, CommandInteraction, ContextMenuCommandInteraction, EmbedBuilder, Message, MessageFlags, MessageReaction, PartialUser, User } from 'discord.js';
 import { Client } from 'discordx';
 import { fileTypeFromStream } from 'file-type';
 import { choice } from 'pandemonium';
@@ -79,10 +79,10 @@ export class RescaleDiscord {
 
           // now we send out the rescaled message
           try {
-            const msg = await reply(this.context, new MessageAttachment(filename));
+            const msg = await reply(this.context, new AttachmentBuilder(filename));
             if (!msg) {
               this.logger.debug('could not get a message during image operation, not proceeding with adding trash react');
-            } else if (msg instanceof Message && !msg.flags.has('EPHEMERAL')) {
+            } else if (msg instanceof Message && !msg.flags.has(MessageFlags.Ephemeral)) {
               // check if ephemeral to avoid discord API errors (can't react to an ephermeral message)
               await cubeMessageManager.registerTrashReact(this.context, msg, this.user.id);
               // job is finished so send status to trigger next jobs
@@ -150,7 +150,7 @@ export function setStatus(client: Client) {
     'https://cubemoji.art',
     'Type /roles to get your roles!'
   ]);
-  client.user?.setActivity(status, { type: 'PLAYING' });
+  client.user?.setActivity(status, { type: ActivityType.Playing });
 }
 
 /**
@@ -296,7 +296,7 @@ export async function sendPagination(interaction: CommandInteraction, type: Sour
           // and add to menu text
           menuItem = menuItem.concat(emoteSource[i - 1].name);
           curEmotePage.setDescription(embedBody);
-          curEmotePage.footer = { text: menuItem };
+          curEmotePage.setFooter({ text: menuItem });
           // append page to embeds
           embeds.push(curEmotePage);
           menuText.push(menuItem);
@@ -309,7 +309,7 @@ export async function sendPagination(interaction: CommandInteraction, type: Sour
           // then we need to also end now
           menuItem = menuItem.concat(emoteSource[i - 1].name);
           curEmotePage.setDescription(embedBody);
-          curEmotePage.footer = { text: menuItem };
+          curEmotePage.setFooter({ text: menuItem });
           embeds.push(curEmotePage);
           menuText.push(menuItem);
         }
@@ -351,16 +351,25 @@ function newPage(embed: EmbedBuilder, type: Source) {
       break;
     case Source.Any:
       embed.setTitle('List of All Emotes');
-      embed.addField('License Info', mutantAttr);
+      embed.addFields([
+        {
+          name: 'License Info',
+          value: mutantAttr
+        }
+      ]);
       break;
     case Source.Mutant:
       embed.setTitle('List of Mutant Emoji');
-      embed.addField('License Info', mutantAttr);
+      embed.addFields([
+        {
+          name: 'License Info',
+          value: mutantAttr
+        }]);
       break;
     case Source.ThisServer:
       embed.setTitle('Emoji on this Server');
   }
-  embed.setColor('RANDOM');
+  embed.setColor(Colors.DarkGold);
   return embed;
 }
 
@@ -372,15 +381,15 @@ function newPage(embed: EmbedBuilder, type: Source) {
  * @returns undefined if DM message sent or a message object if a message was
  * sent in channel
  */
-async function reactReply(context: MessageReaction, content: MessageAttachment | string) {
+async function reactReply(context: MessageReaction, content: AttachmentBuilder | string) {
   const enrollment = container.resolve(CubeStorage).serverEnrollment;
 
   if (context.message.guildId && await enrollment.get(context.message.guildId)) {
     // send a DM as the server is enrolled
-    if (content instanceof MessageAttachment) {
+    if (content instanceof AttachmentBuilder) {
       // send rescale results in an embed
       const embed = new EmbedBuilder({
-        color: 'LIGHT_GREY',
+        color: Colors.LightGrey,
         description: `Here are the results of your image edit in ${context.message.guild?.name}, done by reacting with an emoji. See https://cubemoji.art/#react for more information. [Link to original](${context.message.url})`
       });
 
@@ -395,15 +404,15 @@ async function reactReply(context: MessageReaction, content: MessageAttachment |
     }
   } else {
     // reply in channel without a ping reply
-    if (content instanceof MessageAttachment) return await context.message.reply({ files: [content], allowedMentions: { repliedUser: false } });
+    if (content instanceof AttachmentBuilder) return await context.message.reply({ files: [content], allowedMentions: { repliedUser: false } });
     else return await context.message.reply({ content, allowedMentions: { repliedUser: false } });
   }
 }
 
 // do a different reply depending on the context we have
-export async function reply(context: MsgContext, content: MessageAttachment | string) {
+export async function reply(context: MsgContext, content: AttachmentBuilder | string) {
   let msg: Message | undefined;
-  if (content instanceof MessageAttachment) {
+  if (content instanceof AttachmentBuilder) {
     // different logic depending on which context we are passing in
     if (context instanceof CommandInteraction) {
       const repMsg = await context.editReply({ files: [content] });
