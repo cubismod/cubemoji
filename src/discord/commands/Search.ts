@@ -1,4 +1,4 @@
-import { CommandInteraction, EmbedBuilder } from 'discord.js';
+import { Colors, CommandInteraction, EmbedBuilder } from 'discord.js';
 import { Discord, Slash, SlashOption } from 'discordx';
 import { container } from 'tsyringe';
 import { EmoteCache } from '../../lib/emote/EmoteCache.js';
@@ -38,7 +38,7 @@ export abstract class Search {
               embeds.push(new EmbedBuilder()
                 .setTitle(result.item.name)
                 .setImage(result.item.url)
-                .setColor('PURPLE'));
+                .setColor(Colors.Purple));
               ++mutantCount;
             }
           }
@@ -47,8 +47,13 @@ export abstract class Search {
         const discEmbed = new EmbedBuilder()
           .setTitle(`Search for ${query} (${results.length})`)
           .setDescription(discEmotes.join('').slice(0, 2047)) // avoid api error of going over char count
-          .setColor('BLUE')
-          .addField('Mutant Emojis', 'Below there may be emotes from the [Mutant emote pack](https://mutant.tech/) that you can use with Cubemoji as well with their names!');
+          .setColor(Colors.Blue)
+          .addFields([
+            {
+              name: 'Mutant Emojis',
+              value: 'Below there may be emotes from the [Mutant emote pack](https://mutant.tech/) that you can use with Cubemoji as well with their names!'
+            }
+          ]);
         embeds.unshift(discEmbed);
         await interaction.editReply({ embeds });
       } else {
