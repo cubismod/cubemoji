@@ -1,5 +1,5 @@
 import { RateLimit, TIME_UNIT } from '@discordx/utilities';
-import { AutocompleteInteraction, CommandInteraction, GuildMember } from 'discord.js';
+import { ApplicationCommandOptionType, AutocompleteInteraction, CommandInteraction, GuildMember } from 'discord.js';
 import { Discord, Guard, Slash, SlashOption } from 'discordx';
 import { emoteAutocomplete } from '../../lib/cmd/Autocomplete';
 import { EditDiscord, parseForEmote } from '../../lib/image/DiscordLogic.js';
@@ -20,7 +20,7 @@ export abstract class Jumbo {
     @SlashOption('emote', {
       description: strings.emoteSlash,
       autocomplete: (interaction: AutocompleteInteraction) => emoteAutocomplete(interaction),
-      type: 'STRING',
+      type: ApplicationCommandOptionType.String,
       required: false
     })
       emote: string,
