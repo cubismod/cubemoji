@@ -1,16 +1,18 @@
 // Generate HTML from PUG template for use in static server
 import { GuildManager } from 'discord.js';
+import { Discord } from 'discordx';
 import { stat, writeFile } from 'fs/promises';
 import path from 'path';
 import { compileFile, compileTemplate } from 'pug';
-import { container, singleton } from 'tsyringe';
+import { container, injectable } from 'tsyringe';
 import { adjectives, names, uniqueNamesGenerator } from 'unique-names-generator';
 import { generateList } from '../conversion/UnitList.js';
 import { CubeStorage } from '../db/Storage.js';
 import { EmoteCache } from '../emote/EmoteCache.js';
 import { CubeLogger } from '../observability/CubeLogger.js';
 
-@singleton()
+@Discord()
+@injectable()
 export class PugGenerator {
   templateDir = './assets/template';
   // private storage = container.resolve(CubeStorage);

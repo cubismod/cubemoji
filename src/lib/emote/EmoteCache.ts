@@ -1,13 +1,13 @@
 /* eslint-disable new-cap */
 // emote cache and some helper functions
 import { GuildEmoji } from 'discord.js';
-import { Client } from 'discordx';
+import { Client, Discord } from 'discordx';
 import { fileTypeFromStream } from 'file-type';
 import Fuse from 'fuse.js';
 import pkg from 'micromatch';
 import hash from 'node-object-hash';
 import { choice } from 'pandemonium';
-import { container, singleton } from 'tsyringe';
+import { container, injectable } from 'tsyringe';
 import { parse } from 'twemoji-parser';
 import mutantNames from '../../res/emojiNames.json' assert { type: 'json' };
 import { CubeStorage, ValRaw } from '../db/Storage.js';
@@ -17,7 +17,8 @@ import { Cmoji, Source } from './Cmoji.js';
 const { got } = await import('got');
 const { isMatch } = pkg;
 
-@singleton()
+@Discord()
+@injectable()
 // a class which can return an array version of emotes
 // and also only refreshes when necessary
 export class EmoteCache {

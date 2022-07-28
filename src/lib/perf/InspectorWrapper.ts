@@ -1,15 +1,17 @@
 /* eslint-disable no-undef */
+import { Discord } from 'discordx';
 import { randomUUID } from 'node:crypto';
 import { open, rm, writeFile } from 'node:fs/promises';
 import inspector from 'node:inspector';
 import path from 'node:path';
-import { container, singleton } from 'tsyringe';
+import { container, injectable } from 'tsyringe';
 import { Milliseconds } from '../constants/Units';
 import { compress } from '../db/DatabaseMgmt';
 import { BucketContentType, S3Client } from '../db/Storage';
 import { CubeLogger } from '../observability/CubeLogger';
 
-@singleton()
+@Discord()
+@injectable()
 export class InspectorWrapper {
   private cpuInspector = new inspector.Session();
   status = false;

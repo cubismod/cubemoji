@@ -1,4 +1,5 @@
-import { singleton } from 'tsyringe';
+import { Discord } from 'discordx';
+import { injectable } from 'tsyringe';
 import { createLogger, format, Logger, transports } from 'winston';
 import { Bytes } from '../constants/Units.js';
 import { LokiTransport } from './LokiTransport.js';
@@ -7,7 +8,8 @@ import { LokiTransport } from './LokiTransport.js';
  * cubemoji logging using Winston
  * https://www.npmjs.com/package/winston
  */
-@singleton()
+@Discord()
+@injectable()
 export class CubeLogger {
   readonly parent: Logger;
   // each child is its own logger

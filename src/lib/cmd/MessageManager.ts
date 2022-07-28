@@ -1,10 +1,12 @@
 import { CommandInteraction, ContextMenuCommandInteraction, Message, MessageReaction, Snowflake } from 'discord.js';
-import { container, singleton } from 'tsyringe';
+import { Discord } from 'discordx';
+import { container, injectable } from 'tsyringe';
 import { CubeStorage } from '../db/Storage.js';
 import { MsgContext } from '../image/ImageLogic.js';
 import { CubeLogger } from '../observability/CubeLogger.js';
 
-@singleton()
+@Discord()
+@injectable()
 // used to keep track of cubemoji sent messages
 export class CubeMessageManager {
   // first option is the message ID, second option is the user ID who sent the message
