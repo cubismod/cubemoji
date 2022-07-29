@@ -49,6 +49,8 @@ stages:
 
 build:
   stage: build
+  tags:
+    - cubemoji
   image:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]
@@ -71,6 +73,8 @@ build:
 
 lint:
   stage: housekeeping
+  tags:
+    - cubemoji
   image:
     name: ${CONTAINER_DEST}
   script:
@@ -81,6 +85,8 @@ lint:
 
 skopeo_copy:
   stage: housekeeping
+  tags:
+    - cubemoji
   image:
     name: alpine
   before_script:
