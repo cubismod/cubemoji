@@ -1,11 +1,11 @@
 import AWS from 'aws-sdk';
 import Database from 'better-sqlite3';
 import { GuildMember } from 'discord.js';
-import { Client } from 'discordx';
+import { Client, Discord } from 'discordx';
 import { readFile } from 'fs/promises';
 import Keyv from 'keyv';
 import path from 'path';
-import { container, singleton } from 'tsyringe';
+import { container, injectable } from 'tsyringe';
 import { ModAction, RolePicker } from '../cmd/ModHelper.js';
 import { Milliseconds } from '../constants/Units.js';
 import { EphemeralLink } from '../http/RoleManager.js';
@@ -64,7 +64,8 @@ export interface RateLimitVal {
   see below
 
 */
-@singleton()
+@Discord()
+@injectable()
 export class CubeStorage {
   /*
     Database that is persisting the info for little trash icons you see
@@ -259,7 +260,8 @@ export class CubeStorage {
  * Several environment variables required, which are described
  * in .example.env
  */
-@singleton()
+@Discord()
+@injectable()
 export class S3Client {
   private s3?:AWS.S3;
   private logger = container.resolve(CubeLogger).storage;

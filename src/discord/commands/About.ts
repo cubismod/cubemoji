@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import { CommandInteraction, MessageEmbed } from 'discord.js';
+import { CommandInteraction, EmbedBuilder } from 'discord.js';
 import { Client, Discord, Guard, Slash } from 'discordx';
 import { container } from 'tsyringe';
 import { EmoteCache } from '../../lib/emote/EmoteCache.js';
@@ -17,12 +17,11 @@ export abstract class About {
   async about(interaction: CommandInteraction, _client: Client, data: BSGuardData) {
     const emoteCache = container.resolve(EmoteCache);
     if (emoteCache !== undefined) {
-      const embed = new MessageEmbed();
+      const embed = new EmbedBuilder();
       embed.setTitle('Cubemoji');
       embed.setThumbnail('https://gitlab.com/cubismod/cubemoji/-/raw/master/assets/icon.png');
       embed.setColor(0x91d7f2);
-      embed.author = { name: 'Created by cubis' };
-      embed.setDescription('a simple emoji bot built to last ⌛');
+      embed.setDescription(`a simple emoji bot built to last ⌛\n built by cubis, <@${process.env.CM_BOTOWNER}>`);
 
       embed.addFields([
         {

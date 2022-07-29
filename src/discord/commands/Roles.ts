@@ -1,4 +1,4 @@
-import { ButtonInteraction, CommandInteraction, MessageActionRow, MessageButton, MessageEmbed } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, Colors, CommandInteraction, EmbedBuilder } from 'discord.js';
 import { ButtonComponent, Discord, Slash } from 'discordx';
 import { clearPage, rolePermissionCheck, rolesCommand } from '../../lib/http/RoleManager';
 
@@ -11,13 +11,13 @@ export abstract class Roles {
     await interaction.deferReply({ ephemeral: true });
 
     // button to clear temporary page
-    const button = new MessageButton()
+    const button = new ButtonBuilder()
       .setLabel('Delete roles profile')
       .setEmoji('🗑️')
-      .setStyle('DANGER')
+      .setStyle(ButtonStyle.Danger)
       .setCustomId('delete-button');
 
-    const actionRow = new MessageActionRow().addComponents(button);
+    const actionRow = new ActionRowBuilder<ButtonBuilder>().addComponents(button);
 
     if (interaction.guildId) {
       const res = await rolesCommand(interaction.user.id, interaction.guildId);
@@ -25,14 +25,17 @@ export abstract class Roles {
       if (manageRolesPerm) {
         await interaction.editReply({
           embeds: [
-            new MessageEmbed({ title: 'Roles Profile', description: res, color: 'DARK_VIVID_PINK' })
+            new EmbedBuilder({ title: 'Roles Profile', description: res, color: Colors.DarkVividPink })
           ],
           components: [actionRow]
         });
       } else {
         await interaction.editReply({
           embeds: [
-            new MessageEmbed({ description: 'Cubemoji does not have permissions to edit roles on this server therefore the Role Picker feature is disabled. Please contact a server moderator or administrator to ensure they enable the permission.', color: 'RED' })
+            new EmbedBuilder({
+              description: 'Cubemoji does not have permissions to edit roles on this server therefore the Role Picker feature is disabled. Please contact a server moderator or administrator to ensure they enable the permission.',
+              color: Colors.Red
+            })
           ]
         });
       }

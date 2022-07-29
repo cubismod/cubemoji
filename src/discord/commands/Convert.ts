@@ -1,4 +1,4 @@
-import { AutocompleteInteraction, CommandInteraction } from 'discord.js';
+import { ApplicationCommandOptionType, AutocompleteInteraction, CommandInteraction } from 'discord.js';
 import { Discord, Slash, SlashOption } from 'discordx';
 import Qty from 'js-quantities';
 import { container } from 'tsyringe';
@@ -13,18 +13,18 @@ export abstract class Convert {
   async convert(
     @SlashOption('fromval', {
       description: 'the value of whatever you are converting from',
-      type: 'NUMBER'
+      type: ApplicationCommandOptionType.Number
     }) fromval: number,
 
     @SlashOption('fromunit', {
       description: 'the unit of whatever you are converting from, use "tempC/tempF" for temperature',
-      type: 'STRING',
+      type: ApplicationCommandOptionType.String,
       autocomplete: (interaction: AutocompleteInteraction) => unitAutocomplete(interaction)
     }) fromunit: string,
 
     @SlashOption('tounit', {
       description: 'unit to convert to, use "tempC/tempF" for temperatures',
-      type: 'STRING',
+      type: ApplicationCommandOptionType.String,
       autocomplete: (interaction: AutocompleteInteraction) => unitAutocomplete(interaction)
     }) tounit: string,
       interaction: CommandInteraction

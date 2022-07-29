@@ -1,14 +1,11 @@
 import { dirname, importx } from '@discordx/importer';
-import { Intents } from 'discord.js';
-import { Client } from 'discordx';
-import { config } from 'dotenv';
+import { GatewayIntentBits, Partials } from 'discord.js';
+import { Client, DIService, tsyringeDependencyRegistryEngine } from 'discordx';
 import { mkdir } from 'fs/promises';
 import 'reflect-metadata';
+import { container } from 'tsyringe';
 import { bigServerDetect, blockedChannelDetect } from './discord/Guards.js';
 import { CubeLogger } from './lib/observability/CubeLogger.js';
-
-// load dotenv file if exists
-config();
 
 // create a directory and ignore if already exists
 async function createDir(dirName: string) {
@@ -25,6 +22,8 @@ export class Main {
   }
 
   static async start() {
+    DIService.engine = tsyringeDependencyRegistryEngine.setInjector(container);
+
     const logger = new CubeLogger().main;
 
     // create required folders
@@ -49,13 +48,13 @@ export class Main {
     this._client = new Client({
       botGuilds: [(client) => client.guilds.cache.map((guild) => guild.id)],
       intents: [
-        Intents.FLAGS.GUILDS,
-        Intents.FLAGS.GUILD_EMOJIS_AND_STICKERS,
-        Intents.FLAGS.GUILD_MESSAGES,
-        Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
-        Intents.FLAGS.GUILD_MEMBERS
+        GatewayIntentBits.Guilds,
+        GatewayIntentBits.GuildEmojisAndStickers,
+        GatewayIntentBits.GuildMessages,
+        GatewayIntentBits.GuildMessageReactions,
+        GatewayIntentBits.GuildMembers
       ],
-      partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
+      partials: [Partials.Message, Partials.Channel, Partials.Reaction],
       // for testing purposes in cubemoji server
       silent,
       guards: [blockedChannelDetect, bigServerDetect]

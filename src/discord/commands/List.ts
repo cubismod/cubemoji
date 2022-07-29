@@ -12,11 +12,11 @@ export abstract class List {
     description: 'Get a full list of emojis'
   })
   async list(
-    @SlashChoice('All', 'all')
-    @SlashChoice('Discord', 'discord')
-    @SlashChoice('Mutant', 'mutant')
-    @SlashChoice('This Server', 'thisserver')
-    @SlashChoice('Web', 'web')
+    @SlashChoice('all')
+    @SlashChoice('discord')
+    @SlashChoice('mutant_emoji')
+    @SlashChoice('this_server')
+    @SlashChoice('webpage')
     @SlashOption('subset', { description: 'Which subset of emotes would you like to choose from?' })
       subset: string,
       interaction: CommandInteraction,
@@ -29,13 +29,13 @@ export abstract class List {
       case 'discord':
         type = Source.Discord;
         break;
-      case 'mutant':
+      case 'mutant_emoji':
         type = Source.Mutant;
         break;
-      case 'thisserver':
+      case 'this_server':
         type = Source.ThisServer;
         break;
-      case 'web':
+      case 'webpage':
         interaction.reply(`Check out an online emoji list at ${process.env.CM_URL}.`);
         return;
     }

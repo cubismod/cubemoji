@@ -1,13 +1,13 @@
-import { ContextMenuInteraction } from 'discord.js';
+import { ApplicationCommandType, ContextMenuCommandInteraction } from 'discord.js';
 import { Client, ContextMenu, Discord } from 'discordx';
 import { EditDiscord, getMessageImage, RescaleDiscord } from '../lib/image/DiscordLogic.js';
 import { BSGuardData } from './Guards.js';
 
 @Discord()
 export abstract class CubeMessageContext {
-  @ContextMenu('MESSAGE', 'Apply edit to this message')
+  @ContextMenu(ApplicationCommandType.Message, 'Apply edit to this message')
   async editHandler(
-    interaction: ContextMenuInteraction,
+    interaction: ContextMenuCommandInteraction,
     _client: Client,
     data: BSGuardData) {
     if (interaction.channel) {
@@ -19,9 +19,9 @@ export abstract class CubeMessageContext {
     }
   }
 
-  @ContextMenu('MESSAGE', 'Rescale this message')
+  @ContextMenu(ApplicationCommandType.Message, 'Rescale this message')
   async rescaleHandler(
-    interaction: ContextMenuInteraction,
+    interaction: ContextMenuCommandInteraction,
     _client: Client,
     data: BSGuardData) {
     if (interaction.channel) {
@@ -32,9 +32,9 @@ export abstract class CubeMessageContext {
     }
   }
 
-  @ContextMenu('MESSAGE', 'Jumbofy this message')
+  @ContextMenu(ApplicationCommandType.Message, 'Jumbofy this message')
   async jumboHandler(
-    interaction: ContextMenuInteraction,
+    interaction: ContextMenuCommandInteraction,
     _client: Client,
     data: BSGuardData) {
     if (interaction.channel) {

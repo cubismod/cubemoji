@@ -1,4 +1,4 @@
-import { AutocompleteInteraction, CommandInteraction, GuildMember } from 'discord.js';
+import { ApplicationCommandOptionType, AutocompleteInteraction, CommandInteraction, GuildMember } from 'discord.js';
 import { Client, Discord, Slash, SlashOption } from 'discordx';
 import { editAutocomplete, emoteAutocomplete } from '../../lib/cmd/Autocomplete';
 import { EditDiscord } from '../../lib/image/DiscordLogic.js';
@@ -13,7 +13,7 @@ export abstract class Edit {
     @SlashOption('source', {
       description: strings.sourceSlash,
       autocomplete: (interaction: AutocompleteInteraction) => emoteAutocomplete(interaction),
-      type: 'STRING',
+      type: ApplicationCommandOptionType.String,
       required: false
     })
       emote: string,
@@ -22,7 +22,7 @@ export abstract class Edit {
     @SlashOption('effects', {
       description: 'list of effects (space separated, max 20). If not specified then random effects will be applied',
       autocomplete: (interaction: AutocompleteInteraction) => editAutocomplete(interaction),
-      type: 'STRING',
+      type: ApplicationCommandOptionType.String,
       required: false
     })
       effects: string,
@@ -48,7 +48,7 @@ export abstract class Edit {
         await edDiscord.run();
       } else if (member) {
         await interaction.deferReply(deferOptions);
-        const edDiscord = new EditDiscord(interaction, effects, member.displayAvatarURL({ format: 'png', dynamic: true, size: 256 }), interaction.user);
+        const edDiscord = new EditDiscord(interaction, effects, member.displayAvatarURL({ extension: 'png', size: 256 }), interaction.user);
         await edDiscord.run();
       }
     }

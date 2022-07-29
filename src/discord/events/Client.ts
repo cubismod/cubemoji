@@ -2,8 +2,8 @@
 
 import { SpanStatusCode } from '@opentelemetry/api';
 import { Tracer } from '@opentelemetry/sdk-trace-base';
-import { CommandInteraction, ContextMenuInteraction } from 'discord.js';
-import { ArgsOf, Client, Discord, DIService, On, Once } from 'discordx';
+import { CommandInteraction, ContextMenuCommandInteraction } from 'discord.js';
+import { ArgsOf, Client, Discord, On, Once } from 'discordx';
 import { container } from 'tsyringe';
 import { GitClient } from '../../lib/cd/GitClient.js';
 import { CubeMessageManager } from '../../lib/cmd/MessageManager.js';
@@ -34,109 +34,103 @@ export abstract class ClientEvents {
     [_args]: ArgsOf<'ready'>, // we don't care about Discord.js's client object
     client: Client
   ) {
-    DIService.container = container;
-
     const webServer = new CubeServer();
 
     // dependency injection initialization
-    if (DIService.container !== undefined) {
-      const res = configureTracer();
-      DIService.container.register(Tracer, { useValue: res });
-      this.logger.info('Tracing started');
+    const res = configureTracer();
+    container.register(Tracer, { useValue: res });
+    this.logger.info('Tracing started');
 
-      DIService.container.register(CubeLogger, { useValue: this.cubeLogger });
-      this.logger.info('registered CubeLogger');
+    container.register(CubeLogger, { useValue: this.cubeLogger });
+    this.logger.info('registered CubeLogger');
 
-      const sleep = new Promise(resolve => setTimeout(resolve, Milliseconds.fiveSec));
-      // setup logging on exceptions, unhandled rejections
-      // and sent over http
-      process.on('uncaughtException', async (err, origin) => {
-        this.cubeLogger.errors.crit(`A fatal error ocurred: ${err}\n Origin: ${origin}.`);
-        await sleep;
-        process.exit(1);
-      });
+    const sleep = new Promise(resolve => setTimeout(resolve, Milliseconds.fiveSec));
+    // setup logging on exceptions, unhandled rejections
+    // and sent over http
+    process.on('uncaughtException', async (err, origin) => {
+      this.cubeLogger.errors.crit(`A fatal error ocurred: ${err}\n Origin: ${origin}.`);
+      await sleep;
+      process.exit(1);
+    });
 
-      process.on('unhandledRejection', async (reason, promise) => {
-        this.cubeLogger.errors.crit(`Fatal unhandled rejection ocurred at: ${promise}, reason: ${reason}.`);
-        await sleep;
-        process.exit(1);
-      });
+    process.on('unhandledRejection', async (reason, promise) => {
+      this.cubeLogger.errors.crit(`Fatal unhandled rejection ocurred at: ${promise}, reason: ${reason}.`);
+      await sleep;
+      process.exit(1);
+    });
 
-      DIService.container.register(FileQueue, { useValue: new FileQueue() });
-      this.logger.info('registered ImageQueue');
+    container.register(FileQueue, { useValue: new FileQueue() });
+    this.logger.info('registered ImageQueue');
 
-      const imageQueue = container.resolve(FileQueue);
-      await imageQueue.clear();
-      this.logger.info('cleared download directory');
+    const imageQueue = container.resolve(FileQueue);
+    await imageQueue.clear();
+    this.logger.info('cleared download directory');
 
-      DIService.container.register(CubeMessageManager, { useValue: new CubeMessageManager() });
-      this.logger.info('registered CubeMessageManager');
+    container.register(CubeMessageManager, { useValue: new CubeMessageManager() });
+    this.logger.info('registered CubeMessageManager');
 
-      DIService.container.register(CubeStorage, { useValue: new CubeStorage() });
-      this.logger.info('registered CubeStorage');
+    container.register(CubeStorage, { useValue: new CubeStorage() });
+    this.logger.info('registered CubeStorage');
 
-      const badHosts = new BadHosts();
-      await badHosts.downloadList();
-      DIService.container.register(BadHosts, { useValue: badHosts });
-      this.logger.info('registered BadHosts');
+    const badHosts = new BadHosts();
+    await badHosts.downloadList();
+    container.register(BadHosts, { useValue: badHosts });
+    this.logger.info('registered BadHosts');
 
-      setInterval(
-        async () => {
-          await badHosts.downloadList();
-        },
-        Milliseconds.week
-      );
+    setInterval(
+      async () => {
+        await badHosts.downloadList();
+      },
+      Milliseconds.week
+    );
 
-      await container.resolve(CubeStorage).loadServerOwners(client);
+    await container.resolve(CubeStorage).loadServerOwners(client);
 
-      const s3Client = new S3Client();
-      DIService.container.register(S3Client, { useValue: s3Client });
-      this.logger.info('registered S3Client');
+    const s3Client = new S3Client();
+    container.register(S3Client, { useValue: s3Client });
+    this.logger.info('registered S3Client');
 
-      DIService.container.register(InspectorWrapper, { useValue: new InspectorWrapper() });
+    container.register(InspectorWrapper, { useValue: new InspectorWrapper() });
 
-      // schedule a backup for 2am EST
-      scheduleBackup();
+    // schedule a backup for 2am EST
+    scheduleBackup();
 
-      // load up cubemoji emote cache
-      const emoteCache = container.resolve(EmoteCache);
-      await emoteCache.init(client);
-      emoteCache.loadBlockedEmojis();
-      this.logger.info('initialized EmoteCache');
+    // load up cubemoji emote cache
+    const emoteCache = container.resolve(EmoteCache);
+    await emoteCache.init(client);
+    emoteCache.loadBlockedEmojis();
+    this.logger.info('initialized EmoteCache');
 
-      const pugGenerator = new PugGenerator();
-      DIService.container.register(PugGenerator, { useValue: pugGenerator });
-      await pugGenerator.emojiRender(client.guilds);
-      await pugGenerator.staticRenders();
-      this.logger.info('initialized PugGenerator');
+    const pugGenerator = new PugGenerator();
+    container.register(PugGenerator, { useValue: pugGenerator });
+    await pugGenerator.emojiRender(client.guilds);
+    await pugGenerator.staticRenders();
+    this.logger.info('initialized PugGenerator');
 
-      let workers = 4;
-      if (process.env.CM_WORKERS) workers = parseInt(process.env.CM_WORKERS);
-      DIService.container.register(WorkerPool, { useValue: new WorkerPool(workers) });
-      this.logger.info('registered WorkerPool');
+    let workers = 4;
+    if (process.env.CM_WORKERS) workers = parseInt(process.env.CM_WORKERS);
+    container.register(WorkerPool, { useValue: new WorkerPool(workers) });
+    this.logger.info('registered WorkerPool');
 
-      DIService.container.register(CubeServer, { useValue: webServer });
+    container.register(CubeServer, { useValue: webServer });
 
-      DIService.container.register(GitClient, { useValue: new GitClient() });
-      await DIService.container.resolve(GitClient).init();
-      this.logger.info('registered GitClient');
+    container.register(GitClient, { useValue: new GitClient() });
+    await container.resolve(GitClient).init();
+    this.logger.info('registered GitClient');
 
-      // every 90 min, refresh our cache of who the server owners are
-      // and re-init permissions on Moderation commands as well as
-      // regen pug
-      setInterval(
-        async () => {
-          await container.resolve(CubeStorage).loadServerOwners(client);
-          // await client.initApplicationPermissions();
-          await container.resolve(PugGenerator).emojiRender(client.guilds);
-          this.logger.debug('Pug-regen completed');
-          await container.resolve(GitClient).pull();
-        },
-        Milliseconds.ninetyMin
-      );
-    } else {
-      throw new Error('DIServer.container is undefined therefore cannot initialize dependency injection');
-    }
+    // every 90 min, refresh our cache of who the server owners are
+    // and re-init permissions on Moderation commands as well as
+    // regen pug
+    setInterval(
+      async () => {
+        await container.resolve(CubeStorage).loadServerOwners(client);
+        // await client.initApplicationPermissions();
+        await container.resolve(PugGenerator).emojiRender(client.guilds);
+        this.logger.debug('Pug-regen completed');
+        await container.resolve(GitClient).pull();
+      },
+      Milliseconds.ninetyMin
+    );
 
     await webServer.start();
 
@@ -149,7 +143,7 @@ export abstract class ClientEvents {
       throw new Error('exiting application as commands can\'t init properly');
     }
 
-    DIService.container.register(Client, { useValue: client });
+    container.register(Client, { useValue: client });
 
     this.logger.info(`cubemoji ${process.env.npm_package_version} is now running...`);
     this.logger.info(`It took ${process.uptime()}s to startup this time`);
@@ -204,7 +198,7 @@ export abstract class ClientEvents {
     // determine command name
     let name = interaction.id;
 
-    if (interaction instanceof CommandInteraction || interaction instanceof ContextMenuInteraction) {
+    if (interaction instanceof CommandInteraction || interaction instanceof ContextMenuCommandInteraction) {
       name = `command - ${interaction.commandName}`;
     }
     await tracer.startActiveSpan(name, async span => {
@@ -219,6 +213,7 @@ export abstract class ClientEvents {
           span.recordException(err);
           span.setStatus({ code: SpanStatusCode.ERROR });
           span.end();
+          return;
         }
       }
 

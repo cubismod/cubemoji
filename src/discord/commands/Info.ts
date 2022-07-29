@@ -1,12 +1,12 @@
 // https://github.com/oceanroleplay/discord.ts-example/blob/main/src/commands/slashes.ts
-import { AutocompleteInteraction, ButtonInteraction, CommandInteraction, GuildMember, MessageActionRow, MessageButton, MessageEmbed } from 'discord.js';
+import { ActionRowBuilder, ApplicationCommandOptionType, AutocompleteInteraction, ButtonBuilder, ButtonInteraction, ButtonStyle, Colors, CommandInteraction, EmbedBuilder, GuildMember } from 'discord.js';
 import { ButtonComponent, Discord, Slash, SlashOption } from 'discordx';
 import rgbHex from 'rgb-hex';
 import { container } from 'tsyringe';
 import { emoteAutocomplete } from '../../lib/cmd/Autocomplete';
 import { Source } from '../../lib/emote/Cmoji.js';
 import { EmoteCache } from '../../lib/emote/EmoteCache.js';
-import { getColors } from '../../lib/image/ColorExtract';
+import { getColors, paletteToInt } from '../../lib/image/ColorExtract';
 import { CubeLogger } from '../../lib/observability/CubeLogger.js';
 import strings from '../../res/strings.json' assert { type: 'json' };
 
@@ -23,7 +23,7 @@ export abstract class Info {
     @SlashOption('emote', {
       description: strings.emoteSlash,
       autocomplete: (interaction: AutocompleteInteraction) => emoteAutocomplete(interaction),
-      type: 'STRING',
+      type: ApplicationCommandOptionType.String,
       required: false
     })
       emote: string,
@@ -40,7 +40,7 @@ export abstract class Info {
         if (res !== undefined) {
           await interaction.deferReply();
 
-          let embed = new MessageEmbed();
+          let embed = new EmbedBuilder();
           embed = await this.setColors(embed, res.url);
           embed.setImage(res.url);
           embed.setTitle(res.name);
@@ -51,18 +51,50 @@ export abstract class Info {
 
           switch (res.source) {
             case Source.Discord: {
-              if (res.guildEmoji?.createdAt) embed.addField('Creation Date', `<t:${Math.round(res.guildEmoji.createdAt.getTime() / 1000)}>`);
-              if (res.guildEmoji?.id) embed.addField('ID', res.guildEmoji.id);
-              embed.addField('URL', res.url);
-              if (res.guildEmoji?.animated) embed.addField('Animated', 'Yes');
-              if (res.guildEmoji?.guild.name) embed.addField('Origin Server Name', res.guildEmoji.guild.name);
+              if (res.guildEmoji?.createdAt) {
+                embed.addFields([
+                  {
+                    name: 'Creation Date',
+                    value: `<t:${Math.round(res.guildEmoji.createdAt.getTime() / 1000)}>`
+                  }
+                ]);
+              }
+              if (res.guildEmoji?.id) {
+                embed.addFields([
+                  { name: 'ID', value: res.guildEmoji.id }
+                ]);
+              }
+              embed.addFields([
+                { name: 'URL', value: res.url }
+              ]);
+              if (res.guildEmoji?.animated) {
+                embed.addFields([
+                  { name: 'Animated', value: 'Yes' }
+                ]);
+              }
+              if (res.guildEmoji?.guild.name) {
+                embed.addFields([
+                  {
+                    name: 'Origin Server Name', value: res.guildEmoji.guild.name
+                  }
+                ]);
+              }
               const author = await res.guildEmoji?.fetchAuthor();
-              if (author !== undefined) embed.addField('Author', author.username);
+              if (author !== undefined) {
+                embed.addFields([
+                  { name: 'Author', value: author.username }
+                ]);
+              }
               await interaction.editReply({ embeds: [embed], components: [row] });
               break;
             }
             case Source.Mutant: {
-              embed.addField('Disclaimer', ' This bot uses Mutant Standard emoji (https://mutant.tech) which are licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License (https://creativecommons.org/licenses/by-nc-sa/4.0/).');
+              embed.addFields([
+                {
+                  name: 'Disclaimer',
+                  value: 'This bot uses Mutant Standard emoji (https://mutant.tech) which are licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License (https://creativecommons.org/licenses/by-nc-sa/4.0/).'
+                }
+              ]);
               await interaction.editReply({ embeds: [embed], components: [row] });
               break;
             }
@@ -72,8 +104,8 @@ export abstract class Info {
         }
       } else if (member !== undefined) {
         // user code
-        const avatarURL = member.user.displayAvatarURL({ format: 'png', dynamic: true, size: 256 });
-        let embed = new MessageEmbed();
+        const avatarURL = member.user.displayAvatarURL({ size: 256, extension: 'png' });
+        let embed = new EmbedBuilder();
 
         // button setup
         this.imgUrl = avatarURL;
@@ -82,10 +114,21 @@ export abstract class Info {
         embed = await this.setColors(embed, avatarURL);
         embed.setTitle(member.user.tag);
         embed.setImage(avatarURL);
-        embed.addField('ID', member.user.id);
-        embed.addField('Discord Join Date', `<t:${Math.round(member.user.createdAt.getTime() / 1000)}>`);
-        if (member.joinedAt) embed.addField('This Server Join Date', `<t:${Math.round(member.joinedAt.getTime() / 1000)}>`);
-        embed.addField('Bot', member.user.bot.toString());
+        embed.addFields([
+          { name: 'ID', value: member.user.id }
+        ]);
+        embed.addFields([
+          { name: 'Discord Join Date', value: `<t:${Math.round(member.user.createdAt.getTime() / 1000)}>` }
+        ]);
+        if (member.joinedAt) {
+          embed.addFields([
+            { name: 'This Server Join Date', value: `<t:${Math.round(member.joinedAt.getTime() / 1000)}>` }
+          ]);
+        };
+
+        embed.addFields([
+          { name: 'Bot', value: member.user.bot.toString() }
+        ]);
         try {
           await interaction.reply({ embeds: [embed], components: [row] });
         } catch (err) {
@@ -98,22 +141,22 @@ export abstract class Info {
     }
   }
 
-  private async setColors(embed: MessageEmbed, url: string) {
+  private async setColors(embed: EmbedBuilder, url: string) {
     const colors = await getColors(url);
     const dominant = colors[0];
     if (colors) {
       embed.setColor([dominant[0], dominant[1], dominant[2]]);
-    } else embed.setColor('RANDOM');
+    } else embed.setColor(Colors.Navy);
     return embed;
   }
 
   private buttonCreate() {
-    const button = new MessageButton()
+    const button = new ButtonBuilder()
       .setLabel('Generate a palette of dominant colors')
       .setEmoji('🎨')
-      .setStyle('PRIMARY')
+      .setStyle(ButtonStyle.Primary)
       .setCustomId('color-button');
-    return new MessageActionRow().addComponents(button);
+    return new ActionRowBuilder<ButtonBuilder>().addComponents(button);
   }
 
   @ButtonComponent('color-button')
@@ -128,13 +171,13 @@ export abstract class Info {
       }
     }
     const colors = await getColors(this.imgUrl);
-    const embeds: MessageEmbed[] = [];
+    const embeds: EmbedBuilder[] = [];
     if (colors && this.imgUrl !== '') {
       colors.forEach((color, i) => {
         if (i < 9) {
-          const embed = new MessageEmbed({
+          const embed = new EmbedBuilder({
             description: `RGB: \`${color}\`\nHex: \`#${rgbHex(color[0], color[1], color[2])}\``,
-            color
+            color: paletteToInt(color)
           });
           embeds.push(embed);
         }

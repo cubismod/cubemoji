@@ -1,15 +1,12 @@
 import { RateLimit, TIME_UNIT } from '@discordx/utilities';
-import { AutocompleteInteraction, CommandInteraction, GuildMember } from 'discord.js';
+import { ApplicationCommandOptionType, AutocompleteInteraction, CommandInteraction, GuildMember } from 'discord.js';
 import { Discord, Guard, Slash, SlashOption } from 'discordx';
 import { emoteAutocomplete } from '../../lib/cmd/Autocomplete';
 import { EditDiscord, parseForEmote } from '../../lib/image/DiscordLogic.js';
 import strings from '../../res/strings.json' assert { type: 'json' };
 
 @Guard(
-  RateLimit(TIME_UNIT.seconds, 10, {
-    ephemeral: true,
-    rateValue: 3
-  })
+  RateLimit(TIME_UNIT.seconds, 60, { ephemeral: true })
 )
 @Discord()
 export abstract class Jumbo {
@@ -20,7 +17,7 @@ export abstract class Jumbo {
     @SlashOption('emote', {
       description: strings.emoteSlash,
       autocomplete: (interaction: AutocompleteInteraction) => emoteAutocomplete(interaction),
-      type: 'STRING',
+      type: ApplicationCommandOptionType.String,
       required: false
     })
       emote: string,
@@ -40,7 +37,7 @@ export abstract class Jumbo {
     } else if (member !== undefined) {
       // user code
       // no need to defer a reply since we don't have to search through the emote cache
-      const edDiscord = new EditDiscord(interaction, 'magnify magnify', member.displayAvatarURL({ format: 'png', dynamic: true, size: 256 }), interaction.user);
+      const edDiscord = new EditDiscord(interaction, 'magnify magnify', member.displayAvatarURL({ size: 256, extension: 'png' }), interaction.user);
       await edDiscord.run();
     }
     if ((member === undefined) && (emote === undefined)) {

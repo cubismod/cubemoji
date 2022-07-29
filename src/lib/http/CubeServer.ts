@@ -1,10 +1,12 @@
 import { dirname, importx } from '@discordx/importer';
 import { Koa } from '@discordx/koa';
-import { container, singleton } from 'tsyringe';
+import { Discord } from 'discordx';
+import { container, injectable } from 'tsyringe';
 import { CubeLogger } from '../observability/CubeLogger';
 
 // used for tsyringe object representing server
-@singleton()
+@Discord()
+@injectable()
 export class CubeServer {
   private logger = container.resolve(CubeLogger).web;
   private server = new Koa();

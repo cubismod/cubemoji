@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-vars */
 // various other classes used by cubemoji
-import { GuildEmoji, Snowflake, SnowflakeUtil } from 'discord.js';
+import { randomUUID } from 'crypto';
+import { GuildEmoji, Snowflake } from 'discord.js';
 import { adjectives, names, uniqueNamesGenerator } from 'unique-names-generator';
 
 // the emoji can come from a few places
@@ -38,7 +39,7 @@ export class Cmoji {
       this.source = source ?? Source.Any;
       this.guildEmoji = guildEmoji;
       // auto generate an ID
-      this.id = id ?? SnowflakeUtil.generate();
+      this.id = id ?? randomUUID();
     }
   }
 }
