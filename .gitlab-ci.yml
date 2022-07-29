@@ -49,11 +49,11 @@ stages:
   - maintain
 
 cache:
-    - key:
-        files:
-          - yarn.lock
-        paths:
-          - node_modules/
+  key:
+    files:
+      - yarn.lock
+  paths:
+    - node_modules/
 
 build:
   stage: build
