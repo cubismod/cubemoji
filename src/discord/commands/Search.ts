@@ -43,18 +43,22 @@ export abstract class Search {
             }
           }
         }
-        // then we create an embed for the discord emotes and put them at the beginning of the embeds array
-        const discEmbed = new EmbedBuilder()
-          .setTitle(`Search for ${query} (${results.length})`)
-          .setDescription(discEmotes.join('').slice(0, 2047)) // avoid api error of going over char count
-          .setColor(Colors.Blue)
-          .addFields([
-            {
-              name: 'Mutant Emojis',
-              value: 'Below there may be emotes from the [Mutant emote pack](https://mutant.tech/) that you can use with Cubemoji as well with their names!'
-            }
-          ]);
-        embeds.unshift(discEmbed);
+
+        if (discEmotes.length > 0) {
+          // then we create an embed for the discord emotes and put them at the beginning of the embeds array
+          const discEmbed = new EmbedBuilder()
+            .setTitle(`Search for ${query} (${results.length})`)
+            .setDescription(discEmotes.join('').slice(0, 2047)) // avoid api error of going over char count
+            .setColor(Colors.Blue)
+            .addFields([
+              {
+                name: 'Mutant Emojis',
+                value: 'Below there may be emotes from the [Mutant emote pack](https://mutant.tech/) that you can use with Cubemoji as well with their names!'
+              }
+            ]);
+          embeds.unshift(discEmbed);
+        }
+
         await interaction.editReply({ embeds });
       } else {
         await interaction.editReply(strings.noEmoteFound);
