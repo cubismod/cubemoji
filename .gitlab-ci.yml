@@ -114,7 +114,8 @@ comment_bot:
   interruptible: true
   script:
     - >-
-      curl --request POST 
+      curl --request POST
+      -v
       --header "PRIVATE-TOKEN: ${CI_JOB_TOKEN}"
       --data-urlencode "body=${GL_IMG_COMMENT}"
       "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/commits/${CI_COMMIT_SHA}/discussions"
