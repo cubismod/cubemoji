@@ -125,13 +125,6 @@ skopeo_copy:
       - if: '$CI_COMMIT_BRANCH == "main" && ($CI_PIPELINE_SOURCE != "merge_request_event" || $CI_PIPELINE_SOURCE != "schedule")'
       - *change_rule
 
-sast:
-  variables:
-    SAST_EXCLUDED_ANALYZERS:
-      bandit, brakeman, flawfinder, gosec, kubesec, mobsf, phpcs-security-audit,
-      pmd-apex, security-code-scan, sobelow, spotbugs
-  stage: scan
-
 # only deploy when a new tag is created
 # deploy:
 #   stage: deploy
@@ -180,6 +173,5 @@ docker:
   extends: .dependabot-gitlab
 
 include:
-  - template: Security/SAST.gitlab-ci.yml
   - project: "dependabot-gitlab/dependabot-standalone"
     file: ".gitlab-ci.yml"
