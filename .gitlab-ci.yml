@@ -48,6 +48,22 @@ stages:
   - test
   - maintain
 
+# don't run builds if any of the Docker files
+# haven't actually changed
+.build_rule:
+  change_rule: &change_rule
+    if: '$CI_PIPELINE_SOURCE != "schedule"'
+    changes:
+    - Dockerfile
+    - scripts/
+    - assets/
+    - yarn.lock
+    - package.json
+    - tsconfig.json
+    - .eslintrc.json
+    - src/
+    - PRIVACY.md
+
 build:
   stage: build
   tags:
@@ -57,17 +73,7 @@ build:
     entrypoint: [""]
   interruptible: true
   rules:
-    - if: '$CI_PIPELINE_SOURCE != "schedule"'
-      changes:
-      - Dockerfile
-      - scripts/
-      - assets/
-      - yarn.lock
-      - package.json
-      - tsconfig.json
-      - .eslintrc.json
-      - src/
-      - PRIVACY.md
+    - *change_rule
   script:
     - mkdir -p /kaniko/.docker
     - echo $QUAY_CONF > $KANIKO_AUTH
@@ -87,11 +93,12 @@ build:
 
 lint:
   stage: housekeeping
-  needs: ["build"]
   tags:
     - cubemoji
   image:
     name: ${CONTAINER_DEST}
+  rules:
+    - *change_rule
   interruptible: true
   script:
     - cd /usr/src/cubemoji
@@ -101,7 +108,6 @@ lint:
 
 skopeo_copy:
   stage: housekeeping
-  needs: ["build"]
   tags:
     - cubemoji
   image:
@@ -117,6 +123,7 @@ skopeo_copy:
   interruptible: true
   rules:
       - if: '$CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE != "merge_request_event"'
+      - *change_rule
 
 sast:
   variables:
