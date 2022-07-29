@@ -113,7 +113,9 @@ comment_bot:
     - >-
       curl --request POST 
       --header "PRIVATE-TOKEN: ${CI_JOB_TOKEN}"
-      "${GL_API_EP}projects/${CI_PROJECT_ID}/commits/${CI_COMMIT_SHA}/discussions?body=${GL_IMG_COMMENT}"
+      --data-urlencode "body=${GL_IMG_COMMENT}"
+      "${GL_API_EP}projects/${CI_PROJECT_ID}/commits/${CI_COMMIT_SHA}/discussions"
+
 
 sast:
   variables:
