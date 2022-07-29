@@ -87,6 +87,7 @@ build:
 
 lint:
   stage: housekeeping
+  needs: ["build"]
   tags:
     - cubemoji
   image:
@@ -100,6 +101,7 @@ lint:
 
 skopeo_copy:
   stage: housekeeping
+  needs: ["build"]
   tags:
     - cubemoji
   image:
