@@ -41,7 +41,6 @@ variables:
   CONTAINER_DEST: $REPO_NAME:$CONTAINER_SLUG
   KANIKO_AUTH: /kaniko/.docker/config.json
   SKOP_AUTH: /tmp/skopeo.json
-  GL_API_EP: https://gitlab.com/api/v4/
   GL_IMG_COMMENT: "Image available at [${CONTAINER_DEST}](https://quay.io/cubismod/cubemoji/?tab=tags&tag=${CONTAINER_SLUG})"
 
 stages:
@@ -57,6 +56,7 @@ build:
   image:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]
+  interruptible: true
   script:
     - mkdir -p /kaniko/.docker
     - echo $QUAY_CONF > $KANIKO_AUTH
@@ -80,6 +80,7 @@ lint:
     - cubemoji
   image:
     name: ${CONTAINER_DEST}
+  interruptible: true
   script:
     - cd /usr/src/cubemoji
     - yarn install  # install dev deps as well
@@ -100,6 +101,7 @@ skopeo_copy:
       skopeo copy 
       docker://${CONTAINER_DEST} docker://${REPO_NAME}:latest
       --authfile ${SKOP_AUTH}
+  interruptible: true
   rules:
       - if: '$CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE != "merge_request_event"'
 
@@ -109,12 +111,13 @@ comment_bot:
     - cubemoji
   image:
     name: curlimages/curl 
+  interruptible: true
   script:
     - >-
       curl --request POST 
       --header "PRIVATE-TOKEN: ${CI_JOB_TOKEN}"
       --data-urlencode "body=${GL_IMG_COMMENT}"
-      "${GL_API_EP}projects/${CI_PROJECT_ID}/commits/${CI_COMMIT_SHA}/discussions"
+      "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/commits/${CI_COMMIT_SHA}/discussions"
 
 
 sast:
