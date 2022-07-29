@@ -56,6 +56,18 @@ build:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]
   interruptible: true
+  rules:
+    - if: '$CI_PIPELINE_SOURCE != "schedule"'
+      changes:
+      - Dockerfile
+      - scripts/
+      - assets/
+      - yarn.lock
+      - package.json
+      - tsconfig.json
+      - .eslintrc.json
+      - src/
+      - PRIVACY.md
   script:
     - mkdir -p /kaniko/.docker
     - echo $QUAY_CONF > $KANIKO_AUTH
@@ -72,8 +84,6 @@ build:
       --label quay.expires-after=100w
       --destination ${CONTAINER_DEST}
     
-  rules:
-    - if: '$CI_PIPELINE_SOURCE != "schedule"'
 
 lint:
   stage: housekeeping
