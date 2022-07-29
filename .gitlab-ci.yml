@@ -41,7 +41,6 @@ variables:
   CONTAINER_DEST: $REPO_NAME:$CONTAINER_SLUG
   KANIKO_AUTH: /kaniko/.docker/config.json
   SKOP_AUTH: /tmp/skopeo.json
-  GL_IMG_COMMENT: "Image available at [${CONTAINER_DEST}](https://quay.io/cubismod/cubemoji/?tab=tags&tag=${CONTAINER_SLUG})"
 
 stages:
   - build
@@ -104,22 +103,6 @@ skopeo_copy:
   interruptible: true
   rules:
       - if: '$CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE != "merge_request_event"'
-
-comment_bot:
-  stage: housekeeping
-  tags:
-    - cubemoji
-  image:
-    name: curlimages/curl 
-  interruptible: true
-  script:
-    - >-
-      curl --request POST
-      -v
-      --header "PRIVATE-TOKEN: ${CI_JOB_TOKEN}"
-      --data-urlencode "body=${GL_IMG_COMMENT}"
-      "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/commits/${CI_COMMIT_SHA}/discussions"
-
 
 sast:
   variables:
