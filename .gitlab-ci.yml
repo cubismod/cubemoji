@@ -113,7 +113,7 @@ comment_bot:
       http POST
       ${GL_API_EP}projects/${CI_PROJECT_ID}/commits/${CI_COMMIT_SHA}/discussions
       PRIVATE-TOKEN:${CI_JOB_TOKEN}
-      body==Image available at [${CONTAINER_DEST}](https://quay.io/cubismod/cubemoji/?tab=tags&tag=${CONTAINER_SLUG})
+      body=="Image available at [${CONTAINER_DEST}](https://quay.io/cubismod/cubemoji/?tab=tags&tag=${CONTAINER_SLUG})""
 
 sast:
   variables:
