@@ -34,7 +34,7 @@ export abstract class Rescale {
       await rsDiscord.run();
     } else if (user) {
       await interaction.deferReply(deferOptions);
-      const rsDiscord = new RescaleDiscord(interaction, user.displayAvatarURL({ size: 256 }), interaction.user);
+      const rsDiscord = new RescaleDiscord(interaction, user.displayAvatarURL({ size: 256, extension: 'png' }), interaction.user);
       await rsDiscord.run();
     }
   }

@@ -213,6 +213,7 @@ export abstract class ClientEvents {
           span.recordException(err);
           span.setStatus({ code: SpanStatusCode.ERROR });
           span.end();
+          return;
         }
       }
 

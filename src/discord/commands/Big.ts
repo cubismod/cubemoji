@@ -43,7 +43,7 @@ export abstract class Big {
     } else if (member !== undefined) {
       // user code
       // no need to defer a reply since we don't have to search through the emote cache
-      msg = await reply(interaction, member.user.displayAvatarURL({ size: 256 }));
+      msg = await reply(interaction, member.user.displayAvatarURL({ size: 256, extension: 'png' }));
     }
     if ((member === undefined) && (emote === undefined)) {
       msg = await reply(interaction, strings.noArgs);

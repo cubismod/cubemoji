@@ -11,6 +11,8 @@ Environment Setup
 - Yarn is used for package management. Type `corepack enable` to get yarn working. 
 - [Canvas](https://www.npmjs.com/package/canvas) may require additional system dependencies, please see that linked page for more information.
   - On macOS, you need to install some additional packages: `brew install pkg-config cairo pango libpng jpeg giflib librsvg`.
+- You will need to install GraphicsMagick and ImageMagick.
+  - On mac `brew install graphicsmagick imagemagick`
 Execution
 ---------
 - `npm run build` to build the JS from TypeScript in the `build/` subdirectory

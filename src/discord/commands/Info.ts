@@ -104,7 +104,7 @@ export abstract class Info {
         }
       } else if (member !== undefined) {
         // user code
-        const avatarURL = member.user.displayAvatarURL({ size: 256 });
+        const avatarURL = member.user.displayAvatarURL({ size: 256, extension: 'png' });
         let embed = new EmbedBuilder();
 
         // button setup

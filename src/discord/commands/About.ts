@@ -21,8 +21,7 @@ export abstract class About {
       embed.setTitle('Cubemoji');
       embed.setThumbnail('https://gitlab.com/cubismod/cubemoji/-/raw/master/assets/icon.png');
       embed.setColor(0x91d7f2);
-      embed.setAuthor({ name: 'Created by cubis' });
-      embed.setDescription('a simple emoji bot built to last ⌛');
+      embed.setDescription(`a simple emoji bot built to last ⌛\n built by cubis, <@${process.env.CM_BOTOWNER}>`);
 
       embed.addFields([
         {

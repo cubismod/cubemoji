@@ -1,15 +1,11 @@
 import { dirname, importx } from '@discordx/importer';
 import { GatewayIntentBits, Partials } from 'discord.js';
 import { Client, DIService, tsyringeDependencyRegistryEngine } from 'discordx';
-import { config } from 'dotenv';
 import { mkdir } from 'fs/promises';
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 import { bigServerDetect, blockedChannelDetect } from './discord/Guards.js';
 import { CubeLogger } from './lib/observability/CubeLogger.js';
-
-// load dotenv file if exists
-config();
 
 // create a directory and ignore if already exists
 async function createDir(dirName: string) {
