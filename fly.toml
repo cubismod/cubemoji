@@ -7,7 +7,7 @@ processes = []
 [env]
 
 [build]
-  image = "quay.io/cubismod/cubemoji:mainc390fb78"
+  image = "quay.io/cubismod/cubemoji:3-4-7d54548fb "
 
 [experimental]
   allowed_public_ports = []
