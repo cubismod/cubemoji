@@ -3,8 +3,9 @@ import { ApplicationCommandOptionType, AutocompleteInteraction, CommandInteracti
 import { Discord, Guard, Slash, SlashOption } from 'discordx';
 import { container } from 'tsyringe';
 import { emoteAutocomplete } from '../../lib/cmd/Autocomplete';
+import { emoteCheck } from '../../lib/cmd/CommandLogic';
 import { CubeMessageManager } from '../../lib/cmd/MessageManager.js';
-import { autoDeleteMsg, parseForEmote, reply } from '../../lib/image/DiscordLogic.js';
+import { autoDeleteMsg, reply } from '../../lib/image/DiscordLogic.js';
 import strings from '../../res/strings.json' assert { type: 'json' };
 
 @Discord()
@@ -33,13 +34,7 @@ export abstract class Big {
     await interaction.deferReply();
     let msg: Message | undefined;
     if (emote !== undefined) {
-      const res = await parseForEmote(interaction, emote);
-      if (res) {
-        msg = await reply(interaction, res);
-      } else {
-        msg = await reply(interaction, strings.noEmoteFound);
-        autoDeleteMsg(msg);
-      }
+      msg = await emoteCheck(interaction, emote);
     } else if (member !== undefined) {
       // user code
       // no need to defer a reply since we don't have to search through the emote cache
