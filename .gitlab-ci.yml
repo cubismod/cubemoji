@@ -41,6 +41,7 @@ variables:
   CONTAINER_DEST: $REPO_NAME:$CONTAINER_SLUG
   KANIKO_AUTH: /kaniko/.docker/config.json
   SKOP_AUTH: /tmp/skopeo.json
+  GIT_DEPTH: 10
 
 stages:
   - build
