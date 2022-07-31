@@ -1,6 +1,7 @@
+import { Discord } from 'discordx';
 import { State } from 'gm';
 import PQueue from 'p-queue';
-import { container, singleton } from 'tsyringe';
+import { container, injectable } from 'tsyringe';
 import { Milliseconds } from '../constants/Units.js';
 import { CubeLogger } from '../observability/CubeLogger.js';
 
@@ -11,7 +12,8 @@ import { CubeLogger } from '../observability/CubeLogger.js';
  *
  * paths are actually used as index values for GM state objects
  */
-@singleton()
+@Discord()
+@injectable()
 export class WorkerPool {
   limit: number;
   runningWorkers: Map<string, State>;

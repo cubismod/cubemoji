@@ -1,4 +1,4 @@
-import { AutocompleteInteraction, Client, CommandInteraction, GuildMember } from 'discord.js';
+import { ApplicationCommandOptionType, AutocompleteInteraction, Client, CommandInteraction, GuildMember } from 'discord.js';
 import { Discord, Slash, SlashOption } from 'discordx';
 import { emoteAutocomplete } from '../../lib/cmd/Autocomplete';
 import { RescaleDiscord } from '../../lib/image/DiscordLogic.js';
@@ -12,7 +12,7 @@ export abstract class Rescale {
     @SlashOption('source', {
       description: strings.sourceSlash,
       autocomplete: (interaction: AutocompleteInteraction) => emoteAutocomplete(interaction),
-      type: 'STRING',
+      type: ApplicationCommandOptionType.String,
       required: false
     })
       emote: string,
@@ -34,7 +34,7 @@ export abstract class Rescale {
       await rsDiscord.run();
     } else if (user) {
       await interaction.deferReply(deferOptions);
-      const rsDiscord = new RescaleDiscord(interaction, user.displayAvatarURL({ format: 'png', dynamic: true, size: 256 }), interaction.user);
+      const rsDiscord = new RescaleDiscord(interaction, user.displayAvatarURL({ size: 256, extension: 'png' }), interaction.user);
       await rsDiscord.run();
     }
   }

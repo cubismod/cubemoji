@@ -1,6 +1,7 @@
+import { Discord } from 'discordx';
 import { readdir, unlink } from 'fs/promises';
 import Fuse from 'fuse.js';
-import { container, singleton } from 'tsyringe';
+import { container, injectable } from 'tsyringe';
 import { CubeLogger } from '../observability/CubeLogger.js';
 
 export interface TempFile {
@@ -11,7 +12,8 @@ export interface TempFile {
   localPath: string,
 }
 
-@singleton()
+@Discord()
+@injectable()
 export class FileQueue {
   private fuseOpts = {
     keys: ['id'],

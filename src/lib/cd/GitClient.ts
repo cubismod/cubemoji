@@ -1,13 +1,15 @@
+import { Discord } from 'discordx';
 import { mkdtemp } from 'fs/promises';
 import { tmpdir } from 'os';
 import path from 'path';
 import simpleGit, { SimpleGit, SimpleGitOptions } from 'simple-git';
-import { container, singleton } from 'tsyringe';
+import { container, injectable } from 'tsyringe';
 import { Milliseconds } from '../constants/Units';
 import { CubeLogger } from '../observability/CubeLogger';
 import { rolePickerParse } from './Parser';
 
-@singleton()
+@Discord()
+@injectable()
 export class GitClient {
   directory = '';
   private remoteUrl;

@@ -1,7 +1,7 @@
 // Various server configuration commands
 
 import { Pagination } from '@discordx/pagination';
-import { AutocompleteInteraction, CommandInteraction, MessageAttachment, MessageEmbed, Role, TextChannel, VoiceChannel } from 'discord.js';
+import { ApplicationCommandOptionType, AttachmentBuilder, AutocompleteInteraction, Colors, CommandInteraction, EmbedBuilder, Role, TextChannel, VoiceChannel } from 'discord.js';
 import { Discord, Slash, SlashChoice, SlashGroup, SlashOption } from 'discordx';
 import { rm } from 'fs/promises';
 import { container } from 'tsyringe';
@@ -34,10 +34,10 @@ export abstract class Mod {
   async help(
     interaction: CommandInteraction
   ) {
-    const helpEmbed = new MessageEmbed()
+    const helpEmbed = new EmbedBuilder()
       .setTitle('Moderation Help')
       .setDescription(strings.modIntro)
-      .setColor('GOLD');
+      .setColor(Colors.Gold);
     await interaction.reply({ embeds: [helpEmbed], ephemeral: true });
   }
 
@@ -51,7 +51,7 @@ export abstract class Mod {
       if (tempFile) {
         await interaction.editReply({
           files: [
-            new MessageAttachment(tempFile)
+            new AttachmentBuilder(tempFile)
           ]
         });
         await rm(tempFile);
@@ -64,11 +64,11 @@ export abstract class Mod {
     @SlashOption('server', {
       description: 'server of which to enable/disable for',
       autocomplete: (interaction: AutocompleteInteraction) => serverAutocomplete(interaction),
-      type: 'STRING'
+      type: ApplicationCommandOptionType.String
     }) server: string,
     @SlashOption('setstatus', {
       description: 'enable or disable the Role Picker on this server',
-      type: 'BOOLEAN'
+      type: ApplicationCommandOptionType.Boolean
     }) setStatus: boolean,
       interaction: CommandInteraction) {
     await interaction.deferReply({ ephemeral: true });
@@ -81,18 +81,18 @@ export abstract class Mod {
         await this.storage.rolePickers.set(guildInfo[0], [setStatus, curVal[1]]);
         await interaction.editReply({
           embeds: [
-            new MessageEmbed({
+            new EmbedBuilder({
               description: `Role Picker State for ${guildInfo[1]} is now ${setStatus}`,
-              color: 'BLUE'
+              color: Colors.Blue
             })
           ]
         });
       } else {
         await interaction.editReply({
           embeds: [
-            new MessageEmbed({
+            new EmbedBuilder({
               description: 'No Role Picker is defined for this server. Please refer to the docs at https://cubemoji.art',
-              color: 'RED'
+              color: Colors.Red
             })
           ]
         });
@@ -110,13 +110,13 @@ export abstract class Mod {
       if (res && rolePermission) {
         await interaction.editReply({
           embeds: [
-            new MessageEmbed({ description: res, color: 'AQUA' })
+            new EmbedBuilder({ description: res, color: Colors.Aqua })
           ]
         });
       } else {
         await interaction.editReply({
           embeds: [
-            new MessageEmbed({ description: 'Bot may not have permissions to edit roles on this server. Ensure that it has the MANAGE ROLES permission on this server.', color: 'RED' })
+            new EmbedBuilder({ description: 'Bot may not have permissions to edit roles on this server. Ensure that it has the MANAGE ROLES permission on this server.', color: Colors.Red })
           ]
         });
       }
@@ -143,7 +143,7 @@ export abstract class Enrollment {
     @SlashOption('server', {
       description: 'name of server you want to enroll/unenroll',
       autocomplete: (interaction: AutocompleteInteraction) => serverAutocomplete(interaction),
-      type: 'STRING'
+      type: ApplicationCommandOptionType.String
     }) server: string, interaction: CommandInteraction
   ) {
     await interaction.deferReply({ ephemeral: true });
@@ -167,8 +167,13 @@ export abstract class Enrollment {
    */
   @Slash('audit', { description: 'set a channel to log changes made to permissions' })
   async audit(
-    @SlashOption('clear', { description: 'remove audit channel', type: 'BOOLEAN', required: false }) clear: boolean,
-    @SlashOption('channel', { description: 'channel to log actions to, cubemoji must have write permission here', type: 'CHANNEL', required: false }) channel: TextChannel | VoiceChannel, interaction: CommandInteraction
+    @SlashOption('clear',
+      {
+        description: 'remove audit channel',
+        type: ApplicationCommandOptionType.Boolean,
+        required: false
+      }) clear: boolean,
+    @SlashOption('channel', { description: 'channel to log actions to, cubemoji must have write permission here', type: ApplicationCommandOptionType.Channel, required: false }) channel: TextChannel | VoiceChannel, interaction: CommandInteraction
   ) {
     await interaction.deferReply({ ephemeral: true });
     const guildInfo = await guildOwnersCheck(interaction.user.id, interaction.guildId, interaction.client);
@@ -198,7 +203,7 @@ export abstract class Enrollment {
     @SlashOption('action') action: string,
     @SlashOption('role', {
       description: 'role to grant/remove mod permissions',
-      type: 'ROLE'
+      type: ApplicationCommandOptionType.Role
     }) role: Role, interaction: CommandInteraction
   ) {
     await interaction.deferReply({ ephemeral: true });
@@ -262,15 +267,19 @@ export abstract class blocklist {
     @SlashOption('server', {
       description: 'name of server you want to block emoji on, not req for channel',
       autocomplete: (interaction: AutocompleteInteraction) => serverAutocomplete(interaction),
-      type: 'STRING',
+      type: ApplicationCommandOptionType.String,
       required: false
     }) server: string,
     @SlashOption('glob', {
       description: '<21 chars, glob syntax to block emoji, see /mod help fmi',
-      type: 'STRING',
+      type: ApplicationCommandOptionType.String,
       required: false
     }) glob: string,
-    @SlashOption('channel', { type: 'CHANNEL', description: 'channel that cubemoji is blocked from interacting in', required: false }) channel: TextChannel | VoiceChannel, interaction: CommandInteraction) {
+    @SlashOption('channel', {
+      type: ApplicationCommandOptionType.Channel,
+      description: 'channel that cubemoji is blocked from interacting in',
+      required: false
+    }) channel: TextChannel | VoiceChannel, interaction: CommandInteraction) {
     // first determine what the end user is trying to do
     // block an emoji glob?
     // block a channel?
