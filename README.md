@@ -15,10 +15,10 @@ Environment Setup
   - On mac `brew install graphicsmagick imagemagick`
 Execution
 ---------
-- `npm run build` to build the JS from TypeScript in the `build/` subdirectory
-- `npm start` to run the built JS files
-- `npm run test` to run through unit tests
-- `npm run dev` to use the [tsc-watch](https://www.npmjs.com/package/tsc-watch) package to rebuild the software in real-time while testing features.
+- `yarn build` to build the JS from TypeScript in the `build/` subdirectory
+- `yarn start` to run the built JS files
+- `yarn test` to run through unit tests
+- `yarn dev` to use the [tsc-watch](https://www.npmjs.com/package/tsc-watch) package to rebuild the software in real-time while testing features.
 
 Fly.io
 -------
