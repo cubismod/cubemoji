@@ -64,6 +64,7 @@ stages:
     - .eslintrc.json
     - src/
     - PRIVACY.md
+    - .gitlab-ci.yml
 
 build:
   stage: build
