@@ -114,6 +114,7 @@ skopeo_copy:
     name: alpine
   before_script:
     - echo ${QUAY_CONF} > ${SKOP_AUTH}
+  allow_failure: true
   script:
     - apk add skopeo
     - >-
