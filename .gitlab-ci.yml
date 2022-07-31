@@ -123,7 +123,6 @@ skopeo_copy:
       --authfile ${SKOP_AUTH}
   interruptible: true
   rules:
-      - *change_rule
       - if: '$CI_COMMIT_BRANCH == "main" && ($CI_PIPELINE_SOURCE != "merge_request_event" || $CI_PIPELINE_SOURCE != "schedule")'
 
 # only deploy when a new tag is created
