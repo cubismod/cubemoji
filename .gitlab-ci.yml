@@ -115,7 +115,8 @@ deploy_stage:
     - *change_rule
   script:
     - apk add curl
-    - ${CI_PROJECT_DIR}/scripts/cubemoji-dev/stage_deploy.sh
+    - cd ${CI_PROJECT_DIR}/scripts/cubemoji-dev/
+    - ./stage_deploy.sh
 
 # dependabot setup
 # https://gitlab.com/dependabot-gitlab/dependabot-standalone
