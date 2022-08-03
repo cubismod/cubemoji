@@ -14,6 +14,10 @@ async function createDir(dirName: string) {
   } catch { }
 }
 
+(BigInt.prototype as any).toJSON = function () {
+  return this.toString();
+};
+
 export class Main {
   private static _client: Client;
 
