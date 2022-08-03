@@ -137,7 +137,7 @@ deploy_stage:
   rules:
     - *change_rule
   script:
-    - ./scripts/cubemoji-dev/stage_deploy.sh
+    - ${CI_PROJECT_DIR}/scripts/cubemoji-dev/stage_deploy.sh
 
 # dependabot setup
 # https://gitlab.com/dependabot-gitlab/dependabot-standalone
