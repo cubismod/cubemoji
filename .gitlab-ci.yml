@@ -48,6 +48,7 @@ stages:
   - housekeeping
   - scan
   - maintain
+  - deploy_stage
 
 # don't run builds if any of the Docker files
 # haven't actually changed
@@ -127,20 +128,16 @@ skopeo_copy:
   rules:
       - if: '$CI_COMMIT_BRANCH == "main" && ($CI_PIPELINE_SOURCE != "merge_request_event" || $CI_PIPELINE_SOURCE != "schedule")'
 
-# only deploy when a new tag is created
-# deploy:
-#   stage: deploy
-#   tags:
-#     - cubemoji
-#   rules:
-#     - if: '$CI_COMMIT_TAG'
-#   before_script:
-#     - mkdir -p /root/.docker/
-#     - cp /opt/auth/config.json /root/.docker/config.json
-#     - apk add --no-cache curl
-#     - curl -L https://fly.io/install.sh | sh
-#   script:
-#     - /root/.fly/bin/flyctl deploy --remote-only .
+deploy_stage:
+  stage: deploy_stage
+  tags:
+    - cubemoji
+  image:
+    name: alpine
+  rules:
+    - *change_rule
+  script:
+    - ./scripts/cubemoji-dev/stage_deploy.sh
 
 # dependabot setup
 # https://gitlab.com/dependabot-gitlab/dependabot-standalone
