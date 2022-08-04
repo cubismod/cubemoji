@@ -44,7 +44,7 @@ build:
   tags:
     - cubemoji
   image:
-    name: quay.io/repository/buildah/stable
+    name: quay.io/buildah/stable
     entrypoint: [""]
   interruptible: true
   rules:
