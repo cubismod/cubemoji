@@ -54,11 +54,11 @@ build:
     - cd ${CI_PROJECT_DIR}
     - >-
       buildah build
-      -f ${CI_PROJECT_DIR}/Dockerfile
+      -f ./Dockerfile
       --layers
       -t ${CONTAINER_DEST}
       --label quay.expires-after=100w
-      ${CI_PROJECT_DIR}
+      .
     - buildah push ${CONTAINER_DEST}
     
 
