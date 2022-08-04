@@ -43,7 +43,7 @@ build:
   tags:
     - cubemoji
   image:
-    name: quay.io/buildah/stable:latest
+    name: quay.io/buildah/stable:v1.26.2
     entrypoint: [""]
   interruptible: true
   rules:
