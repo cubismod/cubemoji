@@ -53,14 +53,14 @@ build:
     - echo $QUAY_CONF > $HOME/.docker/config.json
     - cd ${CI_PROJECT_DIR}
     - >-
-      buildah build \
-      --arch amd64 \
-      --cache-from ${CACHE_REPO} \
-      --cache-to ${CACHE_REPO} \
-      -f ${CI_PROJECT_DIR}/Dockerfile \
-      --layers true \
-      -t ${CONTAINER_DEST} \
-      --label quay.expires-after=100w \
+      buildah build 
+      --arch amd64 
+      --cache-from ${CACHE_REPO} 
+      --cache-to ${CACHE_REPO} 
+      -f ${CI_PROJECT_DIR}/Dockerfile 
+      --layers true 
+      -t ${CONTAINER_DEST} 
+      --label quay.expires-after=100w 
       ${CI_PROJECT_DIR}
     - buildah push ${CONTAINER_DEST}
     
