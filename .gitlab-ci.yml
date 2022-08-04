@@ -43,7 +43,7 @@ build:
   tags:
     - cubemoji
   image:
-    name: quay.io/buildah/upstream:latest
+    name: quay.io/buildah/upstream:stable
     entrypoint: [""]
   interruptible: true
   rules:
@@ -54,8 +54,6 @@ build:
     - cd ${CI_PROJECT_DIR}
     - >-
       buildah build
-      --cache-from ${CACHE_REPO}
-      --cache-to ${CACHE_REPO}
       -f ${CI_PROJECT_DIR}/Dockerfile
       --layers true
       -t ${CONTAINER_DEST}
