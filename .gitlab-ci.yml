@@ -9,7 +9,6 @@ variables:
   DEPENDABOT_IMAGE: docker.io/andrcuns/dependabot-gitlab:0.16.0
   CONTAINER_SLUG: $CI_COMMIT_REF_SLUG$CI_COMMIT_SHA
   CONTAINER_DEST: $REPO_NAME:$CONTAINER_SLUG
-  DOCKER_AUTH: $HOME/.docker/config.json
   SKOP_AUTH: /tmp/skopeo.json
   GIT_DEPTH: 10
   WEBHOOK_URL: $WEBHOOK_URL
@@ -51,7 +50,7 @@ build:
     - *change_rule
   script:
     - mkdir -p $HOME/.docker
-    - echo $QUAY_CONF > $DOCKER_AUTH
+    - echo $QUAY_CONF > $HOME/.docker/config.json
     - cd ${CI_PROJECT_DIR}
     - >-
       buildah build \
