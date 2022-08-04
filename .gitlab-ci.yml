@@ -43,7 +43,7 @@ build:
   tags:
     - cubemoji
   image:
-    name: quay.io/buildah/upstream:stable
+    name: quay.io/buildah/stable:latest
     entrypoint: [""]
   interruptible: true
   rules:
@@ -52,6 +52,7 @@ build:
     - mkdir -p $HOME/.docker
     - echo $QUAY_CONF > $HOME/.docker/config.json
     - cd ${CI_PROJECT_DIR}
+    - buildah pull ${CONTAINER_DEST}
     - >-
       buildah build
       -f ${CI_PROJECT_DIR}/Dockerfile
