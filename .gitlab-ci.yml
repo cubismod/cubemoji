@@ -107,6 +107,8 @@ deploy_stage:
   image:
     name: curlimages/curl
   rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+      when: never
     - *change_rule
   script:
     - cd ${CI_PROJECT_DIR}/scripts/cubemoji-dev/
