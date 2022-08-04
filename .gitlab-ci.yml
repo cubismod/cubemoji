@@ -52,10 +52,10 @@ build:
     - mkdir -p $HOME/.docker
     - echo $QUAY_CONF > $HOME/.docker/config.json
     - cd ${CI_PROJECT_DIR}
-    - |
+    - >-
       buildah build
       -f ${CI_PROJECT_DIR}/Dockerfile
-      --layers true
+      --layers
       -t ${CONTAINER_DEST}
       --label quay.expires-after=100w
       ${CI_PROJECT_DIR}
