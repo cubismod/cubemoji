@@ -54,7 +54,6 @@ build:
     - cd ${CI_PROJECT_DIR}
     - >-
       buildah build 
-      --arch amd64 
       --cache-from ${CACHE_REPO} 
       --cache-to ${CACHE_REPO} 
       -f ${CI_PROJECT_DIR}/Dockerfile 
