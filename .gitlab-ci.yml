@@ -103,11 +103,10 @@ deploy_stage:
   tags:
     - cubemoji
   image:
-    name: alpine
+    name: docker pull curlimages/curl
   rules:
     - *change_rule
   script:
-    - apk add curl
     - cd ${CI_PROJECT_DIR}/scripts/cubemoji-dev/
     - ./stage_deploy.sh
 
