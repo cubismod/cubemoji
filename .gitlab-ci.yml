@@ -125,6 +125,7 @@ deploy_prod:
       changes:
         - fly.toml
   script:
+    - cd ${CI_PROJECT_DIR}
     - ${CI_PROJECT_DIR}/scripts/deploy.sh
 
 # dependabot setup
