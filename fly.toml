@@ -44,8 +44,8 @@ processes = []
     restart_limit = 2
 
 [mounts]
-source="cm_data"
-destination="/usr/src/cubemoji/data/"
+  source="cm_data"
+  destination="/usr/src/cubemoji/data/"
 
 [[statics]]
   guest_path = '/usr/src/cubemoji/static/emoji'
@@ -57,5 +57,5 @@ destination="/usr/src/cubemoji/data/"
 
 
 [metrics]
-port=9091
-path='/metrics'
+  port=9091
+  path='/metrics'

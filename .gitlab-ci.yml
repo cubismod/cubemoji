@@ -1,37 +1,7 @@
-# You can override the included template(s) by including variable overrides
-# SAST customization: https://docs.gitlab.com/ee/user/application_security/sast/#customizing-the-sast-settings
-# Secret Detection customization: https://docs.gitlab.com/ee/user/application_security/secret_detection/#customizing-settings
-# Dependency Scanning customization: https://docs.gitlab.com/ee/user/application_security/dependency_scanning/#customizing-the-dependency-scanning-settings
-# Note that environment variables can be set in several places
-# See https://docs.gitlab.com/ee/ci/variables/#cicd-variable-precedence
-
 variables:
-  # When you use the dind service, you must instruct Docker to talk with
-  # the daemon started inside of the service. The daemon is available
-  # with a network connection instead of the default
-  # /var/run/docker.sock socket. Docker 19.03 does this automatically
-  # by setting the DOCKER_HOST in
-  # https://github.com/docker-library/docker/blob/d45051476babc297257df490d22cbd806f1b11e4/19.03/docker-entrypoint.sh#L23-L29
-  #
-  # The 'docker' hostname is the alias of the service container as described at
-  # https://docs.gitlab.com/ee/ci/services/#accessing-the-services.
-  #
-  # Specify to Docker where to create the certificates. Docker
-  # creates them automatically on boot, and creates
-  # `/certs/client` to share between the service and job
-  # container, thanks to volume mount from config.toml
   DOCKER_TLS_CERTDIR: "/certs"
   GIT_SUBMODULE_STRATEGY: "recursive"
-  # CM_BOTOWNER: $CM_BOTOWNER
-  # CM_BROKEN: $CM_BROKEN
-  # CM_ENVIRONMENT: $CM_ENVIRONMENT
-  # CM_EXTEMOJI: $CM_EXTEMOJI
-  # CM_HTTP_HOST: $CM_HTTP_HOST
-  # CM_HTTP_PORT: $CM_HTTP_PORT
-  # CM_TOKEN: $CM_TOKEN
-  # CM_URL: $CM_URL
-  # CM_WORKERS: $CM_WORKERS
-  FLY_API_TOKEN: $FLY_API_TOKEN
+  FLY_ACCESS_TOKEN: $FLY_ACCESS_TOKEN
   QUAY_CONF: $QUAY_CONF
   REPO_NAME: "quay.io/cubismod/cubemoji"
   CACHE_REPO: "quay.io/cubismod/cubemoji-cache"
@@ -42,12 +12,15 @@ variables:
   KANIKO_AUTH: /kaniko/.docker/config.json
   SKOP_AUTH: /tmp/skopeo.json
   GIT_DEPTH: 10
+  WEBHOOK_URL: $WEBHOOK_URL
 
 stages:
   - build
   - housekeeping
   - scan
   - maintain
+  - deploy_stage
+  - deploy_prod
 
 # don't run builds if any of the Docker files
 # haven't actually changed
@@ -127,20 +100,35 @@ skopeo_copy:
   rules:
       - if: '$CI_COMMIT_BRANCH == "main" && ($CI_PIPELINE_SOURCE != "merge_request_event" || $CI_PIPELINE_SOURCE != "schedule")'
 
-# only deploy when a new tag is created
-# deploy:
-#   stage: deploy
-#   tags:
-#     - cubemoji
-#   rules:
-#     - if: '$CI_COMMIT_TAG'
-#   before_script:
-#     - mkdir -p /root/.docker/
-#     - cp /opt/auth/config.json /root/.docker/config.json
-#     - apk add --no-cache curl
-#     - curl -L https://fly.io/install.sh | sh
-#   script:
-#     - /root/.fly/bin/flyctl deploy --remote-only .
+deploy_stage:
+  stage: deploy_stage
+  tags:
+    - cubemoji
+  image:
+    name: curlimages/curl
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+      when: never
+    - *change_rule
+  script:
+    - cd ${CI_PROJECT_DIR}/scripts/cubemoji-dev/
+    - ./stage_deploy.sh
+
+deploy_prod:
+  stage: deploy_prod
+  tags:
+    - cubemoji
+  image:
+    name: curlimages/curl
+  rules:
+    - if: $CI_PIPELINE_SOURCE != "push"
+      when: never
+    - if: $CI_COMMIT_BRANCH == "main"
+      changes:
+        - fly.toml
+  script:
+    - cd ${CI_PROJECT_DIR}
+    - ${CI_PROJECT_DIR}/scripts/deploy.sh
 
 # dependabot setup
 # https://gitlab.com/dependabot-gitlab/dependabot-standalone
