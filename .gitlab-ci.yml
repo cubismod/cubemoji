@@ -53,7 +53,7 @@ build:
     - echo $QUAY_CONF > $HOME/.docker/config.json
     - cd ${CI_PROJECT_DIR}
     - >-
-      buildah build 
+      buildah build
       --cache-from ${CACHE_REPO}
       --cache-to ${CACHE_REPO}
       -f ${CI_PROJECT_DIR}/Dockerfile
