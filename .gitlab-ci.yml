@@ -9,7 +9,7 @@ variables:
   DEPENDABOT_IMAGE: docker.io/andrcuns/dependabot-gitlab:0.16.0
   CONTAINER_SLUG: $CI_COMMIT_REF_SLUG$CI_COMMIT_SHA
   CONTAINER_DEST: $REPO_NAME:$CONTAINER_SLUG
-  KANIKO_AUTH: /kaniko/.docker/config.json
+  DOCKER_AUTH: $HOME/.docker/config.json
   SKOP_AUTH: /tmp/skopeo.json
   GIT_DEPTH: 10
   WEBHOOK_URL: $WEBHOOK_URL
@@ -44,26 +44,26 @@ build:
   tags:
     - cubemoji
   image:
-    name: gcr.io/kaniko-project/executor:debug
+    name: quay.io/repository/buildah/stable
     entrypoint: [""]
   interruptible: true
   rules:
     - *change_rule
   script:
-    - mkdir -p /kaniko/.docker
-    - echo $QUAY_CONF > $KANIKO_AUTH
+    - mkdir -p $HOME/.docker
+    - echo $QUAY_CONF > $DOCKER_AUTH
+    - cd ${CI_PROJECT_DIR}
     - >-
-      /kaniko/executor
-      --context ${CI_PROJECT_DIR}
-      --dockerfile "${CI_PROJECT_DIR}/Dockerfile"
-      --cache-copy-layers
-      --cache=true
-      --cache-repo ${CACHE_REPO}
-      --snapshotMode=redo
-      --skip-unused-stages=true
-      --reproducible
-      --label quay.expires-after=100w
-      --destination ${CONTAINER_DEST}
+      buildah build \
+      --arch=amd64 \
+      --cache-from ${CACHE_REPO} \
+      --cache-to ${CACHE_REPO} \
+      -f ${CI_PROJECT_DIR}/Dockerfile \
+      --layers true \
+      -t ${CONTAINER_DEST} \
+      --label quay.expires-after=100w \
+      ${CI_PROJECT_DIR}
+    - buildah push ${CONTAINER_DEST}
     
 
 lint:
