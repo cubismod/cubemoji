@@ -12,6 +12,7 @@ variables:
   KANIKO_AUTH: /kaniko/.docker/config.json
   SKOP_AUTH: /tmp/skopeo.json
   GIT_DEPTH: 10
+  WEBHOOK_URL: $WEBHOOK_URL
 
 stages:
   - build
@@ -19,6 +20,7 @@ stages:
   - scan
   - maintain
   - deploy_stage
+  - deploy_prod
 
 # don't run builds if any of the Docker files
 # haven't actually changed
@@ -103,12 +105,27 @@ deploy_stage:
   tags:
     - cubemoji
   image:
-    name: docker pull curlimages/curl
+    name: curlimages/curl
   rules:
     - *change_rule
   script:
     - cd ${CI_PROJECT_DIR}/scripts/cubemoji-dev/
     - ./stage_deploy.sh
+
+deploy_prod:
+  stage: deploy_prod
+  tags:
+    - cubemoji
+  image:
+    name: curlimages/curl
+  rules:
+    - if: $CI_PIPELINE_SOURCE != "push"
+      when: never
+    - if: $CI_COMMIT_BRANCH == "main"
+      changes:
+        - fly.toml
+  script:
+    - ${CI_PROJECT_DIR}/scripts/deploy.sh
 
 # dependabot setup
 # https://gitlab.com/dependabot-gitlab/dependabot-standalone
