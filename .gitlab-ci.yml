@@ -60,6 +60,7 @@ build:
       -t ${CONTAINER_DEST}
       --pull
       --arch amd64
+      --format docker
       --label quay.expires-after=100w
       .
     - podman push --authfile ${AUTH_LOC} ${CONTAINER_DEST}
