@@ -13,6 +13,7 @@ variables:
   GIT_DEPTH: 10
   WEBHOOK_URL: $WEBHOOK_URL
   MANIFEST_NAME: cubemoji-manifest
+  AUTH_LOC: /tmp/auth.json
 
 stages:
   - build
@@ -50,8 +51,7 @@ build:
   rules:
     - *change_rule
   script:
-    - mkdir -p ${XDG_RUNTIME_DIR}/containers/
-    - echo $QUAY_CONF > ${XDG_RUNTIME_DIR}/containers/auth.json
+    - echo $QUAY_CONF > ${AUTH_LOC}
     - cd ${CI_PROJECT_DIR}
     - >-
       podman build
@@ -62,7 +62,7 @@ build:
       --arch amd64
       --label quay.expires-after=100w
       .
-    - podman push ${CONTAINER_DEST}
+    - podman push --authfile ${AUTH_LOC} ${CONTAINER_DEST}
     
 
 lint:
