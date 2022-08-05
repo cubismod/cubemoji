@@ -55,7 +55,6 @@ processes = []
   guest_path = '/usr/src/cubemoji/static/favicon'
   url_prefix = '/favicon'
 
-
 [metrics]
   port=9091
   path='/metrics'
