@@ -12,6 +12,7 @@ variables:
   SKOP_AUTH: /tmp/skopeo.json
   GIT_DEPTH: 10
   WEBHOOK_URL: $WEBHOOK_URL
+  MANIFEST_NAME: cubemoji-manifest
 
 stages:
   - build
@@ -52,15 +53,21 @@ build:
     - mkdir -p $HOME/.docker
     - echo $QUAY_CONF > $HOME/.docker/config.json
     - cd ${CI_PROJECT_DIR}
+    - buildah manifest create ${MANIFEST_NAME}
     - >-
       buildah build
       -f ./Dockerfile
       --layers
       -t ${CONTAINER_DEST}
       --pull
+      --manifest ${MANIFEST_NAME}
+      --arch amd64
       --label quay.expires-after=100w
       .
-    - buildah push ${CONTAINER_DEST}
+    - >-
+      buildah manifest push --all 
+      ${MANIFEST_NAME}
+      "docker://${CONTAINER_DEST}"
     
 
 lint:
