@@ -44,30 +44,25 @@ build:
   tags:
     - cubemoji
   image:
-    name: quay.io/buildah/stable:latest
+    name: quay.io/podman/stable:latest
     entrypoint: [""]
   interruptible: true
   rules:
     - *change_rule
   script:
-    - mkdir -p $HOME/.docker
-    - echo $QUAY_CONF > $HOME/.docker/config.json
+    - mkdir -p ${XDG_RUNTIME_DIR}/containers/
+    - echo $QUAY_CONF > ${XDG_RUNTIME_DIR}/containers/auth.json
     - cd ${CI_PROJECT_DIR}
-    - buildah manifest create ${MANIFEST_NAME}
     - >-
-      buildah build
+      podman build
       -f ./Dockerfile
       --layers
       -t ${CONTAINER_DEST}
       --pull
-      --manifest ${MANIFEST_NAME}
       --arch amd64
       --label quay.expires-after=100w
       .
-    - >-
-      buildah manifest push --all 
-      ${MANIFEST_NAME}
-      "docker://${CONTAINER_DEST}"
+    - podman push ${CONTAINER_DEST}
     
 
 lint:
