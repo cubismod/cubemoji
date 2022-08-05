@@ -28,7 +28,7 @@ stages:
     if: '$CI_PIPELINE_SOURCE != "schedule"'
     changes:
     - Dockerfile
-    - scripts/
+    - scripts/deploy.sh
     - assets/
     - yarn.lock
     - package.json
@@ -57,6 +57,7 @@ build:
       -f ./Dockerfile
       --layers
       -t ${CONTAINER_DEST}
+      --pull
       --label quay.expires-after=100w
       .
     - buildah push ${CONTAINER_DEST}
