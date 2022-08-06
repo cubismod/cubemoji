@@ -1,5 +1,5 @@
 // https://github.com/oceanroleplay/discord.ts-example/blob/main/src/commands/slashes.ts
-import { ActionRowBuilder, ApplicationCommandOptionType, AutocompleteInteraction, ButtonBuilder, ButtonInteraction, ButtonStyle, Colors, CommandInteraction, EmbedBuilder, GuildMember } from 'discord.js';
+import { ActionRowBuilder, ApplicationCommandOptionType, AutocompleteInteraction, ButtonBuilder, ButtonInteraction, ButtonStyle, Colors, CommandInteraction, EmbedBuilder, GuildMember, PermissionFlagsBits } from 'discord.js';
 import { ButtonComponent, Discord, Slash, SlashOption } from 'discordx';
 import rgbHex from 'rgb-hex';
 import { container } from 'tsyringe';
@@ -17,7 +17,8 @@ export abstract class Info {
   private imgUrl = '';
 
   @Slash('info', {
-    description: 'Provides information about an emote or user'
+    description: 'Provides information about an emote or user',
+    defaultMemberPermissions: PermissionFlagsBits.SendMessages
   })
   async info(
     @SlashOption('emote', {

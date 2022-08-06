@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType, AutocompleteInteraction, CommandInteraction } from 'discord.js';
+import { ApplicationCommandOptionType, AutocompleteInteraction, CommandInteraction, PermissionFlagsBits } from 'discord.js';
 import { Client, Discord, Slash, SlashChoice, SlashOption } from 'discordx';
 import { emoteAutocomplete } from '../../lib/cmd/Autocomplete';
 import { FaceDiscord, getUrl } from '../../lib/image/DiscordLogic.js';
@@ -7,7 +7,7 @@ import { BSGuardData } from '../Guards';
 
 @Discord()
 export abstract class AddFace {
-  @Slash('addface', { description: 'Adds a face or...other to an emote or image' })
+  @Slash('addface', { description: 'Adds a face or...other to an emote or image', defaultMemberPermissions: PermissionFlagsBits.SendMessages })
   async addface(
     @SlashOption('source', {
       description: strings.sourceSlash,

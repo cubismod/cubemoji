@@ -1,11 +1,12 @@
-import { ApplicationCommandType, ContextMenuCommandInteraction } from 'discord.js';
+import { ApplicationCommandType, ContextMenuCommandInteraction, PermissionFlagsBits } from 'discord.js';
 import { Client, ContextMenu, Discord } from 'discordx';
 import { EditDiscord, getMessageImage, RescaleDiscord } from '../lib/image/DiscordLogic.js';
 import { BSGuardData } from './Guards.js';
 
 @Discord()
 export abstract class CubeMessageContext {
-  @ContextMenu(ApplicationCommandType.Message, 'Apply edit to this message')
+  @ContextMenu(ApplicationCommandType.Message, 'Apply edit to this message',
+    { defaultMemberPermissions: PermissionFlagsBits.SendMessages })
   async editHandler(
     interaction: ContextMenuCommandInteraction,
     _client: Client,
@@ -19,7 +20,8 @@ export abstract class CubeMessageContext {
     }
   }
 
-  @ContextMenu(ApplicationCommandType.Message, 'Rescale this message')
+  @ContextMenu(ApplicationCommandType.Message, 'Rescale this message',
+    { defaultMemberPermissions: PermissionFlagsBits.SendMessages })
   async rescaleHandler(
     interaction: ContextMenuCommandInteraction,
     _client: Client,
@@ -32,7 +34,9 @@ export abstract class CubeMessageContext {
     }
   }
 
-  @ContextMenu(ApplicationCommandType.Message, 'Jumbofy this message')
+  @ContextMenu(ApplicationCommandType.Message, 'Jumbofy this message', {
+    defaultMemberPermissions: PermissionFlagsBits.SendMessages
+  })
   async jumboHandler(
     interaction: ContextMenuCommandInteraction,
     _client: Client,

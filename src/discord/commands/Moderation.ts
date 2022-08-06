@@ -24,7 +24,11 @@ import strings from '../../res/strings.json' assert { type: 'json' };
 // @Permission(false)
 // @Permission(await OwnerCheck())
 // @Permission(await ModOwnerCheck())
-@SlashGroup({ name: 'mod', description: 'moderation functionality for the bot' })
+@SlashGroup({
+  name: 'mod',
+  description: 'moderation functionality for the bot',
+  defaultMemberPermissions: 'ManageGuild'
+})
 @SlashGroup('mod')
 export abstract class Mod {
   private git = container.resolve(GitClient);

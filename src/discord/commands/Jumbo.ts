@@ -11,7 +11,8 @@ import strings from '../../res/strings.json' assert { type: 'json' };
 @Discord()
 export abstract class Jumbo {
   @Slash('jumbo', {
-    description: 'blows up the input object'
+    description: 'blows up the input object',
+    defaultMemberPermissions: 'SendMessages'
   })
   async jumbo(
     @SlashOption('emote', {

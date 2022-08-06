@@ -1,10 +1,10 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, Colors, CommandInteraction, EmbedBuilder } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, Colors, CommandInteraction, EmbedBuilder, PermissionFlagsBits } from 'discord.js';
 import { ButtonComponent, Discord, Slash } from 'discordx';
 import { clearPage, rolePermissionCheck, rolesCommand } from '../../lib/http/RoleManager';
 
 @Discord()
 export abstract class Roles {
-  @Slash('roles', { description: 'Get a link to setup roles on this server' })
+  @Slash('roles', { description: 'Get a link to setup roles on this server', defaultMemberPermissions: PermissionFlagsBits.ViewChannel })
   async roles (
     interaction: CommandInteraction
   ) {

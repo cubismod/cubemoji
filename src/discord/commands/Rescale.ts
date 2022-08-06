@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType, AutocompleteInteraction, Client, CommandInteraction, GuildMember } from 'discord.js';
+import { ApplicationCommandOptionType, AutocompleteInteraction, Client, CommandInteraction, GuildMember, PermissionFlagsBits } from 'discord.js';
 import { Discord, Slash, SlashOption } from 'discordx';
 import { emoteAutocomplete } from '../../lib/cmd/Autocomplete';
 import { RescaleDiscord } from '../../lib/image/DiscordLogic.js';
@@ -7,7 +7,7 @@ import { BSGuardData } from '../Guards';
 
 @Discord()
 export abstract class Rescale {
-  @Slash('rescale', { description: 'Rescale an image or emote using Seam carving to humorous results' })
+  @Slash('rescale', { description: 'Rescale an image or emote using Seam carving to humorous results', defaultMemberPermissions: PermissionFlagsBits.SendMessages })
   async rescale(
     @SlashOption('source', {
       description: strings.sourceSlash,

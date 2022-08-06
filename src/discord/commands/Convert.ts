@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType, AutocompleteInteraction, CommandInteraction } from 'discord.js';
+import { ApplicationCommandOptionType, AutocompleteInteraction, CommandInteraction, PermissionFlagsBits } from 'discord.js';
 import { Discord, Slash, SlashOption } from 'discordx';
 import Qty from 'js-quantities';
 import { container } from 'tsyringe';
@@ -9,7 +9,7 @@ import { CubeLogger } from '../../lib/observability/CubeLogger.js';
 export abstract class Convert {
   private logger = container.resolve(CubeLogger).command;
 
-  @Slash('convert', { description: 'perform unit conversions for common scientific calculations (not currency)' })
+  @Slash('convert', { description: 'perform unit conversions for common scientific calculations (not currency)', defaultMemberPermissions: PermissionFlagsBits.SendMessages })
   async convert(
     @SlashOption('fromval', {
       description: 'the value of whatever you are converting from',

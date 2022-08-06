@@ -1,5 +1,5 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, CommandInteraction, Guild } from 'discord.js';
-import { ButtonComponent, Discord, Guard, Slash, SlashOption } from 'discordx';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, CommandInteraction, Guild, PermissionFlagsBits } from 'discord.js';
+import { ButtonComponent, Client, Discord, Guard, Slash, SlashOption } from 'discordx';
 import { container } from 'tsyringe';
 import { InspectorWrapper } from '../../lib/perf/InspectorWrapper';
 import { botOwnerDetect } from '../Guards';
@@ -9,7 +9,7 @@ import { botOwnerDetect } from '../Guards';
 export abstract class LeaveGuild {
   resolved: Guild | null = null;
 
-  @Slash('leaveguild', { description: 'Leave a guild' })
+  @Slash('leaveguild', { description: 'Leave a guild', defaultMemberPermissions: PermissionFlagsBits.Administrator })
   async leaveGuild(
     @SlashOption('id', { description: 'id of the guild to leave', required: false })
       id: string,
@@ -60,7 +60,7 @@ export abstract class LeaveGuild {
 @Guard(botOwnerDetect)
 export abstract class PerformanceTest {
   private inspector = container.resolve(InspectorWrapper);
-  @Slash('performancetest', { description: 'Run a CPU performance test' })
+  @Slash('performancetest', { description: 'Run a CPU performance test', defaultMemberPermissions: PermissionFlagsBits.Administrator })
   async performanceTest(interaction: CommandInteraction) {
     switch (this.inspector.status) {
       case true:
@@ -74,5 +74,22 @@ export abstract class PerformanceTest {
         });
     }
     await this.inspector.toggleSession();
+  }
+}
+
+@Discord()
+@Guard(botOwnerDetect)
+export abstract class ClearCommands {
+  private client = container.resolve(Client);
+  @Slash('clearcommands', { description: 'Clear all commands', defaultMemberPermissions: PermissionFlagsBits.Administrator })
+  async clearCommmands (interaction: CommandInteraction) {
+    await interaction.reply('processing...');
+    await this.client.clearApplicationCommands();
+    await this.client.initApplicationCommands({
+      global: {
+        log: true
+      }
+    });
+    await interaction.followUp('done!');
   }
 }

@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType, AutocompleteInteraction, CommandInteraction, GuildMember } from 'discord.js';
+import { ApplicationCommandOptionType, AutocompleteInteraction, CommandInteraction, GuildMember, PermissionFlagsBits } from 'discord.js';
 import { Client, Discord, Slash, SlashOption } from 'discordx';
 import { editAutocomplete, emoteAutocomplete } from '../../lib/cmd/Autocomplete';
 import { EditDiscord } from '../../lib/image/DiscordLogic.js';
@@ -8,7 +8,10 @@ import { BSGuardData } from '../Guards';
 
 @Discord()
 export abstract class Edit {
-  @Slash('edit', { description: 'Edits an emote or image according to the effects you select' })
+  @Slash('edit', {
+    description: 'Edits an emote or image according to the effects you select',
+    defaultMemberPermissions: PermissionFlagsBits.SendMessages
+  })
   async edit(
     @SlashOption('source', {
       description: strings.sourceSlash,

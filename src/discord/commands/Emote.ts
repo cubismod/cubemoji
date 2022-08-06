@@ -1,5 +1,5 @@
 import { RateLimit, TIME_UNIT } from '@discordx/utilities';
-import { ApplicationCommandOptionType, AutocompleteInteraction, CommandInteraction, Message } from 'discord.js';
+import { ApplicationCommandOptionType, AutocompleteInteraction, CommandInteraction, Message, PermissionFlagsBits } from 'discord.js';
 import { Discord, Guard, Slash, SlashOption } from 'discordx';
 import { container } from 'tsyringe';
 import { emoteAutocomplete } from '../../lib/cmd/Autocomplete';
@@ -18,7 +18,8 @@ import strings from '../../res/strings.json' assert { type: 'json' };
 )
 export abstract class Emote {
   @Slash('emote', {
-    description: 'inserts an emote into chat'
+    description: 'inserts an emote into chat',
+    defaultMemberPermissions: PermissionFlagsBits.SendMessages
   })
   async emote (
     @SlashOption('emote', {

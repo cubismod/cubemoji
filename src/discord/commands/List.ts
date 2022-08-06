@@ -1,4 +1,4 @@
-import { CommandInteraction } from 'discord.js';
+import { CommandInteraction, PermissionFlagsBits } from 'discord.js';
 import { Client, Discord, Slash, SlashChoice, SlashOption } from 'discordx';
 import { container } from 'tsyringe';
 import { Source } from '../../lib/emote/Cmoji.js';
@@ -9,7 +9,8 @@ import { BSGuardData } from '../Guards';
 @Discord()
 export abstract class List {
   @Slash('list', {
-    description: 'Get a full list of emojis'
+    description: 'Get a full list of emojis',
+    defaultMemberPermissions: PermissionFlagsBits.SendMessages
   })
   async list(
     @SlashChoice('all')

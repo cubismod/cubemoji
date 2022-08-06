@@ -1,5 +1,5 @@
 import { RateLimit, TIME_UNIT } from '@discordx/utilities';
-import { CommandInteraction } from 'discord.js';
+import { CommandInteraction, PermissionFlagsBits } from 'discord.js';
 import { Discord, Guard, Slash, SlashOption } from 'discordx';
 import { container } from 'tsyringe';
 import { EmoteCache } from '../../lib/emote/EmoteCache.js';
@@ -13,7 +13,8 @@ import { EmoteCache } from '../../lib/emote/EmoteCache.js';
 @Discord()
 export abstract class Random {
   @Slash('random', {
-    description: 'insert a random emote'
+    description: 'insert a random emote',
+    defaultMemberPermissions: PermissionFlagsBits.SendMessages
   })
   async random(
     @SlashOption('items', { description: 'how many emotes would you like in the chat, max 25', required: false })

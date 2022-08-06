@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import { CommandInteraction, EmbedBuilder } from 'discord.js';
+import { CommandInteraction, EmbedBuilder, PermissionFlagsBits } from 'discord.js';
 import { Client, Discord, Guard, Slash } from 'discordx';
 import { container } from 'tsyringe';
 import { EmoteCache } from '../../lib/emote/EmoteCache.js';
@@ -12,7 +12,8 @@ dayjs.extend(relativeTime);
 export abstract class About {
   @Guard(bigServerDetect)
   @Slash('about', {
-    description: 'Provides information and stats about the bot.'
+    description: 'Provides information and stats about the bot.',
+    defaultMemberPermissions: PermissionFlagsBits.SendMessages
   })
   async about(interaction: CommandInteraction, _client: Client, data: BSGuardData) {
     const emoteCache = container.resolve(EmoteCache);

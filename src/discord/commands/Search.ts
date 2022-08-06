@@ -1,4 +1,4 @@
-import { Colors, CommandInteraction, EmbedBuilder } from 'discord.js';
+import { Colors, CommandInteraction, EmbedBuilder, PermissionFlagsBits } from 'discord.js';
 import { Discord, Slash, SlashOption } from 'discordx';
 import { container } from 'tsyringe';
 import { EmoteCache } from '../../lib/emote/EmoteCache.js';
@@ -7,7 +7,8 @@ import strings from '../../res/strings.json' assert { type: 'json' };
 @Discord()
 export abstract class Search {
   @Slash('search', {
-    description: 'Search the database for emotes'
+    description: 'Search the database for emotes',
+    defaultMemberPermissions: PermissionFlagsBits.SendMessages
   })
   async search(
     @SlashOption('query', { description: 'you can search based on name or Discord ID (snowflake)' })

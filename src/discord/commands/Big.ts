@@ -1,5 +1,5 @@
 import { RateLimit, TIME_UNIT } from '@discordx/utilities';
-import { ApplicationCommandOptionType, AutocompleteInteraction, CommandInteraction, GuildMember, Message } from 'discord.js';
+import { ApplicationCommandOptionType, AutocompleteInteraction, CommandInteraction, GuildMember, Message, PermissionFlagsBits } from 'discord.js';
 import { Discord, Guard, Slash, SlashOption } from 'discordx';
 import { container } from 'tsyringe';
 import { emoteAutocomplete } from '../../lib/cmd/Autocomplete';
@@ -16,7 +16,8 @@ import strings from '../../res/strings.json' assert { type: 'json' };
 )
 export abstract class Big {
   @Slash('big', {
-    description: 'enlarges the input object'
+    description: 'enlarges the input object',
+    defaultMemberPermissions: PermissionFlagsBits.SendMessages
   })
   async big(
     @SlashOption('emote', {
