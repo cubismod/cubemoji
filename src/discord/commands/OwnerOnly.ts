@@ -83,6 +83,15 @@ export abstract class PerformanceTest {
   }
 }
 
+interface GuildCommands {
+  id: string,
+  commands: string[]
+}
+
+interface PermGrabList {
+  applicationID?: string,
+  guilds: Array<GuildCommands>
+}
 @Discord()
 @Guard(botOwnerDetect)
 export abstract class PermGrab {
@@ -96,24 +105,27 @@ export abstract class PermGrab {
 
     await interaction.deferReply();
 
-    const message: string[] = [];
-
-    message.push(`Application ID: ${interaction.client.application?.id}`);
-
-    message.push('\nCommands:');
+    const message: PermGrabList = {
+      applicationID: interaction.client.application?.id,
+      guilds: []
+    };
 
     // push each guildID and all the commandIDs in each
     for (const guild of interaction.client.guilds.cache) {
-      message.push(`\n${guild[0]}, ${guild[1].name}\n`);
+      const commands: string[] = [];
       for (const command of guild[1].commands.cache) {
-        message.push(command[0]);
+        commands.push(command[0]);
       }
+      message.guilds.push({
+        id: guild[0],
+        commands
+      });
     }
 
     // save to a file
     const fileName = path.join('./download', randomUUID() + '.txt');
     try {
-      await writeFile(fileName, message.join('\n'));
+      await writeFile(fileName, JSON.stringify(message, undefined, 2));
     } catch (err) {
       logger.error(err);
       await interaction.editReply('Unable to write to file.');
