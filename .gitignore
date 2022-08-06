@@ -136,3 +136,5 @@ static/
 package-lock.json
 
 .DS_Store
+
+perms.json
