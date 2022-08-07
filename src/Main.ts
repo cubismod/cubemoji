@@ -1,6 +1,6 @@
 import { dirname, importx } from '@discordx/importer';
 import { GatewayIntentBits, Partials } from 'discord.js';
-import { Client, DIService, tsyringeDependencyRegistryEngine } from 'discordx';
+import { Client, DIService, IGuild, tsyringeDependencyRegistryEngine } from 'discordx';
 import { mkdir } from 'fs/promises';
 import 'reflect-metadata';
 import { container } from 'tsyringe';
@@ -38,19 +38,25 @@ export class Main {
     await createDir('./static/emotes');
     await createDir('./data/backups');
 
+    // discord client setup
     await importx(dirname(import.meta.url) + '/discord/**/*.js');
     logger.info('🅲🆄🅱🅴🅼🅾🅹🅸');
     logger.info(`v. ${process.env.npm_package_version}`);
     let silent: false | undefined;
+
+    // use global commands in production
+    // and guild commands in testing
+    let botGuilds: IGuild[] | undefined;
     if (process.env.CM_ENVIRONMENT === 'prd') {
-      logger.info('running in PRD');
+      logger.info('running in PRD\nUsing global commands');
     } else {
-      logger.info('Running in NPR');
+      logger.info('Running in NPR\nUsing guild commands');
+      botGuilds = [(client) => client.guilds.cache.map((guild) => guild.id)];
       silent = false;
     }
 
     this._client = new Client({
-      botGuilds: [(client) => client.guilds.cache.map((guild) => guild.id)],
+      botGuilds,
       intents: [
         GatewayIntentBits.Guilds,
         GatewayIntentBits.GuildEmojisAndStickers,
