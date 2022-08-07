@@ -31,12 +31,12 @@ stages:
     changes:
     - Dockerfile
     - scripts/deploy.sh
-    - assets/
+    - assets/**/*
     - yarn.lock
     - package.json
     - tsconfig.json
     - .eslintrc.json
-    - src/
+    - src/**/*.{ts,json}
     - PRIVACY.md
     - .gitlab-ci.yml
 
