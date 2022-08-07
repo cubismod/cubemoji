@@ -127,6 +127,7 @@ deploy_prod:
       changes:
         - fly.toml
   script:
+    - apk install git
     - cd ${CI_PROJECT_DIR}
     - ${CI_PROJECT_DIR}/scripts/deploy.sh
 

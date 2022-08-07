@@ -35,7 +35,7 @@ processes = []
    [[services.http_checks]]
     interval = "20s"
     # increase grace period for troubleshooting
-    grace_period = "100s"
+    grace_period = "120s"
     method = "get"
     path = "/status"
     protocol = "http"
