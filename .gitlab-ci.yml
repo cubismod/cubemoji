@@ -53,6 +53,7 @@ build:
   script:
     - echo $QUAY_CONF > ${AUTH_LOC}
     - cd ${CI_PROJECT_DIR}
+    - podman pull $REPO_NAME
     - >-
       podman build
       -f ./Dockerfile
@@ -127,7 +128,7 @@ deploy_prod:
       changes:
         - fly.toml
   script:
-    - apk install git
+    - apk add git
     - cd ${CI_PROJECT_DIR}
     - ${CI_PROJECT_DIR}/scripts/deploy.sh
 
