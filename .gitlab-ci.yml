@@ -118,7 +118,7 @@ deploy_prod:
   tags:
     - cubemoji
   image:
-    name: curlimages/curl
+    name: quay.io/cubismod/cubemoji-base
   rules:
     - if: $CI_PIPELINE_SOURCE != "push"
       when: never
