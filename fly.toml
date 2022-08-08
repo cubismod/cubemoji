@@ -2,7 +2,6 @@ app = "cubemoji"
 
 kill_signal = "SIGINT"
 kill_timeout = 2
-processes = []
 
 [build]
   image = "quay.io/cubismod/cubemoji:main1c7c97af"
