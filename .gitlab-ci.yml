@@ -53,13 +53,11 @@ build:
   script:
     - echo $QUAY_CONF > ${AUTH_LOC}
     - cd ${CI_PROJECT_DIR}
-    - podman pull $REPO_NAME
     - >-
       podman build
       -f ./Dockerfile
       --layers
       -t ${CONTAINER_DEST}
-      --pull
       --arch amd64
       --format docker
       --label quay.expires-after=100w
