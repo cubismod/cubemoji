@@ -55,7 +55,7 @@
     "chokidar": "^3.5.3",
     "color-thief-node": "^1.0.4",
     "dayjs": "^1.11.4",
-    "discord.js": "^14.1.2",
+    "discord.js": "^14.2.0",
     "discordx": "11.0.8",
     "file-type": "^17.1.6",
     "fuse.js": "^6.6.2",
