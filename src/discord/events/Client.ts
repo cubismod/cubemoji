@@ -169,6 +169,19 @@ export abstract class ClientEvents {
       }, Milliseconds.thirtySec // 30 sec
       );
     }
+
+    await client.guilds.fetch();
+    // delete all guild commands
+    for (const guild of client.guilds.cache) {
+      await guild[1].commands.fetch();
+      this.logger.info(guild[1].name);
+      for (const command of guild[1].commands.cache) {
+        await guild[1].commands.delete(command[1]);
+        this.logger.info(`Delete command ${command[1].name} in ${guild[1]}`);
+      }
+      this.logger.info(`All guild commands have been deleted in ${guild[1].name}`);
+    }
+    this.logger.info('All guild commands have been deleted');
   }
 
   @On('warn')
