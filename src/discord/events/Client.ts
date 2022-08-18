@@ -29,7 +29,7 @@ export abstract class ClientEvents {
    * core setup of the bot including dependency init
    * and command init
    */
-  @Once('ready')
+  @Once({ event: 'ready' })
   async ready(
     [_args]: ArgsOf<'ready'>, // we don't care about Discord.js's client object
     client: Client
@@ -165,14 +165,14 @@ export abstract class ClientEvents {
     }
   }
 
-  @On('warn')
+  @On({ event: 'warn' })
   warning(
     [data]: ArgsOf<'warn'>
   ) {
     this.logger.debug(data);
   }
 
-  @On('debug')
+  @On({ event: 'debug' })
   debug(
     [data]: ArgsOf<'debug'>
   ) {
@@ -183,7 +183,7 @@ export abstract class ClientEvents {
   /**
    * respond to an interaction
    */
-  @On('interactionCreate')
+  @On({ event: 'interactionCreate' })
   async interactionCreate(
     [interaction]: ArgsOf<'interactionCreate'>,
     client: Client
@@ -232,7 +232,7 @@ export abstract class ClientEvents {
   /**
    * emitted when cubemoji joins a guild
    */
-  @On('guildCreate')
+  @On({ event: 'guildCreate' })
   async guildCreate(
     [guild]: ArgsOf<'guildCreate'>,
     client: Client

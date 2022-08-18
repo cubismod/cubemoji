@@ -1,4 +1,4 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, CommandInteraction, Guild, PermissionFlagsBits } from 'discord.js';
+/* import { ActionRowBuilder, ButtonBuilder, ButtonStyle, CommandInteraction, Guild, PermissionFlagsBits } from 'discord.js';
 import { ButtonComponent, Client, Discord, Guard, Slash, SlashOption } from 'discordx';
 import { container } from 'tsyringe';
 import { InspectorWrapper } from '../../lib/perf/InspectorWrapper';
@@ -93,3 +93,4 @@ export abstract class ClearCommands {
     await interaction.followUp('done!');
   }
 }
+ */

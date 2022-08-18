@@ -12,12 +12,17 @@ import { EmoteCache } from '../../lib/emote/EmoteCache.js';
 )
 @Discord()
 export abstract class Random {
-  @Slash('random', {
+  @Slash({
+    name: 'random',
     description: 'insert a random emote',
     defaultMemberPermissions: PermissionFlagsBits.SendMessages
   })
   async random(
-    @SlashOption('items', { description: 'how many emotes would you like in the chat, max 25', required: false })
+    @SlashOption({
+      name: 'items',
+      description: 'how many emotes would you like in the chat, max 25',
+      required: false
+    })
       items: number,
       interaction: CommandInteraction
   ) {

@@ -14,7 +14,7 @@ import { BSGuardData } from '../Guards.js';
 export abstract class ReactEvents {
   private logger = container.resolve(CubeLogger).events;
 
-  @On('messageReactionAdd')
+  @On({ event: 'messageReactionAdd' })
   async onMessageReactionAdd(
     [reaction]: ArgsOf<'messageReactionAdd'>,
     _client: Client,

@@ -3,7 +3,11 @@ import { Discord, Slash } from 'discordx';
 
 @Discord()
 export abstract class Uptime {
-  @Slash('uptime', { description: 'show bot current uptime', defaultMemberPermissions: 'SendMessages' })
+  @Slash({
+    name: 'uptime',
+    description: 'show bot current uptime',
+    defaultMemberPermissions: 'SendMessages'
+  })
   async uptime(interaction: CommandInteraction) {
     const timestamp = interaction.client.readyTimestamp;
     if (timestamp) {

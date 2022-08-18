@@ -10,19 +10,25 @@ import strings from '../../res/strings.json' assert { type: 'json' };
 )
 @Discord()
 export abstract class Jumbo {
-  @Slash('jumbo', {
+  @Slash({
+    name: 'jumbo',
     description: 'blows up the input object',
     defaultMemberPermissions: 'SendMessages'
   })
   async jumbo(
-    @SlashOption('emote', {
+    @SlashOption({
+      name: 'emote',
       description: strings.emoteSlash,
       autocomplete: (interaction: AutocompleteInteraction) => emoteAutocomplete(interaction),
       type: ApplicationCommandOptionType.String,
       required: false
     })
       emote: string,
-    @SlashOption('member', { description: strings.memberSlash, required: false })
+    @SlashOption({
+      name: 'member',
+      description: strings.memberSlash,
+      required: false
+    })
       member: GuildMember,
       interaction: CommandInteraction
   ) {

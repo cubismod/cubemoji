@@ -8,7 +8,8 @@ import { BSGuardData } from '../Guards';
 
 @Discord()
 export abstract class List {
-  @Slash('list', {
+  @Slash({
+    name: 'list',
     description: 'Get a full list of emojis',
     defaultMemberPermissions: PermissionFlagsBits.SendMessages
   })
@@ -18,7 +19,7 @@ export abstract class List {
     @SlashChoice('mutant_emoji')
     @SlashChoice('this_server')
     @SlashChoice('webpage')
-    @SlashOption('subset', { description: 'Which subset of emotes would you like to choose from?' })
+    @SlashOption({ name: 'subset', description: 'Which subset of emotes would you like to choose from?' })
       subset: string,
       interaction: CommandInteraction,
       _client: Client,

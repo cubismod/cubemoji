@@ -7,16 +7,21 @@ import { BSGuardData } from '../Guards';
 
 @Discord()
 export abstract class Rescale {
-  @Slash('rescale', { description: 'Rescale an image or emote using Seam carving to humorous results', defaultMemberPermissions: PermissionFlagsBits.SendMessages })
+  @Slash({
+    name: 'rescale',
+    description: 'Rescale an image or emote using Seam carving to humorous results',
+    defaultMemberPermissions: PermissionFlagsBits.SendMessages
+  })
   async rescale(
-    @SlashOption('source', {
+    @SlashOption({
+      name: 'source',
       description: strings.sourceSlash,
       autocomplete: (interaction: AutocompleteInteraction) => emoteAutocomplete(interaction),
       type: ApplicationCommandOptionType.String,
       required: false
     })
       emote: string,
-    @SlashOption('member', { description: 'a user', required: false })
+    @SlashOption({ name: 'member', description: 'a user', required: false })
       user: GuildMember,
       interaction: CommandInteraction,
       _client: Client,

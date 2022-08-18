@@ -6,12 +6,13 @@ import strings from '../../res/strings.json' assert { type: 'json' };
 
 @Discord()
 export abstract class Search {
-  @Slash('search', {
+  @Slash({
+    name: 'search',
     description: 'Search the database for emotes',
     defaultMemberPermissions: PermissionFlagsBits.SendMessages
   })
   async search(
-    @SlashOption('query', { description: 'you can search based on name or Discord ID (snowflake)' })
+    @SlashOption({ name: 'query', description: 'you can search based on name or Discord ID (snowflake)' })
       query: string,
       interaction: CommandInteraction
   ) {
