@@ -17,12 +17,14 @@ import strings from '../../res/strings.json' assert { type: 'json' };
   })
 )
 export abstract class Emote {
-  @Slash('emote', {
+  @Slash({
+    name: 'emote',
     description: 'inserts an emote into chat',
     defaultMemberPermissions: PermissionFlagsBits.SendMessages
   })
   async emote (
-    @SlashOption('emote', {
+    @SlashOption({
+      name: 'emote',
       description: strings.emoteSlash,
       autocomplete: (interaction: AutocompleteInteraction) => emoteAutocomplete(interaction),
       type: ApplicationCommandOptionType.String

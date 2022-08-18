@@ -7,9 +7,14 @@ import { BSGuardData } from '../Guards';
 
 @Discord()
 export abstract class AddFace {
-  @Slash('addface', { description: 'Adds a face or...other to an emote or image', defaultMemberPermissions: PermissionFlagsBits.SendMessages })
+  @Slash({
+    name: 'addface',
+    description: 'Adds a face or...other to an emote or image',
+    defaultMemberPermissions: PermissionFlagsBits.SendMessages
+  })
   async addface(
-    @SlashOption('source', {
+    @SlashOption({
+      name: 'source',
       description: strings.sourceSlash,
       autocomplete: (interaction: AutocompleteInteraction) => emoteAutocomplete(interaction),
       type: ApplicationCommandOptionType.String
@@ -23,7 +28,10 @@ export abstract class AddFace {
     @SlashChoice('weary')
     @SlashChoice('zany')
     @SlashChoice('flushed')
-    @SlashOption('face', { description: 'face to composite on an image' })
+    @SlashOption({
+      name: 'face',
+      description: 'face to composite on an image'
+    })
       face: string,
       interaction: CommandInteraction,
       _client: Client,

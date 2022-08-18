@@ -5,8 +5,11 @@ import { BSGuardData } from './Guards.js';
 
 @Discord()
 export abstract class CubeMessageContext {
-  @ContextMenu(ApplicationCommandType.Message, 'Apply edit to this message',
-    { defaultMemberPermissions: PermissionFlagsBits.SendMessages })
+  @ContextMenu({
+    type: ApplicationCommandType.Message,
+    name: 'Apply edit to this message',
+    defaultMemberPermissions: PermissionFlagsBits.SendMessages
+  })
   async editHandler(
     interaction: ContextMenuCommandInteraction,
     _client: Client,
@@ -20,8 +23,11 @@ export abstract class CubeMessageContext {
     }
   }
 
-  @ContextMenu(ApplicationCommandType.Message, 'Rescale this message',
-    { defaultMemberPermissions: PermissionFlagsBits.SendMessages })
+  @ContextMenu({
+    type: ApplicationCommandType.Message,
+    name: 'Rescale this message',
+    defaultMemberPermissions: PermissionFlagsBits.SendMessages
+  })
   async rescaleHandler(
     interaction: ContextMenuCommandInteraction,
     _client: Client,
@@ -34,7 +40,9 @@ export abstract class CubeMessageContext {
     }
   }
 
-  @ContextMenu(ApplicationCommandType.Message, 'Jumbofy this message', {
+  @ContextMenu({
+    type: ApplicationCommandType.Message,
+    name: 'Jumbofy this message',
     defaultMemberPermissions: PermissionFlagsBits.SendMessages
   })
   async jumboHandler(

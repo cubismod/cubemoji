@@ -9,20 +9,27 @@ import { CubeLogger } from '../../lib/observability/CubeLogger.js';
 export abstract class Convert {
   private logger = container.resolve(CubeLogger).command;
 
-  @Slash('convert', { description: 'perform unit conversions for common scientific calculations (not currency)', defaultMemberPermissions: PermissionFlagsBits.SendMessages })
+  @Slash({
+    name: 'convert',
+    description: 'perform unit conversions for common scientific calculations (not currency)',
+    defaultMemberPermissions: PermissionFlagsBits.SendMessages
+  })
   async convert(
-    @SlashOption('fromval', {
+    @SlashOption({
+      name: 'fromval',
       description: 'the value of whatever you are converting from',
       type: ApplicationCommandOptionType.Number
     }) fromval: number,
 
-    @SlashOption('fromunit', {
+    @SlashOption({
+      name: 'fromunit',
       description: 'the unit of whatever you are converting from, use "tempC/tempF" for temperature',
       type: ApplicationCommandOptionType.String,
       autocomplete: (interaction: AutocompleteInteraction) => unitAutocomplete(interaction)
     }) fromunit: string,
 
-    @SlashOption('tounit', {
+    @SlashOption({
+      name: 'tounit',
       description: 'unit to convert to, use "tempC/tempF" for temperatures',
       type: ApplicationCommandOptionType.String,
       autocomplete: (interaction: AutocompleteInteraction) => unitAutocomplete(interaction)

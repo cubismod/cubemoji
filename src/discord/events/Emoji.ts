@@ -8,7 +8,7 @@ import { EmoteCache } from '../../lib/emote/EmoteCache.js';
 
 @Discord()
 export abstract class EmojiEvents {
-  @On('emojiCreate')
+  @On({ event: 'emojiCreate' })
   async emojiCreate(emojis: GuildEmoji[]) {
     if (emojis.length > 0) {
       const emoteCache = container.resolve(EmoteCache);
@@ -16,7 +16,7 @@ export abstract class EmojiEvents {
     }
   }
 
-  @On('emojiDelete')
+  @On({ event: 'emojiDelete' })
   async emojiDelete(emojis: GuildEmoji[]) {
     if (emojis.length > 0) {
       const emoteCache = container.resolve(EmoteCache);
@@ -24,7 +24,7 @@ export abstract class EmojiEvents {
     }
   }
 
-  @On('emojiUpdate')
+  @On({ event: 'emojiUpdate' })
   async emojiUpdate(emojis: GuildEmoji[]) {
     if (emojis.length > 1) {
       // the event returns an array with the old emoji at pos 0, new emoji at pos 1

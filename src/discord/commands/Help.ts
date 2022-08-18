@@ -4,7 +4,11 @@ import strings from '../../res/strings.json' assert { type: 'json' };
 
 @Discord()
 export abstract class Help {
-  @Slash('help', { description: 'A guide on how to use cubemoji', defaultMemberPermissions: 'SendMessages' })
+  @Slash({
+    name: 'help',
+    description: 'A guide on how to use cubemoji',
+    defaultMemberPermissions: 'SendMessages'
+  })
   async help(interaction: CommandInteraction) {
     const helpEmbed = new EmbedBuilder()
       .setTitle('cubemoji Help')

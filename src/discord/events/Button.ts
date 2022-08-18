@@ -7,7 +7,7 @@ import { EmoteCache } from '../../lib/emote/EmoteCache';
 
 @Discord()
 export abstract class ButtonResponder {
-  @ButtonComponent('mod-action-confirm')
+  @ButtonComponent({ id: 'mod-action-confirm' })
   async modActionConfirm(interaction: ButtonInteraction) {
     await interaction.deferReply({ ephemeral: true });
 

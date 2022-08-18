@@ -8,28 +8,39 @@ import { BSGuardData } from '../Guards';
 
 @Discord()
 export abstract class Edit {
-  @Slash('edit', {
+  @Slash({
+    name: 'edit',
     description: 'Edits an emote or image according to the effects you select',
     defaultMemberPermissions: PermissionFlagsBits.SendMessages
   })
   async edit(
-    @SlashOption('source', {
+    @SlashOption({
+      name: 'source',
       description: strings.sourceSlash,
       autocomplete: (interaction: AutocompleteInteraction) => emoteAutocomplete(interaction),
       type: ApplicationCommandOptionType.String,
       required: false
     })
       emote: string,
-    @SlashOption('member', { description: 'a server member', required: false })
+    @SlashOption({
+      name: 'member',
+      description: 'a server member',
+      required: false
+    })
       member: GuildMember,
-    @SlashOption('effects', {
+    @SlashOption({
+      name: 'effects',
       description: 'list of effects (space separated, max 20). If not specified then random effects will be applied',
       autocomplete: (interaction: AutocompleteInteraction) => editAutocomplete(interaction),
       type: ApplicationCommandOptionType.String,
       required: false
     })
       effects: string,
-    @SlashOption('list', { description: 'get a list of the available effects', required: false })
+    @SlashOption({
+      name: 'list',
+      description: 'get a list of the available effects',
+      required: false
+    })
       list: boolean,
       interaction: CommandInteraction,
       _client: Client,

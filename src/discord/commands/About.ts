@@ -11,9 +11,11 @@ dayjs.extend(relativeTime);
 @Discord()
 export abstract class About {
   @Guard(bigServerDetect)
-  @Slash('about', {
+  @Slash({
+    name: 'about',
     description: 'Provides information and stats about the bot.',
     defaultMemberPermissions: PermissionFlagsBits.SendMessages
+
   })
   async about(interaction: CommandInteraction, _client: Client, data: BSGuardData) {
     const emoteCache = container.resolve(EmoteCache);

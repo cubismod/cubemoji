@@ -15,19 +15,21 @@ import strings from '../../res/strings.json' assert { type: 'json' };
   })
 )
 export abstract class Big {
-  @Slash('big', {
+  @Slash({
+    name: 'big',
     description: 'enlarges the input object',
     defaultMemberPermissions: PermissionFlagsBits.SendMessages
   })
   async big(
-    @SlashOption('emote', {
+    @SlashOption({
+      name: 'emote',
       description: strings.emoteSlash,
       autocomplete: (interaction: AutocompleteInteraction) => emoteAutocomplete(interaction),
       type: ApplicationCommandOptionType.String,
       required: false
     })
       emote: string,
-    @SlashOption('member', { description: strings.memberSlash, required: false })
+    @SlashOption({ name: 'member', description: strings.memberSlash, required: false })
       member: GuildMember,
       interaction: CommandInteraction
   ) {

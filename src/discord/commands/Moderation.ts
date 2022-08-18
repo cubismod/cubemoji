@@ -26,15 +26,15 @@ import strings from '../../res/strings.json' assert { type: 'json' };
 // @Permission(await ModOwnerCheck())
 @SlashGroup({
   name: 'mod',
-  description: 'moderation functionality for the bot',
-  defaultMemberPermissions: 'ManageGuild'
+  description: 'moderation functionality for the bot'
 })
+// extremely consistent options requirements very good discord.ts
 @SlashGroup('mod')
 export abstract class Mod {
   private git = container.resolve(GitClient);
   private storage = container.resolve(CubeStorage);
 
-  @Slash('help')
+  @Slash({ name: 'help' })
   async help(
     interaction: CommandInteraction
   ) {
@@ -45,7 +45,10 @@ export abstract class Mod {
     await interaction.reply({ embeds: [helpEmbed], ephemeral: true });
   }
 
-  @Slash('allroles', { description: 'Get a list of all roles on this server!' })
+  @Slash({
+    name: 'allroles',
+    description: 'Get a list of all roles on this server!'
+  })
   async allRolesCmd(
     interaction: CommandInteraction
   ) {
@@ -63,14 +66,19 @@ export abstract class Mod {
     }
   }
 
-  @Slash('rolepickstatus', { description: 'Enable or disable Role Picker' })
+  @Slash({
+    name: 'rolepickstatus',
+    description: 'Enable or disable Role Picker'
+  })
   async rolePickStatus(
-    @SlashOption('server', {
+    @SlashOption({
+      name: 'server',
       description: 'server of which to enable/disable for',
       autocomplete: (interaction: AutocompleteInteraction) => serverAutocomplete(interaction),
       type: ApplicationCommandOptionType.String
     }) server: string,
-    @SlashOption('setstatus', {
+    @SlashOption({
+      name: 'setstatus',
       description: 'enable or disable the Role Picker on this server',
       type: ApplicationCommandOptionType.Boolean
     }) setStatus: boolean,
@@ -104,7 +112,10 @@ export abstract class Mod {
     }
   }
 
-  @Slash('rolereload', { description: 'Reload Role Picker configuration' })
+  @Slash({
+    name: 'rolereload',
+    description: 'Reload Role Picker configuration'
+  })
   async roleReload(interaction: CommandInteraction) {
     await interaction.deferReply({ ephemeral: true });
     const guildInfo = await validUser(interaction.user, interaction.guildId, interaction.client);
@@ -139,12 +150,16 @@ export abstract class Enrollment {
   /**
    * Only server owners can enroll/unenroll a server from the mode.
    */
-  @Slash('modify', { description: 'enroll/unenroll a new server into big server mode' })
+  @Slash({
+    name: 'modify',
+    description: 'enroll/unenroll a new server into big server mode'
+  })
   async modify(
     @SlashChoice('enroll')
     @SlashChoice('unenroll')
-    @SlashOption('action') action: string,
-    @SlashOption('server', {
+    @SlashOption({ name: 'action' }) action: string,
+    @SlashOption({
+      name: 'server',
       description: 'name of server you want to enroll/unenroll',
       autocomplete: (interaction: AutocompleteInteraction) => serverAutocomplete(interaction),
       type: ApplicationCommandOptionType.String
@@ -169,15 +184,24 @@ export abstract class Enrollment {
   /**
    * limited to server owners
    */
-  @Slash('audit', { description: 'set a channel to log changes made to permissions' })
+  @Slash({
+    name: 'audit',
+    description: 'set a channel to log changes made to permissions'
+  })
   async audit(
-    @SlashOption('clear',
+    @SlashOption(
       {
+        name: 'clear',
         description: 'remove audit channel',
         type: ApplicationCommandOptionType.Boolean,
         required: false
       }) clear: boolean,
-    @SlashOption('channel', { description: 'channel to log actions to, cubemoji must have write permission here', type: ApplicationCommandOptionType.Channel, required: false }) channel: TextChannel | VoiceChannel, interaction: CommandInteraction
+    @SlashOption({
+      name: 'channel',
+      description: 'channel to log actions to, cubemoji must have write permission here',
+      type: ApplicationCommandOptionType.Channel,
+      required: false
+    }) channel: TextChannel | VoiceChannel, interaction: CommandInteraction
   ) {
     await interaction.deferReply({ ephemeral: true });
     const guildInfo = await guildOwnersCheck(interaction.user.id, interaction.guildId, interaction.client);
@@ -200,12 +224,16 @@ export abstract class Enrollment {
   /**
    * limited to server owners
    */
-  @Slash('rolemod', { description: 'grant/revoke a role moderation perms' })
+  @Slash({
+    name: 'rolemod',
+    description: 'grant/revoke a role moderation perms'
+  })
   async roleMod(
     @SlashChoice('grant')
     @SlashChoice('revoke')
-    @SlashOption('action') action: string,
-    @SlashOption('role', {
+    @SlashOption({ name: 'action' }) action: string,
+    @SlashOption({
+      name: 'role',
       description: 'role to grant/remove mod permissions',
       type: ApplicationCommandOptionType.Role
     }) role: Role, interaction: CommandInteraction
@@ -234,7 +262,10 @@ export abstract class Enrollment {
    * displays servers that the user has access to as a server owner
    * or being part of a moderation group
    */
-  @Slash('list', { description: 'list servers currently enrolled in big server mode as well as moderator roles' })
+  @Slash({
+    name: 'list',
+    description: 'list servers currently enrolled in big server mode as well as moderator roles'
+  })
   async list(
     interaction: CommandInteraction
   ) {
@@ -263,23 +294,29 @@ export abstract class blocklist {
   /**
    * command only runs for those w/ mod or server owner perms
    */
-  @Slash('modify', { description: 'block/unblock emoji glob or channel' })
+  @Slash({
+    name: 'modify',
+    description: 'block/unblock emoji glob or channel'
+  })
   async modify(
     @SlashChoice('block')
     @SlashChoice('unblock')
-    @SlashOption('action') action: string,
-    @SlashOption('server', {
+    @SlashOption({ name: 'action' }) action: string,
+    @SlashOption({
+      name: 'server',
       description: 'name of server you want to block emoji on, not req for channel',
       autocomplete: (interaction: AutocompleteInteraction) => serverAutocomplete(interaction),
       type: ApplicationCommandOptionType.String,
       required: false
     }) server: string,
-    @SlashOption('glob', {
+    @SlashOption({
+      name: 'glob',
       description: '<21 chars, glob syntax to block emoji, see /mod help fmi',
       type: ApplicationCommandOptionType.String,
       required: false
     }) glob: string,
-    @SlashOption('channel', {
+    @SlashOption({
+      name: 'channel',
       type: ApplicationCommandOptionType.Channel,
       description: 'channel that cubemoji is blocked from interacting in',
       required: false
@@ -334,7 +371,10 @@ export abstract class blocklist {
   /**
    * only display permissions that user is scoped to see
    */
-  @Slash('list', { description: 'list blocked emoji and channels' })
+  @Slash({
+    name: 'list',
+    description: 'list blocked emoji and channels'
+  })
   async list(
     interaction: CommandInteraction
   ) {
@@ -348,9 +388,13 @@ export abstract class blocklist {
   /**
    * checks in place to ensure that each bulk action can be performed by the user in question
    */
-  @Slash('bulk', { description: 'perform bulk blocking/unblocking of globs and channels' })
+  @Slash({
+    name: 'bulk',
+    description: 'perform bulk blocking/unblocking of globs and channels'
+  })
   async bulk(
-    @SlashOption('listlink', {
+    @SlashOption({
+      name: 'listlink',
       description: 'publicly available plaintext link following bulk syntax, (see wiki for details)',
       required: true
     })

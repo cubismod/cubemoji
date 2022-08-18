@@ -4,7 +4,11 @@ import { clearPage, rolePermissionCheck, rolesCommand } from '../../lib/http/Rol
 
 @Discord()
 export abstract class Roles {
-  @Slash('roles', { description: 'Get a link to setup roles on this server', defaultMemberPermissions: PermissionFlagsBits.ViewChannel })
+  @Slash({
+    name: 'roles',
+    description: 'Get a link to setup roles on this server',
+    defaultMemberPermissions: PermissionFlagsBits.ViewChannel
+  })
   async roles (
     interaction: CommandInteraction
   ) {
@@ -42,7 +46,7 @@ export abstract class Roles {
     }
   }
 
-  @ButtonComponent('delete-button')
+  @ButtonComponent({ id: 'delete-button' })
   async deleteButton(interaction: ButtonInteraction) {
     await interaction.deferReply({ ephemeral: true });
 

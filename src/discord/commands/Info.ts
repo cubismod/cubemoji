@@ -16,19 +16,25 @@ export abstract class Info {
   private logger = container.resolve(CubeLogger).command;
   private imgUrl = '';
 
-  @Slash('info', {
+  @Slash({
+    name: 'info',
     description: 'Provides information about an emote or user',
     defaultMemberPermissions: PermissionFlagsBits.SendMessages
   })
   async info(
-    @SlashOption('emote', {
+    @SlashOption({
+      name: 'emote',
       description: strings.emoteSlash,
       autocomplete: (interaction: AutocompleteInteraction) => emoteAutocomplete(interaction),
       type: ApplicationCommandOptionType.String,
       required: false
     })
       emote: string,
-    @SlashOption('member', { description: strings.memberSlash, required: false })
+    @SlashOption({
+      name: 'member',
+      description: strings.memberSlash,
+      required: false
+    })
       member: GuildMember,
       interaction: CommandInteraction
   ) {
@@ -160,7 +166,7 @@ export abstract class Info {
     return new ActionRowBuilder<ButtonBuilder>().addComponents(button);
   }
 
-  @ButtonComponent('color-button')
+  @ButtonComponent({ id: 'color-button' })
   async colorButton(interaction: ButtonInteraction) {
     await interaction.deferReply({ ephemeral: true });
     // snag url if this is a cached reply

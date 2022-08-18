@@ -1,7 +1,7 @@
 {
   "name": "cubemoji",
   "author": "cubis",
-  "version": "3.4.8",
+  "version": "3.4.9",
   "description": "A Discord emoji bot",
   "main": "Main.ts",
   "license": "MIT",
@@ -56,7 +56,7 @@
     "color-thief-node": "^1.0.4",
     "dayjs": "^1.11.5",
     "discord.js": "^14.1.2",
-    "discordx": "11.0.8",
+    "discordx": "11.1.5",
     "file-type": "^17.1.6",
     "fuse.js": "^6.6.2",
     "gm": "^1.23.1",
