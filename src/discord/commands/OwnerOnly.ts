@@ -1,3 +1,47 @@
+/* import { CommandInteraction, PermissionFlagsBits } from 'discord.js';
+import { Client, Discord, Guard, Slash } from 'discordx';
+import { container } from 'tsyringe';
+import { CubeLogger } from '../../lib/observability/CubeLogger';
+import { botOwnerDetect } from '../Guards';
+
+const logger = container.resolve(CubeLogger).command;
+
+@Discord()
+@Guard(botOwnerDetect)
+export abstract class FlushCommands {
+  @Slash({ name: 'flushcommands', defaultMemberPermissions: PermissionFlagsBits.Administrator })
+  async flushCommands(interaction: CommandInteraction) {
+    await interaction.deferReply();
+    const msgContent = ['Flushing commands', '0', '/', '0', 'none'];
+
+    await interaction.editReply({
+      content: msgContent.join(' ')
+    });
+
+    const client = container.resolve(Client);
+    for (const guild of client.guilds.cache) {
+      await guild[1].commands.fetch();
+      msgContent[3] = guild[1].commands.cache.size.toString();
+      msgContent[4] = guild[1].name;
+
+      let count = 0;
+
+      for (const command of guild[1].commands.cache) {
+        await guild[1].commands.delete(command[1]);
+        count++;
+
+        msgContent[1] = count.toString();
+        await interaction.editReply({ content: msgContent.join(' ') });
+        logger.info(`Deleted ${command[1].name} in ${guild[1]}`);
+      }
+      const msg = `All commands have been deleted in ${guild[1].name}`;
+      logger.info(msg);
+    }
+    await interaction.followUp({ content: 'done' });
+    process.exit();
+  }
+}
+ */
 /* import { ActionRowBuilder, ButtonBuilder, ButtonStyle, CommandInteraction, Guild, PermissionFlagsBits } from 'discord.js';
 import { ButtonComponent, Client, Discord, Guard, Slash, SlashOption } from 'discordx';
 import { container } from 'tsyringe';

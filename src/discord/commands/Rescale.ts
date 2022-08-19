@@ -10,7 +10,8 @@ export abstract class Rescale {
   @Slash({
     name: 'rescale',
     description: 'Rescale an image or emote using Seam carving to humorous results',
-    defaultMemberPermissions: PermissionFlagsBits.SendMessages
+    defaultMemberPermissions: PermissionFlagsBits.SendMessages,
+    dmPermission: false
   })
   async rescale(
     @SlashOption({

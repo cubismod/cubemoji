@@ -26,7 +26,8 @@ import strings from '../../res/strings.json' assert { type: 'json' };
 // @Permission(await ModOwnerCheck())
 @SlashGroup({
   name: 'mod',
-  description: 'moderation functionality for the bot'
+  description: 'moderation functionality for the bot',
+  dmPermission: false
 })
 // extremely consistent options requirements very good discord.ts
 @SlashGroup('mod')

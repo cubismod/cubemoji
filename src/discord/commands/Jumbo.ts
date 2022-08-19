@@ -13,7 +13,8 @@ export abstract class Jumbo {
   @Slash({
     name: 'jumbo',
     description: 'blows up the input object',
-    defaultMemberPermissions: 'SendMessages'
+    defaultMemberPermissions: 'SendMessages',
+    dmPermission: false
   })
   async jumbo(
     @SlashOption({

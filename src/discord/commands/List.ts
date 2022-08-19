@@ -11,7 +11,8 @@ export abstract class List {
   @Slash({
     name: 'list',
     description: 'Get a full list of emojis',
-    defaultMemberPermissions: PermissionFlagsBits.SendMessages
+    defaultMemberPermissions: PermissionFlagsBits.SendMessages,
+    dmPermission: false
   })
   async list(
     @SlashChoice('all')

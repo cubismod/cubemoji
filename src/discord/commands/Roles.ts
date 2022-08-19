@@ -7,7 +7,8 @@ export abstract class Roles {
   @Slash({
     name: 'roles',
     description: 'Get a link to setup roles on this server',
-    defaultMemberPermissions: PermissionFlagsBits.ViewChannel
+    defaultMemberPermissions: PermissionFlagsBits.ViewChannel,
+    dmPermission: false
   })
   async roles (
     interaction: CommandInteraction

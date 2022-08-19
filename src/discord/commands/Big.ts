@@ -18,7 +18,8 @@ export abstract class Big {
   @Slash({
     name: 'big',
     description: 'enlarges the input object',
-    defaultMemberPermissions: PermissionFlagsBits.SendMessages
+    defaultMemberPermissions: PermissionFlagsBits.SendMessages,
+    dmPermission: false
   })
   async big(
     @SlashOption({

@@ -11,7 +11,8 @@ export abstract class Edit {
   @Slash({
     name: 'edit',
     description: 'Edits an emote or image according to the effects you select',
-    defaultMemberPermissions: PermissionFlagsBits.SendMessages
+    defaultMemberPermissions: PermissionFlagsBits.SendMessages,
+    dmPermission: false
   })
   async edit(
     @SlashOption({

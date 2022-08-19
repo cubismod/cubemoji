@@ -9,7 +9,8 @@ export abstract class Search {
   @Slash({
     name: 'search',
     description: 'Search the database for emotes',
-    defaultMemberPermissions: PermissionFlagsBits.SendMessages
+    defaultMemberPermissions: PermissionFlagsBits.SendMessages,
+    dmPermission: false
   })
   async search(
     @SlashOption({ name: 'query', description: 'you can search based on name or Discord ID (snowflake)' })
