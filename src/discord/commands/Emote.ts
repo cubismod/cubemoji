@@ -20,7 +20,8 @@ export abstract class Emote {
   @Slash({
     name: 'emote',
     description: 'inserts an emote into chat',
-    defaultMemberPermissions: PermissionFlagsBits.SendMessages
+    defaultMemberPermissions: PermissionFlagsBits.SendMessages,
+    dmPermission: false
   })
   async emote (
     @SlashOption({

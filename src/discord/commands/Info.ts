@@ -19,7 +19,8 @@ export abstract class Info {
   @Slash({
     name: 'info',
     description: 'Provides information about an emote or user',
-    defaultMemberPermissions: PermissionFlagsBits.SendMessages
+    defaultMemberPermissions: PermissionFlagsBits.SendMessages,
+    dmPermission: false
   })
   async info(
     @SlashOption({

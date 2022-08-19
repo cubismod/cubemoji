@@ -6,7 +6,8 @@ export abstract class Uptime {
   @Slash({
     name: 'uptime',
     description: 'show bot current uptime',
-    defaultMemberPermissions: 'SendMessages'
+    defaultMemberPermissions: 'SendMessages',
+    dmPermission: true
   })
   async uptime(interaction: CommandInteraction) {
     const timestamp = interaction.client.readyTimestamp;

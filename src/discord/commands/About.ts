@@ -14,7 +14,8 @@ export abstract class About {
   @Slash({
     name: 'about',
     description: 'Provides information and stats about the bot.',
-    defaultMemberPermissions: PermissionFlagsBits.SendMessages
+    defaultMemberPermissions: PermissionFlagsBits.SendMessages,
+    dmPermission: true
 
   })
   async about(interaction: CommandInteraction, _client: Client, data: BSGuardData) {

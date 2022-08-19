@@ -15,7 +15,8 @@ export abstract class Random {
   @Slash({
     name: 'random',
     description: 'insert a random emote',
-    defaultMemberPermissions: PermissionFlagsBits.SendMessages
+    defaultMemberPermissions: PermissionFlagsBits.SendMessages,
+    dmPermission: false
   })
   async random(
     @SlashOption({

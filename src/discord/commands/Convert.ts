@@ -12,7 +12,8 @@ export abstract class Convert {
   @Slash({
     name: 'convert',
     description: 'perform unit conversions for common scientific calculations (not currency)',
-    defaultMemberPermissions: PermissionFlagsBits.SendMessages
+    defaultMemberPermissions: PermissionFlagsBits.SendMessages,
+    dmPermission: true
   })
   async convert(
     @SlashOption({

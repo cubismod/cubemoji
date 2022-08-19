@@ -18,7 +18,6 @@ variables:
 stages:
   - build
   - housekeeping
-  - scan
   - maintain
   - deploy_stage
   - deploy_prod
@@ -133,6 +132,8 @@ deploy_prod:
 # https://gitlab.com/dependabot-gitlab/dependabot-standalone
 .dependabot-gitlab:
   stage: maintain
+  tags:
+    - cubemoji
   image:
     name: $DEPENDABOT_IMAGE
     entrypoint: [""]

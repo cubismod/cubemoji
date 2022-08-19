@@ -10,7 +10,8 @@ export abstract class AddFace {
   @Slash({
     name: 'addface',
     description: 'Adds a face or...other to an emote or image',
-    defaultMemberPermissions: PermissionFlagsBits.SendMessages
+    defaultMemberPermissions: PermissionFlagsBits.SendMessages,
+    dmPermission: false
   })
   async addface(
     @SlashOption({

@@ -7,7 +7,8 @@ export abstract class Help {
   @Slash({
     name: 'help',
     description: 'A guide on how to use cubemoji',
-    defaultMemberPermissions: 'SendMessages'
+    defaultMemberPermissions: 'SendMessages',
+    dmPermission: true
   })
   async help(interaction: CommandInteraction) {
     const helpEmbed = new EmbedBuilder()
