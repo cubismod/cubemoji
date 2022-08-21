@@ -801,7 +801,7 @@
   resolved "https://registry.yarnpkg.com/@types/node-emoji/-/node-emoji-1.8.1.tgz#689cb74fdf6e84309bcafce93a135dfecd01de3f"
   integrity sha512-0fRfA90FWm6KJfw6P9QGyo0HDTCmthZ7cWaBQndITlaWLTZ6njRyKwrwpzpg+n6kBXBIGKeUHEQuBx7bphGJkA==
 
-"@types/node@*", "@types/node@^18.7.6":
+"@types/node@*":
   version "18.7.6"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-18.7.6.tgz#31743bc5772b6ac223845e18c3fc26f042713c83"
   integrity sha512-EdxgKRXgYsNITy5mjjXjVE/CS8YENSdhiagGrLqjG0pvA2owgJ6i4l7wy/PFZGC0B1/H20lWKN7ONVDNYDZm7A==
@@ -810,6 +810,11 @@
   version "10.17.60"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-10.17.60.tgz#35f3d6213daed95da7f0f73e75bcc6980e90597b"
   integrity sha512-F0KIgDJfy2nA3zMLmWGKxcH2ZVEtCZXHHdOQs2gSaQ27+lNeEfGxzkIw90aXswATX7AZ33tahPbzy6KAfUreVw==
+
+"@types/node@^18.7.8":
+  version "18.7.8"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-18.7.8.tgz#6bbf2be6fbf9c187a5040d4277d24a06a18957a1"
+  integrity sha512-/YP55EMK2341JkODUb8DM9O0x1SIz2aBvyF33Uf1c76St3VpsMXEIW0nxuKkq/5cxnbz0RD9cfwNZHEAZQD3ag==
 
 "@types/probe-image-size@^7.2.0":
   version "7.2.0"
@@ -1122,10 +1127,10 @@ available-typed-arrays@^1.0.5:
   resolved "https://registry.yarnpkg.com/available-typed-arrays/-/available-typed-arrays-1.0.5.tgz#92f95616501069d07d10edb2fc37d3e1c65123b7"
   integrity sha512-DMD0KiN46eipeziST1LPP/STfDU0sufISXmjSgvVsoU2tqxctQeASejWcfNtxYKqETM1UxQ8sp2OrSBWpHY6sw==
 
-aws-sdk@^2.1198.0:
-  version "2.1198.0"
-  resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.1198.0.tgz#9fc8aab80c45e80a21e5e7e88d8e89526ff5c413"
-  integrity sha512-blFAqK+6N1iKDseAlTwEwpfh3YdCluOwuo/Glv6+A5dvcq78/kqYB+haND8rXL1Esg4BiqVtafHp35FuwQzTTQ==
+aws-sdk@^2.1199.0:
+  version "2.1199.0"
+  resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.1199.0.tgz#1279a2086c34232a450f032543fd43e98e3d8232"
+  integrity sha512-N51EMTCMsiVAJDSKCDTMUheLBlPZ7/c/qyCMGirdoF64/JU+gvZ/u+UqkYPhK7XE80b0GqTj676rtp9OkU1kyg==
   dependencies:
     buffer "4.9.2"
     events "1.1.1"
@@ -1773,10 +1778,10 @@ discord.js@^14.2.0:
     undici "^5.8.2"
     ws "^8.8.1"
 
-discordx@11.1.8:
-  version "11.1.8"
-  resolved "https://registry.yarnpkg.com/discordx/-/discordx-11.1.8.tgz#5ffd559187ef03c37e3c1dbf13b01d068b8f523b"
-  integrity sha512-tb57LQZglJnaG4yJxgW1OD6sejduHMSo3yRTySFRO21g6oC46sjYJPTivgBGY45TWPIMfkcUPc6nGWJ7DZR5SQ==
+discordx@11.1.9:
+  version "11.1.9"
+  resolved "https://registry.yarnpkg.com/discordx/-/discordx-11.1.9.tgz#2d216875ef751a723fc6bccae805b4123e8261c1"
+  integrity sha512-jThyYNYDzHnaTOec8KAuUq1OZ8XzSpDvuZTbn1Lsm4gaCGm98f1/0YF1Hd/k+3DXw4s0HsQYT4R3vpomkpYI5g==
   dependencies:
     "@discordx/di" "^3.0.1"
     "@discordx/internal" "^1.0.2"

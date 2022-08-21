@@ -167,8 +167,8 @@ export async function allRoles(serverID: string) {
   }
 }
 
-async function alertOnChange(serverID: string, oldRole: string | undefined, newRole: string, userID: string) {
-  let action: string = `**Role change for** <@${userID}>\n`;
+async function alertOnChange(serverID: string, oldRole: string | undefined, newRole: string, userID: string, username?: string) {
+  let action: string = `**Role change for** <@${userID}>, ${username}\n`;
   if (oldRole) {
     action += `Removed role: <@&${oldRole}>\n`;
   }
@@ -217,7 +217,7 @@ export async function roleUpdatesSwitch(roleID: string, checkValue: string | und
           logger.info(`Adding role: ${roleID} to user: ${userID} in guild: ${serverID}`);
           await member?.roles.add(roleID, reason);
           if (alert) {
-            await alertOnChange(serverID, undefined, roleID, userID);
+            await alertOnChange(serverID, undefined, roleID, userID, member?.user.tag);
           }
         }
 
@@ -272,7 +272,7 @@ export async function roleUpdateRadio(roles: string[], roleID: string, userID: s
       // if we don't this the alert will state that the same role has been removed
       // and added
       if (alert && currentAssignedRole && currentAssignedRole !== roleID) {
-        await alertOnChange(serverID, currentAssignedRole, roleID, userID);
+        await alertOnChange(serverID, currentAssignedRole, roleID, userID, member?.user.tag);
       }
 
       span.setAttributes({
