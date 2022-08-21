@@ -44,7 +44,7 @@ build:
   tags:
     - cubemoji
   image:
-    name: quay.io/podman/stable:latest
+    name: quay.io/buildah/upstream:latest
     entrypoint: [""]
   interruptible: true
   rules:
@@ -53,15 +53,18 @@ build:
     - echo $QUAY_CONF > ${AUTH_LOC}
     - cd ${CI_PROJECT_DIR}
     - >-
-      podman build
+      buildah build
       -f ./Dockerfile
       --layers
       -t ${CONTAINER_DEST}
       --arch amd64
       --format docker
       --label quay.expires-after=100w
+      --cache-from ${CACHE_REPO}
+      --cache-to ${CACHE_REPO}
+      --authfile ${AUTH_LOC}
       .
-    - podman push --authfile ${AUTH_LOC} ${CONTAINER_DEST}
+    - buildah push --authfile ${AUTH_LOC} ${CONTAINER_DEST}
     
 
 lint:
@@ -75,7 +78,7 @@ lint:
   interruptible: true
   script:
     - cd /usr/src/cubemoji
-    - yarn install  # install dev deps as well
+    - yarn install  # install dev deps as well``
     - npm run audit
     - npm run lint
 
