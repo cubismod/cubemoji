@@ -50,19 +50,19 @@ build:
   rules:
     - *change_rule
   script:
-    - echo "${QUAY_CONF}" > ${AUTH_LOC}
+    - echo "${QUAY_CONF}" > "${AUTH_LOC}"
     - cd "${CI_PROJECT_DIR}"
     - >-
       buildah build
       -f ./Dockerfile
       --layers
-      -t ${CONTAINER_DEST}
+      -t "${CONTAINER_DEST}"
       --arch amd64
       --format docker
       --label quay.expires-after=100w
-      --cache-from ${CACHE_REPO}
-      --cache-to ${CACHE_REPO}
-      --authfile ${AUTH_LOC}
+      --cache-from "${CACHE_REPO}"
+      --cache-to "${CACHE_REPO}"
+      --authfile "${AUTH_LOC}"
       .
     - buildah push --authfile "${AUTH_LOC}" "${CONTAINER_DEST}"
     
@@ -96,7 +96,7 @@ skopeo_copy:
     - >-
       skopeo copy 
       "docker://${CONTAINER_DEST}" "docker://${REPO_NAME}:latest"
-      --authfile ${SKOP_AUTH}
+      --authfile "${SKOP_AUTH}"
   interruptible: true
   rules:
       - if: '$CI_COMMIT_BRANCH == "main" && ($CI_PIPELINE_SOURCE != "merge_request_event" || $CI_PIPELINE_SOURCE != "schedule")'
@@ -107,12 +107,11 @@ deploy_stage:
     - cubemoji
   image:
     name: curlimages/curl
+  allow_failure: true
   rules:
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
-      when: never
     - *change_rule
   script:
-    - cd ${CI_PROJECT_DIR}/scripts/cubemoji-dev/
+    - cd "${CI_PROJECT_DIR}/scripts/cubemoji-dev/"
     - ./stage_deploy.sh
 
 deploy_prod:
