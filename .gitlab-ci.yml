@@ -50,8 +50,8 @@ build:
   rules:
     - *change_rule
   script:
-    - echo $QUAY_CONF > ${AUTH_LOC}
-    - cd ${CI_PROJECT_DIR}
+    - echo "${QUAY_CONF}" > ${AUTH_LOC}
+    - cd "${CI_PROJECT_DIR}"
     - >-
       buildah build
       -f ./Dockerfile
@@ -64,7 +64,7 @@ build:
       --cache-to ${CACHE_REPO}
       --authfile ${AUTH_LOC}
       .
-    - buildah push --authfile ${AUTH_LOC} ${CONTAINER_DEST}
+    - buildah push --authfile "${AUTH_LOC}" "${CONTAINER_DEST}"
     
 
 lint:
@@ -89,13 +89,13 @@ skopeo_copy:
   image:
     name: alpine
   before_script:
-    - echo ${QUAY_CONF} > ${SKOP_AUTH}
+    - echo "${QUAY_CONF}" > "${SKOP_AUTH}"
   allow_failure: true
   script:
     - apk add skopeo
     - >-
       skopeo copy 
-      docker://${CONTAINER_DEST} docker://${REPO_NAME}:latest
+      "docker://${CONTAINER_DEST}" "docker://${REPO_NAME}:latest"
       --authfile ${SKOP_AUTH}
   interruptible: true
   rules:
@@ -128,7 +128,7 @@ deploy_prod:
       changes:
         - fly.toml
   script:
-    - cd ${CI_PROJECT_DIR}
+    - cd "${CI_PROJECT_DIR}"
     - ${CI_PROJECT_DIR}/scripts/deploy.sh
 
 # dependabot setup
