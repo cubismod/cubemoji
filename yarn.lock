@@ -1788,10 +1788,10 @@ discord.js@^14.3.0:
     undici "^5.9.1"
     ws "^8.8.1"
 
-discordx@11.1.11:
-  version "11.1.11"
-  resolved "https://registry.yarnpkg.com/discordx/-/discordx-11.1.11.tgz#1b0d9644fad89bc17e431e58179911e1a865782b"
-  integrity sha512-+cG8rA/cCuNVPPSlOc1Mv18/P01mKgZfje3hkvury0V1HtG6ir/AC0vHrw4v2h1fptUqkHQRfBtqAeRd5DgoBw==
+discordx@11.1.12:
+  version "11.1.12"
+  resolved "https://registry.yarnpkg.com/discordx/-/discordx-11.1.12.tgz#a8d8576d7e37fff106c13512e218bf61724c48d1"
+  integrity sha512-zlXVtW3AMuxvdmceYTxsVujl6FyFvhyjbp6cn7ofZxO/SeVE1wuxvMCHcUe1vLwLq4kzDK19BPHbj6qYQVkZPw==
   dependencies:
     "@discordx/di" "^3.0.1"
     "@discordx/internal" "^1.0.2"
