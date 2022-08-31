@@ -97,10 +97,10 @@
   dependencies:
     tslib "^2.3.1"
 
-"@discordx/koa@^1.1.1":
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/@discordx/koa/-/koa-1.1.1.tgz#2c56d23136dad732a47ad840c38903fc7b3c8f7b"
-  integrity sha512-CzxEF4vgFzpLcPShMUyZ7G8IJ7GUQs0KLVlaEjK9nS7q09GHCxHsApGOzEo/yXlFo5bwQcVcqVAlZMcD0AWl+A==
+"@discordx/koa@^1.1.2":
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/@discordx/koa/-/koa-1.1.2.tgz#f0e79636c4cd84a8e67cf6cce814ed6eb4c31d5d"
+  integrity sha512-ce1+pcXwHk5WMi4wZxPS6spR0oTTVv3D3ykfqv+wgH8XNMSwM2fxF/hpX/vk1Mz9lwK0PyNXa39ZqDgNQ/ftrA==
   dependencies:
     "@discordx/di" "^3.0.1"
     "@discordx/internal" "^1.0.2"
