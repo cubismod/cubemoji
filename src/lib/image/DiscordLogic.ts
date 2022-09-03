@@ -438,6 +438,21 @@ export async function reply(context: MsgContext, content: AttachmentBuilder | st
   return msg;
 }
 
+// export interface replyStatus {
+
+// }
+
+// export async function determineReplyStatus(interaction: ArgsOf<'interactionCreate'>) {
+//   if (interaction instanceof ContextMenuCommandInteraction ||
+//     interaction instanceof CommandInteraction) {
+//     return interaction;
+//   } else if (interaction instanceof MessageReaction) {
+
+//   } else {
+
+//   }
+// }
+
 // get the guild id from context obj
 function getContextGuild(context: MsgContext) {
   if (context instanceof MessageReaction) {

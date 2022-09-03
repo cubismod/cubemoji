@@ -137,11 +137,7 @@ export abstract class Info {
         embed.addFields([
           { name: 'Bot', value: member.user.bot.toString() }
         ]);
-        try {
-          await interaction.reply({ embeds: [embed], components: [row] });
-        } catch (err) {
-          this.logger.error(err);
-        }
+        await interaction.reply({ embeds: [embed], components: [row] });
       }
       if ((member === undefined) && (emote === undefined)) {
         await interaction.reply({ content: strings.noArgs, ephemeral: true });

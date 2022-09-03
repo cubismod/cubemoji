@@ -25,6 +25,17 @@ import { InspectorWrapper } from '../../lib/perf/InspectorWrapper.js';
 export abstract class ClientEvents {
   private cubeLogger = new CubeLogger();
   private logger = this.cubeLogger.client;
+
+  /**
+   * Replies to a user that an error ocurred. Has intelligent
+   * handling for determine whether the interaction has been replied
+   * to to avoid an error
+   * @param interaction
+   */
+  async reportErrorToUser (interaction: ArgsOf<'interactionCreate'>) {
+
+  }
+
   /**
    * core setup of the bot including dependency init
    * and command init
