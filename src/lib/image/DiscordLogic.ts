@@ -216,11 +216,11 @@ export async function isUrl(url: string, urlType = 'image') {
  * @param guildId guild ID snowflake for checking for blocked emotes
  * @returns
  */
-export async function getUrl(source: string, guildId: string) {
+export async function getUrl(source: string, guildId?: string | null) {
   const emoteCache = container.resolve(EmoteCache);
   // yes that's a URL we can use for editing
   if (await isUrl(source)) return source;
-  else if (emoteCache !== undefined) {
+  else if (emoteCache !== undefined && guildId) {
     // see if it's an emote
     const res = await emoteCache.retrieve(source, guildId);
     if (res === undefined) return undefined;
@@ -347,17 +347,17 @@ export async function sendPagination(interaction: CommandInteraction, type: Sour
  * @param interaction Discord Command interaction, does not reply
  * @param source name/id of an emote or a URL for an image
  */
-export async function parseSource(interaction: CommandInteraction, source: string) {
-  const emoteCache = container.resolve(EmoteCache);
-  // emote parsing code
-  if (interaction.guildId) {
-    const retrievedEmoji = await emoteCache.retrieve(source, interaction.guildId);
-    if (retrievedEmoji !== undefined) {
-      return retrievedEmoji.url;
-    }
-  }
-  return false;
-}
+// export async function parseSource(interaction: CommandInteraction, source: string) {
+//   const emoteCache = container.resolve(EmoteCache);
+//   // emote parsing code
+//   if (interaction.guildId) {
+//     const retrievedEmoji = await emoteCache.retrieve(source, interaction.guildId);
+//     if (retrievedEmoji !== undefined) {
+//       return retrievedEmoji.url;
+//     }
+//   }
+//   return false;
+// }
 
 /**
  * Initializes a new page

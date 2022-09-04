@@ -1,7 +1,6 @@
 import { RateLimit, TIME_UNIT } from '@discordx/utilities';
 import {
   ApplicationCommandOptionType,
-  Attachment,
   AutocompleteInteraction,
   CommandInteraction,
   GuildMember,
@@ -20,7 +19,7 @@ import { SourceCommand } from './base/SourceCommand';
     rateValue: 3
   })
 )
-export abstract class Big {
+export abstract class Big extends SourceCommand {
     @Slash({
       name: 'big',
       description: 'enlarges the input object',
@@ -36,27 +35,28 @@ export abstract class Big {
           required: false
         })
           emote: string,
-        @SlashOption({ name: 'member', description: strings.memberSlash, required: false })
-          member: GuildMember,
         @SlashOption({
-          name: 'attachment',
-          description: 'an image to upload',
-          required: false,
-          type: ApplicationCommandOptionType.Attachment
+          name: 'member',
+          description: strings.memberSlash,
+          required: false
         })
-          attachment: Attachment,
+          member: GuildMember,
           interaction: CommandInteraction
   ) {
     await interaction.deferReply();
 
-    const sourceCommand = new SourceCommand(emote, member);
-    const res = await sourceCommand.parseCommand(interaction);
+    this.source = emote;
+    this.member = member;
+
+    if (await this.invalidArgsCheck(interaction)) return;
+
+    const res = await this.parseCommand(interaction);
 
     if (res) {
       const msg = await reply(interaction, res);
-      await sourceCommand.registerTrash(interaction, msg);
+      await this.registerTrash(interaction, msg);
     } else {
-      await sourceCommand.couldNotFind(interaction);
+      await this.couldNotFind(interaction);
     }
   }
 }

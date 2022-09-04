@@ -9,7 +9,7 @@ import hash from 'node-object-hash';
 import { choice } from 'pandemonium';
 import { container, injectable } from 'tsyringe';
 import { parse } from 'twemoji-parser';
-import mutantNames from '../../res/emojiNames.json' assert { type: 'json' };
+import mutantNames from '../../res/emojiNames.json' assert {type: 'json'};
 import { CubeStorage, ValRaw } from '../db/Storage.js';
 import { CubeLogger } from '../observability/CubeLogger.js';
 import { Cmoji, Source } from './Cmoji.js';
@@ -164,11 +164,11 @@ export class EmoteCache {
    * @param guildId guild ID to perform filtering if necessary
    * @returns a Cmoji or undefined if we can't find an emote
    */
-  async retrieve(identifier: string, guildId: string) {
+  async retrieve(identifier: string, guildId?: string) {
     // discord emojis are represented in text
     // like <:flass:781664252058533908>
     // so we split to get the components including name and ID
-    if (!await this.isBlocked(identifier, guildId)) {
+    if (guildId && !await this.isBlocked(identifier, guildId)) {
       const split = identifier.slice(1, -1).split(':');
       // search by ID or name w/ fuse's extended syntax https://fusejs.io/examples.html#extended-search
       if (split.length > 2) identifier = `${split[2]}|${split[1]}`;

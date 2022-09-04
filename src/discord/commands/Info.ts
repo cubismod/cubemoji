@@ -51,109 +51,107 @@ export abstract class Info {
       member: GuildMember,
       interaction: CommandInteraction
   ) {
-    if (this.emoteCache !== undefined) {
-      // check our args
-      if (emote !== undefined && interaction.guildId) {
-        // emote parsing code
-        const emoteName = emote.toLowerCase();
-        const res = await this.emoteCache.retrieve(emoteName, interaction.guildId);
-        if (res !== undefined) {
-          await interaction.deferReply();
+    // check our args
+    if (emote !== undefined && interaction.guildId) {
+      // emote parsing code
+      const emoteName = emote.toLowerCase();
+      const res = await this.emoteCache.retrieve(emoteName, interaction.guildId);
+      if (res !== undefined) {
+        await interaction.deferReply();
 
-          let embed = new EmbedBuilder();
-          embed = await this.setColors(embed, res.url);
-          embed.setImage(res.url);
-          embed.setTitle(res.name);
-
-          // button setup
-          this.imgUrl = res.url;
-          const row = this.buttonCreate();
-
-          switch (res.source) {
-            case Source.Discord: {
-              if (res.guildEmoji?.createdAt) {
-                embed.addFields([
-                  {
-                    name: 'Creation Date',
-                    value: `<t:${Math.round(res.guildEmoji.createdAt.getTime() / 1000)}>`
-                  }
-                ]);
-              }
-              if (res.guildEmoji?.id) {
-                embed.addFields([
-                  { name: 'ID', value: res.guildEmoji.id }
-                ]);
-              }
-              embed.addFields([
-                { name: 'URL', value: res.url }
-              ]);
-              if (res.guildEmoji?.animated) {
-                embed.addFields([
-                  { name: 'Animated', value: 'Yes' }
-                ]);
-              }
-              if (res.guildEmoji?.guild.name) {
-                embed.addFields([
-                  {
-                    name: 'Origin Server Name', value: res.guildEmoji.guild.name
-                  }
-                ]);
-              }
-              const author = await res.guildEmoji?.fetchAuthor();
-              if (author !== undefined) {
-                embed.addFields([
-                  { name: 'Author', value: author.username }
-                ]);
-              }
-              await interaction.editReply({ embeds: [embed], components: [row] });
-              break;
-            }
-            case Source.Mutant: {
-              embed.addFields([
-                {
-                  name: 'Disclaimer',
-                  value: 'This bot uses Mutant Standard emoji (https://mutant.tech) which are licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License (https://creativecommons.org/licenses/by-nc-sa/4.0/).'
-                }
-              ]);
-              await interaction.editReply({ embeds: [embed], components: [row] });
-              break;
-            }
-          }
-        } else {
-          await interaction.reply({ content: strings.noEmoteFound, ephemeral: true });
-        }
-      } else if (member !== undefined) {
-        // user code
-        const avatarURL = member.user.displayAvatarURL({ size: 256, extension: 'png' });
         let embed = new EmbedBuilder();
+        embed = await this.setColors(embed, res.url);
+        embed.setImage(res.url);
+        embed.setTitle(res.name);
 
         // button setup
-        this.imgUrl = avatarURL;
+        this.imgUrl = res.url;
         const row = this.buttonCreate();
 
-        embed = await this.setColors(embed, avatarURL);
-        embed.setTitle(member.user.tag);
-        embed.setImage(avatarURL);
-        embed.addFields([
-          { name: 'ID', value: member.user.id }
-        ]);
-        embed.addFields([
-          { name: 'Discord Join Date', value: `<t:${Math.round(member.user.createdAt.getTime() / 1000)}>` }
-        ]);
-        if (member.joinedAt) {
-          embed.addFields([
-            { name: 'This Server Join Date', value: `<t:${Math.round(member.joinedAt.getTime() / 1000)}>` }
-          ]);
-        };
+        switch (res.source) {
+          case Source.Discord: {
+            if (res.guildEmoji?.createdAt) {
+              embed.addFields([
+                {
+                  name: 'Creation Date',
+                  value: `<t:${Math.round(res.guildEmoji.createdAt.getTime() / 1000)}>`
+                }
+              ]);
+            }
+            if (res.guildEmoji?.id) {
+              embed.addFields([
+                { name: 'ID', value: res.guildEmoji.id }
+              ]);
+            }
+            embed.addFields([
+              { name: 'URL', value: res.url }
+            ]);
+            if (res.guildEmoji?.animated) {
+              embed.addFields([
+                { name: 'Animated', value: 'Yes' }
+              ]);
+            }
+            if (res.guildEmoji?.guild.name) {
+              embed.addFields([
+                {
+                  name: 'Origin Server Name', value: res.guildEmoji.guild.name
+                }
+              ]);
+            }
+            const author = await res.guildEmoji?.fetchAuthor();
+            if (author !== undefined) {
+              embed.addFields([
+                { name: 'Author', value: author.username }
+              ]);
+            }
+            await interaction.editReply({ embeds: [embed], components: [row] });
+            break;
+          }
+          case Source.Mutant: {
+            embed.addFields([
+              {
+                name: 'Disclaimer',
+                value: 'This bot uses Mutant Standard emoji (https://mutant.tech) which are licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License (https://creativecommons.org/licenses/by-nc-sa/4.0/).'
+              }
+            ]);
+            await interaction.editReply({ embeds: [embed], components: [row] });
+            break;
+          }
+        }
+      } else {
+        await interaction.reply({ content: strings.noEmoteFound, ephemeral: true });
+      }
+    } else if (member !== undefined) {
+      // user code
+      const avatarURL = member.displayAvatarURL({ size: 256, extension: 'png' });
+      let embed = new EmbedBuilder();
 
+      // button setup
+      this.imgUrl = avatarURL;
+      const row = this.buttonCreate();
+
+      embed = await this.setColors(embed, avatarURL);
+      embed.setTitle(member.user.tag);
+      embed.setImage(avatarURL);
+      embed.addFields([
+        { name: 'ID', value: member.user.id }
+      ]);
+      embed.addFields([
+        { name: 'Discord Join Date', value: `<t:${Math.round(member.user.createdAt.getTime() / 1000)}>` }
+      ]);
+      if (member.joinedAt) {
         embed.addFields([
-          { name: 'Bot', value: member.user.bot.toString() }
+          { name: 'This Server Join Date', value: `<t:${Math.round(member.joinedAt.getTime() / 1000)}>` }
         ]);
-        await interaction.reply({ embeds: [embed], components: [row] });
-      }
-      if ((member === undefined) && (emote === undefined)) {
-        await interaction.reply({ content: strings.noArgs, ephemeral: true });
-      }
+      };
+
+      embed.addFields([
+        { name: 'Bot', value: member.user.bot.toString() }
+      ]);
+      await interaction.reply({ embeds: [embed], components: [row] });
+    }
+    if ((member === undefined) && (emote === undefined)) {
+      await interaction.reply({ content: strings.noArgs, ephemeral: true });
     }
   }
 

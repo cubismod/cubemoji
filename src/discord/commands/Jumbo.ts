@@ -2,14 +2,15 @@ import { RateLimit, TIME_UNIT } from '@discordx/utilities';
 import { ApplicationCommandOptionType, AutocompleteInteraction, CommandInteraction, GuildMember } from 'discord.js';
 import { Discord, Guard, Slash, SlashOption } from 'discordx';
 import { emoteAutocomplete } from '../../lib/cmd/Autocomplete';
-import { EditDiscord, parseSource } from '../../lib/image/DiscordLogic.js';
+import { EditDiscord } from '../../lib/image/DiscordLogic.js';
 import strings from '../../res/strings.json' assert {type: 'json'};
+import { SourceCommand } from './base/SourceCommand';
 
 @Guard(
   RateLimit(TIME_UNIT.seconds, 60, { ephemeral: true })
 )
 @Discord()
-export abstract class Jumbo {
+export abstract class Jumbo extends SourceCommand {
   @Slash({
     name: 'jumbo',
     description: 'blows up the input object',
@@ -34,22 +35,17 @@ export abstract class Jumbo {
       interaction: CommandInteraction
   ) {
     await interaction.deferReply();
-    if (emote !== undefined) {
-      const res = await parseSource(interaction, emote);
-      if (res) {
-        const edDiscord = new EditDiscord(interaction, 'magnify magnify', res, interaction.user);
-        await edDiscord.run();
-      } else {
-        await interaction.editReply(strings.noEmoteFound);
-      }
-    } else if (member !== undefined) {
-      // user code
-      // no need to defer a reply since we don't have to search through the emote cache
-      const edDiscord = new EditDiscord(interaction, 'magnify magnify', member.displayAvatarURL({ size: 256, extension: 'png' }), interaction.user);
+
+    this.source = emote;
+    this.member = member;
+
+    if (await this.invalidArgsCheck(interaction)) return;
+    const res = await this.parseCommand(interaction);
+    if (res) {
+      const edDiscord = new EditDiscord(interaction, 'magnify magnify', res, interaction.user);
       await edDiscord.run();
-    }
-    if ((member === undefined) && (emote === undefined)) {
-      await interaction.editReply({ content: strings.noArgs });
+    } else {
+      await this.couldNotFind(interaction);
     }
   }
 }

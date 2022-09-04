@@ -20,7 +20,10 @@ export abstract class List {
     @SlashChoice('mutant_emoji')
     @SlashChoice('this_server')
     @SlashChoice('webpage')
-    @SlashOption({ name: 'subset', description: 'Which subset of emotes would you like to choose from?' })
+    @SlashOption({
+      name: 'subset',
+      description: 'Which subset of emotes would you like to choose from?'
+    })
       subset: string,
       interaction: CommandInteraction,
       _client: Client,
@@ -39,9 +42,9 @@ export abstract class List {
         type = Source.ThisServer;
         break;
       case 'webpage':
-        interaction.reply(`Check out an online emoji list at ${process.env.CM_URL}.`);
+        await interaction.reply(`Check out an online emoji list at ${process.env.CM_URL}.`);
         return;
     }
-    sendPagination(interaction, type, emoteCache, data.enrolled);
+    await sendPagination(interaction, type, emoteCache, data.enrolled);
   }
 }
