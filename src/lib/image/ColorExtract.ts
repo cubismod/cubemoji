@@ -7,8 +7,7 @@ import { getPaletteFromURL, Palette } from 'color-thief-node';
  * @returns color palette
  */
 export async function getColors(url: string) {
-  const palette = await getPaletteFromURL(url);
-  return palette;
+  return await getPaletteFromURL(url);
 }
 
 export function paletteToInt(palette: Palette) {

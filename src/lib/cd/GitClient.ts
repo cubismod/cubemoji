@@ -12,7 +12,7 @@ import { rolePickerParse } from './Parser';
 @injectable()
 export class GitClient {
   directory = '';
-  private remoteUrl;
+  private readonly remoteUrl;
   private logger = container.resolve(CubeLogger).git;
 
   options: Partial<SimpleGitOptions>;

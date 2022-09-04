@@ -1,7 +1,7 @@
 // Generate HTML from PUG template for use in static server
 import { GuildManager } from 'discord.js';
 import { Discord } from 'discordx';
-import { stat, writeFile } from 'fs/promises';
+import { writeFile } from 'fs/promises';
 import path from 'path';
 import { compileFile, compileTemplate } from 'pug';
 import { container, injectable } from 'tsyringe';
@@ -110,16 +110,6 @@ export class PugGenerator {
       await writeFile(pathName, body);
 
       return pathName;
-    } catch (err) {
-      this.logger.error(err);
-    }
-  }
-
-  async retrieveCache (id: string) {
-    try {
-      const pathName = path.resolve('download', `${id}.html.gz`);
-      const exists = await stat(pathName);
-      if (exists) return pathName;
     } catch (err) {
       this.logger.error(err);
     }

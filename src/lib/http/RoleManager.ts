@@ -56,7 +56,7 @@ export async function rolesCommand(userID: string, serverID: string) {
     const userLink = await storage.ephemeralLinks.get(ephemKey);
 
     if (!userLink) {
-      const res = await tracer.startActiveSpan(`role link setup for ${userID} in ${serverID}`, async span => {
+      return await tracer.startActiveSpan(`role link setup for ${userID} in ${serverID}`, async span => {
         // generate new ephemeral link
         const id = randomString(10, 12);
         const newLink: EphemeralLink = {
@@ -89,7 +89,6 @@ export async function rolesCommand(userID: string, serverID: string) {
           return `You can access your profile to edit roles at: ${link?.url}. This expires <t:${link?.expires}:R> , although you can click the button below to delete it early (your roles will not be deleted, just the temporary page).`;
         }
       });
-      return res;
     }
   } else {
     return 'This server is not enrolled in the roles feature. Ask the administrator to enable it.';

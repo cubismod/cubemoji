@@ -62,8 +62,7 @@ export class RescaleDiscord {
   // perform rescale
   protected async performOp() {
     const rescaleOperation = new RescaleOperation(this.source);
-    const outputPath = await rescaleOperation.run();
-    return outputPath;
+    return await rescaleOperation.run();
   }
 
   async run() {
@@ -75,11 +74,11 @@ export class RescaleDiscord {
       // to the actual URL we acquired
       this.source = url;
 
-      startTyping(this.context);
+      await startTyping(this.context);
       const filename = await this.performOp();
       if (filename === undefined) {
         // error in performing the command, react with emote
-        reactErr(this.context);
+        await reactErr(this.context);
       } else {
         // setup file watcher for resulting output
         const watcher = watch(filename, { awaitWriteFinish: true });
@@ -95,7 +94,7 @@ export class RescaleDiscord {
             const msg = await reply(this.context, new AttachmentBuilder(filename));
             if (!msg) {
               this.logger.debug('could not get a message during image operation, not proceeding with adding trash react');
-            } else if (msg instanceof Message && !msg.flags.has(MessageFlags.Ephemeral)) {
+            } else if (!msg.flags.has(MessageFlags.Ephemeral)) {
               // check if ephemeral to avoid discord API errors (can't react to an ephermeral message)
               await cubeMessageManager.registerTrashReact(this.context, msg, this.user.id);
               // job is finished so send status to trigger next jobs
@@ -132,8 +131,7 @@ export class EditDiscord extends RescaleDiscord {
 
   protected async performOp() {
     const editOperation = new EditOperation(this.source, this.effects);
-    const outputPath = await editOperation.run();
-    return outputPath;
+    return await editOperation.run();
   }
 }
 
@@ -147,8 +145,7 @@ export class FaceDiscord extends RescaleDiscord {
 
   protected async performOp() {
     const faceOp = new FaceOperation(this.source, this.face);
-    const outputPath = await faceOp.run();
-    return outputPath;
+    return await faceOp.run();
   }
 }
 
@@ -170,7 +167,8 @@ export function setStatus(client: Client) {
  * checks whether a url is using a proper extension
  * that cubemoji supports, is not on a hostname blocklist,
  * and is using https
- * @param url
+ * @param url url to check
+ * @param urlType is it an image, txt, or json file
  * @returns boolean indicating valid
  */
 export async function isUrl(url: string, urlType = 'image') {
@@ -184,7 +182,7 @@ export async function isUrl(url: string, urlType = 'image') {
     const badHosts = container.resolve(BadHosts);
     const res = await badHosts.checkHost(whatwgUrl.hostname);
     // on the blocklist, then we don't continue
-    if (res !== false) return false;
+    if (res) return false;
 
     // now check the filetype
 
@@ -438,21 +436,17 @@ export async function reply(context: MsgContext, content: AttachmentBuilder | st
   if (content instanceof AttachmentBuilder) {
     // different logic depending on which context we are passing in
     if (context instanceof CommandInteraction) {
-      const repMsg = await context.editReply({ files: [content] });
-      if (repMsg instanceof Message) msg = repMsg;
+      msg = await context.editReply({ files: [content] });
     }
     if (context instanceof ContextMenuCommandInteraction) {
-      const repMsg = await context.editReply({ files: [content] });
-      if (repMsg instanceof Message) msg = repMsg;
+      msg = await context.editReply({ files: [content] });
     }
   } else {
     if (context instanceof CommandInteraction) {
-      const repMsg = await context.editReply(content);
-      if (repMsg instanceof Message) msg = repMsg;
+      msg = await context.editReply(content);
     }
     if (context instanceof ContextMenuCommandInteraction) {
-      const repMsg = await context.editReply({ content });
-      if (repMsg instanceof Message) msg = repMsg;
+      msg = await context.editReply({ content });
     }
   }
   if (context instanceof MessageReaction) {
@@ -499,10 +493,8 @@ async function reactErr(context: MsgContext) {
   if (context instanceof CommandInteraction) {
     logger.error(`Command interaction failure on channel id: ${context.channelId}, guild id: ${context.guildId}`);
     const reply = await context.editReply(`${errEmote} this operation failed!`);
-    if (reply instanceof Message) {
-      // allow user to delete the error message
-      await cubeMessageManager.registerTrashReact(context, reply, context.user.id);
-    }
+    // allow user to delete the error message
+    await cubeMessageManager.registerTrashReact(context, reply, context.user.id);
   }
   if (context instanceof ContextMenuCommandInteraction) {
     logger.error(`Context menu failure on channel id: ${context.channelId}, guild id: ${context.guildId}`);
