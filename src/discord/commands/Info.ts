@@ -1,5 +1,17 @@
 // https://github.com/oceanroleplay/discord.ts-example/blob/main/src/commands/slashes.ts
-import { ActionRowBuilder, ApplicationCommandOptionType, AutocompleteInteraction, ButtonBuilder, ButtonInteraction, ButtonStyle, Colors, CommandInteraction, EmbedBuilder, GuildMember, PermissionFlagsBits } from 'discord.js';
+import {
+  ActionRowBuilder,
+  ApplicationCommandOptionType,
+  AutocompleteInteraction,
+  ButtonBuilder,
+  ButtonInteraction,
+  ButtonStyle,
+  Colors,
+  CommandInteraction,
+  EmbedBuilder,
+  GuildMember,
+  PermissionFlagsBits
+} from 'discord.js';
 import { ButtonComponent, Discord, Slash, SlashOption } from 'discordx';
 import rgbHex from 'rgb-hex';
 import { container } from 'tsyringe';
@@ -8,7 +20,7 @@ import { Source } from '../../lib/emote/Cmoji.js';
 import { EmoteCache } from '../../lib/emote/EmoteCache.js';
 import { getColors, paletteToInt } from '../../lib/image/ColorExtract';
 import { CubeLogger } from '../../lib/observability/CubeLogger.js';
-import strings from '../../res/strings.json' assert { type: 'json' };
+import strings from '../../res/strings.json' assert {type: 'json'};
 
 @Discord()
 export abstract class Info {
@@ -186,9 +198,9 @@ export abstract class Info {
           embeds.push(embed);
         }
       });
-      interaction.editReply({ embeds });
+      await interaction.editReply({ embeds });
     } else {
-      interaction.editReply('colors could not be determined');
+      await interaction.editReply('colors could not be determined');
     }
   }
 }

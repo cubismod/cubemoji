@@ -3,7 +3,7 @@
   "sourceSlash": "an emote or url pointing to an image somewhere out on the web",
   "memberSlash": "a mention of a server member",
   "noEmoteFound": "**Error:** no emote found",
-  "noArgs": "**Error**: No arguments specified, can't perform the operation on nothing",
+  "noArgs": "**Error**: No arguments specified.",
   "missingArg": "**Error**: Missing required argument(s)",
   "fileTypeUndetermined": "could not determine filetype of image",
   "sourceErr": "**Error**: An error occurred when trying to parse the source",

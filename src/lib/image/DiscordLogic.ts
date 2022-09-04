@@ -2,7 +2,19 @@
 // commands when doing image effects
 import { Pagination, PaginationType } from '@discordx/pagination';
 import { watch } from 'chokidar';
-import { ActivityType, AttachmentBuilder, Colors, CommandInteraction, ContextMenuCommandInteraction, EmbedBuilder, Message, MessageFlags, MessageReaction, PartialUser, User } from 'discord.js';
+import {
+  ActivityType,
+  AttachmentBuilder,
+  Colors,
+  CommandInteraction,
+  ContextMenuCommandInteraction,
+  EmbedBuilder,
+  Message,
+  MessageFlags,
+  MessageReaction,
+  PartialUser,
+  User
+} from 'discord.js';
 import { Client } from 'discordx';
 import { fileTypeFromStream } from 'file-type';
 import { choice } from 'pandemonium';
@@ -18,6 +30,7 @@ import { CubeLogger } from '../observability/CubeLogger.js';
 import { FileQueue } from './FileQueue.js';
 import { EditOperation, FaceOperation, MsgContext, RescaleOperation, splitEffects } from './ImageLogic.js';
 import { WorkerPool } from './WorkerPool.js';
+
 const { got } = await import('got');
 
 const logger = container.resolve(CubeLogger).discordLogic;
@@ -154,12 +167,12 @@ export function setStatus(client: Client) {
 }
 
 /**
-* checks whether a url is using a proper extension
-* that cubemoji supports, is not on a hostname blocklist,
-* and is using https
-* @param url
-* @returns boolean indicating valid
-*/
+ * checks whether a url is using a proper extension
+ * that cubemoji supports, is not on a hostname blocklist,
+ * and is using https
+ * @param url
+ * @returns boolean indicating valid
+ */
 export async function isUrl(url: string, urlType = 'image') {
   try {
     const whatwgUrl = new URL(url);
@@ -216,9 +229,9 @@ export async function getUrl(source: string, guildId: string) {
 }
 
 /**
-  * gets either a message attachment or content of a message
-  * and returns that
-  */
+ * gets either a message attachment or content of a message
+ * and returns that
+ */
 export function getMessageImage(message: Message) {
   const attach = message.attachments.random();
   if (message.attachments.size > 0 && attach) {
@@ -227,8 +240,8 @@ export function getMessageImage(message: Message) {
 }
 
 /**
-  * send a new pagination to the specified interaction
-  */
+ * send a new pagination to the specified interaction
+ */
 export async function sendPagination(interaction: CommandInteraction, type: Source, emoteCache: EmoteCache, ephemeral: boolean) {
   // first setup embeds
   const embeds: EmbedBuilder[] = [];
@@ -328,11 +341,17 @@ export async function sendPagination(interaction: CommandInteraction, type: Sour
   }
 }
 
-export async function parseForEmote(interaction: CommandInteraction, emote: string) {
+/**
+ * searches the emote cache
+ * for an emote
+ * @param interaction Discord Command interaction, does not reply
+ * @param source name/id of an emote or a URL for an image
+ */
+export async function parseSource(interaction: CommandInteraction, source: string) {
   const emoteCache = container.resolve(EmoteCache);
   // emote parsing code
   if (interaction.guildId) {
-    const retrievedEmoji = await emoteCache.retrieve(emote, interaction.guildId);
+    const retrievedEmoji = await emoteCache.retrieve(source, interaction.guildId);
     if (retrievedEmoji !== undefined) {
       return retrievedEmoji.url;
     }
@@ -341,8 +360,8 @@ export async function parseForEmote(interaction: CommandInteraction, emote: stri
 }
 
 /**
-  * Initializes a new page
-  */
+ * Initializes a new page
+ */
 function newPage(embed: EmbedBuilder, type: Source) {
   const mutantAttr = 'This bot uses Mutant Standard emoji (https://mutant.tech) which are licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License (https://creativecommons.org/licenses/by-nc-sa/4.0/)';
   switch (type) {
@@ -404,8 +423,12 @@ async function reactReply(context: MessageReaction, content: AttachmentBuilder |
     }
   } else {
     // reply in channel without a ping reply
-    if (content instanceof AttachmentBuilder) return await context.message.reply({ files: [content], allowedMentions: { repliedUser: false } });
-    else return await context.message.reply({ content, allowedMentions: { repliedUser: false } });
+    if (content instanceof AttachmentBuilder) {
+      return await context.message.reply({
+        files: [content],
+        allowedMentions: { repliedUser: false }
+      });
+    } else return await context.message.reply({ content, allowedMentions: { repliedUser: false } });
   }
 }
 
@@ -463,11 +486,11 @@ function getContextGuild(context: MsgContext) {
 }
 
 /**
-  * reacts with custom error emote defined in secrets.json
-  * and log an error to the console
-  * when an image fails its operation if its not a / command
-  * @param context either a message or interaction
-  */
+ * reacts with custom error emote defined in secrets.json
+ * and log an error to the console
+ * when an image fails its operation if its not a / command
+ * @param context either a message or interaction
+ */
 async function reactErr(context: MsgContext) {
   // TODO: add ephermal followup explaining error details
   const cubeMessageManager = container.resolve(CubeMessageManager);

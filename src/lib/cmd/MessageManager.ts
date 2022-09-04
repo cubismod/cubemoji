@@ -21,11 +21,11 @@ export class CubeMessageManager {
     try {
       if (context instanceof ContextMenuCommandInteraction || context instanceof CommandInteraction) {
         // all these checks to ensure cubemoji can delete the message and can also add a react
-        msg.react('🗑️');
+        await msg.react('🗑️');
         await this.storage.trashReacts.set(msg.id, sender);
       }
       if (context instanceof MessageReaction) {
-        msg.react('🗑️');
+        await msg.react('🗑️');
         await this.storage.trashReacts.set(msg.id, sender);
       }
     } catch (err) {

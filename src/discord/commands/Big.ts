@@ -1,11 +1,19 @@
 import { RateLimit, TIME_UNIT } from '@discordx/utilities';
-import { ApplicationCommandOptionType, AutocompleteInteraction, CommandInteraction, GuildMember, Message, PermissionFlagsBits } from 'discord.js';
+import {
+  ApplicationCommandOptionType,
+  Attachment,
+  AutocompleteInteraction,
+  CommandInteraction,
+  GuildMember,
+  Message,
+  PermissionFlagsBits
+} from 'discord.js';
 import { Discord, Guard, Slash, SlashOption } from 'discordx';
 import { container } from 'tsyringe';
 import { emoteAutocomplete } from '../../lib/cmd/Autocomplete';
 import { CubeMessageManager } from '../../lib/cmd/MessageManager.js';
-import { autoDeleteMsg, parseForEmote, reply } from '../../lib/image/DiscordLogic.js';
-import strings from '../../res/strings.json' assert { type: 'json' };
+import { autoDeleteMsg, parseSource, reply } from '../../lib/image/DiscordLogic.js';
+import strings from '../../res/strings.json' assert {type: 'json'};
 
 @Discord()
 @Guard(
@@ -15,29 +23,36 @@ import strings from '../../res/strings.json' assert { type: 'json' };
   })
 )
 export abstract class Big {
-  @Slash({
-    name: 'big',
-    description: 'enlarges the input object',
-    defaultMemberPermissions: PermissionFlagsBits.SendMessages,
-    dmPermission: false
-  })
-  async big(
-    @SlashOption({
-      name: 'emote',
-      description: strings.emoteSlash,
-      autocomplete: (interaction: AutocompleteInteraction) => emoteAutocomplete(interaction),
-      type: ApplicationCommandOptionType.String,
-      required: false
+    @Slash({
+      name: 'big',
+      description: 'enlarges the input object',
+      defaultMemberPermissions: PermissionFlagsBits.SendMessages,
+      dmPermission: false
     })
-      emote: string,
-    @SlashOption({ name: 'member', description: strings.memberSlash, required: false })
-      member: GuildMember,
-      interaction: CommandInteraction
+  async big(
+        @SlashOption({
+          name: 'emote',
+          description: strings.emoteSlash,
+          autocomplete: (interaction: AutocompleteInteraction) => emoteAutocomplete(interaction),
+          type: ApplicationCommandOptionType.String,
+          required: false
+        })
+          emote: string,
+        @SlashOption({ name: 'member', description: strings.memberSlash, required: false })
+          member: GuildMember,
+        @SlashOption({
+          name: 'attachment',
+          description: 'an image to upload',
+          required: false,
+          type: ApplicationCommandOptionType.Attachment
+        })
+          attachment: Attachment,
+          interaction: CommandInteraction
   ) {
     await interaction.deferReply();
     let msg: Message | undefined;
     if (emote !== undefined) {
-      const res = await parseForEmote(interaction, emote);
+      const res = await parseSource(interaction, emote);
       if (res) {
         msg = await reply(interaction, res);
       } else {
@@ -54,6 +69,6 @@ export abstract class Big {
       autoDeleteMsg(msg);
     }
     const cubeMessageManager = container.resolve(CubeMessageManager);
-    if (msg) cubeMessageManager.registerTrashReact(interaction, msg, interaction.user.id);
+    if (msg) await cubeMessageManager.registerTrashReact(interaction, msg, interaction.user.id);
   }
 }

@@ -2,8 +2,8 @@ import { RateLimit, TIME_UNIT } from '@discordx/utilities';
 import { ApplicationCommandOptionType, AutocompleteInteraction, CommandInteraction, GuildMember } from 'discord.js';
 import { Discord, Guard, Slash, SlashOption } from 'discordx';
 import { emoteAutocomplete } from '../../lib/cmd/Autocomplete';
-import { EditDiscord, parseForEmote } from '../../lib/image/DiscordLogic.js';
-import strings from '../../res/strings.json' assert { type: 'json' };
+import { EditDiscord, parseSource } from '../../lib/image/DiscordLogic.js';
+import strings from '../../res/strings.json' assert {type: 'json'};
 
 @Guard(
   RateLimit(TIME_UNIT.seconds, 60, { ephemeral: true })
@@ -35,7 +35,7 @@ export abstract class Jumbo {
   ) {
     await interaction.deferReply();
     if (emote !== undefined) {
-      const res = await parseForEmote(interaction, emote);
+      const res = await parseSource(interaction, emote);
       if (res) {
         const edDiscord = new EditDiscord(interaction, 'magnify magnify', res, interaction.user);
         await edDiscord.run();
