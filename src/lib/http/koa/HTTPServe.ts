@@ -16,14 +16,21 @@ import { WorkerPool } from '../../image/WorkerPool';
 import { CubeLogger } from '../../observability/CubeLogger';
 import { PugGenerator } from '../PugGenerator';
 import { checkedRoles, genRolesList, roleUpdateRadio, roleUpdatesSwitch as roleUpdateSwitch } from '../RoleManager';
+import { GitClient } from '../../cd/GitClient';
+
+const glTokenHeader = 'x-gitlab-token http';
 
 async function LogRequest(ctx: RouterContext, next: Next) {
   const tracer = container.resolve(Tracer);
   const logger = container.resolve(CubeLogger).web;
 
   await next();
-
   if (!ctx.URL.pathname.startsWith('/emotes' || !ctx.URL.pathname.startsWith('/favicon'))) {
+    if (glTokenHeader in ctx.headers) {
+      // redaction for GitLab token
+      ctx.headers[glTokenHeader] = '*';
+    }
+
     // don't log what will be passed off to Fly
     logger.info({
       type: 'response',
@@ -55,10 +62,11 @@ async function LogRequest(ctx: RouterContext, next: Next) {
 @Middleware(LogRequest)
 @Middleware(koaCompress())
 export class HTTPServe {
-  private workerPool = container.resolve(WorkerPool);
-  private fileQueue = container.resolve(FileQueue);
-  private pugGenerator = container.resolve(PugGenerator);
-  private storage = container.resolve(CubeStorage);
+  private readonly workerPool = container.resolve(WorkerPool);
+  private readonly fileQueue = container.resolve(FileQueue);
+  private readonly pugGenerator = container.resolve(PugGenerator);
+  private readonly storage = container.resolve(CubeStorage);
+  private readonly gitClient = container.resolve(GitClient);
 
   @Get('/')
   async home(context: Context) {
@@ -91,6 +99,33 @@ export class HTTPServe {
       await send(context, imgPath);
     } else {
       await this.err(context);
+    }
+  }
+
+  @Post('/gitlab_webhook')
+  async gitlabWebhook(context: Context) {
+    if (process.env.CM_GITLAB_TOKEN &&
+        process.env.CM_GITLAB_TOKEN ===
+    context.request.headers[glTokenHeader]) {
+      // token validated
+      const eventHeader = context.headers['x-gitlab-event'];
+      if (eventHeader === 'Push Hook') {
+        context.status = 200;
+        await this.workerPool.pQueue.add(
+          () => {
+            setTimeout(
+              async () => {
+                await this.gitClient.pull();
+              }, Milliseconds.twoSec
+            );
+          }
+        );
+      } else {
+        context.status = 204;
+      }
+    } else {
+      context.status = 401;
+      context.body = 'Invalid GitLab token sent in X-Gitlab-Token HTTP';
     }
   }
 
