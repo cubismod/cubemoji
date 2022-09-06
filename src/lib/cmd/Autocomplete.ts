@@ -126,7 +126,6 @@ export async function editAutocomplete(interaction: AutocompleteInteraction) {
  * @param interaction
  */
 export async function serverAutocomplete(interaction: AutocompleteInteraction) {
-  const query = interaction.options.getFocused(true).value;
   try {
     const storage = container.resolve(CubeStorage);
     const guilds = await storage.serverOwners.get(interaction.user.id);
@@ -134,15 +133,13 @@ export async function serverAutocomplete(interaction: AutocompleteInteraction) {
     if (guilds) {
       guilds.forEach(guild => {
         const name = guild.id + '-' + guild.name.slice(0, 60);
-        // try not to go over autocomplete limits
-        if (responses.length < 10) {
-          responses.push({
-            name,
-            value: name
-          });
-        }
+        responses.push({
+          name,
+          value: name
+        });
       });
-      await interaction.respond(responses);
+      // respond with a max of 25 options
+      await interaction.respond(geometricReservoirSample(Math.min(25, responses.length), responses));
     }
   } catch (err) {
     logger.error(err);
