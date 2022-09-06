@@ -25,11 +25,22 @@ import { InspectorWrapper } from '../../lib/perf/InspectorWrapper.js';
 export abstract class ClientEvents {
   private cubeLogger = new CubeLogger();
   private logger = this.cubeLogger.client;
+
   /**
-   * core setup of the bot including dependency init
-   * and command init
-   */
-  @Once({ event: 'ready' })
+     * Replies to a user that an error ocurred. Has intelligent
+     * handling for determine whether the interaction has been replied
+     * to to avoid an error
+     * @param interaction
+     */
+  async reportErrorToUser(interaction: ArgsOf<'interactionCreate'>) {
+
+  }
+
+    /**
+     * core setup of the bot including dependency init
+     * and command init
+     */
+    @Once({ event: 'ready' })
   async ready(
     [_args]: ArgsOf<'ready'>, // we don't care about Discord.js's client object
     client: Client
@@ -93,7 +104,7 @@ export abstract class ClientEvents {
     container.register(InspectorWrapper, { useValue: new InspectorWrapper() });
 
     // schedule a backup for 2am EST
-    scheduleBackup();
+    await scheduleBackup();
 
     // load up cubemoji emote cache
     const emoteCache = container.resolve(EmoteCache);
@@ -165,81 +176,81 @@ export abstract class ClientEvents {
     }
   }
 
-  @On({ event: 'warn' })
-  warning(
-    [data]: ArgsOf<'warn'>
-  ) {
-    this.logger.debug(data);
-  }
-
-  @On({ event: 'debug' })
-  debug(
-    [data]: ArgsOf<'debug'>
-  ) {
-    // don't log our own bot token
-    if (!data.includes('token')) this.logger.debug(data);
-  }
-
-  /**
-   * respond to an interaction
-   */
-  @On({ event: 'interactionCreate' })
-  async interactionCreate(
-    [interaction]: ArgsOf<'interactionCreate'>,
-    client: Client
-  ) {
-    if (interaction.isButton() || interaction.isSelectMenu()) {
-      if (interaction.customId.startsWith('discordx@pagination@')) {
-        return;
-      }
+    @On({ event: 'warn' })
+    warning(
+      [data]: ArgsOf<'warn'>
+    ) {
+      this.logger.debug(data);
     }
-    const tracer = container.resolve(Tracer);
 
-    // determine command name
-    let name = interaction.id;
-
-    if (interaction instanceof CommandInteraction || interaction instanceof ContextMenuCommandInteraction) {
-      name = `command - ${interaction.commandName}`;
+    @On({ event: 'debug' })
+    debug(
+      [data]: ArgsOf<'debug'>
+    ) {
+      // don't log our own bot token
+      if (!data.includes('token')) this.logger.debug(data);
     }
-    await tracer.startActiveSpan(name, async span => {
-      try {
-        await client.executeInteraction(interaction);
-      } catch (err: unknown) {
-        this.logger.error('INTERACTION FAILURE');
-        this.logger.error(`Type: ${interaction.type}\nTimestamp: ${Date()}\nGuild: ${interaction.guild}\nUser: ${interaction.user.tag}\nChannel: ${interaction.channel}`);
-        this.logger.error(err);
 
-        if (err instanceof Error) {
-          span.recordException(err);
-          span.setStatus({ code: SpanStatusCode.ERROR });
-          span.end();
+    /**
+     * respond to an interaction
+     */
+    @On({ event: 'interactionCreate' })
+    async interactionCreate(
+      [interaction]: ArgsOf<'interactionCreate'>,
+      client: Client
+    ) {
+      if (interaction.isButton() || interaction.isSelectMenu()) {
+        if (interaction.customId.startsWith('discordx@pagination@')) {
           return;
         }
       }
+      const tracer = container.resolve(Tracer);
 
-      span.setAttributes({
-        userID: interaction.user.id,
-        username: interaction.user.username,
-        channelId: interaction.channel?.id ?? '',
-        guildId: interaction.guildId ?? '',
-        guildName: interaction.guild?.name,
-        type: interaction.type
+      // determine command name
+      let name = interaction.id;
+
+      if (interaction instanceof CommandInteraction || interaction instanceof ContextMenuCommandInteraction) {
+        name = `command - ${interaction.commandName}`;
+      }
+      await tracer.startActiveSpan(name, async span => {
+        try {
+          await client.executeInteraction(interaction);
+        } catch (err: unknown) {
+          this.logger.error('INTERACTION FAILURE');
+          this.logger.error(`Type: ${interaction.type}\nTimestamp: ${Date()}\nGuild: ${interaction.guild}\nUser: ${interaction.user.tag}\nChannel: ${interaction.channel}`);
+          this.logger.error(err);
+
+          if (err instanceof Error) {
+            span.recordException(err);
+            span.setStatus({ code: SpanStatusCode.ERROR });
+            span.end();
+            return;
+          }
+        }
+
+        span.setAttributes({
+          userID: interaction.user.id,
+          username: interaction.user.username,
+          channelId: interaction.channel?.id ?? '',
+          guildId: interaction.guildId ?? '',
+          guildName: interaction.guild?.name,
+          type: interaction.type
+        });
+        span.end();
       });
-      span.end();
-    });
-  }
+    }
 
-  /**
-   * emitted when cubemoji joins a guild
-   */
-  @On({ event: 'guildCreate' })
-  async guildCreate(
-    [guild]: ArgsOf<'guildCreate'>,
-    client: Client
-  ) {
-    this.logger.info(`New guild "${guild.id}", "${guild.name}" joined, re-initing app commands & perms`);
-    client.botGuilds.push(guild.id);
-    await client.initApplicationCommands();
-    // await client.initApplicationPermissions();
-  }
+    /**
+     * emitted when cubemoji joins a guild
+     */
+    @On({ event: 'guildCreate' })
+    async guildCreate(
+      [guild]: ArgsOf<'guildCreate'>,
+      client: Client
+    ) {
+      this.logger.info(`New guild "${guild.id}", "${guild.name}" joined, re-initing app commands & perms`);
+      client.botGuilds.push(guild.id);
+      await client.initApplicationCommands();
+      // await client.initApplicationPermissions();
+    }
 }

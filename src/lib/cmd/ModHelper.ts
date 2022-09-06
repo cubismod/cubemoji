@@ -1,6 +1,17 @@
 // helper commands for Moderation group
 
-import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, Client, Colors, CommandInteraction, EmbedBuilder, TextChannel, User } from 'discord.js';
+import {
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonInteraction,
+  ButtonStyle,
+  Client,
+  Colors,
+  CommandInteraction,
+  EmbedBuilder,
+  TextChannel,
+  User
+} from 'discord.js';
 import { createReadStream } from 'fs';
 import { isBinaryFile } from 'isbinaryfile';
 import { choice } from 'pandemonium';
@@ -334,6 +345,7 @@ export async function performBulkAction(interaction: CommandInteraction, fileLin
  * allows them to confirm with an emoji
  * @param interaction deferred command interaction that is NOT ephemeral
  * @param actions list of actions to take
+ * @param sourceUrl the text file the user provided
  */
 export async function bulkActionsEmbed(interaction: CommandInteraction, actions: ModAction[], sourceUrl: string) {
   if (actions.length > 0) {

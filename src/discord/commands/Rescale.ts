@@ -1,12 +1,20 @@
-import { ApplicationCommandOptionType, AutocompleteInteraction, Client, CommandInteraction, GuildMember, PermissionFlagsBits } from 'discord.js';
+import {
+  ApplicationCommandOptionType,
+  AutocompleteInteraction,
+  Client,
+  CommandInteraction,
+  GuildMember,
+  PermissionFlagsBits
+} from 'discord.js';
 import { Discord, Slash, SlashOption } from 'discordx';
 import { emoteAutocomplete } from '../../lib/cmd/Autocomplete';
 import { RescaleDiscord } from '../../lib/image/DiscordLogic.js';
-import strings from '../../res/strings.json' assert { type: 'json' };
+import strings from '../../res/strings.json' assert {type: 'json'};
 import { BSGuardData } from '../Guards';
+import { SourceCommand } from './base/SourceCommand';
 
 @Discord()
-export abstract class Rescale {
+export abstract class Rescale extends SourceCommand {
   @Slash({
     name: 'rescale',
     description: 'Rescale an image or emote using Seam carving to humorous results',
@@ -22,7 +30,11 @@ export abstract class Rescale {
       required: false
     })
       emote: string,
-    @SlashOption({ name: 'member', description: 'a user', required: false })
+    @SlashOption({
+      name: 'member',
+      description: 'a user',
+      required: false
+    })
       user: GuildMember,
       interaction: CommandInteraction,
       _client: Client,
@@ -32,16 +44,15 @@ export abstract class Rescale {
       ephemeral: data.enrolled,
       fetchReply: !data.enrolled
     };
-    if (!emote && !user) {
-      interaction.reply({ content: strings.noArgs, ephemeral: true });
-    } else if (emote) {
-      await interaction.deferReply(deferOptions);
-      const rsDiscord = new RescaleDiscord(interaction, emote, interaction.user);
+    await interaction.deferReply(deferOptions);
+
+    const res = await this.parseCommand(interaction);
+
+    if (res) {
+      const rsDiscord = new RescaleDiscord(interaction, res, interaction.user);
       await rsDiscord.run();
-    } else if (user) {
-      await interaction.deferReply(deferOptions);
-      const rsDiscord = new RescaleDiscord(interaction, user.displayAvatarURL({ size: 256, extension: 'png' }), interaction.user);
-      await rsDiscord.run();
+    } else {
+      await this.couldNotFind(interaction);
     }
   }
 }

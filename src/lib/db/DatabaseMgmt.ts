@@ -109,12 +109,12 @@ export async function compress(sourcePath: string) {
   return newPath;
 }
 
-export function scheduleBackup() {
+export async function scheduleBackup() {
   const logger = container.resolve(CubeLogger).databaseMgmt;
   const cur = dayjs();
   // run backup immedieatly if backup between these times
   if (cur.hour() > 0 && cur.hour() < 5) {
-    runBackups();
+    await runBackups();
   } else {
     // schedule backup for tomorrow
     const backupTime = cur.add(1, 'day').set('hour', 2).set('minute', 0);

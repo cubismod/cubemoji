@@ -1,13 +1,21 @@
-import { ApplicationCommandOptionType, AutocompleteInteraction, CommandInteraction, GuildMember, PermissionFlagsBits } from 'discord.js';
+import {
+  ApplicationCommandOptionType,
+  Attachment,
+  AutocompleteInteraction,
+  CommandInteraction,
+  GuildMember,
+  PermissionFlagsBits
+} from 'discord.js';
 import { Client, Discord, Slash, SlashOption } from 'discordx';
 import { editAutocomplete, emoteAutocomplete } from '../../lib/cmd/Autocomplete';
 import { EditDiscord } from '../../lib/image/DiscordLogic.js';
-import imgEffects from '../../res/imgEffects.json' assert { type: 'json' };
-import strings from '../../res/strings.json' assert { type: 'json' };
+import imgEffects from '../../res/imgEffects.json' assert {type: 'json'};
+import strings from '../../res/strings.json' assert {type: 'json'};
 import { BSGuardData } from '../Guards';
+import { SourceCommand } from './base/SourceCommand';
 
 @Discord()
-export abstract class Edit {
+export abstract class Edit extends SourceCommand {
   @Slash({
     name: 'edit',
     description: 'Edits an emote or image according to the effects you select',
@@ -22,13 +30,20 @@ export abstract class Edit {
       type: ApplicationCommandOptionType.String,
       required: false
     })
-      emote: string,
+      source: string,
     @SlashOption({
       name: 'member',
       description: 'a server member',
       required: false
     })
       member: GuildMember,
+    @SlashOption({
+      name: 'attachment',
+      description: 'an image to upload',
+      required: false,
+      type: ApplicationCommandOptionType.Attachment
+    })
+      attachment: Attachment,
     @SlashOption({
       name: 'effects',
       description: 'list of effects (space separated, max 20). If not specified then random effects will be applied',
@@ -49,22 +64,27 @@ export abstract class Edit {
   ) {
     if (list) {
       // just give the user back the effects options
-      interaction.reply({ content: imgEffects.join(' '), ephemeral: true });
+      await interaction.reply({ content: imgEffects.join(' '), ephemeral: true });
     } else {
       const deferOptions = {
         ephemeral: data.enrolled,
         fetchReply: !data.enrolled
       };
-      if (!emote && !member) {
-        interaction.reply({ content: strings.noArgs, ephemeral: true });
-      } else if (emote) {
-        await interaction.deferReply(deferOptions);
-        const edDiscord = new EditDiscord(interaction, effects, emote, interaction.user);
-        await edDiscord.run();
-      } else if (member) {
-        await interaction.deferReply(deferOptions);
-        const edDiscord = new EditDiscord(interaction, effects, member.displayAvatarURL({ extension: 'png', size: 256 }), interaction.user);
-        await edDiscord.run();
+
+      await interaction.deferReply(deferOptions);
+
+      this.source = source;
+      this.member = member;
+      this.attachment = attachment;
+      const url = await this.parseCommand(interaction);
+
+      if (await this.invalidArgsCheck(interaction)) return;
+
+      if (url) {
+        const editDiscord = new EditDiscord(interaction, effects, url, interaction.user);
+        await editDiscord.run();
+      } else {
+        await this.couldNotFind(interaction);
       }
     }
   }

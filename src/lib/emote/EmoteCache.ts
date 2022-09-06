@@ -9,7 +9,7 @@ import hash from 'node-object-hash';
 import { choice } from 'pandemonium';
 import { container, injectable } from 'tsyringe';
 import { parse } from 'twemoji-parser';
-import mutantNames from '../../res/emojiNames.json' assert { type: 'json' };
+import mutantNames from '../../res/emojiNames.json' assert {type: 'json'};
 import { CubeStorage, ValRaw } from '../db/Storage.js';
 import { CubeLogger } from '../observability/CubeLogger.js';
 import { Cmoji, Source } from './Cmoji.js';
@@ -148,15 +148,6 @@ export class EmoteCache {
   }
 
   /**
- * search limited only to Discord emoji
- * @param query emoji name or id
- * @returns a list of results
- */
-  searchDiscord(query: string) {
-    return (this.discFuse.search(query));
-  }
-
-  /**
    * returns an emote based on name or if the user sent an
    * emote object in their message, we return that emote object
    * if it is a nitro emote then we return a URL to the emote image
@@ -164,15 +155,16 @@ export class EmoteCache {
    * @param guildId guild ID to perform filtering if necessary
    * @returns a Cmoji or undefined if we can't find an emote
    */
-  async retrieve(identifier: string, guildId: string) {
+  async retrieve(identifier: string, guildId?: string) {
     // discord emojis are represented in text
     // like <:flass:781664252058533908>
     // so we split to get the components including name and ID
-    if (!await this.isBlocked(identifier, guildId)) {
+    if (guildId && !await this.isBlocked(identifier, guildId)) {
       const split = identifier.slice(1, -1).split(':');
       // search by ID or name w/ fuse's extended syntax https://fusejs.io/examples.html#extended-search
       if (split.length > 2) identifier = `${split[2]}|${split[1]}`;
-      const searchResults = await this.search(identifier);
+      const searchResults = this.search(identifier);
+
       // want an exact match
       if (searchResults.length > 0 && searchResults[0].item.id === split[2]) return searchResults[0].item;
       // now we see if we have a nitro emote cubemoji doesn't have in its guilds
@@ -306,7 +298,7 @@ export class EmoteCache {
       if (vals.size < 51) {
         // vals exists so we can append because its also doesn't have more than 50 emoji
         if (block) this.blockedEmoji.set(serverId, vals.add(glob));
-        else await this.blockedEmoji.delete(serverId);
+        else this.blockedEmoji.delete(serverId);
         if (database) await this.modifyEmojiDB(glob, serverId, block);
       } else {
         // too large
@@ -334,7 +326,7 @@ export class EmoteCache {
   loadBlockedEmojis() {
     const dbEmoji = this.storage.getNamespace('emoji');
     if (dbEmoji) {
-      dbEmoji.forEach((emoji) => {
+      dbEmoji.forEach(async (emoji) => {
         // parse the key
         // which is in the format emoji:serverid_emojinamehash
         const split = emoji.key.split(':');
@@ -344,7 +336,7 @@ export class EmoteCache {
             // idAndName[0] = id
             // parse the value as well
             const parsedVal: ValRaw = JSON.parse(emoji.value);
-            this.modifyBlockedEmoji(parsedVal.value, idAndHash[0], true, false);
+            await this.modifyBlockedEmoji(parsedVal.value, idAndHash[0], true, false);
           }
         }
       });

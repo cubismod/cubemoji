@@ -4,10 +4,15 @@
  */
 
 import { diag, DiagLogLevel, Sampler, trace } from '@opentelemetry/api';
-import { AlwaysOnSampler, TraceIdRatioBasedSampler } from '@opentelemetry/core';
+import {
+  AlwaysOnSampler,
+  BatchSpanProcessor,
+  InMemorySpanExporter,
+  SpanExporter,
+  TraceIdRatioBasedSampler
+} from '@opentelemetry/sdk-trace-base';
 import { ZipkinExporter } from '@opentelemetry/exporter-zipkin';
 import { Resource } from '@opentelemetry/resources';
-import { BatchSpanProcessor, InMemorySpanExporter, SpanExporter } from '@opentelemetry/sdk-trace-base';
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 import { container } from 'tsyringe';

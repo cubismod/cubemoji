@@ -45,17 +45,6 @@ export interface ValRaw {
   value: string,
   expires: null;
 }
-
-/**
- * ends is a UTC timestamp for when the rate limit ends
- * multiple is how many times the rate limit has been triggered,
- * which is used to determine the next rate limit period
- */
-export interface RateLimitVal {
-  ends: number,
-  multiple: number
-}
-
 /* database storage using https://github.com/zaaack/keyv-file
   we utilize a plain JSON file for blocked hosts list because it loads so quickly
   and SQLite for the other storage as its consistent
@@ -142,7 +131,7 @@ export class CubeStorage {
   private logger = container.resolve(CubeLogger).storage;
   // in testing mode, we are saving data to data/test/
   dbLocation = 'data/';
-  private serverInfoPath: string;
+  private readonly serverInfoPath: string;
   constructor() {
     // create separate databases when testing
     if (process.env.CM_TEST === 'true') this.dbLocation = 'data/test/';
@@ -242,8 +231,7 @@ export class CubeStorage {
     try {
       // convert type to just key and value
       const converted = res.map(value => {
-        const parsed = (value as KeyVRaw);
-        return parsed;
+        return (value as KeyVRaw);
       });
       db.close();
       return converted;

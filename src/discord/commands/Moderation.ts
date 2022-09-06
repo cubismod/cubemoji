@@ -1,7 +1,17 @@
 // Various server configuration commands
 
 import { Pagination } from '@discordx/pagination';
-import { ApplicationCommandOptionType, AttachmentBuilder, AutocompleteInteraction, Colors, CommandInteraction, EmbedBuilder, Role, TextChannel, VoiceChannel } from 'discord.js';
+import {
+  ApplicationCommandOptionType,
+  AttachmentBuilder,
+  AutocompleteInteraction,
+  Colors,
+  CommandInteraction,
+  EmbedBuilder,
+  Role,
+  TextChannel,
+  VoiceChannel
+} from 'discord.js';
 import { Discord, Slash, SlashChoice, SlashGroup, SlashOption } from 'discordx';
 import { rm } from 'fs/promises';
 import { container } from 'tsyringe';
@@ -11,7 +21,7 @@ import { buildList, guildOwnersCheck, modReply, performBulkAction, validUser } f
 import { CubeStorage } from '../../lib/db/Storage.js';
 import { EmoteCache } from '../../lib/emote/EmoteCache.js';
 import { allRoles, rolePermissionCheck } from '../../lib/http/RoleManager';
-import strings from '../../res/strings.json' assert { type: 'json' };
+import strings from '../../res/strings.json' assert {type: 'json'};
 
 /**
  * Cubemoji Moderation!
@@ -271,7 +281,7 @@ export abstract class Enrollment {
     interaction: CommandInteraction
   ) {
     await interaction.deferReply({ ephemeral: true });
-    new Pagination(
+    await new Pagination(
       interaction,
       await buildList(interaction, ['servers', 'mods'])
     ).send();
@@ -380,7 +390,7 @@ export abstract class blocklist {
     interaction: CommandInteraction
   ) {
     await interaction.deferReply({ ephemeral: true });
-    new Pagination(
+    await new Pagination(
       interaction,
       await buildList(interaction, ['emoji', 'channels'])
     ).send();

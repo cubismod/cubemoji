@@ -12,11 +12,12 @@ import path from 'path';
 import probe from 'probe-image-size';
 import { pipeline } from 'stream/promises';
 import { container } from 'tsyringe';
-import imgEffects from '../../res/imgEffects.json' assert { type: 'json' };
+import imgEffects from '../../res/imgEffects.json' assert {type: 'json'};
 import { gotOptions } from '../emote/Cmoji.js';
 import { CubeLogger } from '../observability/CubeLogger.js';
 import { FileQueue } from './FileQueue.js';
 import { WorkerPool } from './WorkerPool.js';
+
 const { got } = await import('got');
 
 export type MsgContext = ContextMenuCommandInteraction | CommandInteraction | MessageReaction;
@@ -324,7 +325,7 @@ export function generateEditOptions(preset = '') {
 // parse effects strings to enums or generate random
 // effects with an undefined string passed in
 export function splitEffects(effects: string) {
-  let effectsList: string[] = [];
+  let effectsList: string[];
   // if no edit options specified, we will generate some
   if (effects === undefined || effects === '') effectsList = generateEditOptions();
   else {

@@ -22,7 +22,7 @@ export class FileQueue {
     fieldNormWeight: 1
   };
 
-  private files: TempFile[];
+  private readonly files: TempFile[];
 
   private fuse: Fuse<TempFile>;
 

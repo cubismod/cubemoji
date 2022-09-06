@@ -5,7 +5,6 @@ import { open, rm, writeFile } from 'node:fs/promises';
 import inspector from 'node:inspector';
 import path from 'node:path';
 import { container, injectable } from 'tsyringe';
-import { Milliseconds } from '../constants/Units';
 import { compress } from '../db/DatabaseMgmt';
 import { BucketContentType, S3Client } from '../db/Storage';
 import { CubeLogger } from '../observability/CubeLogger';
@@ -48,7 +47,7 @@ export class InspectorWrapper {
         await writeFile(fd, m.params.chunk);
       });
 
-      this.memoryInspector.post('HeapProfiler.takeHeapSnapshot', undefined, async (err, r) => {
+      this.memoryInspector.post('HeapProfiler.takeHeapSnapshot', undefined, async (err) => {
         if (err) {
           this.logger.error(err);
           return;
@@ -89,48 +88,5 @@ export class InspectorWrapper {
         }
       });
     });
-  }
-
-  /**
-   * Toggle a profiling session on or off.
-   * Saves CPU profiles every 3 minutes to S3 bucket.
-   */
-  async toggleSession() {
-    // are we currently running an inspector session?
-    switch (this.status) {
-      case true:
-        // end current session
-        await this.cpuIntervalTime();
-        if (this.interval) clearInterval(this.interval);
-        this.status = false;
-        this.logger.info('Stopping performance test.');
-        break;
-      case false:
-        // start new session
-        this.cpuInspector.post('Profiler.enable', async() => {
-          this.cpuInspector.post('Profiler.start', async (err) => {
-            if (err !== null) {
-              this.logger.error(err);
-            }
-            this.interval = setInterval(
-              async () => {
-                await this.cpuIntervalTime();
-                // take some heap dumps
-                await this.heapDump();
-
-                setTimeout(
-                  async () => { await this.heapDump(); }, Milliseconds.thirtySec
-                );
-              },
-              Milliseconds.min
-            );
-
-            this.logger.info('Starting performance test.');
-            this.status = true;
-
-            await this.heapDump();
-          });
-        });
-    }
   }
 }
