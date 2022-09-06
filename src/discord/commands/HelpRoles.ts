@@ -44,7 +44,7 @@ export abstract class HelpRoles {
     async findSlash(interaction: CommandInteraction, slashes: Collection<string, ApplicationCommand>, who: GuildMember) {
       for (const slash of slashes) {
         if (slash[1].name === 'roles') {
-          const reply = `**How to Set Your </roles:${slash[1].id}> with cubemoji**\nhttps://s3.us-east-1.wasabisys.com/cubemoji/how-to-roles.webm`;
+          const reply = `**How to Set Your </roles:${slash[1].id}> with cubemoji (the command works in any channel)**\nhttps://s3.us-east-1.wasabisys.com/cubemoji/how-to-roles.webm`;
           if (who) {
             await interaction.editReply({
               content: `<@${who.id}> ${reply}`
