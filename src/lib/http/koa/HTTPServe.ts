@@ -19,7 +19,7 @@ import { checkedRoles, genRolesList, roleUpdateRadio, roleUpdatesSwitch as roleU
 import { GitClient } from '../../cd/GitClient';
 import koaHtmlMinifier from 'koa-html-minifier';
 
-const glTokenHeader = 'x-gitlab-token http';
+const glTokenHeader = 'x-gitlab-token';
 
 async function LogRequest(ctx: RouterContext, next: Next) {
   const tracer = container.resolve(Tracer);
