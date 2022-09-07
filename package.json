@@ -109,7 +109,7 @@
     "@types/probe-image-size": "^7.2.0",
     "@types/pug": "^2.0.6",
     "@types/twemoji-parser": "^13.1.1",
-    "@typescript-eslint/eslint-plugin": "^5.35.1",
+    "@typescript-eslint/eslint-plugin": "^5.36.2",
     "@typescript-eslint/parser": "^5.36.1",
     "eslint": "8.22.0",
     "eslint-config-standard": "^17.0.0",
