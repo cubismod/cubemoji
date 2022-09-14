@@ -105,7 +105,7 @@
     "@types/koa__router": "^12.0.0",
     "@types/micromatch": "^4.0.2",
     "@types/node": "^18.7.16",
-    "@types/node-emoji": "^1.8.1",
+    "@types/node-emoji": "^1.8.2",
     "@types/probe-image-size": "^7.2.0",
     "@types/pug": "^2.0.6",
     "@types/twemoji-parser": "^13.1.1",
