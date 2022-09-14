@@ -74,10 +74,10 @@
     tslib "^2.4.0"
     undici "^5.9.1"
 
-"@discordx/di@^3.0.1":
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/@discordx/di/-/di-3.0.1.tgz#c017515aab83d0904265ff1ca75da0ef3ad9dfc3"
-  integrity sha512-YVDWZQ/9Usq6Gi6olnhwIYBUtjK4/VLf70xXixdmDqiPRBXW/72lnn9KoEpRhKdoz3ReP3wF/de6kYY7vPBOvg==
+"@discordx/di@^3.0.1", "@discordx/di@^3.0.2":
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/@discordx/di/-/di-3.0.2.tgz#c751bbaeb6749d305d6bc0d9a4208c2c31fdbde6"
+  integrity sha512-mHvM+dscoyo5/yvQb/QHSPLdhfphNhYHKRuo1P9fphTpF150t/39kDJrEzqbTfoXBtoY/DtVD/Voni8mNgmiyw==
   dependencies:
     tsyringe "^4.7.0"
     typedi "^0.10.0"
@@ -1878,12 +1878,12 @@ discord.js@^14.3.0:
     undici "^5.9.1"
     ws "^8.8.1"
 
-discordx@11.1.12:
-  version "11.1.12"
-  resolved "https://registry.yarnpkg.com/discordx/-/discordx-11.1.12.tgz#a8d8576d7e37fff106c13512e218bf61724c48d1"
-  integrity sha512-zlXVtW3AMuxvdmceYTxsVujl6FyFvhyjbp6cn7ofZxO/SeVE1wuxvMCHcUe1vLwLq4kzDK19BPHbj6qYQVkZPw==
+discordx@11.2.0:
+  version "11.2.0"
+  resolved "https://registry.yarnpkg.com/discordx/-/discordx-11.2.0.tgz#8e0ccfe5325f8dc0e9d2fe9259f18eaaf2ddf71f"
+  integrity sha512-BgJ4889lzs9Rar0wK33CakiYZEww/OXoHU9mzF1J+2rHNRNbNC3cTNwDd/E+iuDqe+xGVm4MbxWcH73G60/W4w==
   dependencies:
-    "@discordx/di" "^3.0.1"
+    "@discordx/di" "^3.0.2"
     "@discordx/internal" "^1.0.2"
     lodash "^4.17.21"
     reflect-metadata "^0.1.13"
