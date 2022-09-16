@@ -3739,7 +3739,7 @@ mkdirp@^1.0.3, mkdirp@^1.0.4:
   resolved "https://registry.yarnpkg.com/mkdirp/-/mkdirp-1.0.4.tgz#3eb5ed62622756d79a5f0e2a221dfebad75c2f7e"
   integrity sha512-vVqVZQyf3WLx2Shd0qJ9xuvqgAyKPLAiqITEtqW0oIUjzo3PePDd6fW9iFz30ef7Ysp/oiWqbhszeGWW2T6Gzw==
 
-mnemonist@^0.39.0:
+mnemonist@^0.39.2:
   version "0.39.2"
   resolved "https://registry.yarnpkg.com/mnemonist/-/mnemonist-0.39.2.tgz#7e6a0bd5c7199460ee12a651103c7007adc6225a"
   integrity sha512-n3ZCEosuMH03DVivZ9N0fcXPWiZrBLEdfSlEJ+S/mJxmk3zuo1ur0dj9URDczFyP1VS3wfiyKzqLLDXoPJ6rPA==
@@ -4300,12 +4300,12 @@ pacote@^13.0.3, pacote@^13.6.1, pacote@^13.6.2:
     ssri "^9.0.0"
     tar "^6.1.11"
 
-pandemonium@^2.3.0:
-  version "2.3.0"
-  resolved "https://registry.yarnpkg.com/pandemonium/-/pandemonium-2.3.0.tgz#d9c70686bb33c3ee4f435162601b0755a439bdcb"
-  integrity sha512-/+5rFCn3npqNwAvhKOSRKwAnEWQeXH4xFuur7vWKlj5Z7AM2JNJt1tC2rptfm1M7t7OlXAyeBuRjspqe+gQGHA==
+pandemonium@^2.4.0:
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/pandemonium/-/pandemonium-2.4.0.tgz#9466c8d6c3f6fe332bf15307d5c9a82bd9230b0e"
+  integrity sha512-karQXsRyX0/W4g8eMjnGgNRJ8Fx700A9aHe4GIsQA0NBD72IvBYMumHPdiV7JN2RRglrbf/2ngTRt/b5KaIEtA==
   dependencies:
-    mnemonist "^0.39.0"
+    mnemonist "^0.39.2"
 
 param-case@^3.0.4:
   version "3.0.4"
