@@ -114,10 +114,10 @@
     lodash "^4.17.21"
     tslib "^2.4.0"
 
-"@discordx/utilities@5.0.0":
-  version "5.0.0"
-  resolved "https://registry.yarnpkg.com/@discordx/utilities/-/utilities-5.0.0.tgz#ef5646d24790838b7b005d6ee956229fa1f63809"
-  integrity sha512-7bPBL37Ffd4XZJmzFpsvcYpoq39BsIcy9lrjQtYVH/xti8xU0gw8W59L8DFnuz9DgFqwC9OteQ2Z4oulZEi8lQ==
+"@discordx/utilities@5.1.0":
+  version "5.1.0"
+  resolved "https://registry.yarnpkg.com/@discordx/utilities/-/utilities-5.1.0.tgz#548380fab1d0820ef680c7c7ab5c287ce9c54aa9"
+  integrity sha512-hf2v4c0N+9q/gAKS9Ep2rsLIFrCclYxPxWaAGtoZAHH+SGNzzh5y+qidIbMVWm84baioyvD1l73bawzBcmnjqQ==
   dependencies:
     tslib "^2.4.0"
 
