@@ -1946,15 +1946,14 @@ discord.js@^14.3.0:
     undici "^5.9.1"
     ws "^8.8.1"
 
-discordx@11.2.0:
-  version "11.2.0"
-  resolved "https://registry.yarnpkg.com/discordx/-/discordx-11.2.0.tgz#8e0ccfe5325f8dc0e9d2fe9259f18eaaf2ddf71f"
-  integrity sha512-BgJ4889lzs9Rar0wK33CakiYZEww/OXoHU9mzF1J+2rHNRNbNC3cTNwDd/E+iuDqe+xGVm4MbxWcH73G60/W4w==
+discordx@11.4.0:
+  version "11.4.0"
+  resolved "https://registry.yarnpkg.com/discordx/-/discordx-11.4.0.tgz#0d6876b4a0eb27bc35a2e2ab8f189f92c5245687"
+  integrity sha512-s0S6gicdT8HNSwaM/PmMoaVyAGYRULoNBOaj9m52/ABAz+nGHKeAYjO6tIX8acvh5hf2rHYu/0aPehcs3622lA==
   dependencies:
     "@discordx/di" "^3.0.2"
     "@discordx/internal" "^1.0.2"
     lodash "^4.17.21"
-    reflect-metadata "^0.1.13"
     tslib "^2.4.0"
 
 doctrine@^2.1.0:
