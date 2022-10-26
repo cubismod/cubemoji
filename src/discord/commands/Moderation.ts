@@ -21,7 +21,7 @@ import { buildList, guildOwnersCheck, modReply, performBulkAction, validUser } f
 import { CubeStorage } from '../../lib/db/Storage.js';
 import { EmoteCache } from '../../lib/emote/EmoteCache.js';
 import { allRoles, rolePermissionCheck } from '../../lib/http/RoleManager';
-import strings from '../../res/strings.json' assert {type: 'json'};
+import strings from '../../res/strings.json' assert { type: 'json' };
 
 /**
  * Cubemoji Moderation!
@@ -45,7 +45,7 @@ export abstract class Mod {
   private git = container.resolve(GitClient);
   private storage = container.resolve(CubeStorage);
 
-  @Slash({ name: 'help' })
+  @Slash({ name: 'help', description: 'find out how to use cubemoji' })
   async help(
     interaction: CommandInteraction
   ) {
@@ -151,7 +151,7 @@ export abstract class Mod {
 }
 
 @Discord()
-@SlashGroup({ name: 'enrollment', root: 'mod' })
+@SlashGroup({ description: 'enroll the bot into big server mode', name: 'enrollment', root: 'mod' })
 @SlashGroup('enrollment', 'mod')
 export abstract class Enrollment {
   enrollment = container.resolve(CubeStorage).serverEnrollment;
@@ -168,7 +168,11 @@ export abstract class Enrollment {
   async modify(
     @SlashChoice('enroll')
     @SlashChoice('unenroll')
-    @SlashOption({ name: 'action' }) action: string,
+    @SlashOption({
+      name: 'action',
+      type: ApplicationCommandOptionType.String,
+      description: 'enroll or unenroll a server'
+    }) action: string,
     @SlashOption({
       name: 'server',
       description: 'name of server you want to enroll/unenroll',
@@ -242,7 +246,11 @@ export abstract class Enrollment {
   async roleMod(
     @SlashChoice('grant')
     @SlashChoice('revoke')
-    @SlashOption({ name: 'action' }) action: string,
+    @SlashOption({
+      name: 'action',
+      description: 'grant or revoke a permission',
+      type: ApplicationCommandOptionType.String
+    }) action: string,
     @SlashOption({
       name: 'role',
       description: 'role to grant/remove mod permissions',
@@ -283,7 +291,11 @@ export abstract class Enrollment {
     await interaction.deferReply({ ephemeral: true });
     await new Pagination(
       interaction,
-      await buildList(interaction, ['servers', 'mods'])
+      [
+        {
+          embeds: await buildList(interaction, ['servers', 'mods'])
+        }
+      ]
     ).send();
   }
 }
@@ -296,7 +308,7 @@ async function guildErrorFinish(interaction: CommandInteraction, guildName: stri
 }
 
 @Discord()
-@SlashGroup({ name: 'blocklist', root: 'mod' })
+@SlashGroup({ name: 'blocklist', root: 'mod', description: 'block emoji/channel usage' })
 @SlashGroup('blocklist', 'mod')
 export abstract class blocklist {
   emoteCache = container.resolve(EmoteCache);
@@ -312,7 +324,11 @@ export abstract class blocklist {
   async modify(
     @SlashChoice('block')
     @SlashChoice('unblock')
-    @SlashOption({ name: 'action' }) action: string,
+    @SlashOption({
+      name: 'action',
+      type: ApplicationCommandOptionType.String,
+      description: 'block or unblock'
+    }) action: string,
     @SlashOption({
       name: 'server',
       description: 'name of server you want to block emoji on, not req for channel',
@@ -392,7 +408,11 @@ export abstract class blocklist {
     await interaction.deferReply({ ephemeral: true });
     await new Pagination(
       interaction,
-      await buildList(interaction, ['emoji', 'channels'])
+      [
+        {
+          embeds: await buildList(interaction, ['emoji', 'channels'])
+        }
+      ]
     ).send();
   }
 
@@ -407,7 +427,8 @@ export abstract class blocklist {
     @SlashOption({
       name: 'listlink',
       description: 'publicly available plaintext link following bulk syntax, (see wiki for details)',
-      required: true
+      required: true,
+      type: ApplicationCommandOptionType.String
     })
       listLink: string,
       interaction: CommandInteraction

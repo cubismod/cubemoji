@@ -9,7 +9,7 @@ import {
 import { Discord, Guard, Slash, SlashOption } from 'discordx';
 import { emoteAutocomplete } from '../../lib/cmd/Autocomplete';
 import { reply } from '../../lib/image/DiscordLogic.js';
-import strings from '../../res/strings.json' assert {type: 'json'};
+import strings from '../../res/strings.json' assert { type: 'json' };
 import { SourceCommand } from './base/SourceCommand';
 
 @Discord()
@@ -38,6 +38,7 @@ export abstract class Big extends SourceCommand {
         @SlashOption({
           name: 'member',
           description: strings.memberSlash,
+          type: ApplicationCommandOptionType.User,
           required: false
         })
           member: GuildMember,

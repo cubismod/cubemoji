@@ -1,5 +1,5 @@
 import { RateLimit, TIME_UNIT } from '@discordx/utilities';
-import { CommandInteraction, PermissionFlagsBits } from 'discord.js';
+import { ApplicationCommandOptionType, CommandInteraction, PermissionFlagsBits } from 'discord.js';
 import { Discord, Guard, Slash, SlashOption } from 'discordx';
 import { container } from 'tsyringe';
 import { EmoteCache } from '../../lib/emote/EmoteCache.js';
@@ -22,7 +22,8 @@ export abstract class Random {
     @SlashOption({
       name: 'items',
       description: 'how many emotes would you like in the chat, max 25',
-      required: false
+      required: false,
+      type: ApplicationCommandOptionType.Number
     })
       items: number,
       interaction: CommandInteraction

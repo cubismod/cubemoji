@@ -9,7 +9,7 @@ import {
 import { Client, Discord, Slash, SlashChoice, SlashOption } from 'discordx';
 import { emoteAutocomplete } from '../../lib/cmd/Autocomplete';
 import { FaceDiscord } from '../../lib/image/DiscordLogic.js';
-import strings from '../../res/strings.json' assert {type: 'json'};
+import strings from '../../res/strings.json' assert { type: 'json' };
 import { BSGuardData } from '../Guards';
 import { SourceCommand } from './base/SourceCommand';
 
@@ -32,7 +32,8 @@ export abstract class AddFace extends SourceCommand {
       @SlashChoice('flushed')
       @SlashOption({
         name: 'face',
-        description: 'face to composite on an image'
+        description: 'face to composite on an image',
+        type: ApplicationCommandOptionType.String
       })
         face: string,
     @SlashOption({
@@ -46,7 +47,8 @@ export abstract class AddFace extends SourceCommand {
     @SlashOption({
       name: 'member',
       description: 'a server member',
-      required: false
+      required: false,
+      type: ApplicationCommandOptionType.User
     })
         member: GuildMember,
     @SlashOption({

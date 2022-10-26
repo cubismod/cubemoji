@@ -3,7 +3,7 @@ import { ApplicationCommandOptionType, AutocompleteInteraction, CommandInteracti
 import { Discord, Guard, Slash, SlashOption } from 'discordx';
 import { emoteAutocomplete } from '../../lib/cmd/Autocomplete';
 import { EditDiscord } from '../../lib/image/DiscordLogic.js';
-import strings from '../../res/strings.json' assert {type: 'json'};
+import strings from '../../res/strings.json' assert { type: 'json' };
 import { SourceCommand } from './base/SourceCommand';
 
 @Guard(
@@ -29,7 +29,8 @@ export abstract class Jumbo extends SourceCommand {
     @SlashOption({
       name: 'member',
       description: strings.memberSlash,
-      required: false
+      required: false,
+      type: ApplicationCommandOptionType.User
     })
       member: GuildMember,
       interaction: CommandInteraction

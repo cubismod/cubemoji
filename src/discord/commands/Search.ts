@@ -1,4 +1,4 @@
-import { Colors, CommandInteraction, EmbedBuilder, PermissionFlagsBits } from 'discord.js';
+import { ApplicationCommandOptionType, Colors, CommandInteraction, EmbedBuilder, PermissionFlagsBits } from 'discord.js';
 import { Discord, Slash, SlashOption } from 'discordx';
 import { container } from 'tsyringe';
 import { EmoteCache } from '../../lib/emote/EmoteCache.js';
@@ -13,7 +13,11 @@ export abstract class Search {
     dmPermission: false
   })
   async search(
-    @SlashOption({ name: 'query', description: 'you can search based on name or Discord ID (snowflake)' })
+    @SlashOption({
+      name: 'query',
+      description: 'you can search based on name or Discord ID (snowflake)',
+      type: ApplicationCommandOptionType.String
+    })
       query: string,
       interaction: CommandInteraction
   ) {

@@ -9,7 +9,7 @@ import {
 import { Discord, Slash, SlashOption } from 'discordx';
 import { emoteAutocomplete } from '../../lib/cmd/Autocomplete';
 import { RescaleDiscord } from '../../lib/image/DiscordLogic.js';
-import strings from '../../res/strings.json' assert {type: 'json'};
+import strings from '../../res/strings.json' assert { type: 'json' };
 import { BSGuardData } from '../Guards';
 import { SourceCommand } from './base/SourceCommand';
 
@@ -33,7 +33,8 @@ export abstract class Rescale extends SourceCommand {
     @SlashOption({
       name: 'member',
       description: 'a user',
-      required: false
+      required: false,
+      type: ApplicationCommandOptionType.User
     })
       user: GuildMember,
       interaction: CommandInteraction,
@@ -44,6 +45,10 @@ export abstract class Rescale extends SourceCommand {
       ephemeral: data.enrolled,
       fetchReply: !data.enrolled
     };
+
+    this.source = emote;
+    this.member = user;
+
     await interaction.deferReply(deferOptions);
 
     const res = await this.parseCommand(interaction);

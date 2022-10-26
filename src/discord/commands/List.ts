@@ -1,4 +1,4 @@
-import { CommandInteraction, PermissionFlagsBits } from 'discord.js';
+import { ApplicationCommandOptionType, CommandInteraction, PermissionFlagsBits } from 'discord.js';
 import { Client, Discord, Slash, SlashChoice, SlashOption } from 'discordx';
 import { container } from 'tsyringe';
 import { Source } from '../../lib/emote/Cmoji.js';
@@ -22,7 +22,8 @@ export abstract class List {
     @SlashChoice('webpage')
     @SlashOption({
       name: 'subset',
-      description: 'Which subset of emotes would you like to choose from?'
+      description: 'Which subset of emotes would you like to choose from?',
+      type: ApplicationCommandOptionType.String
     })
       subset: string,
       interaction: CommandInteraction,

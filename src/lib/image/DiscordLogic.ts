@@ -327,7 +327,7 @@ export async function sendPagination(interaction: CommandInteraction, type: Sour
       }
     }
     // now we send an actual pagination
-    await new Pagination(interaction, embeds, {
+    await new Pagination(interaction, [{ embeds }], {
       type: PaginationType.SelectMenu,
       // ephemeral: true, have a feeling this is causing api errors
       pageText: menuText,

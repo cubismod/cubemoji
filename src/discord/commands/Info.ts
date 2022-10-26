@@ -20,7 +20,7 @@ import { Source } from '../../lib/emote/Cmoji.js';
 import { EmoteCache } from '../../lib/emote/EmoteCache.js';
 import { getColors, paletteToInt } from '../../lib/image/ColorExtract';
 import { CubeLogger } from '../../lib/observability/CubeLogger.js';
-import strings from '../../res/strings.json' assert {type: 'json'};
+import strings from '../../res/strings.json' assert { type: 'json' };
 
 @Discord()
 export abstract class Info {
@@ -46,7 +46,8 @@ export abstract class Info {
     @SlashOption({
       name: 'member',
       description: strings.memberSlash,
-      required: false
+      required: false,
+      type: ApplicationCommandOptionType.User
     })
       member: GuildMember,
       interaction: CommandInteraction

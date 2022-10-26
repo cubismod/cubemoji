@@ -9,8 +9,8 @@ import {
 import { Client, Discord, Slash, SlashOption } from 'discordx';
 import { editAutocomplete, emoteAutocomplete } from '../../lib/cmd/Autocomplete';
 import { EditDiscord } from '../../lib/image/DiscordLogic.js';
-import imgEffects from '../../res/imgEffects.json' assert {type: 'json'};
-import strings from '../../res/strings.json' assert {type: 'json'};
+import imgEffects from '../../res/imgEffects.json' assert { type: 'json' };
+import strings from '../../res/strings.json' assert { type: 'json' };
 import { BSGuardData } from '../Guards';
 import { SourceCommand } from './base/SourceCommand';
 
@@ -34,7 +34,8 @@ export abstract class Edit extends SourceCommand {
     @SlashOption({
       name: 'member',
       description: 'a server member',
-      required: false
+      required: false,
+      type: ApplicationCommandOptionType.User
     })
       member: GuildMember,
     @SlashOption({
@@ -55,7 +56,8 @@ export abstract class Edit extends SourceCommand {
     @SlashOption({
       name: 'list',
       description: 'get a list of the available effects',
-      required: false
+      required: false,
+      type: ApplicationCommandOptionType.Boolean
     })
       list: boolean,
       interaction: CommandInteraction,
