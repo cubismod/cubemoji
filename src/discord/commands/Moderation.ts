@@ -21,7 +21,7 @@ import { buildList, guildOwnersCheck, modReply, performBulkAction, validUser } f
 import { CubeStorage } from '../../lib/db/Storage.js';
 import { EmoteCache } from '../../lib/emote/EmoteCache.js';
 import { allRoles, rolePermissionCheck } from '../../lib/http/RoleManager';
-import strings from '../../res/strings.json' assert {type: 'json'};
+import strings from '../../res/strings.json' assert { type: 'json' };
 
 /**
  * Cubemoji Moderation!
@@ -283,7 +283,11 @@ export abstract class Enrollment {
     await interaction.deferReply({ ephemeral: true });
     await new Pagination(
       interaction,
-      await buildList(interaction, ['servers', 'mods'])
+      [
+        {
+          embeds: await buildList(interaction, ['servers', 'mods'])
+        }
+      ]
     ).send();
   }
 }
@@ -392,7 +396,11 @@ export abstract class blocklist {
     await interaction.deferReply({ ephemeral: true });
     await new Pagination(
       interaction,
-      await buildList(interaction, ['emoji', 'channels'])
+      [
+        {
+          embeds: await buildList(interaction, ['emoji', 'channels'])
+        }
+      ]
     ).send();
   }
 
