@@ -207,10 +207,10 @@
     "@jridgewell/resolve-uri" "^3.0.3"
     "@jridgewell/sourcemap-codec" "^1.4.10"
 
-"@keyv/sqlite@^3.6.2":
-  version "3.6.2"
-  resolved "https://registry.yarnpkg.com/@keyv/sqlite/-/sqlite-3.6.2.tgz#1ab562caf3867d48a07b96ef10ec2d94a9b58346"
-  integrity sha512-DSLP25bhnBnAhLnSbfk2j2xq2lP9XaaYL3voXZJUANNrWH9Ho3Zx16c9EFbtBT24iXGPD2mqSSAklSeiiaTb3w==
+"@keyv/sqlite@^3.6.3":
+  version "3.6.3"
+  resolved "https://registry.yarnpkg.com/@keyv/sqlite/-/sqlite-3.6.3.tgz#7ba644babcc141c6977dc617a6e4277f48be53a4"
+  integrity sha512-zJs5gUa08nnt+PIzMJgYAbWj115JqAd09waZAqKuWjHPIQv+RGpMeVb37dyX2kgmQw50oTcqnp2+S7hBrzyPIw==
   dependencies:
     pify "^5.0.0"
     sqlite3 "^5.1.2"
