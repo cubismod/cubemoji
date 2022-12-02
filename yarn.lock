@@ -108,13 +108,13 @@
     "@discordx/internal" "^1.0.2"
     tslib "^2.4.0"
 
-"@discordx/pagination@^3.3.1":
-  version "3.3.1"
-  resolved "https://registry.yarnpkg.com/@discordx/pagination/-/pagination-3.3.1.tgz#2a9d4d80131b8a58114ae0450553e16b14aaeb23"
-  integrity sha512-jmyL43xcAbA4EVqzAQYB4PENbyNqKP797hLMOYNIm12vafOXZJWaHWyFJOcd7s/pN4Sro3mKBURJCxM//nQssQ==
+"@discordx/pagination@^3.4.0":
+  version "3.4.0"
+  resolved "https://registry.yarnpkg.com/@discordx/pagination/-/pagination-3.4.0.tgz#36e572b224d7211683d2f00d062e9c725f9551c8"
+  integrity sha512-39O/ooPA70Nw66QijqH5hBJgGULGYnJW6fmKjmbmaZ0OTwPd4W/SY0Ujb8Zrbn80y4oiNwUvzoCXYU0IEc6rTA==
   dependencies:
     lodash "^4.17.21"
-    tslib "^2.4.0"
+    tslib "^2.4.1"
 
 "@discordx/utilities@5.1.0":
   version "5.1.0"
@@ -5296,10 +5296,10 @@ tslib@^1.8.1, tslib@^1.9.3:
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-1.14.1.tgz#cf2d38bdc34a134bcaf1091c41f6619e2f672d00"
   integrity sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==
 
-tslib@^2.0.3, tslib@^2.3.1, tslib@^2.4.0:
-  version "2.4.0"
-  resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.4.0.tgz#7cecaa7f073ce680a05847aa77be941098f36dc3"
-  integrity sha512-d6xOpEDfsi2CZVlPQzGeux8XMwLT9hssAsaPYExaQMuYskwb+x1x7J371tWlbBdWHroy99KnVB6qIkUbs5X3UQ==
+tslib@^2.0.3, tslib@^2.3.1, tslib@^2.4.0, tslib@^2.4.1:
+  version "2.4.1"
+  resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.4.1.tgz#0d0bfbaac2880b91e22df0768e55be9753a5b17e"
+  integrity sha512-tGyy4dAjRIEwI7BzsB0lynWgOpfqjUdq91XXAlIWD2OwKBH7oCl/GZG/HT4BOHrTlPMOASlMQ7veyTqpmRcrNA==
 
 tsscmp@1.0.6:
   version "1.0.6"
