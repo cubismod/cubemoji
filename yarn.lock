@@ -207,13 +207,13 @@
     "@jridgewell/resolve-uri" "^3.0.3"
     "@jridgewell/sourcemap-codec" "^1.4.10"
 
-"@keyv/sqlite@^3.6.2":
-  version "3.6.2"
-  resolved "https://registry.yarnpkg.com/@keyv/sqlite/-/sqlite-3.6.2.tgz#1ab562caf3867d48a07b96ef10ec2d94a9b58346"
-  integrity sha512-DSLP25bhnBnAhLnSbfk2j2xq2lP9XaaYL3voXZJUANNrWH9Ho3Zx16c9EFbtBT24iXGPD2mqSSAklSeiiaTb3w==
+"@keyv/sqlite@^3.6.4":
+  version "3.6.4"
+  resolved "https://registry.yarnpkg.com/@keyv/sqlite/-/sqlite-3.6.4.tgz#5582efe86e3fbbf9a65b895973d73d6d5950c879"
+  integrity sha512-nE7bjOU6lmGn3QBkaAZS+LLvBHebBKDwDbMGlTbhRNJoREam69LZewspGbePb8dpZS1C6IazedVRCq2eb5kFWw==
   dependencies:
     pify "^5.0.0"
-    sqlite3 "^5.1.2"
+    sqlite3 "^5.1.4"
 
 "@koa/router@^12.0.0":
   version "12.0.0"
@@ -5017,10 +5017,10 @@ split@0.3:
   dependencies:
     through "2"
 
-sqlite3@^5.1.2:
-  version "5.1.2"
-  resolved "https://registry.yarnpkg.com/sqlite3/-/sqlite3-5.1.2.tgz#f50d5b1482b6972fb650daf6f718e6507c6cfb0f"
-  integrity sha512-D0Reg6pRWAFXFUnZKsszCI67tthFD8fGPewRddDCX6w4cYwz3MbvuwRICbL+YQjBAh9zbw+lJ/V9oC8nG5j6eg==
+sqlite3@^5.1.4:
+  version "5.1.4"
+  resolved "https://registry.yarnpkg.com/sqlite3/-/sqlite3-5.1.4.tgz#35f83d368963168b324ad2f0fffce09f3b8723a7"
+  integrity sha512-i0UlWAzPlzX3B5XP2cYuhWQJsTtlMD6obOa1PgeEQ4DHEXUuyJkgv50I3isqZAP5oFc2T8OFvakmDh2W6I+YpA==
   dependencies:
     "@mapbox/node-pre-gyp" "^1.0.0"
     node-addon-api "^4.2.0"

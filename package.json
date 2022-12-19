@@ -37,7 +37,7 @@
     "@discordx/koa": "^1.1.2",
     "@discordx/pagination": "^3.3.1",
     "@discordx/utilities": "5.1.0",
-    "@keyv/sqlite": "^3.6.2",
+    "@keyv/sqlite": "^3.6.4",
     "@koa/router": "^12.0.0",
     "@opentelemetry/api": "^1.2.0",
     "@opentelemetry/context-async-hooks": "^1.7.0",
