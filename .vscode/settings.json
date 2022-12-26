@@ -17,5 +17,6 @@
         "source.organizeImports": true,
         "source.fixAll": true
     },
-    "python.formatting.provider": "black"
+    "python.formatting.provider": "black",
+    "typescript.preferences.importModuleSpecifierEnding": "js"
 }

@@ -1,8 +1,9 @@
 import { Discord } from 'discordx';
 import { injectable } from 'tsyringe';
 import { createLogger, format, Logger, transports } from 'winston';
+import { WinstonGelfTransporter } from 'winston-gelf-transporter';
 import { Bytes } from '../constants/Units.js';
-import { LokiTransport } from './LokiTransport.js';
+import { NtfyTransport } from './NtfyTransport.js';
 
 /**
  * cubemoji logging using Winston
@@ -33,10 +34,14 @@ export class CubeLogger {
   readonly traces: Logger;
 
   constructor() {
-    const lokiTransport = new LokiTransport({
-      host: process.env.CM_HTTP_HOST ?? 'localhost',
-      port: parseInt(process.env.CM_HTTP_PORT ?? '200'),
-      label: 'cubemoji'
+    const ntfyTransport = new NtfyTransport({
+      host: process.env.CM_NTFY_URL ?? 'localhost',
+      auth: process.env.CM_NTFY_AUTH ?? 'auth'
+    });
+
+    const gelfTransport = new WinstonGelfTransporter({
+      host: process.env.CM_PROM_HOST ?? 'localhost',
+      port: parseInt(process.env.CM_PROM_PORT ?? '12201')
     });
 
     // different transports when using different versions of bot
@@ -88,10 +93,11 @@ export class CubeLogger {
           }) */
         ]
       });
-      if (process.env.CM_HTTP_LOG === 'true' &&
-        process.env.CM_HTTP_PORT &&
-        process.env.CM_HTTP_HOST) {
-        this.parent.add(lokiTransport);
+      if (process.env.CM_NTFY_LOG === 'true') {
+        this.parent.add(ntfyTransport);
+      }
+      if (process.env.CM_PROM_LOG === 'true') {
+        this.parent.add(gelfTransport);
       }
     }
 
