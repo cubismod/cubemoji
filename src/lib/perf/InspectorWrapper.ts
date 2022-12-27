@@ -5,9 +5,9 @@ import { open, rm, writeFile } from 'node:fs/promises';
 import inspector from 'node:inspector';
 import path from 'node:path';
 import { container, injectable } from 'tsyringe';
-import { compress } from '../db/DatabaseMgmt';
-import { BucketContentType, S3Client } from '../db/Storage';
-import { CubeLogger } from '../observability/CubeLogger';
+import { compress } from '../db/DatabaseMgmt.js';
+import { BucketContentType, S3Client } from '../db/Storage.js';
+import { CubeLogger } from '../observability/CubeLogger.js';
 
 @Discord()
 @injectable()

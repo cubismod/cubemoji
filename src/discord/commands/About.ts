@@ -1,10 +1,10 @@
 import dayjs from 'dayjs';
-import relativeTime from 'dayjs/plugin/relativeTime';
+import relativeTime from 'dayjs/plugin/relativeTime.js';
 import { CommandInteraction, EmbedBuilder, PermissionFlagsBits } from 'discord.js';
 import { Client, Discord, Guard, Slash } from 'discordx';
 import { container } from 'tsyringe';
 import { EmoteCache } from '../../lib/emote/EmoteCache.js';
-import { bigServerDetect, BSGuardData } from '../Guards';
+import { bigServerDetect, BSGuardData } from '../Guards.js';
 
 dayjs.extend(relativeTime);
 

@@ -7,11 +7,11 @@ import {
   PermissionFlagsBits
 } from 'discord.js';
 import { Discord, Slash, SlashOption } from 'discordx';
-import { emoteAutocomplete } from '../../lib/cmd/Autocomplete';
+import { emoteAutocomplete } from '../../lib/cmd/Autocomplete.js';
 import { RescaleDiscord } from '../../lib/image/DiscordLogic.js';
 import strings from '../../res/strings.json' assert { type: 'json' };
-import { BSGuardData } from '../Guards';
-import { SourceCommand } from './base/SourceCommand';
+import { BSGuardData } from '../Guards.js';
+import { SourceCommand } from './base/SourceCommand.js';
 
 @Discord()
 export abstract class Rescale extends SourceCommand {

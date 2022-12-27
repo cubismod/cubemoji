@@ -1,9 +1,9 @@
 import { readdir, readFile } from 'fs/promises';
 import path from 'path';
 import { container } from 'tsyringe';
-import { RolePicker } from '../cmd/ModHelper';
-import { CubeStorage } from '../db/Storage';
-import { CubeLogger } from '../observability/CubeLogger';
+import { RolePicker } from '../cmd/ModHelper.js';
+import { CubeStorage } from '../db/Storage.js';
+import { CubeLogger } from '../observability/CubeLogger.js';
 
 const logger = container.resolve(CubeLogger).git;
 const storage = container.resolve(CubeStorage).rolePickers;

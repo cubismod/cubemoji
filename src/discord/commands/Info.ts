@@ -1,24 +1,16 @@
 // https://github.com/oceanroleplay/discord.ts-example/blob/main/src/commands/slashes.ts
 import {
-  ActionRowBuilder,
   ApplicationCommandOptionType,
-  AutocompleteInteraction,
-  ButtonBuilder,
-  ButtonInteraction,
-  ButtonStyle,
-  Colors,
-  CommandInteraction,
+  AutocompleteInteraction, CommandInteraction,
   EmbedBuilder,
   GuildMember,
   PermissionFlagsBits
 } from 'discord.js';
-import { ButtonComponent, Discord, Slash, SlashOption } from 'discordx';
-import rgbHex from 'rgb-hex';
+import { Discord, Slash, SlashOption } from 'discordx';
 import { container } from 'tsyringe';
-import { emoteAutocomplete } from '../../lib/cmd/Autocomplete';
+import { emoteAutocomplete } from '../../lib/cmd/Autocomplete.js';
 import { Source } from '../../lib/emote/Cmoji.js';
 import { EmoteCache } from '../../lib/emote/EmoteCache.js';
-import { getColors, paletteToInt } from '../../lib/image/ColorExtract';
 import { CubeLogger } from '../../lib/observability/CubeLogger.js';
 import strings from '../../res/strings.json' assert { type: 'json' };
 
@@ -60,14 +52,14 @@ export abstract class Info {
       if (res !== undefined) {
         await interaction.deferReply();
 
-        let embed = new EmbedBuilder();
-        embed = await this.setColors(embed, res.url);
+        const embed = new EmbedBuilder();
+        // embed = await this.setColors(embed, res.url);
         embed.setImage(res.url);
         embed.setTitle(res.name);
 
         // button setup
         this.imgUrl = res.url;
-        const row = this.buttonCreate();
+        // const row = this.buttonCreate();
 
         switch (res.source) {
           case Source.Discord: {
@@ -105,7 +97,7 @@ export abstract class Info {
                 { name: 'Author', value: author.username }
               ]);
             }
-            await interaction.editReply({ embeds: [embed], components: [row] });
+            await interaction.editReply({ embeds: [embed] });
             break;
           }
           case Source.Mutant: {
@@ -115,7 +107,7 @@ export abstract class Info {
                 value: 'This bot uses Mutant Standard emoji (https://mutant.tech) which are licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License (https://creativecommons.org/licenses/by-nc-sa/4.0/).'
               }
             ]);
-            await interaction.editReply({ embeds: [embed], components: [row] });
+            await interaction.editReply({ embeds: [embed] });
             break;
           }
         }
@@ -125,13 +117,11 @@ export abstract class Info {
     } else if (member !== undefined) {
       // user code
       const avatarURL = member.displayAvatarURL({ size: 256, extension: 'png' });
-      let embed = new EmbedBuilder();
+      const embed = new EmbedBuilder();
 
       // button setup
       this.imgUrl = avatarURL;
-      const row = this.buttonCreate();
 
-      embed = await this.setColors(embed, avatarURL);
       embed.setTitle(member.user.tag);
       embed.setImage(avatarURL);
       embed.addFields([
@@ -149,17 +139,18 @@ export abstract class Info {
       embed.addFields([
         { name: 'Bot', value: member.user.bot.toString() }
       ]);
-      await interaction.reply({ embeds: [embed], components: [row] });
+      await interaction.reply({ embeds: [embed] });
     }
     if ((member === undefined) && (emote === undefined)) {
       await interaction.reply({ content: strings.noArgs, ephemeral: true });
     }
   }
+}
 
-  private async setColors(embed: EmbedBuilder, url: string) {
+/*   private async setColors(embed: EmbedBuilder, url: string) {
     const colors = await getColors(url);
-    const dominant = colors[0];
     if (colors) {
+      const dominant = colors[0];
       embed.setColor([dominant[0], dominant[1], dominant[2]]);
     } else embed.setColor(Colors.Navy);
     return embed;
@@ -192,7 +183,7 @@ export abstract class Info {
         if (i < 9) {
           const embed = new EmbedBuilder({
             description: `RGB: \`${color}\`\nHex: \`#${rgbHex(color[0], color[1], color[2])}\``,
-            color: paletteToInt(color)
+            color: colorToInt(color)
           });
           embeds.push(embed);
         }
@@ -202,4 +193,4 @@ export abstract class Info {
       await interaction.editReply('colors could not be determined');
     }
   }
-}
+} */

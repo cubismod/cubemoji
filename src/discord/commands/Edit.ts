@@ -7,12 +7,12 @@ import {
   PermissionFlagsBits
 } from 'discord.js';
 import { Client, Discord, Slash, SlashOption } from 'discordx';
-import { editAutocomplete, emoteAutocomplete } from '../../lib/cmd/Autocomplete';
+import { editAutocomplete, emoteAutocomplete } from '../../lib/cmd/Autocomplete.js';
 import { EditDiscord } from '../../lib/image/DiscordLogic.js';
 import imgEffects from '../../res/imgEffects.json' assert { type: 'json' };
 import strings from '../../res/strings.json' assert { type: 'json' };
-import { BSGuardData } from '../Guards';
-import { SourceCommand } from './base/SourceCommand';
+import { BSGuardData } from '../Guards.js';
+import { SourceCommand } from './base/SourceCommand.js';
 
 @Discord()
 export abstract class Edit extends SourceCommand {

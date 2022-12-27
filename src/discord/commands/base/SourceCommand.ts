@@ -1,8 +1,8 @@
 import { Attachment, CommandInteraction, GuildMember, Message } from 'discord.js';
-import { getUrl, reply } from '../../../lib/image/DiscordLogic';
-import strings from '../../../res/strings.json' assert {type: 'json'};
 import { container } from 'tsyringe';
-import { CubeMessageManager } from '../../../lib/cmd/MessageManager';
+import { CubeMessageManager } from '../../../lib/cmd/MessageManager.js';
+import { getUrl, reply } from '../../../lib/image/DiscordLogic.js';
+import strings from '../../../res/strings.json' assert { type: 'json' };
 
 /**
  * Commands involving the following inputs:

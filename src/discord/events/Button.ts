@@ -1,9 +1,9 @@
 import { ButtonInteraction, EmbedBuilder, TextChannel } from 'discord.js';
 import { ButtonComponent, Discord } from 'discordx';
 import { container } from 'tsyringe';
-import { modReply } from '../../lib/cmd/ModHelper';
-import { CubeStorage } from '../../lib/db/Storage';
-import { EmoteCache } from '../../lib/emote/EmoteCache';
+import { modReply } from '../../lib/cmd/ModHelper.js';
+import { CubeStorage } from '../../lib/db/Storage.js';
+import { EmoteCache } from '../../lib/emote/EmoteCache.js';
 
 @Discord()
 export abstract class ButtonResponder {

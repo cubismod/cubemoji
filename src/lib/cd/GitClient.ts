@@ -4,9 +4,9 @@ import { tmpdir } from 'os';
 import path from 'path';
 import simpleGit, { SimpleGit, SimpleGitOptions } from 'simple-git';
 import { container, injectable } from 'tsyringe';
-import { Milliseconds } from '../constants/Units';
-import { CubeLogger } from '../observability/CubeLogger';
-import { rolePickerParse } from './Parser';
+import { Milliseconds } from '../constants/Units.js';
+import { CubeLogger } from '../observability/CubeLogger.js';
+import { rolePickerParse } from './Parser.js';
 
 @Discord()
 @injectable()

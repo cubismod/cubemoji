@@ -7,8 +7,8 @@ import { createInterface } from 'readline';
 import { pipeline } from 'stream';
 import { container } from 'tsyringe';
 import { promisify } from 'util';
-import { gotOptions } from '../emote/Cmoji';
-import { CubeLogger } from '../observability/CubeLogger';
+import { gotOptions } from '../emote/Cmoji.js';
+import { CubeLogger } from '../observability/CubeLogger.js';
 const { got } = await import('got');
 
 // persist this file between restarts of bot

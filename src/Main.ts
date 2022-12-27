@@ -2,6 +2,7 @@ import { dirname, importx } from '@discordx/importer';
 import { GatewayIntentBits, Partials } from 'discord.js';
 import { Client, DIService, IGuild, tsyringeDependencyRegistryEngine } from 'discordx';
 import { mkdir } from 'fs/promises';
+import { exit } from 'process';
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 import { bigServerDetect, blockedChannelDetect } from './discord/Guards.js';
@@ -39,7 +40,12 @@ export class Main {
     await createDir('./data/backups');
 
     // discord client setup
-    await importx(dirname(import.meta.url) + '/discord/**/*.js');
+    try {
+      await importx(dirname(import.meta.url) + '/discord/**/*.js');
+    } catch (err) {
+      logger.error(err);
+      exit(1);
+    }
     logger.info('🅲🆄🅱🅴🅼🅾🅹🅸');
     logger.info(`v. ${process.env.npm_package_version}`);
     let silent: false | undefined;

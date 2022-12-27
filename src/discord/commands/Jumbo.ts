@@ -1,10 +1,10 @@
 import { RateLimit, TIME_UNIT } from '@discordx/utilities';
 import { ApplicationCommandOptionType, AutocompleteInteraction, CommandInteraction, GuildMember } from 'discord.js';
 import { Discord, Guard, Slash, SlashOption } from 'discordx';
-import { emoteAutocomplete } from '../../lib/cmd/Autocomplete';
+import { emoteAutocomplete } from '../../lib/cmd/Autocomplete.js';
 import { EditDiscord } from '../../lib/image/DiscordLogic.js';
 import strings from '../../res/strings.json' assert { type: 'json' };
-import { SourceCommand } from './base/SourceCommand';
+import { SourceCommand } from './base/SourceCommand.js';
 
 @Guard(
   RateLimit(TIME_UNIT.seconds, 60, { ephemeral: true })

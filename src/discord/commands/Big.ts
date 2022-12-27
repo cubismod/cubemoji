@@ -7,10 +7,10 @@ import {
   PermissionFlagsBits
 } from 'discord.js';
 import { Discord, Guard, Slash, SlashOption } from 'discordx';
-import { emoteAutocomplete } from '../../lib/cmd/Autocomplete';
+import { emoteAutocomplete } from '../../lib/cmd/Autocomplete.js';
 import { reply } from '../../lib/image/DiscordLogic.js';
 import strings from '../../res/strings.json' assert { type: 'json' };
-import { SourceCommand } from './base/SourceCommand';
+import { SourceCommand } from './base/SourceCommand.js';
 
 @Discord()
 @Guard(

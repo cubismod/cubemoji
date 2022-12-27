@@ -15,12 +15,12 @@ import {
 import { Discord, Slash, SlashChoice, SlashGroup, SlashOption } from 'discordx';
 import { rm } from 'fs/promises';
 import { container } from 'tsyringe';
-import { GitClient } from '../../lib/cd/GitClient';
-import { serverAutocomplete } from '../../lib/cmd/Autocomplete';
-import { buildList, guildOwnersCheck, modReply, performBulkAction, validUser } from '../../lib/cmd/ModHelper';
+import { GitClient } from '../../lib/cd/GitClient.js';
+import { serverAutocomplete } from '../../lib/cmd/Autocomplete.js';
+import { buildList, guildOwnersCheck, modReply, performBulkAction, validUser } from '../../lib/cmd/ModHelper.js';
 import { CubeStorage } from '../../lib/db/Storage.js';
 import { EmoteCache } from '../../lib/emote/EmoteCache.js';
-import { allRoles, rolePermissionCheck } from '../../lib/http/RoleManager';
+import { allRoles, rolePermissionCheck } from '../../lib/http/RoleManager.js';
 import strings from '../../res/strings.json' assert { type: 'json' };
 
 /**

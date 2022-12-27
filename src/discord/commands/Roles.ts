@@ -1,6 +1,6 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, Colors, CommandInteraction, EmbedBuilder, PermissionFlagsBits } from 'discord.js';
 import { ButtonComponent, Discord, Slash } from 'discordx';
-import { clearPage, rolePermissionCheck, rolesCommand } from '../../lib/http/RoleManager';
+import { clearPage, rolePermissionCheck, rolesCommand } from '../../lib/http/RoleManager.js';
 
 @Discord()
 export abstract class Roles {

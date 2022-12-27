@@ -12,10 +12,10 @@ import { appendFile } from 'fs/promises';
 import { randomString } from 'pandemonium';
 import path from 'path';
 import { container } from 'tsyringe';
-import { auditMsg } from '../cmd/ModHelper';
-import { Milliseconds } from '../constants/Units';
-import { CubeStorage } from '../db/Storage';
-import { CubeLogger } from '../observability/CubeLogger';
+import { auditMsg } from '../cmd/ModHelper.js';
+import { Milliseconds } from '../constants/Units.js';
+import { CubeStorage } from '../db/Storage.js';
+import { CubeLogger } from '../observability/CubeLogger.js';
 
 const storage = container.resolve(CubeStorage);
 const logger = container.resolve(CubeLogger).discordLogic;

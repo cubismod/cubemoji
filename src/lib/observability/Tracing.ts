@@ -16,7 +16,7 @@ import {
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 import { container } from 'tsyringe';
-import { CubeLogger } from './CubeLogger';
+import { CubeLogger } from './CubeLogger.js';
 
 /**
  * creates an OpenTelemetry Tracer

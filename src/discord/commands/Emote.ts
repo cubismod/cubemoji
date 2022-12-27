@@ -2,7 +2,7 @@ import { RateLimit, TIME_UNIT } from '@discordx/utilities';
 import { ApplicationCommandOptionType, AutocompleteInteraction, CommandInteraction, Message, PermissionFlagsBits } from 'discord.js';
 import { Discord, Guard, Slash, SlashOption } from 'discordx';
 import { container } from 'tsyringe';
-import { emoteAutocomplete } from '../../lib/cmd/Autocomplete';
+import { emoteAutocomplete } from '../../lib/cmd/Autocomplete.js';
 import { CubeMessageManager } from '../../lib/cmd/MessageManager.js';
 import { Source } from '../../lib/emote/Cmoji.js';
 import { EmoteCache } from '../../lib/emote/EmoteCache.js';
