@@ -50,7 +50,7 @@
     "@opentelemetry/sdk-trace-node": "^1.8.0",
     "@opentelemetry/semantic-conventions": "^1.8.0",
     "@types/koa": "^2.13.5",
-    "aws-sdk": "^2.1282.0",
+    "aws-sdk": "^2.1283.0",
     "better-sqlite3": "^8.0.1",
     "chokidar": "^3.5.3",
     "dayjs": "^1.11.7",
