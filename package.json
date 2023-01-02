@@ -92,7 +92,7 @@
     "winston": "^3.8.2",
     "winston-gelf-transporter": "^1.0.2",
     "winston-transport": "^4.5.0",
-    "yaml": "^2.2.0"
+    "yaml": "^2.2.1"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.3",
