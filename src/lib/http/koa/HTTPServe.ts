@@ -1,7 +1,5 @@
 import { Get, Middleware, Post, Router } from '@discordx/koa';
 import { RouterContext } from '@koa/router';
-import { Tracer } from '@opentelemetry/sdk-trace-base';
-import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 import { Client } from 'discordx';
 import { stat } from 'fs/promises';
 import { Context, Next } from 'koa';
@@ -22,7 +20,6 @@ import { checkedRoles, genRolesList, roleUpdateRadio, roleUpdatesSwitch as roleU
 const glTokenHeader = 'x-gitlab-token';
 
 async function LogRequest(ctx: RouterContext, next: Next) {
-  const tracer = container.resolve(Tracer);
   const logger = container.resolve(CubeLogger).web;
 
   await next();
@@ -41,21 +38,6 @@ async function LogRequest(ctx: RouterContext, next: Next) {
     });
 
     logger.debug(ctx.request.body);
-  }
-
-  // ignore status requests as health checks add additional
-  // noise that's already recorded with logs
-  if (!ctx.URL.pathname.startsWith('/status')) {
-    await tracer.startActiveSpan(`web - ${ctx.URL.pathname}`, async span => {
-      span.setAttribute(SemanticAttributes.HTTP_CLIENT_IP, ctx.ip);
-      span.setAttribute(SemanticAttributes.HTTP_METHOD, ctx.method);
-      span.setAttribute(SemanticAttributes.HTTP_ROUTE, ctx.URL.pathname);
-      span.setAttribute(SemanticAttributes.HTTP_STATUS_CODE, ctx.response.status);
-      span.setAttribute(SemanticAttributes.HTTP_USER_AGENT, ctx.headers['user-agent'] ?? '');
-      span.setAttribute(SemanticAttributes.HTTP_SERVER_NAME, ctx.URL.hostname);
-
-      span.end();
-    });
   }
 }
 

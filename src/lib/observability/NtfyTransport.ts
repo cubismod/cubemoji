@@ -1,10 +1,9 @@
 // custom HTTP transport to Ntfy
 // uses Got https://www.npmjs.com/package/got for HTTP
 
-import { RequestError } from 'got';
+import { request } from 'https';
 import TransportStream, { TransportStreamOptions } from 'winston-transport';
 import { stringify } from 'yaml';
-const { got } = await import('got');
 
 export interface NtfyTransportOptions extends TransportStreamOptions {
   host: string,
@@ -42,30 +41,27 @@ export class NtfyTransport extends TransportStream {
   async log(info: NtfyInfoObj, next: () => void) {
     if (info.level !== 'info' || info.message.includes('now running...')) {
       const yamlMessage = stringify(info);
-      await got.post(
-        `${this.host}/cubemoji`,
-        {
-          headers: {
-            Authorization: `Basic ${this.auth}`,
-            Title: info.module,
-            Priority: 'high'
-          },
-          body: yamlMessage,
-          timeout: {
-            request: 10000
-          }
-        }
-      ).catch(err => {
-        if (err instanceof RequestError) {
-          console.error({
-            code: err.code,
-            response: err.response?.body,
-            reqBody: err.request?.options.body
-          });
-        } else {
-          console.error(err);
-        }
+
+      const req = request({
+        hostname: this.host,
+        path: '/cubemoji',
+        auth: `Basic ${this.auth}`,
+        headers: {
+          Authorization: `Basic ${this.auth}`,
+          Title: info.module,
+          Priority: 'high',
+          Connection: 'keep-alive'
+        },
+        method: 'POST',
+        timeout: 1000
+      }, (res) => {
+        res.setEncoding('utf8');
+        res.on('error', (err) => { console.error(err); });
+        // res.on('data', (chunk) => console.log(chunk));
       });
+
+      req.write(yamlMessage);
+      req.end();
     }
 
     next();

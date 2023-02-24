@@ -1,8 +1,4 @@
 // Discord client events
-
-import { SpanStatusCode } from '@opentelemetry/api';
-import { Tracer } from '@opentelemetry/sdk-trace-base';
-import { CommandInteraction, ContextMenuCommandInteraction } from 'discord.js';
 import { ArgsOf, Client, Discord, On, Once } from 'discordx';
 import { container } from 'tsyringe';
 import { GitClient } from '../../lib/cd/GitClient.js';
@@ -18,7 +14,6 @@ import { setStatus } from '../../lib/image/DiscordLogic.js';
 import { FileQueue } from '../../lib/image/FileQueue.js';
 import { WorkerPool } from '../../lib/image/WorkerPool.js';
 import { CubeLogger } from '../../lib/observability/CubeLogger.js';
-import { configureTracer } from '../../lib/observability/Tracing.js';
 import { InspectorWrapper } from '../../lib/perf/InspectorWrapper.js';
 
 @Discord()
@@ -48,9 +43,6 @@ export abstract class ClientEvents {
     const webServer = new CubeServer();
 
     // dependency injection initialization
-    const res = configureTracer();
-    container.register(Tracer, { useValue: res });
-    this.logger.info('Tracing started');
 
     container.register(CubeLogger, { useValue: this.cubeLogger });
     this.logger.info('registered CubeLogger');
@@ -199,45 +191,19 @@ export abstract class ClientEvents {
       [interaction]: ArgsOf<'interactionCreate'>,
       client: Client
     ) {
-      if (interaction.isButton() || interaction.isSelectMenu()) {
+      if (interaction.isButton() || interaction.isStringSelectMenu()) {
         if (interaction.customId.startsWith('discordx@pagination@')) {
           return;
         }
       }
-      const tracer = container.resolve(Tracer);
 
-      // determine command name
-      let name = interaction.id;
-
-      if (interaction instanceof CommandInteraction || interaction instanceof ContextMenuCommandInteraction) {
-        name = `command - ${interaction.commandName}`;
+      try {
+        await client.executeInteraction(interaction);
+      } catch (err: unknown) {
+        this.logger.error('INTERACTION FAILURE');
+        this.logger.error(`Type: ${interaction.type}\nTimestamp: ${Date()}\nGuild: ${interaction.guild}\nUser: ${interaction.user.tag}\nChannel: ${interaction.channel}`);
+        this.logger.error(err);
       }
-      await tracer.startActiveSpan(name, async span => {
-        try {
-          await client.executeInteraction(interaction);
-        } catch (err: unknown) {
-          this.logger.error('INTERACTION FAILURE');
-          this.logger.error(`Type: ${interaction.type}\nTimestamp: ${Date()}\nGuild: ${interaction.guild}\nUser: ${interaction.user.tag}\nChannel: ${interaction.channel}`);
-          this.logger.error(err);
-
-          if (err instanceof Error) {
-            span.recordException(err);
-            span.setStatus({ code: SpanStatusCode.ERROR });
-            span.end();
-            return;
-          }
-        }
-
-        span.setAttributes({
-          userID: interaction.user.id,
-          username: interaction.user.username,
-          channelId: interaction.channel?.id ?? '',
-          guildId: interaction.guildId ?? '',
-          guildName: interaction.guild?.name,
-          type: interaction.type
-        });
-        span.end();
-      });
     }
 
     /**

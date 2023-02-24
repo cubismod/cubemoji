@@ -1,7 +1,6 @@
 import { Discord } from 'discordx';
 import { injectable } from 'tsyringe';
 import { createLogger, format, Logger, transports } from 'winston';
-import { WinstonGelfTransporter } from 'winston-gelf-transporter';
 import { Bytes } from '../constants/Units.js';
 import { NtfyTransport } from './NtfyTransport.js';
 
@@ -31,17 +30,11 @@ export class CubeLogger {
   readonly errors: Logger;
   readonly git: Logger;
   readonly inspector: Logger;
-  readonly traces: Logger;
 
   constructor() {
     const ntfyTransport = new NtfyTransport({
       host: process.env.CM_NTFY_URL ?? 'localhost',
       auth: process.env.CM_NTFY_AUTH ?? 'auth'
-    });
-
-    const gelfTransport = new WinstonGelfTransporter({
-      host: process.env.CM_PROM_HOST ?? 'localhost',
-      port: parseInt(process.env.CM_PROM_PORT ?? '12201')
     });
 
     // different transports when using different versions of bot
@@ -96,9 +89,6 @@ export class CubeLogger {
       if (process.env.CM_NTFY_LOG === 'true') {
         this.parent.add(ntfyTransport);
       }
-      if (process.env.CM_PROM_LOG === 'true') {
-        this.parent.add(gelfTransport);
-      }
     }
 
     // now setup child loggers
@@ -119,33 +109,5 @@ export class CubeLogger {
     this.errors = this.parent.child({ module: 'Errors' });
     this.git = this.parent.child({ module: 'Git' });
     this.inspector = this.parent.child({ module: 'InspectorWrapper' });
-    this.traces = this.parent.child({ module: 'Traces' });
-
-    /* // exceptions/rejections log to separate file
-    const exReFileTransport = new transports.File({
-      filename: 'data/logs/exceptions.log',
-      maxsize: Bytes.oneMB,
-      maxFiles: 20
-    })
-
-    const exReConsoleTransport = new transports.Console()
-
-    const exReLogger = createLogger({
-      exceptionHandlers: [
-        exReFileTransport, exReConsoleTransport
-      ],
-      rejectionHandlers: [
-        exReFileTransport, exReConsoleTransport
-      ]
-    })
-
-    if (process.env.CM_HTTP_LOG === 'true' &&
-    process.env.CM_HTTP_PORT &&
-    process.env.CM_HTTP_HOST) {
-      exReLogger.exceptions.handle(lokiTransport)
-      exReLogger.rejections.handle(lokiTransport)
-    }
-
-    // handle exceptions and errors with logger */
   }
 }
