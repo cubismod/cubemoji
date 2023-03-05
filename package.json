@@ -1,7 +1,7 @@
 {
   "name": "cubemoji",
   "author": "cubis",
-  "version": "3.5.3",
+  "version": "3.5.4",
   "description": "A Discord emoji bot",
   "main": "Main.ts",
   "license": "MIT",
@@ -80,6 +80,7 @@
     "unique-names-generator": "^4.7.1",
     "uuid": "^9.0.0",
     "winston": "^3.8.2",
+    "winston-discord-webhook": "^2.0.0",
     "winston-gelf-transporter": "^1.0.2",
     "winston-transport": "^4.5.0",
     "yaml": "^2.2.1"

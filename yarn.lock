@@ -5907,6 +5907,14 @@ wide-align@^1.1.2, wide-align@^1.1.5:
   dependencies:
     string-width "^1.0.2 || 2 || 3 || 4"
 
+winston-discord-webhook@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/winston-discord-webhook/-/winston-discord-webhook-2.0.0.tgz#687ac45eaead71675d0aef8266b7dd9b543f7d51"
+  integrity sha512-1NcTjMKMDzz3efDHGcQoyddtmFNPu5QH1OTPU6DMCW311x0yxQhXoUhvDqCDf8NAX7u1qolgDM7TgzJ/lwKuFA==
+  dependencies:
+    discord.js "^14.7.1"
+    winston-transport "^4.4.2"
+
 winston-gelf-transporter@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/winston-gelf-transporter/-/winston-gelf-transporter-1.0.2.tgz#9da3d6a972f009e51cadf51c0c9e66ee5a241b9c"
@@ -5924,7 +5932,7 @@ winston-transport@4.3.0:
     readable-stream "^2.3.6"
     triple-beam "^1.2.0"
 
-winston-transport@^4.5.0:
+winston-transport@^4.4.2, winston-transport@^4.5.0:
   version "4.5.0"
   resolved "https://registry.yarnpkg.com/winston-transport/-/winston-transport-4.5.0.tgz#6e7b0dd04d393171ed5e4e4905db265f7ab384fa"
   integrity sha512-YpZzcUzBedhlTAfJg6vJDlyEai/IFMIVcaEZZyl3UXIl4gmqRpU7AE89AHLkbzLUsv0NVmw7ts+iztqKxxPW1Q==

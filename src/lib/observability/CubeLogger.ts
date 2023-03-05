@@ -1,8 +1,8 @@
 import { Discord } from 'discordx';
 import { injectable } from 'tsyringe';
 import { createLogger, format, Logger, transports } from 'winston';
+import DiscordTransport from 'winston-discord-webhook';
 import { Bytes } from '../constants/Units.js';
-import { NtfyTransport } from './NtfyTransport.js';
 
 /**
  * cubemoji logging using Winston
@@ -32,9 +32,13 @@ export class CubeLogger {
   readonly inspector: Logger;
 
   constructor() {
-    const ntfyTransport = new NtfyTransport({
-      host: process.env.CM_NTFY_URL ?? 'localhost',
-      auth: process.env.CM_NTFY_AUTH ?? 'auth'
+    const discordLogger = new DiscordTransport({
+      webhook: process.env.CM_DISCORD_WEBHOOK ?? 'blank',
+      level: 'warn',
+      colors: new Map([
+        ['warn', '#ff6600'],
+        ['error', '#ff0000']
+      ])
     });
 
     // different transports when using different versions of bot
@@ -86,9 +90,10 @@ export class CubeLogger {
           }) */
         ]
       });
-      if (process.env.CM_NTFY_LOG === 'true') {
-        this.parent.add(ntfyTransport);
-      }
+    }
+
+    if (process.env.CM_DISCORD_LOG === 'true') {
+      this.parent.add(discordLogger);
     }
 
     // now setup child loggers
