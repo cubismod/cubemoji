@@ -1,4 +1,5 @@
 // Discord client events
+import { WebhookClient } from 'discord.js';
 import { ArgsOf, Client, Discord, On, Once } from 'discordx';
 import { container } from 'tsyringe';
 import { GitClient } from '../../lib/cd/GitClient.js';
@@ -21,14 +22,17 @@ export abstract class ClientEvents {
   private cubeLogger = new CubeLogger();
   private logger = this.cubeLogger.client;
 
-  /**
-     * Replies to a user that an error ocurred. Has intelligent
-     * handling for determine whether the interaction has been replied
-     * to to avoid an error
-     * @param interaction
-     */
-  async reportErrorToUser(interaction: ArgsOf<'interactionCreate'>) {
+  // sends a webhook to indicate the client has started up
+  async startupWebhook() {
+    if (process.env.CM_DISCORD_LOG === 'true' && process.env.CM_DISCORD_WEBHOOK) {
+      const webhookClient = new WebhookClient({
+        url: process.env.CM_DISCORD_WEBHOOK
+      });
 
+      await webhookClient.send({
+        content: `**cubemoji ${process.env.npm_package_version} in ${process.env.CM_ENVIRONMENT} has started up successfully 🎉 at ${process.env.CM_URL}**`
+      });
+    }
   }
 
     /**
@@ -151,6 +155,8 @@ export abstract class ClientEvents {
     this.logger.info(`cubemoji ${process.env.npm_package_version} is now running...`);
     this.logger.info(`It took ${process.uptime()}s to startup this time`);
     this.logger.info(`Access the web server at ${process.env.CM_URL}`);
+    await this.startupWebhook();
+
     // set a new status msg every 5 min
     setStatus(client);
     setInterval(setStatus, Milliseconds.fiveMin, client);
