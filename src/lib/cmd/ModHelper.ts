@@ -126,16 +126,16 @@ export async function auditMsg(message: {
 }, interaction?: CommandInteraction | ButtonInteraction, client?: Client) {
   const auditInfo = container.resolve(CubeStorage).serverAuditInfo;
   // check audit channel first
-  const auditChannel = await auditInfo.get(message.guildId);
-  if (auditChannel) {
+  const auditSettings = await auditInfo.get(message.guildId);
+  if (auditSettings) {
     // try to post to channel and handle any permission errors
     try {
       const channel =
-      await interaction?.client.channels.fetch(auditChannel) ??
-      await client?.channels.fetch(auditChannel);
+      await interaction?.client.channels.fetch(auditSettings.auditChannel) ??
+      await client?.channels.fetch(auditSettings.auditChannel);
       if (channel?.isTextBased()) {
         if (interaction) {
-          channel.send(
+          await channel.send(
             {
               embeds: [
                 new EmbedBuilder({
@@ -146,7 +146,7 @@ export async function auditMsg(message: {
               ]
             });
         } else if (client) {
-          channel.send(
+          await channel.send(
             {
               embeds: [
                 new EmbedBuilder({
@@ -161,8 +161,8 @@ export async function auditMsg(message: {
       }
     } catch (err) {
       logger.error(err);
-      // unset channel value so we don't keep erroring ourselves
-      await auditInfo.delete(auditChannel);
+      // delete audit settings
+      await auditInfo.delete(auditSettings.auditChannel);
     }
   }
 }

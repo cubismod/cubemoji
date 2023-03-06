@@ -196,6 +196,37 @@ export abstract class Enrollment {
     }
   }
 
+  @Slash({
+    name: 'joinlogs',
+    description: 'enable or disable join logs for the current server'
+  })
+  async joinlogs(
+    @SlashOption({
+      name: 'status',
+      type: ApplicationCommandOptionType.Boolean,
+      description: 'enable or disable logs',
+      required: true
+    }) status: boolean, interaction: CommandInteraction
+  ) {
+    await interaction.deferReply({ ephemeral: true });
+    const guildInfo = await guildOwnersCheck(interaction.user.id, interaction.guildId, interaction.client);
+    if (guildInfo && interaction.guildId) {
+      const existing = await this.serverAudit.get(interaction.guildId);
+      if (existing && existing.auditChannel) {
+        await this.serverAudit.set(interaction.guildId, {
+          auditChannel: existing.auditChannel,
+          auditingStatus: existing.auditingStatus,
+          joinLogs: status
+        });
+        await modReply(interaction, guildInfo[1], true, `set join logs for this server to ${status}`, `Logs will be sent to <#${existing.auditChannel}>`);
+      } else {
+        await modReply(interaction, guildInfo[1], false, 'You need to set an audit channel first using the `/mod enrollment audit` command', this.serverOwnerMsg);
+      }
+    } else {
+      await modReply(interaction, 'Error!', false, 'update join log status', this.serverOwnerMsg);
+    }
+  }
+
   /**
    * limited to server owners
    */
@@ -223,10 +254,23 @@ export abstract class Enrollment {
     if (guildInfo) {
       const key = interaction.guildId;
       if (clear && key) {
-        await this.serverAudit.delete(key);
+        // get existing value
+        const existing = await this.serverAudit.get(key);
+        if (existing) {
+          // then just set the flag to false there
+          await this.serverAudit.set(key, {
+            auditChannel: existing.auditChannel,
+            auditingStatus: false,
+            joinLogs: existing.joinLogs
+          });
+        }
         await modReply(interaction, guildInfo[1], true, 'clear audit channel', '', guildInfo[0]);
       } else if (channel && key && channel instanceof TextChannel) {
-        await this.serverAudit.set(key, channel.id);
+        await this.serverAudit.set(key, {
+          auditChannel: channel.id,
+          auditingStatus: true,
+          joinLogs: false
+        });
         await modReply(interaction, guildInfo[1], true, 'set new audit channel', `Set to <#${channel.id}>`, guildInfo[0]);
       } else {
         await interaction.editReply({ content: `${process.env.CM_BROKEN} Command failure or no options specified!\n**Command Usage**: Set an audit channel to log all changes to cubemoji settings.` });

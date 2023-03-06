@@ -38,6 +38,12 @@ export interface KeyVRaw {
   value: string;
 }
 
+export interface AuditInfo {
+  auditingStatus: boolean, // enable or disable the channel
+  auditChannel: string, // channel id to log changes to
+  joinLogs: boolean // whether to log new server joins
+}
+
 /**
  * raw keyv value item
  */
@@ -100,9 +106,9 @@ export class CubeStorage {
   emojiBlocked: Keyv<string>;
 
   /**
-   * key is guildId, value is the audit channel
+   * key is guildId, value is settings for auditing
    */
-  serverAuditInfo: Keyv<string>;
+  serverAuditInfo: Keyv<AuditInfo>;
 
   /**
    * key is guildId, value is a random server name
@@ -154,7 +160,7 @@ export class CubeStorage {
     this.blockedChannels = new Keyv<ChannelInfo>(serverInfoPath, { namespace: 'channels' });
     this.serverAnonNames = new Keyv<string>(serverInfoPath, { namespace: 'server-anon' });
 
-    this.serverAuditInfo = new Keyv<string>(serverInfoPath, { namespace: 'audit' });
+    this.serverAuditInfo = new Keyv<AuditInfo>(serverInfoPath, { namespace: 'audit' });
 
     this.pendingModActions = new Keyv<ModAction[]>(serverInfoPath, { namespace: 'actions', ttl: Milliseconds.day });
 
