@@ -1,6 +1,6 @@
 import AWS from 'aws-sdk';
 import Database from 'better-sqlite3';
-import { GuildMember } from 'discord.js';
+import { EmbedBuilder, GuildMember } from 'discord.js';
 import { Client, Discord } from 'discordx';
 import { readFile } from 'fs/promises';
 import Keyv from 'keyv';
@@ -42,6 +42,11 @@ export interface AuditInfo {
   auditingStatus: boolean, // enable or disable the channel
   auditChannel: string, // channel id to log changes to
   joinLogs: boolean // whether to log new server joins
+}
+
+export interface JoinLog {
+  joinDate: string,
+  embed: EmbedBuilder,
 }
 
 /**
@@ -134,6 +139,10 @@ export class CubeStorage {
 
   members: Map<string, GuildMember>;
 
+  // key is serverID - userID
+  // value keeps track of when the user joined and if they left
+  joinLogs: Keyv<JoinLog>;
+
   private logger = container.resolve(CubeLogger).storage;
   // in testing mode, we are saving data to data/test/
   dbLocation = 'data/';
@@ -171,6 +180,8 @@ export class CubeStorage {
     this.uniqueIDLookup = new Keyv<string>(serverInfoPath, { namespace: 'idlookup', ttl: Milliseconds.twentyMin });
 
     this.members = new Map<string, GuildMember>();
+
+    this.joinLogs = new Keyv<JoinLog>(serverInfoPath, { namespace: 'joinLog', ttl: Milliseconds.week });
   }
 
   /**
