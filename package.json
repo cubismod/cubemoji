@@ -41,7 +41,7 @@
     "@koa/router": "^12.0.0",
     "@types/koa": "^2.13.5",
     "aws-sdk": "^2.1330.0",
-    "better-sqlite3": "^8.1.0",
+    "better-sqlite3": "^8.2.0",
     "chokidar": "^3.5.3",
     "dayjs": "^1.11.7",
     "discord.js": "^14.7.1",
