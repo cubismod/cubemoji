@@ -17,11 +17,11 @@ variables:
   AUTH_LOC: /tmp/auth.json
 
 stages:
-  - build
-  - housekeeping
-  - maintain
-  - deploy_stage
-  - deploy_prod
+- build
+- housekeeping
+- maintain
+- deploy_stage
+- deploy_prod
 
 # don't run builds if any of the Docker files
 # haven't actually changed
@@ -43,100 +43,88 @@ stages:
 build:
   stage: build
   tags:
-    - cubemoji
+  - cubemoji
   image:
     name: quay.io/buildah/upstream:latest
     entrypoint: [""]
   interruptible: true
   rules:
-    - *change_rule
+  - *change_rule
   script:
-    - echo "${QUAY_CONF}" > "${AUTH_LOC}"
-    - cd "${CI_PROJECT_DIR}"
-    - >-
-      buildah build
-      -f ./Dockerfile
-      --layers
-      -t "${CONTAINER_DEST}"
-      --arch amd64
-      --format docker
-      --label quay.expires-after=100w
-      --cache-from "${CACHE_REPO}"
-      --cache-to "${CACHE_REPO}"
-      --authfile "${AUTH_LOC}"
-      .
-    - buildah push --authfile "${AUTH_LOC}" "${CONTAINER_DEST}"
-    
+  - echo "${QUAY_CONF}" > "${AUTH_LOC}"
+  - cd "${CI_PROJECT_DIR}"
+  - >-
+    buildah build -f ./Dockerfile --layers -t "${CONTAINER_DEST}" --arch amd64 --format docker --label quay.expires-after=100w --cache-from "${CACHE_REPO}" --cache-to "${CACHE_REPO}" --authfile "${AUTH_LOC}" .
+  - buildah push --authfile "${AUTH_LOC}" "${CONTAINER_DEST}"
+
 
 lint:
   stage: housekeeping
   tags:
-    - cubemoji
+  - cubemoji
   image:
     name: ${CONTAINER_DEST}
   rules:
-    - *change_rule
+  - *change_rule
   interruptible: true
   script:
-    - cd /usr/src/cubemoji
-    - yarn install  # install dev deps as well``
-    - npm run audit
-    - npm run lint
+  - cd /usr/src/cubemoji
+  - yarn install # install dev deps as well``
+  - npm run audit
+  - npm run lint
 
 skopeo_copy:
   stage: housekeeping
   tags:
-    - cubemoji
+  - cubemoji
   image:
     name: alpine
   before_script:
-    - echo "${QUAY_CONF}" > "${SKOP_AUTH}"
+  - echo "${QUAY_CONF}" > "${SKOP_AUTH}"
   allow_failure: true
   script:
-    - apk add skopeo
-    - >-
-      skopeo copy 
-      "docker://${CONTAINER_DEST}" "docker://${REPO_NAME}:latest"
-      --authfile "${SKOP_AUTH}"
+  - apk add skopeo
+  - >-
+    skopeo copy  "docker://${CONTAINER_DEST}" "docker://${REPO_NAME}:latest" --authfile "${SKOP_AUTH}"
   interruptible: true
   rules:
-      - if: '$CI_COMMIT_BRANCH == "main" && ($CI_PIPELINE_SOURCE != "merge_request_event" || $CI_PIPELINE_SOURCE != "schedule")'
+  - if: '$CI_COMMIT_BRANCH == "main" && ($CI_PIPELINE_SOURCE != "merge_request_event" || $CI_PIPELINE_SOURCE != "schedule")'
 
 deploy_stage:
   stage: deploy_stage
   tags:
-    - cubemoji
+  - cubemoji
   image:
     name: curlimages/curl
   allow_failure: true
   rules:
-    - *change_rule
+  - if: $CI_PIPELINE_SOURCE == "merge_request_event"
   script:
-    - cd "${CI_PROJECT_DIR}/scripts/cubemoji-dev/"
-    - ./stage_deploy.sh
+  - cd "${CI_PROJECT_DIR}/scripts/cubemoji-dev/"
+  - ./stage_deploy.sh
 
 deploy_prod:
   stage: deploy_prod
   tags:
-    - cubemoji
+  - cubemoji
   image:
     name: quay.io/cubismod/cubemoji-base
   rules:
-    - if: $CI_PIPELINE_SOURCE != "push"
-      when: never
-    - if: $CI_COMMIT_BRANCH == "main"
-      changes:
-        - fly.toml
+  - if: $CI_PIPELINE_SOURCE != "push"
+    when: never
+  - if: $CI_COMMIT_BRANCH == "main"
+    changes:
+    - fly.toml
   script:
-    - cd "${CI_PROJECT_DIR}"
-    - ${CI_PROJECT_DIR}/scripts/deploy.sh
+  - cd "${CI_PROJECT_DIR}"
+  - ${CI_PROJECT_DIR}/scripts/deploy.sh
 
 # dependabot setup
 # https://gitlab.com/dependabot-gitlab/dependabot-standalone
 .dependabot-gitlab:
   stage: maintain
   tags:
-    - cubemoji
+  - cubemoji
   image:
     name: $DEPENDABOT_IMAGE
     entrypoint: [""]
@@ -149,12 +137,12 @@ deploy_prod:
     SETTINGS__STANDALONE: "true"
     SETTINGS__LOG_COLOR: "true"
   rules:
-    - if: $DEPENDENCY_UPDATES_DISABLED
-      when: never
-    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+  - if: $DEPENDENCY_UPDATES_DISABLED
+    when: never
+  - if: '$CI_PIPELINE_SOURCE == "schedule"'
   script:
-    - cd /home/dependabot/app
-    - bundle exec rake "dependabot:update[$PROJECT_PATH,$PACKAGE_MANAGER,$DIRECTORY]"
+  - cd /home/dependabot/app
+  - bundle exec rake "dependabot:update[$PROJECT_PATH,$PACKAGE_MANAGER,$DIRECTORY]"
 
 bundler:
   extends: .dependabot-gitlab
@@ -166,5 +154,5 @@ docker:
   extends: .dependabot-gitlab
 
 include:
-  - project: "dependabot-gitlab/dependabot-standalone"
-    file: ".gitlab-ci.yml"
+- project: "dependabot-gitlab/dependabot-standalone"
+  file: ".gitlab-ci.yml"
