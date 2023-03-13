@@ -7,7 +7,7 @@ variables:
   CACHE_REPO: "quay.io/cubismod/cubemoji-cache"
   SETTINGS__GITLAB_ACCESS_TOKEN: $SETTINGS__GITLAB_ACCESS_TOKEN
   SETTINGS__GITHUB_ACCESS_TOKEN: $SETTINGS__GITHUB_ACCESS_TOKEN
-  EPENDABOT_IMAGE: docker.io/andrcuns/dependabot-gitlab:0.16.0
+  DEPENDABOT_IMAGE: docker.io/andrcuns/dependabot-gitlab:0.16.0
   CONTAINER_SLUG: $CI_COMMIT_REF_SLUG$CI_COMMIT_SHORT_SHA
   CONTAINER_DEST: $REPO_NAME:$CONTAINER_SLUG
   SKOP_AUTH: /tmp/skopeo.json
@@ -15,6 +15,7 @@ variables:
   WEBHOOK_URL: $WEBHOOK_URL
   MANIFEST_NAME: cubemoji-manifest
   AUTH_LOC: /tmp/auth.json
+  DESIRED_PROJECT_ID: $DESIRED_PROJECT_ID
 
 stages:
 - build
