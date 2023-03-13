@@ -119,6 +119,20 @@ deploy_prod:
   - cd "${CI_PROJECT_DIR}"
   - ${CI_PROJECT_DIR}/scripts/deploy.sh
 
+clean_mrs:
+  stage: maintain
+  tags:
+  - cubemoji
+  image:
+    name: 3.10-slim-buster
+  rules:
+  - if: '$CI_PIPELINE_SOURCE == "$schedule"'
+  script:
+  - cd "${CI_PROJECT_DIR}/scripts/gitlab/"
+  - python3 -m venv venv
+  - pip install -r requirements.txt
+  - python3 cleanup.py
+
 # dependabot setup
 # https://gitlab.com/dependabot-gitlab/dependabot-standalone
 .dependabot-gitlab:
