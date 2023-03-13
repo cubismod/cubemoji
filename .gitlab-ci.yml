@@ -125,7 +125,7 @@ clean_mrs:
   tags:
   - cubemoji
   image:
-    name: 3.10-slim-buster
+    name: python:3.10-slim-buster
   rules:
   - if: '$CI_PIPELINE_SOURCE == "schedule"'
   script:
