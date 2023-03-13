@@ -127,7 +127,7 @@ clean_mrs:
   image:
     name: 3.10-slim-buster
   rules:
-  - if: '$CI_PIPELINE_SOURCE == "$schedule"'
+  - if: '$CI_PIPELINE_SOURCE == "schedule"'
   script:
   - cd "${CI_PROJECT_DIR}/scripts/gitlab/"
   - python3 -m venv venv
