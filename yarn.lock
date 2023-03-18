@@ -637,10 +637,10 @@
   dependencies:
     "@types/node" "*"
 
-"@types/gm@^1.25.0":
-  version "1.25.0"
-  resolved "https://registry.yarnpkg.com/@types/gm/-/gm-1.25.0.tgz#8e0780e3e9c542570ea2d976bac030993d389922"
-  integrity sha512-y0nI4vp+0Vtsve+daADIHeSckm11TnWAdC4CBq2BEXTg+CfJiolnsnzsXeIEuIpBCksjN26LUZlvQKJDpthw5g==
+"@types/gm@^1.25.1":
+  version "1.25.1"
+  resolved "https://registry.yarnpkg.com/@types/gm/-/gm-1.25.1.tgz#1c8aaaebac403ac641f5ee04ce061fdf417ec163"
+  integrity sha512-WLqlPvjot5jxpt1AFxaWm0fgWZUBGXOPJC3ZrQgRpvpHYjwYbvr/4GwRzd0mXFfxzX+TrvXaow+/WbmWFHomlQ==
   dependencies:
     "@types/node" "*"
 
