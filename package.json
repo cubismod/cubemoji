@@ -33,7 +33,7 @@
   },
   "homepage": "https://gitlab.com/cubismod/cubemoji#readme",
   "dependencies": {
-    "@discordx/importer": "^1.1.10",
+    "@discordx/importer": "^1.2.1",
     "@discordx/koa": "^1.1.2",
     "@discordx/pagination": "^3.4.1",
     "@discordx/utilities": "5.2.1",
