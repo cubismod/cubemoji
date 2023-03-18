@@ -4,7 +4,7 @@ kill_signal = "SIGINT"
 kill_timeout = 2
 
 [build]
-  image = "quay.io/cubismod/cubemoji:main3230d4f4"
+  image = "quay.io/cubismod/cubemoji:mainf75c1dfd"
 
 [experimental]
   allowed_public_ports = []
