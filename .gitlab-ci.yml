@@ -41,6 +41,12 @@ stages:
     - PRIVACY.md
     - .gitlab-ci.yml
 
+# don't spawn two identical pipelines for an MR
+.only_on_default_branch:
+  default_branch_rule: &default_branch_rule
+    if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH'
+    when: never
+
 build:
   stage: build
   tags:
@@ -51,6 +57,7 @@ build:
   interruptible: true
   rules:
   - *change_rule
+  - *default_branch_rule
   script:
   - echo "${QUAY_CONF}" > "${AUTH_LOC}"
   - cd "${CI_PROJECT_DIR}"
@@ -67,6 +74,7 @@ lint:
     name: ${CONTAINER_DEST}
   rules:
   - *change_rule
+  - *default_branch_rule
   interruptible: true
   script:
   - cd /usr/src/cubemoji
