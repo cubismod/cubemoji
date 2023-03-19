@@ -246,6 +246,26 @@ export class CubeStorage {
     }
     db.close();
   }
+
+  /**
+   * Close out database connections upon receiving a SiGNAL
+   */
+  async close() {
+    await this.blockedChannels.disconnect();
+    await this.emojiBlocked.disconnect();
+    await this.ephemeralLinks.disconnect();
+    await this.modEnrollment.disconnect();
+    await this.pendingModActions.disconnect();
+    await this.rolePickers.disconnect();
+    await this.serverAnonNames.disconnect();
+    await this.serverAuditInfo.disconnect();
+    await this.serverEnrollment.disconnect();
+    await this.serverOwners.disconnect();
+    await this.trashReacts.disconnect();
+    await this.uniqueIDLookup.disconnect();
+
+    this.logger.info('Database file connections closed');
+  }
 }
 
 /**
