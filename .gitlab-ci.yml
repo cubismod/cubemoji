@@ -56,8 +56,8 @@ build:
     entrypoint: [""]
   interruptible: true
   rules:
-  - *change_rule
   - *default_branch_rule
+  - *change_rule
   script:
   - echo "${QUAY_CONF}" > "${AUTH_LOC}"
   - cd "${CI_PROJECT_DIR}"
@@ -73,8 +73,8 @@ lint:
   image:
     name: ${CONTAINER_DEST}
   rules:
-  - *change_rule
   - *default_branch_rule
+  - *change_rule
   interruptible: true
   script:
   - cd /usr/src/cubemoji

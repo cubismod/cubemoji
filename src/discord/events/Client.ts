@@ -161,6 +161,15 @@ export abstract class ClientEvents {
     setStatus(client);
     setInterval(setStatus, Milliseconds.fiveMin, client);
 
+    process.on('SIGINT', async () => {
+      this.logger.info('sigint received, shutting down');
+
+      setTimeout(() => { process.exit(2); }, 500);
+
+      const storage = container.resolve(CubeStorage);
+      await storage.close();
+    });
+
     if (process.env.CM_ENVIRONMENT === 'npr') {
       setInterval(() => {
         const list: string[] = [];
