@@ -37,7 +37,7 @@
     "@discordx/koa": "^1.1.2",
     "@discordx/pagination": "^3.4.1",
     "@discordx/utilities": "5.2.1",
-    "@keyv/sqlite": "^3.6.4",
+    "@keyv/sqlite": "^3.6.5",
     "@koa/router": "^12.0.0",
     "@types/koa": "^2.13.5",
     "aws-sdk": "^2.1338.0",
