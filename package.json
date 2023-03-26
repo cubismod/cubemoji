@@ -45,7 +45,7 @@
     "chokidar": "^3.5.3",
     "dayjs": "^1.11.7",
     "discord.js": "^14.8.0",
-    "discordx": "11.7.2",
+    "discordx": "11.7.4",
     "file-type": "^18.2.1",
     "fuse.js": "^6.6.2",
     "gm": "^1.25.0",
