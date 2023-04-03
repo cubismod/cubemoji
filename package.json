@@ -39,7 +39,7 @@
     "@discordx/utilities": "5.2.1",
     "@keyv/sqlite": "^3.6.5",
     "@koa/router": "^12.0.0",
-    "@types/koa": "^2.13.5",
+    "@types/koa": "^2.13.6",
     "aws-sdk": "^2.1338.0",
     "better-sqlite3": "^8.2.0",
     "chokidar": "^3.5.3",
